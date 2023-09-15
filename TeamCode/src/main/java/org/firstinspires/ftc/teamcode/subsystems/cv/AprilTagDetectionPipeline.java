@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.vision;
+package org.firstinspires.ftc.teamcode.subsystems.cv;
 /*
  * Copyright (c) 2021 OpenFTC Team
  *
@@ -36,7 +36,6 @@ import org.openftc.apriltag.AprilTagDetectorJNI;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class AprilTagDetectionPipeline extends OpenCvPipeline
 {

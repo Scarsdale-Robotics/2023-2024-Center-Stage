@@ -1,17 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.subsystems.vision.AprilTagDetectionPipeline;
-import org.firstinspires.ftc.teamcode.subsystems.vision.FilterPipeline;
+import org.firstinspires.ftc.teamcode.subsystems.cv.AprilTagDetectionPipeline;
 import org.opencv.core.Point;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
-import org.openftc.easyopencv.OpenCvInternalCamera2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
