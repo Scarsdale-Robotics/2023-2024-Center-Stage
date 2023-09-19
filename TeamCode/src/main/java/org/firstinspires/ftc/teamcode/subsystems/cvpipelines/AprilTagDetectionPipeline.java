@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.cv;
+package org.firstinspires.ftc.teamcode.subsystems.cvpipelines;
 /*
  * Copyright (c) 2021 OpenFTC Team
  *

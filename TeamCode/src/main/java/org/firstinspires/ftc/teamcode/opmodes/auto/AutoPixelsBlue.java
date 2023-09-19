@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.core.DriveSubsystem;
 
-public class AutoBackboardBlue extends LinearOpMode {
+@Autonomous(name = "Auto Pixels Blue")
+public class AutoPixelsBlue extends LinearOpMode {
     @Override
     // The "Main" code will go in here
     public void runOpMode() {

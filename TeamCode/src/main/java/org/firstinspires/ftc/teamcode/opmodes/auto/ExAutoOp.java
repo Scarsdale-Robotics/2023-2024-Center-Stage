@@ -3,10 +3,8 @@ package org.firstinspires.ftc.teamcode.opmodes.auto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcontroller.external.samples.RobotAutoDriveByEncoder_Linear;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
-import org.firstinspires.ftc.teamcode.subsystems.cv.ExPipeline;
-import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.core.DriveSubsystem;
 
 // Set the name for the OpMode that will appear on the driver station
 @Autonomous(name = "Example Auto OpMode")
@@ -24,17 +22,10 @@ public class ExAutoOp extends LinearOpMode {
                 robot.imu,
                 this
         );
-        ExPipeline blueDetector = new ExPipeline();
 
         waitForStart();
 
-        if (blueDetector.isEnoughBlue(555)) {
-            drive.driveRobotCentric(0, 0, 360);
-        }
 
-        drive.driveByEncoder(0.7, 0.2, 0.1, 20);
-        drive.driveByEncoder(-0.2, -0.5, -0.1, 10);
-        drive.driveByEncoder(-0.6, 0.1, 0, 20);
     }
 
     public void AutoLeftTop(){
