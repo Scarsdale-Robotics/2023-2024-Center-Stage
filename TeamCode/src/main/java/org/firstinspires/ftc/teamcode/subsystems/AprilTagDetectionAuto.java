@@ -125,6 +125,6 @@ public class AprilTagDetectionAuto extends LinearOpMode {
         telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
         telemetry.addLine("RBE = Range, Bearing & Elevation");
 
-        return
+        return 0;
     }   // end method telemetryAprilTag()
 }
