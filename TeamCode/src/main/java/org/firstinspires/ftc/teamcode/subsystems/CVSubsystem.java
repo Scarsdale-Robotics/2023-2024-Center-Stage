@@ -8,19 +8,27 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CVSubsystem {
-    public final int LOCATION_LEFT = 0;
-    public final int LOCATION_CENTER = 1;
-    public final int LOCATION_RIGHT = 2;
+
+    OpenCvCamera camera;
+
+    public final int LOCATION_LEFT   =  0;
+    public final int LOCATION_CENTER =  1;
+    public final int LOCATION_RIGHT  =  2;
+    public final int NO_LOCATION     = -1;
+
+    public final double NO_ROTATIONAL_OFFSET = -50000.0;
+    public final double NO_SIZE = -50000.0;
+    public final double ERROR   =  3.0;
 
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
 
-    public CVSubsystem(OpenCvCamera camera) {
+    public CVSubsystem() {
         // create AprilTagProcessor and VisionPortal
-
         initAprilTag();
     }
 
@@ -40,7 +48,6 @@ public class CVSubsystem {
         //.setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
         // Create the vision portal by using a builder.
         VisionPortal.Builder builder = new VisionPortal.Builder();
-
 
         // Set the built-in RC phone camera
         builder.setCamera(BuiltinCameraDirection.BACK);
@@ -75,34 +82,26 @@ public class CVSubsystem {
      * @param tagID the id of the AprilTag from the 36h11 family
      * @return whether the AprilTag is left, center, or right in the camera view
      */
+
     public int getAprilTagLocation(int tagID) {
 
+        visionPortal.resumeStreaming();
+
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        // telemetry.addData("# AprilTags Detected", currentDetections.size());
 
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
-                ids.add(detection.id);
 
                 if (detection.id == tagID) {
                     if (detection.ftcPose.z < -ERROR) return LOCATION_LEFT;
                     else if (detection.ftcPose.z >  ERROR) return LOCATION_RIGHT;
                     else return LOCATION_CENTER;
                 }
-
             }
-
         }
 
-        // Add "key" information to telemetry
-        /*
-        telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
-        telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
-        telemetry.addLine("RBE = Range, Bearing & Elevation");
-        */
-
-        return 0; // TEMPORARY
+        return NO_LOCATION;
     }
 
     /**
@@ -111,7 +110,22 @@ public class CVSubsystem {
      * @return a double representing the amount the robot should turn to be "parallel" to the AprilTag
      */
     public double getAprilTagRotationalOffset(int tagID) {
-        return 0; // TEMPORARY
+        visionPortal.resumeStreaming();
+
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+
+        double rotationalOffset = NO_ROTATIONAL_OFFSET;
+
+        // Step through the list of detections and display info for each one.
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+                if (detection.id == tagID) {
+                    rotationalOffset = detection.ftcPose.pitch;
+                }
+            }
+        }
+
+        return rotationalOffset; // TEMPORARY
     }
 
     //get the angle
