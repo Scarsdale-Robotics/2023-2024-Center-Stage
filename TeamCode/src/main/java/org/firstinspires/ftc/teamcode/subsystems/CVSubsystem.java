@@ -1,4 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
+import android.util.Size;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -44,7 +46,9 @@ public class CVSubsystem {
         builder.setCamera(BuiltinCameraDirection.BACK);
         builder.setAutoStopLiveView(false); // keep camera on when not processing
 
-//      //builder.setCameraResolution(new Size(640, 480));
+        builder.setCameraResolution(new Size(1280, 960)); // android.util
+        //default 640 480
+
         // Choose a camera resolution. Not all cameras support all resolutions.
 
         // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
@@ -108,6 +112,27 @@ public class CVSubsystem {
      */
     public double getAprilTagRotationalOffset(int tagID) {
         return 0; // TEMPORARY
+    }
+
+    //get the angle
+    public double getAprilTagSize(int tagID) {
+        visionPortal.resumeStreaming();
+
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+
+        double tagSize = NO_SIZE;
+
+        // Step through the list of detections and display info for each one.
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+                if (detection.id == tagID) {
+                    //tagSize = detection.ftcPose.;
+                }
+            }
+        }
+        //visionPortal.stopStreaming();
+
+        return tagSize; // TEMPORARY
     }
 
     /**

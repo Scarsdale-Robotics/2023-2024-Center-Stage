@@ -35,18 +35,18 @@ public class AutoBackboardBlue extends LinearOpMode {
             telemetry.update();
             //sleep(1000);
 
-            int oe = cvSubsystem.getAprilTagLocation(15);
-            telemetry.addData("I want to puke: ", oe);
+            double oe = cvSubsystem.getAprilTagRotationalOffset(9);
+            telemetry.addData("I want to answer: ", oe);
 
-            for (Integer id : cvSubsystem.ids) {
-                telemetry.addData("ID: ", id);
-            }
+//            for (Integer id : cvSubsystem.ids) {
+//                telemetry.addData("ID: ", id);
+//            }
 
-            telemetry.addData("Death: ", cvSubsystem.ids.size());
+            // telemetry.addData("Death: ", cvSubsystem.ids.size());
             telemetry.addData("Tracker: ", tracker);
             telemetry.update();
 
-            sleep(200);
+            //sleep(100);
         }
 
 

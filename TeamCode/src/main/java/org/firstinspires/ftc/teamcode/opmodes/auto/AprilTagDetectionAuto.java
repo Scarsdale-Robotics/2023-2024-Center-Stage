@@ -75,7 +75,7 @@ public class AprilTagDetectionAuto extends LinearOpMode {
             }
 
             // Share the CPU.
-            sleep(200);
+            //sleep(200);
         }
     }
 
