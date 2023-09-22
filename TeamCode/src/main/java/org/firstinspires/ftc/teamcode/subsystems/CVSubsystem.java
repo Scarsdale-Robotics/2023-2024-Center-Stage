@@ -109,7 +109,7 @@ public class CVSubsystem {
      * @param tagID the id of the AprilTag from the 36h11 family
      * @return a double representing the amount the robot should turn to be "parallel" to the AprilTag
      */
-    public double getAprilTagRotationalOffset(int tagID) {
+    public double getAprilTagRotationalOffset(int tagID) { // return yaw
         visionPortal.resumeStreaming();
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
@@ -120,7 +120,7 @@ public class CVSubsystem {
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
                 if (detection.id == tagID) {
-                    rotationalOffset = detection.ftcPose.pitch;
+                    rotationalOffset = detection.ftcPose.yaw;
                 }
             }
         }
