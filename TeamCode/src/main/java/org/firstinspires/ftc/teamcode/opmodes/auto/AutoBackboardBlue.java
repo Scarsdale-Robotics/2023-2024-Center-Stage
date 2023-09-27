@@ -35,7 +35,7 @@ public class AutoBackboardBlue extends LinearOpMode {
             telemetry.update();
             //sleep(1000);
 
-            double oe = cvSubsystem.getAprilTagRotationalOffset(9);
+            double oe = cvSubsystem.getAprilTagDistance(9);
             telemetry.addData("I want to answer: ", oe);
 
 //            for (Integer id : cvSubsystem.ids) {

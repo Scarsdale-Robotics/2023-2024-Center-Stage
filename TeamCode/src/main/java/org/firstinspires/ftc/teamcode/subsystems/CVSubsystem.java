@@ -21,7 +21,7 @@ public class CVSubsystem {
     public final int NO_LOCATION     = -1;
 
     public final double NO_ROTATIONAL_OFFSET = -50000.0;
-    public final double NO_SIZE = -50000.0;
+    public final double NO_DISTANCE = -50000.0;
     public final double ERROR   =  3.0;
 
     private AprilTagProcessor aprilTag;
@@ -129,24 +129,24 @@ public class CVSubsystem {
     }
 
     //get the angle
-    public double getAprilTagSize(int tagID) {
+    public double getAprilTagDistance(int tagID) {
         visionPortal.resumeStreaming();
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
-        double tagSize = NO_SIZE;
+        double tagDistance = NO_DISTANCE;
 
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
                 if (detection.id == tagID) {
-                    //tagSize = detection.ftcPose.;
+                    tagDistance = detection.ftcPose.range;
                 }
             }
         }
         //visionPortal.stopStreaming();
 
-        return tagSize; // TEMPORARY
+        return tagDistance; // TEMPORARY
     }
 
     /**
