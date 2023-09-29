@@ -27,6 +27,10 @@ public class CVSubsystem {
         return 0; // TEMPORARY
     }
 
+    public double getAprilTagSize(int tagID) {
+        return 0; // TEMPORARY
+    }
+
     /**
      * GROUP 2
      * @param isRedTeam true if our alliance team is red, false otherwise
