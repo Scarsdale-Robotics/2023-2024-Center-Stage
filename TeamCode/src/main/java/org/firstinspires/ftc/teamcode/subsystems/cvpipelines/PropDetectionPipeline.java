@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+// NOTE: changing this code very soon :)
 public class PropDetectionPipeline extends OpenCvPipeline {
     public Mat frame;
     public Mat sub;
