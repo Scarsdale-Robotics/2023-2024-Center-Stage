@@ -27,7 +27,7 @@ public class CVSubsystem {
         return 0; // TEMPORARY
     }
 
-    public double getAprilTagSize(int tagID) {
+    public double getAprilTagDistance(int tagID) {
         return 0; // TEMPORARY
     }
 

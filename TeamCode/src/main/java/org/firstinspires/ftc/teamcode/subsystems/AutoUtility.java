@@ -5,9 +5,11 @@ import org.firstinspires.ftc.teamcode.subsystems.core.DriveSubsystem;
 public class AutoUtility {
     private DriveSubsystem drive;
     private CVSubsystem cv;
-    public AutoUtility(DriveSubsystem drive, CVSubsystem cv) {
+    private SpeedCoefficients speed;
+    public AutoUtility(DriveSubsystem drive, CVSubsystem cv, SpeedCoefficients speed) {
         this.drive = drive;
         this.cv = cv;
+        this.speed = speed;
     }
 
     /**
@@ -18,17 +20,25 @@ public class AutoUtility {
      * @param tagID the id of the AprilTag from the 36h11 family to move to
      */
     public void moveToAprilTag(int tagID) {
-        int aprilTagLocation = cv.getAprilTagLocation(0);  // temp id
-        while (aprilTagLocation == cv.LOCATION_LEFT) {
-            drive.driveFieldCentric(-1, 0, 0);
-            aprilTagLocation = cv.getAprilTagLocation(0);
-        }
-        while (aprilTagLocation == cv.LOCATION_RIGHT) {
-            drive.driveFieldCentric(1, 0, 0);
-            aprilTagLocation = cv.getAprilTagLocation(0);
-        }
-        while (cv.getAprilTagSize(0) < 1) {
-            drive.driveFieldCentric(0, 1, 0);
+        double DISTANCE_THRESHOLD = 1;  // distance from backboard to stop at
+
+        alignParallelWithAprilTag(tagID);
+        while (cv.getAprilTagDistance(tagID) > DISTANCE_THRESHOLD) {
+            int aprilTagLocation = cv.getAprilTagLocation(tagID);
+            switch (aprilTagLocation) {
+                case 0:
+                    // left location
+                    drive.driveFieldCentric(speed.getStrafeSpeed(), 0, 0);
+                    break;
+                case 2:
+                    // right location
+                    drive.driveFieldCentric(-speed.getStrafeSpeed(), 0, 0);
+                    break;
+                default:
+                    // center location
+                    drive.driveFieldCentric(0, speed.getForwardSpeed(), 0);
+                    break;
+            }
         }
     }
     /**
