@@ -22,8 +22,14 @@ public class PixelDetectionPipeline extends OpenCvPipeline {
     public int width;
     public int height;
 
-    public static Scalar upperRange = new Scalar(179,25,255);  // hsv scale: 179, 255, 255
-    public static Scalar lowerRange = new Scalar(0,0,138);
+    public static Scalar upperRange = new Scalar(34, 255, 255);  // hsv scale: 179, 255, 255
+    //white: (179, 25, 255)
+    //green: (70, 255, 255)
+    //yellow: (34, 255, 255)
+    public static Scalar lowerRange = new Scalar(13, 155, 53);
+    //white: (0, 0, 138)
+    //green: (40, 155, 153)
+    //yellow: (13,155, 28)
 
     public AtomicBoolean hasStarted = new AtomicBoolean(false);
     public AtomicInteger lateralOffset = new AtomicInteger(0);
@@ -73,10 +79,10 @@ public class PixelDetectionPipeline extends OpenCvPipeline {
 
         Imgproc.findContours(inRange, whiteContourList, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-//        for (int i = 0; i < whiteContourList.size(); i++) {
-//            Imgproc.drawContours(sub, whiteContourList, i, new Scalar(255, 255, 0), 2);
-//
-//        }
+        for (int i = 0; i < whiteContourList.size(); i++) {
+            Imgproc.drawContours(sub, whiteContourList, i, new Scalar(255, 255, 0), 2);
+
+        }
         double maxArea = Double.MIN_VALUE;
         MatOfPoint maxContour = null;
         for (MatOfPoint m : whiteContourList) {
