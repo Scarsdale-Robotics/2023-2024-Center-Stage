@@ -11,15 +11,8 @@ public class LiftSubsystem extends SubsystemBase {
     private Level level;
 
     public enum Level {
-        PICKUP(30),
-        STACK_2(248),
-        STACK_3(465),
-        STACK_4(683),
-        STACK_5(900),
-        GROUND(350),
-        LOW(1800),
-        MEDIUM(3050),
-        HIGH(4175);
+        GROUND(30), //TEMP
+        BACKBOARD(500); // TEMP
 
 
         public final int target;
@@ -27,26 +20,11 @@ public class LiftSubsystem extends SubsystemBase {
         Level(int target) {
             this.target = target;
         }
-
-        public Level nextAbove() {
-            if (this == PICKUP) return GROUND;
-            else if (this == GROUND) return LOW;
-            else if (this == LOW) return MEDIUM;
-            else return HIGH; // For MEDIUM and HIGH
-        }
-
-        public Level nextBelow() {
-            if (this == PICKUP) return PICKUP;
-            else if (this == GROUND) return PICKUP;
-            else if (this == LOW) return GROUND;
-            else if (this == MEDIUM) return LOW;
-            else return MEDIUM;
-        }
     }
 
     public LiftSubsystem(Motor liftMotor) {
         m = liftMotor;
-        level = Level.PICKUP;
+        level = Level.GROUND;
     }
 
     public void runLift(double speed) {
@@ -70,14 +48,6 @@ public class LiftSubsystem extends SubsystemBase {
         m.setTargetPosition(getPosition());
     }
 
-    public void nextLevelUp() {
-        setLevel(level.nextAbove());
-    }
-
-    public void nextLevelDown() {
-        setLevel(level.nextBelow());
-    }
-
     public int getPosition() {
         return m.getCurrentPosition();
     }
@@ -92,6 +62,6 @@ public class LiftSubsystem extends SubsystemBase {
 
     public void resetEncoder() {
         m.resetEncoder();
-        m.setTargetPosition(Level.PICKUP.target);
+        m.setTargetPosition(Level.GROUND.target);
     }
 }

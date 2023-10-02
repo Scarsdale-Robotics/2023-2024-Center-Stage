@@ -10,11 +10,11 @@ public class ClawSubsystem extends SubsystemBase {
         this.servo = servo;
     }
 
-    public void open() {
+    private void open() {
         servo.setPosition(0.175);
     }
 
-    public void close() {
+    private void close() {
         servo.setPosition(0.0);
     }
 }

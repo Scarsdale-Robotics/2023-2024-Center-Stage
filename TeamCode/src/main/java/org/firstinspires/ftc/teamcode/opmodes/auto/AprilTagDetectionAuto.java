@@ -39,7 +39,7 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 
 import java.util.List;
 
-@Autonomous(name = "AprilTagDetection")
+@Autonomous(name = "TESTING AprilTagDetection")
 public class AprilTagDetectionAuto extends LinearOpMode {
     OpenCvCamera camera;
     private AprilTagProcessor aprilTag;
