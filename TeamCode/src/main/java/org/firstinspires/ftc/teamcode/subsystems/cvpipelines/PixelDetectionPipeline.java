@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+// 320 x 240 camera resolution standard
+
 public class PixelDetectionPipeline extends OpenCvPipeline {
     public Mat frame;
     public Mat sub;
@@ -22,23 +24,28 @@ public class PixelDetectionPipeline extends OpenCvPipeline {
     public int width;
     public int height;
 
-    public static Scalar upperRange = new Scalar(34, 255, 255);  // hsv scale: 179, 255, 255
-    //white: (179, 25, 255)
-    //green: (70, 255, 255)
-    //yellow: (34, 255, 255)
-    public static Scalar lowerRange = new Scalar(13, 155, 53);
-    //white: (0, 0, 138)
-    //green: (40, 155, 153)
-    //yellow: (13,155, 28)
+    public static final Scalar upperWhite = new Scalar(80, 50, 255);
+    public static final Scalar upperGreen = new Scalar(80, 255, 255);
+    public static final Scalar upperYellow = new Scalar(34, 255, 255);
+    public static final Scalar upperPurple = new Scalar(160, 180, 200);
+
+    public static final Scalar lowerWhite = new Scalar(0, 30, 170);
+    public static final Scalar lowerGreen = new Scalar(40, 90, 110);
+    public static final Scalar lowerYellow = new Scalar(13, 135, 28);
+    public static final Scalar lowerPurple = new Scalar(140, 25, 95);
+
+    public static Scalar upperRange = upperWhite;
+    public static Scalar lowerRange = lowerWhite;
 
     public AtomicBoolean hasStarted = new AtomicBoolean(false);
     public AtomicInteger lateralOffset = new AtomicInteger(0);
 
-    public int contour_dim_ratio;
+    public int contourDimRatio;
 
     public Mat processFrame(Mat input) {
         hasStarted.set(true);
-        //open cv defaults to bgr, but we are completely in rgb/hsv, this is because pipeline's input/output rgb
+
+        // Open cv defaults to BGR, but we are completely in RGB/HSV, this is because pipeline's input/output RGB
         height = input.height()/3;
         width = input.width();
         int y = 2 * height;
@@ -47,19 +54,24 @@ public class PixelDetectionPipeline extends OpenCvPipeline {
         this.frame = input;
         int posY = height / 2;
         int posX = width / 2;
+
         MatOfPoint contour = getPixelContour();
+
         if(contour != null) {
             List<MatOfPoint> pixelContour = new ArrayList<>();
             Rect b = Imgproc.boundingRect(contour);
-//            contour_dim_ratio=b.width/b.height;
-//            if (contour_dim_ratio < 1) {
+
+            // contourDimRatio=b.width/b.height;
+            // if (contourDimRatio < 1) {
+
             pixelContour.add(contour);
 
             Imgproc.drawContours(sub, pixelContour, 0, new Scalar(0, 255, 255), 2);
             posX = b.x + b.width / 2;
             posY = b.y + b.height / 2;
-            Imgproc.circle(sub, new Point(posX, posY), 2, new Scalar(255, 0, 255)); //rgb DRAW CIRCLE
-//            }
+            Imgproc.circle(sub, new Point(posX, posY), 2, new Scalar(255, 0, 255)); // RGB DRAW CIRCLE
+
+            // }
 
         }
 
@@ -81,8 +93,8 @@ public class PixelDetectionPipeline extends OpenCvPipeline {
 
         for (int i = 0; i < whiteContourList.size(); i++) {
             Imgproc.drawContours(sub, whiteContourList, i, new Scalar(255, 255, 0), 2);
-
         }
+
         double maxArea = Double.MIN_VALUE;
         MatOfPoint maxContour = null;
         for (MatOfPoint m : whiteContourList) {
