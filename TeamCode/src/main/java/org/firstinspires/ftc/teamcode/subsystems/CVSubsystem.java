@@ -162,6 +162,7 @@ public class CVSubsystem {
      * @return true if the robot is in front of a piece of tape approximately perpendicular to the camera view, false otherwise
      */
     public boolean isRobotBeforeTape(boolean isRedTeam) {
+
         return false; // TEMPORARY
     }
 

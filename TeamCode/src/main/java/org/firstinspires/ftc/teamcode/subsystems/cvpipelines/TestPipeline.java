@@ -13,11 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TestPipeline extends OpenCvPipeline {
-
+    private Mat frame = new Mat();
     @Override
     public Mat processFrame(Mat input) {
         Imgproc.rectangle(input,new Rect(0, 130, 318, 50), new Scalar(255, 0, 0), 2);
         Rect crop = new Rect(0, 130, 318, 50);
+        Mat cropped = input.submat(crop);
+        frame = cropped;
         Mat hsvMat = new Mat();
         Imgproc.cvtColor(input, hsvMat, Imgproc.COLOR_RGB2HSV);
         Mat inRange = new Mat();
@@ -27,7 +29,24 @@ public class TestPipeline extends OpenCvPipeline {
         for (int i = 0; i < contours.size(); i++) {
             Imgproc.drawContours(input, contours, i, new Scalar(0, 255, 0), 1);
         }
-        return input;
+        return frame;
 
+    }
+    public boolean isBeforeTape(boolean isRedTeam) {
+        double areaThreshold = 50;
+        Mat hsvMat = new Mat();
+        Mat inRange = new Mat();
+        Core.inRange(hsvMat, new Scalar(100, 90, 80), new Scalar(125, 255, 255), inRange);
+        List<MatOfPoint> contourList = new ArrayList<>();
+        Imgproc.findContours(inRange, contourList, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        for (int i = 0; i < contourList.size(); i++) {
+            Imgproc.drawContours(frame, contourList, i, new Scalar(0, 255, 0), 1);
+        }
+        double area = ;
+        if (area > areaThreshold) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
