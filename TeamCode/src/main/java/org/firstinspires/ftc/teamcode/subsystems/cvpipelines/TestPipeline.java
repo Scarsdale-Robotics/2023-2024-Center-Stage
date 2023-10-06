@@ -14,36 +14,33 @@ import java.util.List;
 
 public class TestPipeline extends OpenCvPipeline {
     private Mat frame = new Mat();
+    public boolean beforeTape = false;
     @Override
     public Mat processFrame(Mat input) {
-        Imgproc.rectangle(input,new Rect(0, 130, 318, 50), new Scalar(255, 0, 0), 2);
-        Rect crop = new Rect(0, 130, 318, 50);
+        Imgproc.rectangle(input,new Rect(0, 330, 640, 100), new Scalar(255, 0, 0), 2);
+        Rect crop = new Rect(0, 330, 640, 100);
         Mat cropped = input.submat(crop);
         frame = cropped;
-        Mat hsvMat = new Mat();
-        Imgproc.cvtColor(input, hsvMat, Imgproc.COLOR_RGB2HSV);
-        Mat inRange = new Mat();
-        Core.inRange(hsvMat, new Scalar(100, 90, 80), new Scalar(125, 255, 255), inRange);
-        List<MatOfPoint> contours = new ArrayList<>();
-        Imgproc.findContours(inRange, contours, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-        for (int i = 0; i < contours.size(); i++) {
-            Imgproc.drawContours(input, contours, i, new Scalar(0, 255, 0), 1);
-        }
+        beforeTape = isBeforeTape(true);
         return frame;
 
     }
     public boolean isBeforeTape(boolean isRedTeam) {
         double areaThreshold = 50;
         Mat hsvMat = new Mat();
+        Imgproc.cvtColor(frame, hsvMat, Imgproc.COLOR_RGB2HSV);
         Mat inRange = new Mat();
+        double largestArea = Double.MIN_VALUE;
         Core.inRange(hsvMat, new Scalar(100, 90, 80), new Scalar(125, 255, 255), inRange);
         List<MatOfPoint> contourList = new ArrayList<>();
         Imgproc.findContours(inRange, contourList, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
         for (int i = 0; i < contourList.size(); i++) {
             Imgproc.drawContours(frame, contourList, i, new Scalar(0, 255, 0), 1);
+            contourList.get(i); //all contour size list
+            //get area of largest contour
+            //set largestArea to that
         }
-        double area = ;
-        if (area > areaThreshold) {
+        if (largestArea > areaThreshold) {
             return true;
         } else {
             return false;
