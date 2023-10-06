@@ -162,6 +162,11 @@ public class CVSubsystem {
 
         return 0; // TEMPORARY
     }
+    public int getPixelHorizontalOffset() {
+        PixelDetectionPipeline p = new PixelDetectionPipeline();
+
+        return p.getCenterOffset();
+    }
 
     /**
      * GROUP 2

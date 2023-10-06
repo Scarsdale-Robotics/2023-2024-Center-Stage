@@ -34,13 +34,16 @@ public class PixelDetectionPipeline extends OpenCvPipeline {
     public static final Scalar lowerYellow = new Scalar(13, 135, 28);
     public static final Scalar lowerPurple = new Scalar(140, 25, 95);
 
-    public static Scalar upperRange = upperWhite;
-    public static Scalar lowerRange = lowerWhite;
+    public static Scalar upperRange = upperYellow;
+    public static Scalar lowerRange = lowerYellow;
 
     public AtomicBoolean hasStarted = new AtomicBoolean(false);
     public AtomicInteger lateralOffset = new AtomicInteger(0);
 
     public int contourDimRatio;
+
+    public int centerOffset = -999;
+    public int posX = -999;
 
     public Mat processFrame(Mat input) {
         hasStarted.set(true);
@@ -53,7 +56,7 @@ public class PixelDetectionPipeline extends OpenCvPipeline {
         this.sub = input;
         this.frame = input;
         int posY = height / 2;
-        int posX = width / 2;
+        posX = width / 2;
 
         MatOfPoint contour = getPixelContour();
 
@@ -75,9 +78,12 @@ public class PixelDetectionPipeline extends OpenCvPipeline {
 
         }
 
-        int offset = posX - (width / 2 + 40);
-        lateralOffset.set(offset);
+        centerOffset = posX - (width / 2); //+40?
+        lateralOffset.set(centerOffset);
         return input;
+    }
+    public int getCenterOffset() {
+        return centerOffset;
     }
 
     public MatOfPoint getPixelContour() {
