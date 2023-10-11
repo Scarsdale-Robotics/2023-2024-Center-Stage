@@ -44,19 +44,19 @@ public class PixelDetectionPipeline extends OpenCvPipeline {
 
     public int centerOffset = -999;
     public int posX = -999;
+    public int posY = -999;
 
     public Mat processFrame(Mat input) {
         hasStarted.set(true);
 
         // Open cv defaults to BGR, but we are completely in RGB/HSV, this is because pipeline's input/output RGB
-        height = input.height()/3;
+        height = input.height();
         width = input.width();
-        int y = 2 * height;
-        int x = 0;
+
         this.sub = input;
         this.frame = input;
-        int posY = height / 2;
         posX = width / 2;
+        posY = height / 2;
 
         MatOfPoint contour = getPixelContour();
 
@@ -64,22 +64,18 @@ public class PixelDetectionPipeline extends OpenCvPipeline {
             List<MatOfPoint> pixelContour = new ArrayList<>();
             Rect b = Imgproc.boundingRect(contour);
 
-            // contourDimRatio=b.width/b.height;
-            // if (contourDimRatio < 1) {
-
             pixelContour.add(contour);
 
             Imgproc.drawContours(sub, pixelContour, 0, new Scalar(0, 255, 255), 2);
             posX = b.x + b.width / 2;
             posY = b.y + b.height / 2;
-            Imgproc.circle(sub, new Point(posX, posY), 2, new Scalar(255, 0, 255)); // RGB DRAW CIRCLE
-
-            // }
+            Imgproc.circle(sub, new Point(posX, posY), 4, new Scalar(255, 0, 255)); // RGB DRAW CIRCLE
 
         }
 
         centerOffset = posX - (width / 2); //+40?
         lateralOffset.set(centerOffset);
+
         return input;
     }
     public int getCenterOffset() {
