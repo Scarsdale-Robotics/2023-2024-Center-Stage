@@ -9,6 +9,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelDetectionPipeline;
+import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ public class CVSubsystem {
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
 
-    public CVSubsystem() {
+    public CVSubsystem(OpenCvCamera camera) {
         // create AprilTagProcessor and VisionPortal
         initAprilTag();
     }
@@ -156,15 +157,11 @@ public class CVSubsystem {
      * @return whether the AprilTag is left, center, or right in the camera view
      */
     public int getTeamPropLocation(boolean isRedTeam) {
-        PixelDetectionPipeline p = new PixelDetectionPipeline();
-        //p.processFrame();
-        p.getPixelContour();
-
         return 0; // TEMPORARY
     }
     public int getPixelHorizontalOffset() {
         PixelDetectionPipeline p = new PixelDetectionPipeline();
-
+        camera.setPipeline(p);
         return p.getCenterOffset();
     }
 
