@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -26,6 +27,10 @@ public class AutoBackboardBlue extends LinearOpMode {
         CVSubsystem cvSubsystem = new CVSubsystem();
         waitForStart();
         int tracker = 0;
+
+        int soundID = hardwareMap.appContext.getResources().getIdentifier("ClashRoyaleIntro.wav", "raw", hardwareMap.appContext.getPackageName());
+
+        SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, soundID);
 
         while (opModeIsActive()) {
             tracker++;
