@@ -31,6 +31,7 @@ public class CVSubsystem {
     private VisionPortal visionPortal;
 
     public CVSubsystem(OpenCvCamera camera) {
+        this.camera = camera;
         // create AprilTagProcessor and VisionPortal
         initAprilTag();
     }
@@ -128,7 +129,7 @@ public class CVSubsystem {
             }
         }
 
-        return rotationalOffset; // TEMPORARY
+        return rotationalOffset;
     }
 
     public double getAprilTagDistance(int tagID) {
