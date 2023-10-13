@@ -3,17 +3,15 @@ package org.firstinspires.ftc.teamcode.subsystems.cvpipelines;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
-import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class TestPipeline extends OpenCvPipeline {
+public class TapeDetectionPipeline extends OpenCvPipeline {
     private Mat frame = new Mat();
     public int beforeTape = 0;
     public double largestArea_=0;
@@ -21,8 +19,7 @@ public class TestPipeline extends OpenCvPipeline {
     public Mat processFrame(Mat input) {
         Imgproc.rectangle(input,new Rect(0, 330, 640, 100), new Scalar(255, 0, 0), 2);
         Rect crop = new Rect(0, 330, 640, 100);
-        Mat cropped = input.submat(crop);
-        frame = cropped;
+        frame = input.submat(crop);
         beforeTape = isBeforeTape(false) ? 1 : 0;
         return frame;
 
@@ -47,10 +44,6 @@ public class TestPipeline extends OpenCvPipeline {
             //set largestArea to that
         }
         largestArea_ = largestArea;
-        if (largestArea > areaThreshold) {
-            return true;
-        } else {
-            return false;
-        }
+        return largestArea > areaThreshold;
     }
 }
