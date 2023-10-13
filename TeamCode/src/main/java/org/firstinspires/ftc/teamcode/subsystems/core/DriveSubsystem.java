@@ -6,13 +6,33 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.checkerframework.checker.units.qual.Speed;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.subsystems.SpeedCoefficients;
 
 public class DriveSubsystem extends SubsystemBase {
     private MecanumDrive controller;
     private IMU imu;
     private LinearOpMode opMode;
     private Motor rightBack;
+
+    public enum Direction {
+        FORWARD (0, 1, 0),
+        BACKWARD (0, -1, 0),
+        LEFT (1, 0, 0),
+        RIGHT (-1, 0, 0),
+        CLOCKWISE (0, 0, 1),
+        COUNTERCLOCKWISE (0, 0, -1);
+
+        public final double rightSpeed;
+        public final double forwardSpeed;
+        public final double turnSpeed;
+        Direction(double rightSpeed, double forwardSpeed, double turnSpeed) {
+            this.rightSpeed = rightSpeed;
+            this.forwardSpeed = forwardSpeed;
+            this.turnSpeed = turnSpeed;
+        }
+    }
 
     public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, IMU imu, LinearOpMode opMode) {
         this.rightBack = rightBack;
@@ -70,6 +90,15 @@ public class DriveSubsystem extends SubsystemBase {
         }
 
         controller.stop();
+    }
+
+    public void driveByEncoder(Direction direction, double steps) {
+        driveByEncoder(
+                direction.rightSpeed * SpeedCoefficients.getStrafeSpeed(),
+                direction.forwardSpeed * SpeedCoefficients.getForwardSpeed(),
+                direction.turnSpeed * SpeedCoefficients.getTurnSpeed(),
+                steps
+        );
     }
 
     public void resetIMU() {
