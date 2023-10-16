@@ -27,7 +27,7 @@ public class DriveTeleOp extends LinearOpMode {
 
         LiftSubsystem lift = new LiftSubsystem(robot.lift);
         ClawSubsystem claw = new ClawSubsystem(robot.claw);
-        CVSubsystem cv = new CVSubsystem();
+        CVSubsystem cv = new CVSubsystem(robot.camera);
 
         waitForStart();
 

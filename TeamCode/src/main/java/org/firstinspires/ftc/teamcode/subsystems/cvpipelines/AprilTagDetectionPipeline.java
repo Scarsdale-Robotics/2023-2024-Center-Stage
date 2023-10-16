@@ -41,6 +41,7 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline
 {
     // STATIC CONSTANTS
 
+
     public static Scalar blue = new Scalar(7,197,235,255);
     public static Scalar red = new Scalar(255,0,0,255);
     public static Scalar green = new Scalar(0,255,0,255);

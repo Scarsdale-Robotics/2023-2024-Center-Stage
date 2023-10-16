@@ -5,11 +5,10 @@ import org.firstinspires.ftc.teamcode.subsystems.core.DriveSubsystem;
 public class AutoUtility {
     private DriveSubsystem drive;
     private CVSubsystem cv;
-    private SpeedCoefficients speed;
-    public AutoUtility(DriveSubsystem drive, CVSubsystem cv, SpeedCoefficients speed) {
+    private final double ERROR = 0.5;
+    public AutoUtility(DriveSubsystem drive, CVSubsystem cv) {
         this.drive = drive;
         this.cv = cv;
-        this.speed = speed;
     }
 
     /**
@@ -28,25 +27,27 @@ public class AutoUtility {
             switch (aprilTagLocation) {
                 case 0:
                     // left location
-                    drive.driveFieldCentric(speed.getStrafeSpeed(), 0, 0);
+                    drive.driveFieldCentric(1, 0, 0);
                     break;
                 case 2:
                     // right location
-                    drive.driveFieldCentric(-speed.getStrafeSpeed(), 0, 0);
+                    drive.driveFieldCentric(-1, 0, 0);
                     break;
                 default:
                     // center location
-                    drive.driveFieldCentric(0, speed.getForwardSpeed(), 0);
+                    drive.driveFieldCentric(0, 1, 0);
                     break;
             }
         }
     }
     /**
-     * GROUP 1
      * aligns such that a ray representing a robot's camera direction is (anti-)parallel to a ray extending "outwards" from the center of a given AprilTag
      * @param tagID the id of the AprilTag from the 36h11 family to align with
      */
     public void alignParallelWithAprilTag(int tagID) {
-
+        double rotOff = cv.getAprilTagRotationalOffset(tagID);
+        while (Math.abs(rotOff) > ERROR) {
+            drive.driveFieldCentric(0, 0, rotOff * 1); // times some scaling factor (temporarily at 1)
+        }
     }
 }
