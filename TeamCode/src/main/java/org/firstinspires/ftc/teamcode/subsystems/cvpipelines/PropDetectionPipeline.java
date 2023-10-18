@@ -117,5 +117,11 @@ public class PropDetectionPipeline extends OpenCvPipeline {
         }else{
             return null;
         }
+
+    }
+
+    public Mat crop(Mat input) {
+
+        return input;
     }
 }
