@@ -30,8 +30,8 @@ public class PropDetectionPipeline extends OpenCvPipeline {
     public int width;
     public int height;
 
-    public static Scalar upperRange = new Scalar(110.5,255,255);  // Range needs fixing
-    public static Scalar lowerRange = new Scalar(86,214,64);
+    public static Scalar upperRange = new Scalar(176,114,120);  // Range needs fixing
+    public static Scalar lowerRange = new Scalar(167,66,41);
 
     public AtomicBoolean hasStarted = new AtomicBoolean(false);
     public AtomicInteger lateralOffset = new AtomicInteger(0);
