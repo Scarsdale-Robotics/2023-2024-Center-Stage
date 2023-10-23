@@ -16,8 +16,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-// git push example
-
 
 // NOTE: changing this code very soon :)
 public class PropDetectionPipeline extends OpenCvPipeline {
@@ -36,7 +34,14 @@ public class PropDetectionPipeline extends OpenCvPipeline {
     public AtomicBoolean hasStarted = new AtomicBoolean(false);
     public AtomicInteger lateralOffset = new AtomicInteger(0);
 
-    public int contour_dim_ratio;
+    public Point centerPoint;
+
+    public int place;
+
+    public int x;
+
+    public int y;
+
 
     public PropDetectionPipeline(Telemetry telemetry){
         this.telemetry = telemetry;
@@ -47,50 +52,66 @@ public class PropDetectionPipeline extends OpenCvPipeline {
         this.telemetry = telemetry;
         hasStarted.set(true);
         //open cv defaults to bgr, but we are completely in rgb/hsv, this is because pipeline's input/output rgb
-        height = input.height()/3;
+        height = input.height();
         width = input.width();
-        int y = 2 * height;
-        int x = 0;
         this.sub = input;
-//        int posy = height/2;
-//        int posx = width / 2;
-        MatOfPoint contour = getMaxContour();
-        if (contour != null) {
-            Imgproc.drawContours(sub, new ArrayList<MatOfPoint>(Arrays.asList(contour)), 0, new Scalar(255, 255, 0), 2);
-            Rect b = Imgproc.boundingRect(contour);
-            Imgproc.rectangle(sub, b, new Scalar(255, 255, 0));
-            Point center = new Point(b.x + b.width/2, b.y + b.height/2);
-            Imgproc.circle(sub, center, 2, new Scalar(255, 255, 0));
-            telemetry.addData("x",b.x + b.width/2);
-            telemetry.addData("y",b.y + b.height/2);
-            telemetry.update();
+//        MatOfPoint contour = getMaxContour();
+//        List<Rect> cropped_rectangles = new Rect(width*2/3, 0,width/3, height);
+//        List<MatOfPoint> max_contours = new ArrayList<>(3);
+        double maxArea = Double.MIN_VALUE;
+        int best_idx = 0;
+//        MatOfPoint best_contour = new MatOfPoint();
+//        Imgproc.rectangle(sub, new Rect(width*2/3,0,width/3, height), new Scalar(255, 255, 0));
+//        Imgproc.rectangle(sub, b, new Scalar(255, 255, 0));
+        for (int i=0; i<3; i++){
+            Rect crop = new Rect(width*i/3,0,width/3, height);
+            Imgproc.rectangle(input, crop, new Scalar(255, 255, 0));
+            this.sub = new Mat(input, crop);
+            MatOfPoint contour = getMaxContour();
+
+            if (contour !=null) {
+                double area = Imgproc.contourArea(contour);
+
+                if (area > maxArea) {
+//                    best_contour = contour;
+                    maxArea = area;
+                    best_idx = i;
+                }
+            }
         }
-//        telemetry.addData("foo", 0);
-        telemetry.addData("height", height);
-        telemetry.addData("width", width);
+//        Imgproc.drawContours(input, new ArrayList<MatOfPoint>(Arrays.asList(best_contour)), 0, new Scalar(255, 255, 0), 1);
+        telemetry.addData("best idx", best_idx);
         telemetry.update();
-//
+        return input;
+//        return cropped1;
+//        for
+//        if (contour != null) {
+//            Imgproc.drawContours(sub, new ArrayList<MatOfPoint>(Arrays.asList(contour)), 0, new Scalar(255, 255, 0), 2);
+//            Rect b = Imgproc.boundingRect(contour);
+//            Imgproc.rectangle(sub, b, new Scalar(255, 255, 0));
+//            x = b.x + b.width/2;
+//            y = b.y + b.height/2;
+//            Point centerPoint = new Point(x, y);
+//            Imgproc.circle(sub, centerPoint, 2, new Scalar(255, 255, 0));
+//            if (x<=150) {
+//                place=0;
+//            }
+//            else if (x>150 && x<500){
+//                place=1;
+//            }
+//            else{
+//                place=2;
+//            }
+//            telemetry.addData("x",b.x + b.width/2);
+//            telemetry.addData("y",b.y + b.height/2);
+//            telemetry.addData("place",place);
+//            telemetry.update();
+//        }
 //        telemetry.addData("height", height);
 //        telemetry.addData("width", width);
-
-//        if(contour != null) {
-////            List<MatOfPoint> coneContour = new ArrayList<>();
-//            Rect b = Imgproc.boundingRect(contour);
-////            contour_dim_ratio=b.width/b.height;
-////            if (contour_dim_ratio < 1) {
-//            coneContour.add(contour);
-//            Imgproc.drawContours(sub, coneContour, 0, new Scalar(255, 255, 0), 2);
-//            posx = b.x + b.width / 2;
-//            posy = b.y + b.height / 2;
-//            Imgproc.circle(sub, new Point(posx, posy), 2, new Scalar(255, 255, 0)); //rgb DRAW CIRCLE
-////            }
-
-//        }
-
-//        int offset = posx - (width / 2 + 40);
-//        lateralOffset.set(offset);
-
-        return input;
+//        telemetry.update();
+//
+//        return input;
     }
 
     public MatOfPoint getMaxContour() {
@@ -117,11 +138,5 @@ public class PropDetectionPipeline extends OpenCvPipeline {
         }else{
             return null;
         }
-
-    }
-
-    public Mat crop(Mat input) {
-
-        return input;
     }
 }
