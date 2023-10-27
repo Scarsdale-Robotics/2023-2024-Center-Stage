@@ -19,6 +19,7 @@ public class DriveTeleOp extends LinearOpMode {
     public void runOpMode() {
         // init robot
         HardwareRobot robot = new HardwareRobot(hardwareMap);
+        SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
         DriveSubsystem drive = new DriveSubsystem(
                 robot.leftFront,
                 robot.rightFront,
@@ -39,7 +40,9 @@ public class DriveTeleOp extends LinearOpMode {
         );
 
 
+
         waitForStart();
+
 
 
         // main TeleOp loop
@@ -83,6 +86,9 @@ public class DriveTeleOp extends LinearOpMode {
             // Arm and Claw Control //
             //////////////////////////
 
+
+            telemetry.addData("arm raised: ", inDep.getIsRaised());
+            telemetry.update();
             // Toggle claw with the 'y' button
             if (gamepad1.y && !clawToggled) {
                 if (inDep.getIsOpen()) {

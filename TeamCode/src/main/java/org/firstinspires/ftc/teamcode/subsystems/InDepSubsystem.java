@@ -14,8 +14,10 @@ public class InDepSubsystem extends SubsystemBase {
     private Servo wrist;
     private Level level;
     public enum Level {
-        GROUND(50), BACKBOARD(500); //temp motor encoder values
+        GROUND(50),
+        BACKBOARD(250); //temp motor encoder values
         int target;
+
         Level(int target) {
             this.target = target;
         }
