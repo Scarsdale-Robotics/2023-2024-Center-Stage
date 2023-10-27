@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -18,8 +16,8 @@ public class InDepSubsystem extends SubsystemBase {
     private Servo wrist;
     private Level level;
     public enum Level {
-        GROUND(25),
-        BACKBOARD(150); //temp motor encoder values
+        GROUND(0),
+        BACKBOARD(70); //temp motor encoder values
         int target;
 
         Level(int target) {
@@ -27,7 +25,8 @@ public class InDepSubsystem extends SubsystemBase {
         }
     }
 
-    private boolean isRaised;
+    private boolean isWristRaised;
+    private boolean isArmRaised;
     private boolean isOpen;
 
     public InDepSubsystem(Motor arm, Servo claw, Servo wrist, LinearOpMode opMode, Telemetry telemetry) {
@@ -40,12 +39,21 @@ public class InDepSubsystem extends SubsystemBase {
 
         // initialize vars
         level = Level.GROUND;
-        isRaised = false;
+        isWristRaised = true;
+        isArmRaised = false;
         isOpen = false;
 
         // reset the arm and claw states
-        lower();
+        raiseWrist();
+        lowerArm();
         close();
+    }
+
+    /**
+     * @return the position of the arm motor, in ticks.
+     */
+    public int getArmPosition() {
+        return arm.getCurrentPosition();
     }
 
     /**
@@ -58,52 +66,72 @@ public class InDepSubsystem extends SubsystemBase {
     /**
      * @return true if the arm is raised, otherwise false if it is lowered.
      */
-    public boolean getIsRaised() {
-        return isRaised;
+    public boolean getIsWristRaised() {
+        return isWristRaised;
     }
 
     /**
-     * Raises the arm and flattens the wrist.
+     * @return true if the arm is raised, otherwise false if it is lowered.
      */
-    public void raise() {
+    public boolean getIsArmRaised() {
+        return isArmRaised;
+    }
+
+    /**
+     * sets the raw power of the arm.
+     */
+    public void rawPower(double power) {
+        arm.motor.setPower(power);
+    }
+
+    /**
+     * Raises the wrist.
+     */
+    public void raiseWrist() {
+        wrist.setPosition(0); // set wrist position to angled
+        isWristRaised = true;
+    }
+
+    /**
+     * Lowers the wrist.
+     */
+    public void lowerWrist() {
+        wrist.setPosition(0.15); // set wrist position to flattened
+        isWristRaised = false;
+    }
+
+    /**
+     * Raises the arm.
+     */
+    public void raiseArm() {
         level = Level.BACKBOARD; // set current level to raised
         arm.setTargetPosition(level.target);
 
-        wrist.setPosition(0.05); // set wrist position to flattened
-
         while (opMode.opModeIsActive() && !arm.atTargetPosition()) {
             arm.setTargetPosition(level.target);
             arm.set(SpeedCoefficients.getArmSpeed());
-            telemetry.addData("arm pos: ", arm.getCurrentPosition());
-            telemetry.addData("target pos: ", level.target);
-            telemetry.update();
         }; // wait until arm is at target position
 
         // complete action
         arm.stopMotor();
-        isRaised = true;
+        isArmRaised = true;
     }
 
     /**
-     * Lowers the arm and angles the wrist.
+     * Lowers the arm.
      */
-    public void lower() {
+    public void lowerArm() {
         level = Level.GROUND; // set current level to lowered
         arm.setTargetPosition(level.target);
-
-        wrist.setPosition(0.15); // set wrist position to angled
 
         while (opMode.opModeIsActive() && !arm.atTargetPosition()) {
             arm.setTargetPosition(level.target);
             arm.set(SpeedCoefficients.getArmSpeed());
-            telemetry.addData("arm pos: ", arm.getCurrentPosition());
-            telemetry.addData("target pos: ", level.target);
-            telemetry.update();
         }; // wait until arm is at target position
 
         // complete action
         arm.stopMotor();
-        isRaised = false;
+        isArmRaised = false;
     }
 
     public void resetArmEncoder() {

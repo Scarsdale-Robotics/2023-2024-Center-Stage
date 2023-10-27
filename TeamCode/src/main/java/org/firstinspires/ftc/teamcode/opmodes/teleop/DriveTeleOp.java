@@ -47,8 +47,9 @@ public class DriveTeleOp extends LinearOpMode {
 
 
         // main TeleOp loop
-        boolean armToggled = false, clawToggled = false;
+        boolean wristToggled = false, clawToggled = false;
         boolean omniMode = false;
+        int prevArmEncoder = 0;
         while (opModeIsActive()) {
             //////////////////////////
             // Basic Motion Control //
@@ -77,7 +78,7 @@ public class DriveTeleOp extends LinearOpMode {
             }
 
             // Drive robot centric
-            drive.driveRobotCentric(driveX, driveY, gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed());
+            drive.driveRobotCentric(-driveX, driveY, -gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed());
 
 
 
@@ -88,7 +89,7 @@ public class DriveTeleOp extends LinearOpMode {
             //////////////////////////
 
 
-            telemetry.addData("arm raised: ", inDep.getIsRaised());
+            telemetry.addData("arm raised: ", inDep.getIsWristRaised());
             // Toggle claw with the 'y' button
             if (gamepad1.y && !clawToggled) {
                 if (inDep.getIsOpen()) {
@@ -100,16 +101,20 @@ public class DriveTeleOp extends LinearOpMode {
             }
             if (!gamepad1.y) clawToggled = false;
 
-            // Toggle arm with the left and right bumpers
-            if (gamepad1.left_bumper && !armToggled) {
-                if (inDep.getIsRaised()) inDep.lower();
-                armToggled = true;
+            // Toggle wrist with a condition
+            boolean condition = inDep.getArmPosition() > 50 && (inDep.getArmPosition()-prevArmEncoder) >= 0; // first derivative
+            if (condition) {
+                inDep.lowerWrist();
             }
-            if (gamepad1.right_bumper && !armToggled) {
-                if (!inDep.getIsRaised()) inDep.raise();
-                armToggled = true;
+            if (!condition) {
+                inDep.raiseWrist();
             }
-            if (!gamepad1.left_bumper && !gamepad1.right_bumper) armToggled = false;
+
+            telemetry.addData("arm pos: ", inDep.getArmPosition());
+
+            // Control arm power with triggers
+            double totalChange = (gamepad1.right_trigger - gamepad1.left_trigger) * SpeedCoefficients.getArmSpeed();
+            inDep.rawPower(totalChange);
 
             // Resets arm
             if (gamepad2.a && gamepad2.b) {
@@ -126,6 +131,7 @@ public class DriveTeleOp extends LinearOpMode {
 
 
 
+            prevArmEncoder = inDep.getArmPosition();
             telemetry.update();
         }
     }

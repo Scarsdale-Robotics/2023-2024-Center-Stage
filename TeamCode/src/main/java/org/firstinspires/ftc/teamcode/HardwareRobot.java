@@ -57,6 +57,7 @@ public class HardwareRobot {
         arm.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         arm.setRunMode(Motor.RunMode.PositionControl);
         arm.resetEncoder();
+        arm.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         arm.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         arm.setPositionTolerance(10);
         arm.setPositionCoefficient(0.01);
