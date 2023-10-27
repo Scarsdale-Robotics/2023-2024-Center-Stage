@@ -32,7 +32,8 @@ public class DriveTeleOp extends LinearOpMode {
                 robot.arm,
                 robot.claw,
                 robot.wrist,
-                this
+                this,
+                telemetry
         );
         CVSubsystem cv = new CVSubsystem(
                 robot.camera,
@@ -88,7 +89,6 @@ public class DriveTeleOp extends LinearOpMode {
 
 
             telemetry.addData("arm raised: ", inDep.getIsRaised());
-            telemetry.update();
             // Toggle claw with the 'y' button
             if (gamepad1.y && !clawToggled) {
                 if (inDep.getIsOpen()) {
@@ -126,6 +126,7 @@ public class DriveTeleOp extends LinearOpMode {
 
 
 
+            telemetry.update();
         }
     }
 }

@@ -32,8 +32,8 @@ public class SpeedCoefficients {
     }
 
     public static double getArmSpeed() {
-        double SLOW_ARM_SPEED = 0.5;
-        double FAST_ARM_SPEED = 1;
+        double SLOW_ARM_SPEED = 0.05;
+        double FAST_ARM_SPEED = 0.3;
         return moveMode.mode==MoveMode.MODE_FAST.mode ? FAST_ARM_SPEED : SLOW_ARM_SPEED;
     }
 }

@@ -1,21 +1,25 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 
 public class InDepSubsystem extends SubsystemBase {
     private LinearOpMode opMode;
+    private Telemetry telemetry;
     private Motor arm;
     private Servo claw;
     private Servo wrist;
     private Level level;
     public enum Level {
-        GROUND(50),
-        BACKBOARD(250); //temp motor encoder values
+        GROUND(25),
+        BACKBOARD(150); //temp motor encoder values
         int target;
 
         Level(int target) {
@@ -26,12 +30,13 @@ public class InDepSubsystem extends SubsystemBase {
     private boolean isRaised;
     private boolean isOpen;
 
-    public InDepSubsystem(Motor arm, Servo claw, Servo wrist, LinearOpMode opMode) {
+    public InDepSubsystem(Motor arm, Servo claw, Servo wrist, LinearOpMode opMode, Telemetry telemetry) {
         // initialize objects
         this.arm = arm;
         this.claw = claw;
         this.wrist = wrist;
         this.opMode = opMode;
+        this.telemetry = telemetry;
 
         // initialize vars
         level = Level.GROUND;
@@ -66,8 +71,13 @@ public class InDepSubsystem extends SubsystemBase {
 
         wrist.setPosition(0.05); // set wrist position to flattened
 
-        arm.set(SpeedCoefficients.getArmSpeed());
-        while (opMode.opModeIsActive() && !arm.atTargetPosition()) ; // wait until arm is at target position
+        while (opMode.opModeIsActive() && !arm.atTargetPosition()) {
+            arm.setTargetPosition(level.target);
+            arm.set(SpeedCoefficients.getArmSpeed());
+            telemetry.addData("arm pos: ", arm.getCurrentPosition());
+            telemetry.addData("target pos: ", level.target);
+            telemetry.update();
+        }; // wait until arm is at target position
 
         // complete action
         arm.stopMotor();
@@ -83,8 +93,13 @@ public class InDepSubsystem extends SubsystemBase {
 
         wrist.setPosition(0.15); // set wrist position to angled
 
-        arm.set(SpeedCoefficients.getArmSpeed());
-        while (opMode.opModeIsActive() && !arm.atTargetPosition()) ; // wait until arm is at target position
+        while (opMode.opModeIsActive() && !arm.atTargetPosition()) {
+            arm.setTargetPosition(level.target);
+            arm.set(SpeedCoefficients.getArmSpeed());
+            telemetry.addData("arm pos: ", arm.getCurrentPosition());
+            telemetry.addData("target pos: ", level.target);
+            telemetry.update();
+        }; // wait until arm is at target position
 
         // complete action
         arm.stopMotor();
