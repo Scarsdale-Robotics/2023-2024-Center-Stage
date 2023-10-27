@@ -43,6 +43,7 @@ public class DriveTeleOp extends LinearOpMode {
 
 
         waitForStart();
+        boolean isRedTeam = false;
 
 
 
@@ -50,6 +51,10 @@ public class DriveTeleOp extends LinearOpMode {
         boolean wristToggled = false, clawToggled = false;
         boolean omniMode = false;
         int prevArmEncoder = 0;
+
+        int moving = 1;
+        boolean override = false;
+
         while (opModeIsActive()) {
             //////////////////////////
             // Basic Motion Control //
@@ -58,6 +63,27 @@ public class DriveTeleOp extends LinearOpMode {
             // these drive variables are for possible omni mode in the future
             double driveX = 0;
             double driveY = 0;
+
+
+            //handle override and moving
+            if (gamepad2.left_stick_y < -0.6 && override == false) {
+                override = true;
+            }
+
+            if (cv.isRobotBeforeTape(isRedTeam)) { // detecting tape
+                // turn off override
+                if (!override)
+                    moving = 0;
+                else
+                    moving = 1;
+            } else { // not detecting tape
+                override = false;
+                moving = 1;
+            }
+            if (moving == 0) {
+                //rumble
+            }
+            //moving = 0 while driverassist is active
 
             // Binds movement to just the four cardinal directions
             if (!omniMode) {
@@ -102,7 +128,7 @@ public class DriveTeleOp extends LinearOpMode {
             if (!gamepad1.y) clawToggled = false;
 
             // Toggle wrist with a condition
-            boolean condition = inDep.getArmPosition() > 50 && (inDep.getArmPosition()-prevArmEncoder) >= 0; // first derivative
+            boolean condition = inDep.getArmPosition() > 100 && (inDep.getArmPosition()-prevArmEncoder) >= 0; // first derivative
             if (condition) {
                 inDep.lowerWrist();
             }
@@ -129,7 +155,40 @@ public class DriveTeleOp extends LinearOpMode {
             // CV Motion Control //
             ///////////////////////
 
-
+            // align with apriltag
+            if (gamepad2.dpad_down == true && gamepad2.dpad_left == true && gamepad2.dpad_right == true && gamepad2.dpad_up == true) {
+                if (isRedTeam) {
+                    cv.alignParallelWithAprilTag(5);
+                } else {
+                    cv.alignParallelWithAprilTag(2);
+                }
+            }
+            if (gamepad2.circle) { // picking up
+                //override driver assist
+                override = true;
+                //ground position arm
+                inDep.lowerArm();
+                //set slow speed
+                SpeedCoefficients.setMode(0);
+                //align to april tag
+                if (isRedTeam) {
+                    cv.alignParallelWithAprilTag(5);
+                } else {
+                    cv.alignParallelWithAprilTag(2);
+                }
+            }
+            if (gamepad2.square) {
+                //override driver assist
+                override = true;
+                //set slow speed
+                SpeedCoefficients.setMode(0);
+                //align to april tag
+                if (isRedTeam) {
+                    cv.alignParallelWithAprilTag(5);
+                } else {
+                    cv.alignParallelWithAprilTag(2);
+                }
+            }
 
             prevArmEncoder = inDep.getArmPosition();
             telemetry.update();
