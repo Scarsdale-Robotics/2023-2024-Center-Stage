@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
+
 import android.util.Size;
+
+import com.arcrobotics.ftclib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 
@@ -9,29 +12,29 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelDetectionPipeline;
-import org.openftc.easyopencv.OpenCvPipeline;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class CVSubsystem {
+public class CVSubsystem extends SubsystemBase {
+    private OpenCvCamera camera;
+    private DriveSubsystem drive;
 
-    OpenCvCamera camera;
+    private final int LOCATION_LEFT   =  0;
+    private final int LOCATION_CENTER =  1;
+    private final int LOCATION_RIGHT  =  2;
+    private final int NO_LOCATION     = -1;
 
-    public final int LOCATION_LEFT   =  0;
-    public final int LOCATION_CENTER =  1;
-    public final int LOCATION_RIGHT  =  2;
-    public final int NO_LOCATION     = -1;
-
-    public final double NO_ROTATIONAL_OFFSET = -50000.0;
-    public final double NO_DISTANCE = -50000.0;
-    public final double ERROR   =  3.0;
+    private final double NO_ROTATIONAL_OFFSET = -50000.0;
+    private final double NO_DISTANCE = -50000.0;
+    private final double ERROR   =  3.0;
+    private final double ERROR_ALIGNMENT = 0.5;
 
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
 
-    public CVSubsystem(OpenCvCamera camera) {
+    public CVSubsystem(OpenCvCamera camera, DriveSubsystem drive) {
         this.camera = camera;
+        this.drive = drive;
         // create AprilTagProcessor and VisionPortal
         initAprilTag();
     }
@@ -86,7 +89,6 @@ public class CVSubsystem {
      * @param tagID the id of the AprilTag from the 36h11 family
      * @return whether the AprilTag is left, center, or right in the camera view
      */
-
     public int getAprilTagLocation(int tagID) {
 
         visionPortal.resumeStreaming();
@@ -174,5 +176,44 @@ public class CVSubsystem {
         return false; // TEMPORARY
     }
 
+    /**
+     * GROUP 1
+     * get a given AprilTag's position and moves in front of it
+     * use alignParallelWithAprilTag() and getAprilTagPosition()
+     *
+     * @param tagID the id of the AprilTag from the 36h11 family to move to
+     */
+    public void moveToAprilTag(int tagID) {
+        double DISTANCE_THRESHOLD = 1;  // distance from backboard to stop at
 
+        alignParallelWithAprilTag(tagID);
+        while (getAprilTagDistance(tagID) > DISTANCE_THRESHOLD) {
+            int aprilTagLocation = getAprilTagLocation(tagID);
+            switch (aprilTagLocation) {
+                case 0:
+                    // left location
+                    drive.driveFieldCentric(1, 0, 0);
+                    break;
+                case 2:
+                    // right location
+                    drive.driveFieldCentric(-1, 0, 0);
+                    break;
+                default:
+                    // center location
+                    drive.driveFieldCentric(0, 1, 0);
+                    break;
+            }
+        }
+    }
+
+    /**
+     * aligns such that a ray representing a robot's camera direction is (anti-)parallel to a ray extending "outwards" from the center of a given AprilTag
+     * @param tagID the id of the AprilTag from the 36h11 family to align with
+     */
+    public void alignParallelWithAprilTag(int tagID) {
+        double rotOff = getAprilTagRotationalOffset(tagID);
+        while (Math.abs(rotOff) > ERROR_ALIGNMENT) {
+            drive.driveFieldCentric(0, 0, rotOff * 1); // times some scaling factor (temporarily at 1)
+        }
+    }
 }

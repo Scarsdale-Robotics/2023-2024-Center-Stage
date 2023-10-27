@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.core;
+package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
@@ -6,9 +6,8 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 
-import org.checkerframework.checker.units.qual.Speed;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.subsystems.SpeedCoefficients;
+import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 
 public class DriveSubsystem extends SubsystemBase {
     private MecanumDrive controller;
