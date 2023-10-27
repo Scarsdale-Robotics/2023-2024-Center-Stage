@@ -15,24 +15,44 @@ public class InDepSubsystem extends SubsystemBase {
     private Level level;
     public enum Level {
         GROUND(50), BACKBOARD(500); //temp motor encoder values
-
         int target;
-
         Level(int target) {
             this.target = target;
         }
     }
 
+    private boolean isRaised;
+    private boolean isOpen;
+
     public InDepSubsystem(Motor arm, Servo claw, Servo wrist, LinearOpMode opMode) {
+        // initialize objects
         this.arm = arm;
         this.claw = claw;
         this.wrist = wrist;
         this.opMode = opMode;
+
+        // initialize vars
         level = Level.GROUND;
+        isRaised = false;
+        isOpen = false;
+
+        // reset the arm and claw states
+        lower();
+        close();
     }
 
-    public Level getLevel() {
-        return level;
+    /**
+     * @return true if the claw is open, otherwise false if it is closed.
+     */
+    public boolean getIsOpen() {
+        return isOpen;
+    }
+
+    /**
+     * @return true if the arm is raised, otherwise false if it is lowered.
+     */
+    public boolean getIsRaised() {
+        return isRaised;
     }
 
     /**
@@ -47,7 +67,9 @@ public class InDepSubsystem extends SubsystemBase {
         arm.set(SpeedCoefficients.getArmSpeed());
         while (opMode.opModeIsActive() && !arm.atTargetPosition()) ; // wait until arm is at target position
 
+        // complete action
         arm.stopMotor();
+        isRaised = true;
     }
 
     /**
@@ -62,20 +84,35 @@ public class InDepSubsystem extends SubsystemBase {
         arm.set(SpeedCoefficients.getArmSpeed());
         while (opMode.opModeIsActive() && !arm.atTargetPosition()) ; // wait until arm is at target position
 
+        // complete action
         arm.stopMotor();
+        isRaised = false;
+    }
+
+    public void resetArmEncoder() {
+        arm.resetEncoder();
     }
 
     /**
      * Opens the claw.
      */
-    private void open() {
+    public void open() {
         claw.setPosition(0.175);
+        isOpen = true;
     }
 
     /**
      * Closes the claw.
      */
-    private void close() {
+    public void close() {
         claw.setPosition(0.0);
+        isOpen = false;
+    }
+
+    /**
+     * @return the level of the arm.
+     */
+    public Level getLevel() {
+        return level;
     }
 }
