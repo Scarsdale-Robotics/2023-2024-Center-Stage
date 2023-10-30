@@ -18,13 +18,12 @@ public class HardwareRobot {
     public final Motor rightFront;
     public final Motor leftBack;
     public final Motor rightBack;
-
-    public final Motor lift;
-
-    public final IMU imu;
+    public final Motor arm;
 
     public final Servo claw;
+    public final Servo wrist;
 
+    public final IMU imu;
     public final OpenCvCamera camera;
 
     public HardwareRobot(HardwareMap hardwareMap) {
@@ -48,33 +47,36 @@ public class HardwareRobot {
         leftBack.setRunMode(Motor.RunMode.VelocityControl);
         rightBack.setRunMode(Motor.RunMode.VelocityControl);
 
-        leftFront.setInverted(true);
-        leftBack.setInverted(true);
-        rightBack.setInverted(true);
-        rightFront.setInverted(true);
+        leftFront.setPositionTolerance(10);
+        rightFront.setPositionTolerance(10);
+        leftBack.setPositionTolerance(10);
+        rightBack.setPositionTolerance(10);
 
-        lift = new Motor(hardwareMap, "lift", Motor.GoBILDA.RPM_312);
-        lift.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lift.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        lift.setRunMode(Motor.RunMode.PositionControl);
-        lift.setInverted(true);
-        lift.resetEncoder();
-        lift.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        lift.setPositionTolerance(10);
-        lift.setPositionCoefficient(0.01);
-
-        imu = hardwareMap.get(IMU.class, "imu");
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.FORWARD;
-        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.LEFT;
-        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
+        arm = new Motor(hardwareMap, "arm", Motor.GoBILDA.RPM_312);
+        arm.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        arm.setRunMode(Motor.RunMode.PositionControl);
+        arm.resetEncoder();
+        arm.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        arm.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        arm.setPositionTolerance(10);
+        arm.setPositionCoefficient(0.01);
 
         claw = hardwareMap.servo.get("claw");
         claw.scaleRange(0, 1);
 
+        wrist = hardwareMap.servo.get("wrist");
+        wrist.scaleRange(0, 1);
+        wrist.setPosition(0.15); // starting position is angled to the ground
+
+        imu = hardwareMap.get(IMU.class, "imu");
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.FORWARD;
+        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
+
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
-
     }
 
     public double getYaw() {
