@@ -156,20 +156,21 @@ public class DriveTeleOp extends LinearOpMode {
             ///////////////////////
 
             // align with apriltag
-            if (gamepad2.dpad_down == true && gamepad2.dpad_left == true && gamepad2.dpad_right == true && gamepad2.dpad_up == true) {
+            if (gamepad2.dpad_down == true) {
                 if (isRedTeam) {
                     cv.alignParallelWithAprilTag(5);
                 } else {
                     cv.alignParallelWithAprilTag(2);
                 }
             }
+
             if (gamepad2.circle) { // picking up
                 //override driver assist
                 override = true;
                 //ground position arm
                 inDep.lowerArm();
                 //set slow speed
-                SpeedCoefficients.setMode(0);
+                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
                 //align to april tag
                 if (isRedTeam) {
                     cv.alignParallelWithAprilTag(5);
@@ -181,7 +182,7 @@ public class DriveTeleOp extends LinearOpMode {
                 //override driver assist
                 override = true;
                 //set slow speed
-                SpeedCoefficients.setMode(0);
+                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
                 //align to april tag
                 if (isRedTeam) {
                     cv.alignParallelWithAprilTag(5);
