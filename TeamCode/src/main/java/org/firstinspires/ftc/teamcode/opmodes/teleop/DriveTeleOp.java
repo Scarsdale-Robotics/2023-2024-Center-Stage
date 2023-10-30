@@ -169,7 +169,7 @@ public class DriveTeleOp extends LinearOpMode {
                 //ground position arm
                 inDep.lowerArm();
                 //set slow speed
-                SpeedCoefficients.setMode(0);
+                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
                 //align to april tag
                 if (isRedTeam) {
                     cv.alignParallelWithAprilTag(5);
@@ -181,7 +181,7 @@ public class DriveTeleOp extends LinearOpMode {
                 //override driver assist
                 override = true;
                 //set slow speed
-                SpeedCoefficients.setMode(0);
+                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
                 //align to april tag
                 if (isRedTeam) {
                     cv.alignParallelWithAprilTag(5);
