@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 
 @Autonomous(name = "Auto Backboard Red")
 public class AutoBackboardRed extends LinearOpMode {
@@ -24,6 +25,15 @@ public class AutoBackboardRed extends LinearOpMode {
         CVSubsystem cvSubsystem = new CVSubsystem(robot.camera, drive);
         SpeedCoefficients speedCoefficients = new SpeedCoefficients();
 
+        // Initialize InDepSubsystem with the hardware components from HardwareRobot
+        InDepSubsystem inDep = new InDepSubsystem(
+                robot.arm,
+                robot.claw,
+                robot.wrist,
+                this,
+                telemetry
+        );
+
         waitForStart();
 
         int propLocation = cvSubsystem.getTeamPropLocation(true); // Changed to true for red team
@@ -32,7 +42,7 @@ public class AutoBackboardRed extends LinearOpMode {
             drive.driveByEncoder(0, 0.5, 0, 550);
             drive.driveByEncoder(0, 0, 1, 300); // Changed to turn right
             drive.driveByEncoder(0, 0.5, 0, 250);
-            //place pixel
+            inDep.open(); // open claw
             drive.driveByEncoder(0, 0, 0, -400);
             drive.driveByEncoder(0, 0, -1, 300); // Changed to turn left
             drive.driveByEncoder(0, 0.5, 0, 250);
@@ -44,7 +54,7 @@ public class AutoBackboardRed extends LinearOpMode {
             drive.driveByEncoder(0, 0.7, 0, 100);
             drive.driveByEncoder(0, 0, 90, 0); // Changed to turn right
             drive.driveByEncoder(0, 0.7, 0, 150);
-            //place pixel
+            inDep.open(); // open claw
             drive.driveByEncoder(0, 0.7, 0, -250);
             drive.driveByEncoder(0, 0, 90, 0); // Changed to turn right
             cvSubsystem.moveToAprilTag(0);
@@ -53,7 +63,7 @@ public class AutoBackboardRed extends LinearOpMode {
             drive.driveByEncoder(0, 0.7, 0, 550);
             drive.driveByEncoder(0, 0, -90, 0); // Changed to turn left
             drive.driveByEncoder(0, 0.7, 0, 100);
-            //place pixel
+            inDep.open(); // open claw
             drive.driveByEncoder(0, 0.7, 0, -250);
             drive.driveByEncoder(0, 0, 180, 0); // 180 turns are the same for both sides
             cvSubsystem.moveToAprilTag(0);

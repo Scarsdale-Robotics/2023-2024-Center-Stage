@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 
 @Autonomous(name = "Auto Backboard Blue")
 public class AutoBackboardBlue extends LinearOpMode {
@@ -24,6 +25,18 @@ public class AutoBackboardBlue extends LinearOpMode {
         );
         CVSubsystem cvSubsystem = new CVSubsystem(robot.camera, drive);
         SpeedCoefficients speedCoefficients = new SpeedCoefficients();
+        // Assuming this is in your main OpMode class
+        HardwareRobot hardwareRobot = new HardwareRobot(hardwareMap);
+
+        // Initialize InDepSubsystem with the hardware components from HardwareRobot
+        InDepSubsystem inDep = new InDepSubsystem(
+                robot.arm,
+                robot.claw,
+                robot.wrist,
+                this,
+                telemetry
+        );
+
 
         waitForStart();
 
@@ -35,7 +48,7 @@ public class AutoBackboardBlue extends LinearOpMode {
             drive.driveByEncoder(0, 0.5, 0, 550); // moving
             drive.driveByEncoder(0, 0, -1,300); // left
             drive.driveByEncoder(0, 0.5, 0, 250); // moving
-            //place pixel
+            inDep.open(); // open claw
             drive.driveByEncoder(0,0,0,-400); // moving backwards
             drive.driveByEncoder(0,0,1,300); // turn right
             drive.driveByEncoder(0,0.5,0,250); // moving
@@ -49,7 +62,7 @@ public class AutoBackboardBlue extends LinearOpMode {
             drive.driveByEncoder(0, 0.7, 0, 100); // moving
             drive.driveByEncoder(0, 0, -90, 0); // turn left
             drive.driveByEncoder(0,0.7,0, 150); // moving
-            //place pixel
+            inDep.open(); //open claw
             drive.driveByEncoder(0,0.7,0,-250); // moving backwards
             drive.driveByEncoder(0,0,-90,0); // turn left
             cvSubsystem.moveToAprilTag(0); //temporary bcs don't have april tag id
@@ -59,7 +72,7 @@ public class AutoBackboardBlue extends LinearOpMode {
             drive.driveByEncoder(0, 0.7, 0, 550); // moving
             drive.driveByEncoder(0, 0, 90,0 ); // turn right
             drive.driveByEncoder(0, 0.7, 0, 100); // moving
-            //place pixel
+            inDep.open(); //open claw
             drive.driveByEncoder(0, 0.7, 0, -250); // moving backwards
             drive.driveByEncoder(0, 0, 180, 0); // turning
             cvSubsystem.moveToAprilTag(0); //temporary bcs don't have april tag id
