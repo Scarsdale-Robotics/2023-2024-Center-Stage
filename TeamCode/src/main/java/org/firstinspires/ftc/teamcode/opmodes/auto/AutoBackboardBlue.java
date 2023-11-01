@@ -22,7 +22,7 @@ public class AutoBackboardBlue extends LinearOpMode {
                 robot.imu,
                 this
         );
-        CVSubsystem cvSubsystem = new CVSubsystem();
+        CVSubsystem cvSubsystem = new CVSubsystem(robot.camera, drive);
         SpeedCoefficients speedCoefficients = new SpeedCoefficients();
 
         waitForStart();
