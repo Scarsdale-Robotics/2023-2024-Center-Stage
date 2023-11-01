@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 @Autonomous(name = "Auto Backboard Red")
 public class AutoBackboardRed extends LinearOpMode {
     @Override
+    // The "Main" code will go in here
     public void runOpMode() {
         HardwareRobot robot = new HardwareRobot(hardwareMap);
         DriveSubsystem drive = new DriveSubsystem(
@@ -24,6 +25,8 @@ public class AutoBackboardRed extends LinearOpMode {
         );
         CVSubsystem cvSubsystem = new CVSubsystem(robot.camera, drive);
         SpeedCoefficients speedCoefficients = new SpeedCoefficients();
+        // Assuming this is in your main OpMode class
+        HardwareRobot hardwareRobot = new HardwareRobot(hardwareMap);
 
         // Initialize InDepSubsystem with the hardware components from HardwareRobot
         InDepSubsystem inDep = new InDepSubsystem(
@@ -34,40 +37,55 @@ public class AutoBackboardRed extends LinearOpMode {
                 telemetry
         );
 
+
         waitForStart();
 
-        int propLocation = cvSubsystem.getTeamPropLocation(true); // Changed to true for red team
+        //Start actual Auto now // pretend april tag location has been found, 0 = left, 1 = center, 2 = right
+        int propLocation = cvSubsystem.getTeamPropLocation(false); // 0 = left, 1 = center, 2 = right
 
         if (propLocation == 0) { // left
-            drive.driveByEncoder(0, 0.5, 0, 550);
-            drive.driveByEncoder(0, 0, 1, 300); // Changed to turn right
-            drive.driveByEncoder(0, 0.5, 0, 250);
-            inDep.open(); // open claw
-            drive.driveByEncoder(0, 0, 0, -400);
-            drive.driveByEncoder(0, 0, -1, 300); // Changed to turn left
-            drive.driveByEncoder(0, 0.5, 0, 250);
+            inDep.changeElevation(10); // raise claw
+            drive.driveByEncoder(0, 0.5, 0, 550); // moving forward more than the center path
+            drive.driveByEncoder(0, 0, -1, 300);  // turn left
+            drive.driveByEncoder(0, 0.5, 0, 250); // moving forward to the spike mark tape
+            inDep.changeElevation(-10); // lower claw
+            inDep.open(); // open claw to place the pixel
+            inDep.changeElevation(10);  // raise claw
+            drive.driveByEncoder(0, 0, 1, 600);  // turn right
+            drive.driveByEncoder(0, 0.5, 0, 750); // continue moving forward toward the parking area
             stop();
+            // autoUtil.moveToAprilTag(2); //temporary because we don't have april tag id for right
+            // park
         }
+
         else if (propLocation == 1) { // center
-            drive.driveByEncoder(0, 0.7, 0, 1100);
-            drive.driveByEncoder(0, 0, -90, 0); // Changed to turn left
-            drive.driveByEncoder(0, 0.7, 0, 100);
-            drive.driveByEncoder(0, 0, 90, 0); // Changed to turn right
-            drive.driveByEncoder(0, 0.7, 0, 150);
-            inDep.open(); // open claw
-            drive.driveByEncoder(0, 0.7, 0, -250);
-            drive.driveByEncoder(0, 0, 90, 0); // Changed to turn right
-            cvSubsystem.moveToAprilTag(0);
+            inDep.changeElevation(10); // raise claw
+            drive.driveByEncoder(0, 0.5, 0, 850); // moving forward to spike mark tape
+            inDep.changeElevation(-10); // lower claw
+            inDep.open(); // open claw to place the pixel
+            inDep.changeElevation(10); // raise claw
+            drive.driveByEncoder(0, 0.5, 0, -250); // moving back to pixel placing area
+            drive.driveByEncoder(0, 0, 1, 300);  // turn right
+            drive.driveByEncoder(0, 0.5, 0, 500); // continue moving forward toward the parking area
+            stop();
+            // autoUtil.moveToAprilTag(1); //temporary because we don't have april tag id for center
+            // park
         }
+
         else if (propLocation == 2) { // right
-            drive.driveByEncoder(0, 0.7, 0, 550);
-            drive.driveByEncoder(0, 0, -90, 0); // Changed to turn left
-            drive.driveByEncoder(0, 0.7, 0, 100);
-            inDep.open(); // open claw
-            drive.driveByEncoder(0, 0.7, 0, -250);
-            drive.driveByEncoder(0, 0, 180, 0); // 180 turns are the same for both sides
-            cvSubsystem.moveToAprilTag(0);
+            inDep.changeElevation(10); // raise claw
+            drive.driveByEncoder(0, 0.5, 0, 550); // moving forward toward the pixel placing area
+            drive.driveByEncoder(0, 0, 1, 300);  // turn right
+            drive.driveByEncoder(0, 0.5, 0, 250); // moving forward to the spike mark tape
+            inDep.changeElevation(-10); // lower clawgit
+            inDep.open(); // open claw to place the pixel
+            inDep.changeElevation(10); // raise claw
+            drive.driveByEncoder(0, 0.5, 0, 250); // continue moving forward toward the parking area
+            stop();
+            // autoUtil.moveToAprilTag(0); //temporary because we don't have april tag id
+            // park
         }
+
     }
 
     public void stop(DriveSubsystem drive) {

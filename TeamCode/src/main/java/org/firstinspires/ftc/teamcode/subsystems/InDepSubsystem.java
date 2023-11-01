@@ -16,16 +16,19 @@ public class InDepSubsystem extends SubsystemBase {
     private Servo wrist;
     private Level level;
     public enum Level {
-        GROUND(0),
-        BACKBOARD(70); //temp motor encoder values
-        int target;
+        GROUND(0, 0.0),
+        BACKBOARD1(70,0.05),
+        BACKBOARD2(150,0.15); //temp motor encoder values
 
-        Level(int target) {
+        int target;
+        double wristTarget;
+
+        Level(int target, double wristTarget) {
             this.target = target;
+            this.wristTarget = wristTarget;
         }
     }
 
-    private boolean isWristRaised;
     private boolean isArmRaised;
     private boolean isOpen;
 
@@ -39,14 +42,12 @@ public class InDepSubsystem extends SubsystemBase {
 
         // initialize vars
         level = Level.GROUND;
-        isWristRaised = true;
         isArmRaised = false;
         isOpen = false;
 
         // reset the arm and claw states
-        raiseWrist();
-        lowerArm();
         close();
+        setLevel(level.target, level.wristTarget);
     }
 
     /**
@@ -59,15 +60,10 @@ public class InDepSubsystem extends SubsystemBase {
     /**
      * @return true if the claw is open, otherwise false if it is closed.
      */
+
+    //public double getWristPosition(){return wrist.}
     public boolean getIsOpen() {
         return isOpen;
-    }
-
-    /**
-     * @return true if the arm is raised, otherwise false if it is lowered.
-     */
-    public boolean getIsWristRaised() {
-        return isWristRaised;
     }
 
     /**
@@ -85,27 +81,21 @@ public class InDepSubsystem extends SubsystemBase {
     }
 
     /**
-     * Raises the wrist.
-     */
-    public void raiseWrist() {
-        wrist.setPosition(0); // set wrist position to angled
-        isWristRaised = true;
-    }
-
-    /**
-     * Lowers the wrist.
-     */
-    public void lowerWrist() {
-        wrist.setPosition(0.15); // set wrist position to flattened
-        isWristRaised = false;
-    }
-
-    /**
      * Raises the arm.
      */
     public void raiseArm() {
-        level = Level.BACKBOARD; // set current level to raised
-        arm.setTargetPosition(level.target);
+        switch (level) {
+            case GROUND:
+                level = level.BACKBOARD1; // set current level to raised
+                break;
+            case BACKBOARD1:
+                level = level.BACKBOARD2; // set current level to raised
+                break;
+            case BACKBOARD2:
+                //setLevel(Level.BACKBOARD3);
+                break;
+        }
+        setLevel(level.target, level.wristTarget);
 
         while (opMode.opModeIsActive() && !arm.atTargetPosition()) {
             arm.setTargetPosition(level.target);
@@ -121,8 +111,18 @@ public class InDepSubsystem extends SubsystemBase {
      * Lowers the arm.
      */
     public void lowerArm() {
-        level = Level.GROUND; // set current level to lowered
-        arm.setTargetPosition(level.target);
+        switch (level) {
+            case BACKBOARD2:
+                level = level.BACKBOARD1; // set current level to lowered
+                break;
+            case BACKBOARD1:
+                level = level.GROUND; // set current level to lowered
+                break;
+            case GROUND:
+                //setLevel(Level.BACKBOARD3);
+                break;
+        }
+        setLevel(level.target, level.wristTarget);
 
         while (opMode.opModeIsActive() && !arm.atTargetPosition()) {
             arm.setTargetPosition(level.target);
@@ -132,6 +132,11 @@ public class InDepSubsystem extends SubsystemBase {
         // complete action
         arm.stopMotor();
         isArmRaised = false;
+    }
+
+    public void setLevel(int target, double wristTarget) {
+        arm.setTargetPosition(target);
+        wrist.setPosition(wristTarget);
     }
 
     public void resetArmEncoder() {
@@ -160,4 +165,17 @@ public class InDepSubsystem extends SubsystemBase {
     public Level getLevel() {
         return level;
     }
+
+    public void changeElevation(int ticks) {
+        int newTarget = getArmPosition() + ticks;
+        arm.setTargetPosition(newTarget);
+
+        while (opMode.opModeIsActive() && !arm.atTargetPosition()) {
+            arm.set(SpeedCoefficients.getArmSpeed());
+        }
+
+        arm.stopMotor();
+    }
 }
+
+
