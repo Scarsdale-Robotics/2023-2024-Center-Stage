@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import android.util.Size;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.openftc.easyopencv.OpenCvCamera;
 
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.openftc.easyopencv.OpenCvCamera;
+import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PropDetectionPipeline;
 
 import java.util.ArrayList;
 import java.util.List;
