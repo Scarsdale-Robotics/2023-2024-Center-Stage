@@ -154,7 +154,9 @@ public class CVSubsystem {
      * @return whether the AprilTag is left, center, or right in the camera view
      */
     public int getTeamPropLocation(boolean isRedTeam) {
-        return 0; // TEMPORARY
+        propPipeline = new PropDetectionPipeline(telemetry, isRedTeam);
+        camera.setPipeline(propPipeline);
+        return propPipeline.getPosition();
     }
 
     /**
