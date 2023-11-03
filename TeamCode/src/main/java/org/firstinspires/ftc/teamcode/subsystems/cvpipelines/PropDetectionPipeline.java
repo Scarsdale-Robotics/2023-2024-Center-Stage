@@ -48,7 +48,8 @@ public class PropDetectionPipeline extends OpenCvPipeline {
     public int y;
 
 
-    public PropDetectionPipeline(Telemetry telemetry){
+    public PropDetectionPipeline(Telemetry telemetry, boolean isRedTeam){
+        this.isRedTeam = isRedTeam;
         this.telemetry = telemetry;
     }
 
