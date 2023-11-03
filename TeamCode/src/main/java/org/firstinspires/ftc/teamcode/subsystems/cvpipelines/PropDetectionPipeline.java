@@ -20,7 +20,6 @@ public class PropDetectionPipeline extends OpenCvPipeline {
     Telemetry telemetry;
     boolean isRedTeam = true;
 
-    public Mat frame;
     public Mat sub;
     public Mat temp = new Mat();
 
@@ -37,16 +36,8 @@ public class PropDetectionPipeline extends OpenCvPipeline {
     public static Scalar redLowerRange2 = new Scalar(168, 62, 126);
 
     public AtomicBoolean hasStarted = new AtomicBoolean(false);
-    public AtomicInteger lateralOffset = new AtomicInteger(0);
 
-    public Point centerPoint;
-
-    public int place;
-
-    public int x;
-
-    public int y;
-
+    public int position;
 
     public PropDetectionPipeline(Telemetry telemetry, boolean isRedTeam){
         this.isRedTeam = isRedTeam;
@@ -81,6 +72,11 @@ public class PropDetectionPipeline extends OpenCvPipeline {
         return input;
     }
 
+    public int getPosition(){
+        return position;
+    }
+        
+        
     public double getTotalContourArea() {
         Mat hsvmat = new Mat();
         Imgproc.cvtColor(sub, hsvmat, Imgproc.COLOR_RGB2HSV);
