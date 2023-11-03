@@ -44,13 +44,13 @@ public class AutoPixelsRed extends LinearOpMode {
         int propLocation = cvSubsystem.getTeamPropLocation(false); // 0 = left, 1 = center, 2 = right
 
         if (propLocation == 0) { // left
-            inDep.changeElevation(10); // raise claw
+            //inDep.changeElevation(10); // raise claw
             drive.driveByEncoder(0, 0.5, 0, 550); // moving forward more than the center path
             drive.driveByEncoder(0, 0, -1, 300);  // turn left
             drive.driveByEncoder(0, 0.5, 0, 250); // moving forward to the spike mark tape
-            inDep.changeElevation(-10); // lower claw
+            //inDep.changeElevation(-10); // lower claw
             inDep.open(); // open claw to place the pixel
-            inDep.changeElevation(10);  // raise claw
+            //inDep.changeElevation(10);  // raise claw
             drive.driveByEncoder(0, 0, 1, 600);  // turn right
             drive.driveByEncoder(0, 0.5, 0, 1750); // continue moving forward toward the parking area
             stop();
@@ -59,11 +59,11 @@ public class AutoPixelsRed extends LinearOpMode {
         }
 
         else if (propLocation == 1) { // center
-            inDep.changeElevation(10); // raise claw
+            //inDep.changeElevation(10); // raise claw
             drive.driveByEncoder(0, 0.5, 0, 850); // moving forward to spike mark tape
-            inDep.changeElevation(-10); // lower claw
+            //inDep.changeElevation(-10); // lower claw
             inDep.open(); // open claw to place the pixel
-            inDep.changeElevation(10); // raise claw
+            //inDep.changeElevation(10); // raise claw
             drive.driveByEncoder(0, 0.5, 0, -250); // moving back to pixel placing area
             drive.driveByEncoder(0, 0, 1, 300);  // turn right
             drive.driveByEncoder(0, 0.5, 0, 1500); // continue moving forward toward the parking area

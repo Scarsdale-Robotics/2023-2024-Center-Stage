@@ -45,13 +45,13 @@ public class AutoBackboardBlue extends LinearOpMode {
 
 
         if (propLocation == 0) { // left
-            inDep.changeElevation(10); // raise claw
+            //inDep.changeElevation(10); // raise claw
             drive.driveByEncoder(0, 0.5, 0, 550); // moving forward toward the pixel placing area
             drive.driveByEncoder(0, 0, -1, 300);  // turn left
             drive.driveByEncoder(0, 0.5, 0, 250); // moving forward to the spike mark tape
-            inDep.changeElevation(-10); // lower claw
+            //inDep.changeElevation(-10); // lower claw
             inDep.open(); // open claw to place the pixel
-            inDep.changeElevation(10); // raise claw
+            //inDep.changeElevation(10); // raise claw
             drive.driveByEncoder(0, 0.5, 0, 250); // continue moving forward toward the parking area
             stop();
             // autoUtil.moveToAprilTag(0); //temporary because we don't have april tag id
@@ -59,11 +59,11 @@ public class AutoBackboardBlue extends LinearOpMode {
         }
 
         else if (propLocation == 1) { // center
-            inDep.changeElevation(10); // raise claw
+            //inDep.changeElevation(10); // raise claw
             drive.driveByEncoder(0, 0.5, 0, 850); // moving forward to spike mark tape
-            inDep.changeElevation(-10); // lower claw
+            //inDep.changeElevation(-10); // lower claw
             inDep.open(); // open claw to place the pixel
-            inDep.changeElevation(10); // raise claw
+            //inDep.changeElevation(10); // raise claw
             drive.driveByEncoder(0, 0.5, 0, -250); // moving back to pixel placing area
             drive.driveByEncoder(0, 0, -1, 300);  // turn left
             drive.driveByEncoder(0, 0.5, 0, 500); // continue moving forward toward the parking area
@@ -73,13 +73,13 @@ public class AutoBackboardBlue extends LinearOpMode {
         }
 
         else if (propLocation == 2) { // right
-            inDep.changeElevation(10); // raise claw
+            //inDep.changeElevation(10); // raise claw
             drive.driveByEncoder(0, 0.5, 0, 550); // moving forward more than the center path
             drive.driveByEncoder(0, 0, 1, 300);  // turn right
             drive.driveByEncoder(0, 0.5, 0, 250); // moving forward to the spike mark tape
-            inDep.changeElevation(-10); // lower claw
+            //inDep.changeElevation(-10); // lower claw
             inDep.open(); // open claw to place the pixel
-            inDep.changeElevation(10);  // raise claw
+            //inDep.changeElevation(10);  // raise claw
             drive.driveByEncoder(0, 0, -1, 600);  // turn left
             drive.driveByEncoder(0, 0.5, 0, 750); // continue moving forward toward the parking area
             stop();
