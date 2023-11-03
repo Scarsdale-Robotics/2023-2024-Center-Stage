@@ -43,6 +43,7 @@ public class AutoBackboardBlue extends LinearOpMode {
         //Start actual Auto now // pretend april tag location has been found, 0 = left, 1 = center, 2 = right
         int propLocation = cvSubsystem.getTeamPropLocation(false); // 0 = left, 1 = center, 2 = right
 
+
         if (propLocation == 0) { // left
             inDep.changeElevation(10); // raise claw
             drive.driveByEncoder(0, 0.5, 0, 550); // moving forward toward the pixel placing area
