@@ -5,11 +5,13 @@ import android.util.Size;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.openftc.easyopencv.OpenCvCamera;
 
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.openftc.easyopencv.OpenCvCamera;
+import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PropDetectionPipeline;
 
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelDetectionPipeline;
 
@@ -160,7 +162,9 @@ public class CVSubsystem extends SubsystemBase {
      * @return whether the AprilTag is left, center, or right in the camera view
      */
     public int getTeamPropLocation(boolean isRedTeam) {
-        return 0; // TEMPORARY
+        propPipeline = new PropDetectionPipeline(telemetry, isRedTeam);
+        camera.setPipeline(propPipeline);
+        return propPipeline.getPosition();
     }
     public int getPixelHorizontalOffset() {
         PixelDetectionPipeline p = new PixelDetectionPipeline();
