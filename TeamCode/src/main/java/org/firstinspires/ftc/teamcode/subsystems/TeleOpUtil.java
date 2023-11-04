@@ -9,15 +9,15 @@ import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 
 public class TeleOpUtil {
-    private HardwareRobot robot;
-    private DriveSubsystem drive;
-    private InDepSubsystem inDep;
-    private CVSubsystem cv;
-    private boolean isRedTeam;
-    private Gamepad gamepad1;
-    private Gamepad gamepad2;
+    private final DriveSubsystem drive;
+    private final InDepSubsystem inDep;
+    private final CVSubsystem cv;
+    private final boolean isRedTeam;
+    private final Gamepad gamepad1;
+    private final Gamepad gamepad2;
+    private final AlignmentUtility align;
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
-        robot = new HardwareRobot(hardwareMap);
+        HardwareRobot robot = new HardwareRobot(hardwareMap);
         SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
         drive = new DriveSubsystem(
                 robot.leftFront,
@@ -38,6 +38,7 @@ public class TeleOpUtil {
                 robot.camera,
                 drive
         );
+        align = new AlignmentUtility(drive, cv)
         this.isRedTeam = isRedTeam;
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
@@ -105,8 +106,11 @@ public class TeleOpUtil {
         runResetArmControl();
     }
 
+    private void
+
     public void tick() {
         runMotionControl();
         runArmClawControl();
+
     }
 }
