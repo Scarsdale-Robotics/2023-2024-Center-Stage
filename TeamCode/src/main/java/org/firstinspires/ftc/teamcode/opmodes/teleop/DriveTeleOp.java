@@ -64,15 +64,9 @@ public class DriveTeleOp extends LinearOpMode {
             double driveX = 0;
             double driveY = 0;
 
-            if (gamepad1.dpad_up || gamepad2.dpad_up) {
-                if (gamepad2.dpad_up) {
-                    gamepad1.rumble(500);
-                }
+            if (gamepad2.dpad_up) {
                 SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
-            } else if (gamepad1.dpad_down || gamepad2.dpad_down) {
-                if (gamepad2.dpad_down) {
-                    gamepad1.rumble(500);
-                }
+            } else if (gamepad2.dpad_down) {
                 SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
             }
 
@@ -107,12 +101,8 @@ public class DriveTeleOp extends LinearOpMode {
             //////////////////////////
 
 
-            telemetry.addData("arm raised: ", inDep.getIsWristRaised());
             // Toggle claw with the 'y' button
-            if ((gamepad1.y || gamepad2.y) && !clawToggled) {
-                if (gamepad2.y) {
-                    gamepad1.rumble(500);
-                }
+            if (gamepad1.y && !clawToggled) {
                 if (inDep.getIsOpen()) {
                     inDep.close();
                 } else {
@@ -121,28 +111,18 @@ public class DriveTeleOp extends LinearOpMode {
                 clawToggled = true;
 
             }
-            if (!gamepad1.y && !gamepad2.y) clawToggled = false;
-
-            if (!gamepad1.y && !gamepad2.y) clawToggled = false;
-
-            // Toggle wrist with a condition
-            boolean condition = inDep.getArmPosition() > 100 && (inDep.getArmPosition()-prevArmEncoder) >= 0; // first derivative
-            if (condition) {
-                inDep.lowerWrist();
-            }
-            if (!condition) {
-                inDep.raiseWrist();
-            }
-
-            telemetry.addData("arm pos: ", inDep.getArmPosition());
 
             // Control arm power with triggers
-            double totalChange = (gamepad1.right_trigger - gamepad1.left_trigger) * SpeedCoefficients.getArmSpeed();
-            inDep.rawPower(-totalChange);
+            inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed());
+
+            // Bind to certain arm heights if necessary
+            if (gamepad2.right_bumper)
+                inDep.raiseArm();
+            else if (gamepad2.left_bumper)
+                inDep.lowerArm();
 
             // Resets arm
             if (gamepad1.a || gamepad2.a) {
-
                 inDep.resetArmEncoder();
                 gamepad1.rumble(500);
                 gamepad2.rumble(500);

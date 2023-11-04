@@ -9,19 +9,21 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 
 public class InDepSubsystem extends SubsystemBase {
-    private LinearOpMode opMode;
-    private Telemetry telemetry;
-    private Motor arm;
-    private Servo claw;
-    private Servo wrist;
-    private Level level;
+    private final double CLAW_OPEN_POS = 0.175;
+    private final double CLAW_CLOSED_POS = 0;
+
+    private final LinearOpMode opMode;
+    private final Motor arm;
+    private final Servo claw;
+    private final Servo wrist;
+    private boolean isClawOpen;
     public enum Level {
         GROUND(0, 0.0),
-        BACKBOARD1(70,0.05),
-        BACKBOARD2(150,0.15); //temp motor encoder values
+        BACKBOARD1(70,0.15),
+        BACKBOARD2(150,0.10); //temp motor encoder values
 
-        int target;
-        double wristTarget;
+        final int target;
+        final double wristTarget;
 
         Level(int target, double wristTarget) {
             this.target = target;
@@ -29,25 +31,16 @@ public class InDepSubsystem extends SubsystemBase {
         }
     }
 
-    private boolean isArmRaised;
-    private boolean isOpen;
-
     public InDepSubsystem(Motor arm, Servo claw, Servo wrist, LinearOpMode opMode, Telemetry telemetry) {
         // initialize objects
         this.arm = arm;
         this.claw = claw;
         this.wrist = wrist;
         this.opMode = opMode;
-        this.telemetry = telemetry;
-
-        // initialize vars
-        level = Level.GROUND;
-        isArmRaised = false;
-        isOpen = false;
 
         // reset the arm and claw states
         close();
-        setLevel(level.target, level.wristTarget);
+        setLevel(Level.GROUND);
     }
 
     /**
@@ -63,14 +56,7 @@ public class InDepSubsystem extends SubsystemBase {
 
     //public double getWristPosition(){return wrist.}
     public boolean getIsOpen() {
-        return isOpen;
-    }
-
-    /**
-     * @return true if the arm is raised, otherwise false if it is lowered.
-     */
-    public boolean getIsArmRaised() {
-        return isArmRaised;
+        return isClawOpen;
     }
 
     /**
@@ -81,62 +67,44 @@ public class InDepSubsystem extends SubsystemBase {
     }
 
     /**
+     * gets the level immediately above or immediately below the current position
+     * @param getAbove whether to get the above level or below level
+     * @return the nearby level specified (by getAbove)
+     */
+    private Level getNearbyLevel(boolean getAbove) {
+        double armPos = arm.getCurrentPosition();
+        if (armPos > Level.BACKBOARD2.target)
+            return getAbove ? Level.BACKBOARD2 : Level.BACKBOARD1;
+        else if (armPos > Level.BACKBOARD1.target)
+            return getAbove ? Level.BACKBOARD2 : Level.GROUND;
+        else
+            return getAbove ? Level.BACKBOARD1 : Level.GROUND;
+    }
+
+    /**
      * Raises the arm.
      */
     public void raiseArm() {
-        switch (level) {
-            case GROUND:
-                level = level.BACKBOARD1; // set current level to raised
-                break;
-            case BACKBOARD1:
-                level = level.BACKBOARD2; // set current level to raised
-                break;
-            case BACKBOARD2:
-                //setLevel(Level.BACKBOARD3);
-                break;
-        }
-        setLevel(level.target, level.wristTarget);
-
-        while (opMode.opModeIsActive() && !arm.atTargetPosition()) {
-            arm.setTargetPosition(level.target);
-            arm.set(SpeedCoefficients.getArmSpeed());
-        }; // wait until arm is at target position
-
-        // complete action
-        arm.stopMotor();
-        isArmRaised = true;
+        setLevel(getNearbyLevel(true));
     }
 
     /**
      * Lowers the arm.
      */
     public void lowerArm() {
-        switch (level) {
-            case BACKBOARD2:
-                level = level.BACKBOARD1; // set current level to lowered
-                break;
-            case BACKBOARD1:
-                level = level.GROUND; // set current level to lowered
-                break;
-            case GROUND:
-                //setLevel(Level.BACKBOARD3);
-                break;
-        }
-        setLevel(level.target, level.wristTarget);
+        setLevel(getNearbyLevel(false));
+    }
 
+    public void setLevel(Level l) {
+        arm.setTargetPosition(l.target);
+        wrist.setPosition(l.wristTarget);
         while (opMode.opModeIsActive() && !arm.atTargetPosition()) {
-            arm.setTargetPosition(level.target);
+            arm.setTargetPosition(l.target);
             arm.set(SpeedCoefficients.getArmSpeed());
         }; // wait until arm is at target position
 
         // complete action
         arm.stopMotor();
-        isArmRaised = false;
-    }
-
-    public void setLevel(int target, double wristTarget) {
-        arm.setTargetPosition(target);
-        wrist.setPosition(wristTarget);
     }
 
     public void resetArmEncoder() {
@@ -147,23 +115,16 @@ public class InDepSubsystem extends SubsystemBase {
      * Opens the claw.
      */
     public void open() {
-        claw.setPosition(0.175);
-        isOpen = true;
+        claw.setPosition(CLAW_OPEN_POS);
+        isClawOpen = true;
     }
 
     /**
      * Closes the claw.
      */
     public void close() {
-        claw.setPosition(0.0);
-        isOpen = false;
-    }
-
-    /**
-     * @return the level of the arm.
-     */
-    public Level getLevel() {
-        return level;
+        claw.setPosition(CLAW_CLOSED_POS);
+        isClawOpen = false;
     }
 
     public void changeElevation(int ticks) {
