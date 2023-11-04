@@ -39,15 +39,12 @@ public class PropDetectionPipeline extends OpenCvPipeline {
 
     public int position;
 
-    public PropDetectionPipeline(Telemetry telemetry, boolean isRedTeam){
+    public PropDetectionPipeline(boolean isRedTeam){
         this.isRedTeam = isRedTeam;
-        this.telemetry = telemetry;
     }
 
     @Override
     public Mat processFrame(Mat input) {
-
-        this.telemetry = telemetry;
         hasStarted.set(true);
         height = input.height();
         width = input.width();
@@ -65,7 +62,7 @@ public class PropDetectionPipeline extends OpenCvPipeline {
             if (totalArea>maxTotalArea){
                 maxTotalArea = totalArea;
                 best_idx = i;
-            }
+            }}
             
         telemetry.addData("best idx", best_idx);
         telemetry.update();

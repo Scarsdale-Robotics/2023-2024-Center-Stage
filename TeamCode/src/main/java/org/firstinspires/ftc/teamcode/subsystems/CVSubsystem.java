@@ -162,10 +162,11 @@ public class CVSubsystem extends SubsystemBase {
      * @return whether the AprilTag is left, center, or right in the camera view
      */
     public int getTeamPropLocation(boolean isRedTeam) {
-        propPipeline = new PropDetectionPipeline(telemetry, isRedTeam);
+        PropDetectionPipeline propPipeline = new PropDetectionPipeline(isRedTeam);
         camera.setPipeline(propPipeline);
         return propPipeline.getPosition();
     }
+
     public int getPixelHorizontalOffset() {
         PixelDetectionPipeline p = new PixelDetectionPipeline();
         camera.setPipeline(p);
