@@ -38,7 +38,7 @@ public class TeleOpUtil {
                 robot.camera,
                 drive
         );
-        align = new AlignmentUtility(drive, cv)
+        align = new AlignmentUtility(drive, cv);
         this.isRedTeam = isRedTeam;
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
@@ -105,8 +105,6 @@ public class TeleOpUtil {
         runArmRigidControl();
         runResetArmControl();
     }
-
-    private void
 
     public void tick() {
         runMotionControl();
