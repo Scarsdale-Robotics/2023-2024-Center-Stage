@@ -123,6 +123,8 @@ public class DriveTeleOp extends LinearOpMode {
             }
             if (!gamepad1.y && !gamepad2.y) clawToggled = false;
 
+            if (!gamepad1.y && !gamepad2.y) clawToggled = false;
+
             // Toggle wrist with a condition
             boolean condition = inDep.getArmPosition() > 100 && (inDep.getArmPosition()-prevArmEncoder) >= 0; // first derivative
             if (condition) {
@@ -136,7 +138,7 @@ public class DriveTeleOp extends LinearOpMode {
 
             // Control arm power with triggers
             double totalChange = (gamepad1.right_trigger - gamepad1.left_trigger) * SpeedCoefficients.getArmSpeed();
-            inDep.rawPower(totalChange);
+            inDep.rawPower(-totalChange);
 
             // Resets arm
             if (gamepad1.a || gamepad2.a) {
