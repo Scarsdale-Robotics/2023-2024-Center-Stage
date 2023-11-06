@@ -15,7 +15,6 @@ public class TeleOpUtil {
     private final boolean isRedTeam;
     private final Gamepad gamepad1;
     private final Gamepad gamepad2;
-    private final AlignmentUtility align;
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
         HardwareRobot robot = new HardwareRobot(hardwareMap);
         SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
@@ -38,7 +37,6 @@ public class TeleOpUtil {
                 robot.camera,
                 drive
         );
-        align = new AlignmentUtility(drive, cv);
         this.isRedTeam = isRedTeam;
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
@@ -106,9 +104,70 @@ public class TeleOpUtil {
         runResetArmControl();
     }
 
+    /**
+     * will likely be used in auto, not teleop
+     * this method is for testing
+     * controls are for testing as well
+     */
+    private void runAprilTagAlignmentControl() {
+        if (gamepad2.dpad_right) cv.moveToAprilTag(1);  // feel free to adjust id from 1-6 inclusive
+    }
+
+    /**
+     * temp method, will be moved to auto after testing
+     * ignore that the controls are inconvenient--they are temporary for testing
+     */
+    private void teamPropLocationControl() {
+        if (gamepad2.dpad_left) {
+            int teamPropLocation = cv.getTeamPropLocation(isRedTeam);
+            switch (teamPropLocation) {
+                case 0:
+                    // left location
+                    drive.driveFieldCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+                    break;
+                case 2:
+                    // right location
+                    drive.driveFieldCentric(1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+                    break;
+                default:
+                    // center location
+                    drive.driveFieldCentric(0, 1 * SpeedCoefficients.getForwardSpeed(), 0);
+                    break;
+            }
+        };
+    }
+
+    private void runAprilTagParallelAlignControl() {
+        // check alignParallelWithAprilTag() for details
+        if (gamepad2.b) cv.alignParallelWithAprilTag(isRedTeam ? 5 : 2);
+    }
+
+    /**
+     * macro controls are wip, feel free to change as is comfortable
+     */
+    private void runPixelAlignmentControl() {
+        if (gamepad1.b) cv.moveToPixel();
+    }
+
+    /**
+     * don't question the one-line methods... have to keep a consistent style...
+     */
+    private void runBeforeTapeCheck() {
+        // TODO: check if wentao and tutu have pushed the tape detection pipeline that takes into account isRedTeam
+        // DO NOT TEST YET
+        cv.isRobotBeforeTape(isRedTeam);
+    }
+
     public void tick() {
         runMotionControl();
         runArmClawControl();
+        // TODO: test each method below one-by-one
+        // runAprilTagParallelAlignControl();
+        // runAprilTagAlignmentControl();
+        // teamPropLocationControl();
+        // runPixelAlignmentControl();
 
+        // DO NOT TEST THESE YET
+        // runBeforeTapeCheck();
     }
 }

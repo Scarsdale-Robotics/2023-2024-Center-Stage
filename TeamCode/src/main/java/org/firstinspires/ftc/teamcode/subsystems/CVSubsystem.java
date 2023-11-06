@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 import org.openftc.easyopencv.OpenCvCamera;
 
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -178,7 +179,21 @@ public class CVSubsystem extends SubsystemBase {
      * @return true if the robot is in front of a piece of tape approximately perpendicular to the camera view, false otherwise
      */
     public boolean isRobotBeforeTape(boolean isRedTeam) {
+
         return false; // TEMPORARY
+    }
+
+    public void moveToPixel() {
+        double ERROR_THRESHOLD = 50;
+
+        int pixelOffset = getPixelHorizontalOffset();
+        while (Math.abs(pixelOffset) > ERROR_THRESHOLD) {
+            if (pixelOffset < 0)
+                drive.driveRobotCentric(1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+            else
+                drive.driveFieldCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+            pixelOffset = getPixelHorizontalOffset();
+        }
     }
 
     /**
@@ -197,15 +212,15 @@ public class CVSubsystem extends SubsystemBase {
             switch (aprilTagLocation) {
                 case 0:
                     // left location
-                    drive.driveFieldCentric(1, 0, 0);
+                    drive.driveRobotCentric(1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
                     break;
                 case 2:
                     // right location
-                    drive.driveFieldCentric(-1, 0, 0);
+                    drive.driveRobotCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
                     break;
                 default:
                     // center location
-                    drive.driveFieldCentric(0, 1, 0);
+                    drive.driveRobotCentric(0, 1 * SpeedCoefficients.getForwardSpeed(), 0);
                     break;
             }
         }
@@ -218,7 +233,7 @@ public class CVSubsystem extends SubsystemBase {
     public void alignParallelWithAprilTag(int tagID) {
         double rotOff = getAprilTagRotationalOffset(tagID);
         while (Math.abs(rotOff) > ERROR_ALIGNMENT) {
-            drive.driveFieldCentric(0, 0, rotOff * 1); // times some scaling factor (temporarily at 1)
+            drive.driveFieldCentric(0, 0, rotOff * 1 * SpeedCoefficients.getTurnSpeed()); // times some scaling factor (temporarily at 1)
         }
     }
 }
