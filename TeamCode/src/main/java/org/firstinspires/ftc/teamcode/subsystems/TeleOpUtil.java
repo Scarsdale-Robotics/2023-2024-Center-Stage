@@ -144,30 +144,23 @@ public class TeleOpUtil {
 
     /**
      * macro controls are wip, feel free to change as is comfortable
+     * also don't question the one-line methods... have to keep a consistent style...
      */
     private void runPixelAlignmentControl() {
         if (gamepad1.b) cv.moveToPixel();
     }
 
-    /**
-     * don't question the one-line methods... have to keep a consistent style...
-     */
-    private void runBeforeTapeCheck() {
-        // TODO: check if wentao and tutu have pushed the tape detection pipeline that takes into account isRedTeam
-        // DO NOT TEST YET
-        cv.isRobotBeforeTape(isRedTeam);
-    }
-
     public void tick() {
-        runMotionControl();
-        runArmClawControl();
-        // TODO: test each method below one-by-one
-        // runAprilTagParallelAlignControl();
-        // runAprilTagAlignmentControl();
-        // teamPropLocationControl();
-        // runPixelAlignmentControl();
-
-        // DO NOT TEST THESE YET
-        // runBeforeTapeCheck();
+        // TODO: check if wentao and tutu have pushed the tape detection pipeline that takes into account isRedTeam
+        // DO NOT UNCOMMENT IF STATEMENT UNTIL WENTAO AND TUTU HAVE CODE FOR BEFORE TAPE DETECTION USING isRedTeam
+//        if (gamepad2.y || !cv.isRobotBeforeTape(isRedTeam)) {
+            runMotionControl();
+            runArmClawControl();
+            // TODO: uncomment test each method below one-by-one
+            // runAprilTagParallelAlignControl();
+            // runAprilTagAlignmentControl();
+            // teamPropLocationControl();
+            // runPixelAlignmentControl();
+//        }
     }
 }

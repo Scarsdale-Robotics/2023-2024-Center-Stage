@@ -7,6 +7,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.SpeedCoefficients;
+import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.TapeDetectionPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -34,8 +35,10 @@ public class CVSubsystem extends SubsystemBase {
 
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
-
+    private TapeDetectionPipeline tdp;
     public CVSubsystem(OpenCvCamera camera, DriveSubsystem drive) {
+        tdp = new TapeDetectionPipeline();
+        camera.setPipeline(tdp);
         this.camera = camera;
         this.drive = drive;
         // create AprilTagProcessor and VisionPortal
@@ -179,8 +182,7 @@ public class CVSubsystem extends SubsystemBase {
      * @return true if the robot is in front of a piece of tape approximately perpendicular to the camera view, false otherwise
      */
     public boolean isRobotBeforeTape(boolean isRedTeam) {
-
-        return false; // TEMPORARY
+        return tdp.isBeforeTape(isRedTeam);
     }
 
     public void moveToPixel() {
