@@ -9,14 +9,16 @@ import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 
 public class TeleOpUtil {
-    private final DriveSubsystem drive;
-    private final InDepSubsystem inDep;
-    private final CVSubsystem cv;
+    public HardwareRobot robot;
+    public DriveSubsystem drive;
+    public InDepSubsystem inDep;
+    public CVSubsystem cv;
     private final boolean isRedTeam;
+    private boolean clawToggle = false;
     private final Gamepad gamepad1;
     private final Gamepad gamepad2;
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
-        HardwareRobot robot = new HardwareRobot(hardwareMap);
+        robot = new HardwareRobot(hardwareMap);
         SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
         drive = new DriveSubsystem(
                 robot.leftFront,
@@ -43,9 +45,9 @@ public class TeleOpUtil {
     }
 
     private void runMoveModeControl() {
-        if (gamepad2.dpad_up) {
+        if (gamepad1.dpad_up) {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
-        } else if (gamepad2.dpad_down) {
+        } else if (gamepad1.dpad_down) {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
         }
     }
@@ -67,12 +69,12 @@ public class TeleOpUtil {
     }
 
     private void runClawToggleControl() {
-        if (gamepad1.y) {
-            if (inDep.getIsOpen())
-                inDep.close();
-            else
-                inDep.open();
+        if (gamepad1.y && !clawToggle) {
+            if (inDep.getIsOpen()) inDep.close();
+            else inDep.open();
+            clawToggle = true;
         }
+        if (!gamepad1.y) clawToggle = false;
     }
 
     private void runArmFlexControl() {
@@ -80,10 +82,10 @@ public class TeleOpUtil {
     }
 
     private void runArmRigidControl() {
-        if (gamepad2.right_bumper)
-            inDep.raiseArm();
-        else if (gamepad2.left_bumper)
-            inDep.lowerArm();
+//        if (gamepad1.right_bumper)
+//            inDep.raiseArm();
+//        else if (gamepad1.left_bumper)
+//            inDep.lowerArm();
     }
 
     private void runResetArmControl() {
@@ -110,7 +112,7 @@ public class TeleOpUtil {
      * controls are for testing as well
      */
     private void runAprilTagAlignmentControl() {
-        if (gamepad2.dpad_right) cv.moveToAprilTag(1);  // feel free to adjust id from 1-6 inclusive
+        if (gamepad1.dpad_right) cv.moveToAprilTag(1);  // feel free to adjust id from 1-6 inclusive
     }
 
     /**
@@ -118,20 +120,20 @@ public class TeleOpUtil {
      * ignore that the controls are inconvenient--they are temporary for testing
      */
     private void teamPropLocationControl() {
-        if (gamepad2.dpad_left) {
+        if (gamepad1.dpad_left) {
             int teamPropLocation = cv.getTeamPropLocation(isRedTeam);
             switch (teamPropLocation) {
                 case 0:
                     // left location
-                    drive.driveFieldCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+                    drive.driveRobotCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
                     break;
                 case 2:
                     // right location
-                    drive.driveFieldCentric(1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+                    drive.driveRobotCentric(1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
                     break;
                 default:
                     // center location
-                    drive.driveFieldCentric(0, 1 * SpeedCoefficients.getForwardSpeed(), 0);
+                    drive.driveRobotCentric(0, 1 * SpeedCoefficients.getForwardSpeed(), 0);
                     break;
             }
         };
@@ -139,7 +141,7 @@ public class TeleOpUtil {
 
     private void runAprilTagParallelAlignControl() {
         // check alignParallelWithAprilTag() for details
-        if (gamepad2.b) cv.alignParallelWithAprilTag(isRedTeam ? 5 : 2);
+        if (gamepad1.b) cv.alignParallelWithAprilTag(isRedTeam ? 5 : 2);
     }
 
     /**
@@ -156,6 +158,8 @@ public class TeleOpUtil {
 //        if (gamepad2.y || !cv.isRobotBeforeTape(isRedTeam)) {
             runMotionControl();
             runArmClawControl();
+
+//            inDep.checkForBrake();
             // TODO: uncomment test each method below one-by-one
             // runAprilTagParallelAlignControl();
             // runAprilTagAlignmentControl();

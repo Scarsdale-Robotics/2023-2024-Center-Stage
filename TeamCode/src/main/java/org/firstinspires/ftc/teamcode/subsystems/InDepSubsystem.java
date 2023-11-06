@@ -18,9 +18,9 @@ public class InDepSubsystem extends SubsystemBase {
     private final Servo wrist;
     private boolean isClawOpen;
     public enum Level {
-        GROUND(0, 0.0),
-        BACKBOARD1(70,0.15),
-        BACKBOARD2(150,0.10); //temp motor encoder values
+        GROUND(0, 0),
+        BACKBOARD1(-1960,0.05),
+        BACKBOARD2(-4200,0.125); //temp motor encoder values
 
         final int target;
         final double wristTarget;
@@ -95,16 +95,21 @@ public class InDepSubsystem extends SubsystemBase {
         setLevel(getNearbyLevel(false));
     }
 
-    public void setLevel(Level l) {
-        arm.setTargetPosition(l.target);
-        wrist.setPosition(l.wristTarget);
-        while (opMode.opModeIsActive() && !arm.atTargetPosition()) {
-            arm.setTargetPosition(l.target);
-            arm.set(SpeedCoefficients.getArmSpeed());
-        }; // wait until arm is at target position
+    public void checkForBrake() {
+        if (opMode.opModeIsActive() && arm.atTargetPosition()) {
+            arm.stopMotor();
+            // complete action
+        }
+    }
 
-        // complete action
-        arm.stopMotor();
+    public void setLevel(Level level) {
+        arm.setTargetPosition(level.target);
+        wrist.setPosition(level.wristTarget);
+        arm.set(SpeedCoefficients.getArmSpeed());
+    }
+
+    public void setWrist(Level level) {
+        wrist.setPosition(level.wristTarget);
     }
 
     public void resetArmEncoder() {
@@ -130,12 +135,8 @@ public class InDepSubsystem extends SubsystemBase {
     public void changeElevation(int ticks) {
         int newTarget = getArmPosition() + ticks;
         arm.setTargetPosition(newTarget);
+        arm.set(SpeedCoefficients.getArmSpeed());
 
-        while (opMode.opModeIsActive() && !arm.atTargetPosition()) {
-            arm.set(SpeedCoefficients.getArmSpeed());
-        }
-
-        arm.stopMotor();
     }
 }
 

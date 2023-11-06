@@ -18,10 +18,23 @@ import org.firstinspires.ftc.teamcode.subsystems.TeleOpUtil;
 public class DriveTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() {
-        TeleOpUtil teleop = new TeleOpUtil(hardwareMap, telemetry, false, gamepad1, gamepad2, this);
+        TeleOpUtil teleOp = new TeleOpUtil(hardwareMap, telemetry, false, gamepad1, gamepad2, this);
         waitForStart();
         while (opModeIsActive()) {
-            teleop.tick();
+            teleOp.tick();
+            int armPos = teleOp.robot.arm.motor.getCurrentPosition();
+
+            if (armPos<-4200) {
+                teleOp.inDep.setWrist(InDepSubsystem.Level.BACKBOARD2);
+            } else if (armPos<-1960) {
+                teleOp.inDep.setWrist(InDepSubsystem.Level.BACKBOARD1);
+            } else {
+                teleOp.inDep.setWrist(InDepSubsystem.Level.GROUND);
+            }
+
+            telemetry.addData("Arm pos: ", armPos);
+            telemetry.addData("Wrist pos: ", teleOp.robot.wrist.getPosition());
+            telemetry.update();
         }
     }
 }
