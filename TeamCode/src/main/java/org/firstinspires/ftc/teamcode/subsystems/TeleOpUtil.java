@@ -44,67 +44,13 @@ public class TeleOpUtil {
         this.gamepad2 = gamepad2;
     }
 
-    private void runMoveModeControl() {
-        if (gamepad1.dpad_up) {
-            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
-        } else if (gamepad1.dpad_down) {
-            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
-        }
-    }
-
-    private void runDriveControl() {
-        drive.driveRobotCentric(
-                -Math.signum(gamepad1.left_stick_x) * SpeedCoefficients.getStrafeSpeed(),
-                Math.signum(gamepad1.left_stick_y) * SpeedCoefficients.getForwardSpeed(),
-                -gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed()
-        );
-    }
-
-    /**
-     * PRIMARY MOTION CONTROL METHOD
-     */
-    private void runMotionControl() {
-        runMoveModeControl();
-        runDriveControl();
-    }
-
-    private void runClawToggleControl() {
-        if (gamepad1.y && !clawToggle) {
-            if (inDep.getIsOpen()) inDep.close();
-            else inDep.open();
-            clawToggle = true;
-        }
-        if (!gamepad1.y) clawToggle = false;
-    }
-
-    private void runArmFlexControl() {
-        inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed());
-    }
-
     private void runArmRigidControl() {
-//        if (gamepad1.right_bumper)
-//            inDep.raiseArm();
-//        else if (gamepad1.left_bumper)
-//            inDep.lowerArm();
+        if (gamepad1.right_bumper)
+            inDep.raiseArm();
+        else if (gamepad1.left_bumper)
+            inDep.lowerArm();
     }
 
-    private void runResetArmControl() {
-        if (gamepad1.a || gamepad2.a) {
-            inDep.resetArmEncoder();
-            gamepad1.rumble(500);
-            gamepad2.rumble(500);
-        }
-    }
-
-    /**
-     * PRIMARY ARM CLAW CONTROL METHOD
-     */
-    private void runArmClawControl() {
-        runClawToggleControl();
-        runArmFlexControl();
-        runArmRigidControl();
-        runResetArmControl();
-    }
 
     /**
      * will likely be used in auto, not teleop
@@ -152,6 +98,51 @@ public class TeleOpUtil {
         if (gamepad1.b) cv.moveToPixel();
     }
 
+    /**
+     * PRIMARY MOTION CONTROL METHOD
+     */
+    private void runMotionControl() {
+        // MOVE MODE CONTROL
+        if (gamepad1.dpad_up) {
+            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+        } else if (gamepad1.dpad_down) {
+            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
+        }
+
+        // DRIVE CONTROL
+        drive.driveRobotCentric(
+                -Math.signum(gamepad1.left_stick_x) * SpeedCoefficients.getStrafeSpeed(),
+                Math.signum(gamepad1.left_stick_y) * SpeedCoefficients.getForwardSpeed(),
+                -gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed()
+        );
+    }
+
+    /**
+     * PRIMARY ARM CLAW CONTROL METHOD
+     */
+    private void runArmClawControl() {
+        // CLAW TOGGLE CONTROL
+        if (gamepad1.y && !clawToggle) {
+            if (inDep.getIsOpen()) inDep.close();
+            else inDep.open();
+            clawToggle = true;
+        }
+        if (!gamepad1.y) clawToggle = false;
+
+        // FLEX MODE CONTROL
+        inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed());
+
+        // RIGID MODE CONTROL
+//        runArmRigidControl();
+
+        // RESET ARM CONTROL
+        if (gamepad1.a || gamepad2.a) {
+            inDep.resetArmEncoder();
+            gamepad1.rumble(500);
+            gamepad2.rumble(500);
+        }
+    }
+
     public void tick() {
         // TODO: check if wentao and tutu have pushed the tape detection pipeline that takes into account isRedTeam
         // DO NOT UNCOMMENT IF STATEMENT UNTIL WENTAO AND TUTU HAVE CODE FOR BEFORE TAPE DETECTION USING isRedTeam
@@ -159,7 +150,7 @@ public class TeleOpUtil {
             runMotionControl();
             runArmClawControl();
 
-//            inDep.checkForBrake();
+            inDep.checkForBrake();
             // TODO: uncomment test each method below one-by-one
             // runAprilTagParallelAlignControl();
             // runAprilTagAlignmentControl();

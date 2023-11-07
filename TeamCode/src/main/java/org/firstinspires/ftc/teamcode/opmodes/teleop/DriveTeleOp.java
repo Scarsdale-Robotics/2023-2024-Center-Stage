@@ -22,17 +22,7 @@ public class DriveTeleOp extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             teleOp.tick();
-            int armPos = teleOp.robot.arm.motor.getCurrentPosition();
-
-            if (armPos<-4200) {
-                teleOp.inDep.setWrist(InDepSubsystem.Level.BACKBOARD2);
-            } else if (armPos<-1960) {
-                teleOp.inDep.setWrist(InDepSubsystem.Level.BACKBOARD1);
-            } else {
-                teleOp.inDep.setWrist(InDepSubsystem.Level.GROUND);
-            }
-
-            telemetry.addData("Arm pos: ", armPos);
+            telemetry.addData("Arm pos: ", teleOp.robot.arm.motor.getCurrentPosition());
             telemetry.addData("Wrist pos: ", teleOp.robot.wrist.getPosition());
             telemetry.update();
         }

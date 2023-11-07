@@ -64,6 +64,19 @@ public class InDepSubsystem extends SubsystemBase {
      */
     public void rawPower(double power) {
         arm.motor.setPower(power);
+
+        // code moved into this method to avoid an edge case where curr pos moves slightly too much or fails to move enough
+        // which would mess up curr pos ranges potentially making the wrist act unexpectedly
+        // also moving here increases flexibility and avoids hard coding values without
+        // having very long variable names
+        int armPos = arm.motor.getCurrentPosition();
+        if (armPos < Level.BACKBOARD2.wristTarget) {
+            wrist.setPosition(Level.BACKBOARD2.wristTarget);
+        } else if (armPos < Level.BACKBOARD1.wristTarget) {
+            wrist.setPosition(Level.BACKBOARD1.wristTarget);
+        } else {
+            wrist.setPosition(Level.GROUND.wristTarget);
+        }
     }
 
     /**
@@ -106,10 +119,6 @@ public class InDepSubsystem extends SubsystemBase {
         arm.setTargetPosition(level.target);
         wrist.setPosition(level.wristTarget);
         arm.set(SpeedCoefficients.getArmSpeed());
-    }
-
-    public void setWrist(Level level) {
-        wrist.setPosition(level.wristTarget);
     }
 
     public void resetArmEncoder() {

@@ -30,7 +30,12 @@ public class TapeDetectionPipeline extends OpenCvPipeline {
         Imgproc.cvtColor(frame, hsvMat, Imgproc.COLOR_RGB2HSV);
         Mat inRange = new Mat();
         double largestArea = 0;
-        Core.inRange(hsvMat, new Scalar(100, 90, 80), new Scalar(125, 255, 255), inRange);
+        Core.inRange(
+                hsvMat,
+                isRedTeam ? new Scalar(0, 0, 0) : new Scalar(100, 90, 80),
+                isRedTeam ? new Scalar(0, 0, 0) : new Scalar(125, 255, 255),
+                inRange
+        );
         List<MatOfPoint> contourList = new ArrayList<>();
         Imgproc.findContours(inRange, contourList, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
         for (int i = 0; i < contourList.size(); i++) {
