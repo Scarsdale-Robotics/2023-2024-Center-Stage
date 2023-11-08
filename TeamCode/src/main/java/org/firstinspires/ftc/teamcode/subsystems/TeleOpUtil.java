@@ -14,9 +14,13 @@ public class TeleOpUtil {
     public InDepSubsystem inDep;
     public CVSubsystem cv;
     private final boolean isRedTeam;
-    private boolean clawToggle = false;
     private final Gamepad gamepad1;
     private final Gamepad gamepad2;
+    public boolean speedIsFast = false;
+    private boolean clawToggle = false;
+    private boolean speedToggle = false;
+    private boolean omniToggle = false;
+    public boolean omniMode = true;
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
         robot = new HardwareRobot(hardwareMap);
         SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
@@ -102,19 +106,48 @@ public class TeleOpUtil {
      * PRIMARY MOTION CONTROL METHOD
      */
     private void runMotionControl() {
-        // MOVE MODE CONTROL
-        if (gamepad1.dpad_up) {
-            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
-        } else if (gamepad1.dpad_down) {
-            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
+        // TOGGLE MOVE SPEED MODE CONTROL
+        if ((gamepad1.dpad_up && !speedToggle)) {
+            speedToggle = true;
+            if (SpeedCoefficients.getMode() == 0) {
+                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+            } else {
+                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
+            }
         }
 
-        // DRIVE CONTROL
-        drive.driveRobotCentric(
-                -Math.signum(gamepad1.left_stick_x) * SpeedCoefficients.getStrafeSpeed(),
-                Math.signum(gamepad1.left_stick_y) * SpeedCoefficients.getForwardSpeed(),
-                -gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed()
-        );
+        //Toggle Omni Mode
+        if (!gamepad1.dpad_up) {
+            speedToggle = false;
+        }
+        if (gamepad1.dpad_down && !omniToggle) {
+            omniToggle = true;
+            omniMode = !omniMode;
+        }
+        if (!gamepad1.dpad_down) omniToggle = false;
+
+        // Drive Robot
+        if (!omniMode) {
+            double moveInputX = 0;
+            double moveInputY = 0;
+            if (Math.abs(gamepad1.left_stick_x) > 0.6) {
+                moveInputX = Math.signum(gamepad1.left_stick_x) * SpeedCoefficients.getStrafeSpeed();
+                moveInputY = 0;
+            } else if (Math.abs(gamepad1.left_stick_y) > 0.6) {
+                moveInputX = 0;
+                moveInputY = Math.signum(gamepad1.left_stick_y) * SpeedCoefficients.getForwardSpeed();
+            } else {
+                moveInputX = gamepad1.left_stick_x;
+                moveInputY = gamepad1.left_stick_y;+
+            }
+            // DRIVE CONTROL
+            drive.driveRobotCentric(-moveInputX,moveInputY,-gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed()
+            );
+        } else {
+            drive.driveRobotCentric(-gamepad1.left_stick_x,gamepad1.left_stick_y,-gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed()
+            );
+        }
+
     }
 
     /**
@@ -122,12 +155,12 @@ public class TeleOpUtil {
      */
     private void runArmClawControl() {
         // CLAW TOGGLE CONTROL
-        if (gamepad1.y && !clawToggle) {
-            if (inDep.getIsOpen()) inDep.close();
-            else inDep.open();
-            clawToggle = true;
-        }
+
+        if (gamepad1.y && !clawToggle) clawToggle = true;
         if (!gamepad1.y) clawToggle = false;
+
+        if (inDep.getIsOpen()) inDep.close();
+        else inDep.open();
 
         // FLEX MODE CONTROL
         inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed());
@@ -150,7 +183,6 @@ public class TeleOpUtil {
             runMotionControl();
             runArmClawControl();
 
-            inDep.checkForBrake();
             // TODO: uncomment test each method below one-by-one
             // runAprilTagParallelAlignControl();
             // runAprilTagAlignmentControl();

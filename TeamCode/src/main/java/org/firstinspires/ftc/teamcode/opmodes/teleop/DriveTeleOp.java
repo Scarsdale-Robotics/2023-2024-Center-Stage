@@ -24,6 +24,9 @@ public class DriveTeleOp extends LinearOpMode {
             teleOp.tick();
             telemetry.addData("Arm pos: ", teleOp.robot.arm.motor.getCurrentPosition());
             telemetry.addData("Wrist pos: ", teleOp.robot.wrist.getPosition());
+            telemetry.addData("arm power: ", teleOp.robot.arm.motor.getPower());
+            telemetry.addData("Speed is Fast:", teleOp.speedIsFast);
+            telemetry.addData("Omni Mode:", teleOp.omniMode);
             telemetry.update();
         }
     }

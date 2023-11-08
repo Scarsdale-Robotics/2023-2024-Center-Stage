@@ -12,22 +12,26 @@ public class SpeedCoefficients {
     public static void setMode(MoveMode targetMode) {
         moveMode = targetMode;
     }
+    public static int getMode() {
+        return moveMode == MoveMode.MODE_SLOW ? 0 : 1;
+
+    }
 
     public static double getForwardSpeed() {
-        double SLOW_FORWARD_SPEED = 0.5;
-        double FAST_FORWARD_SPEED = 1;
+        double SLOW_FORWARD_SPEED = 0.25;
+        double FAST_FORWARD_SPEED = 0.5;
         return moveMode.mode==MoveMode.MODE_FAST.mode ? FAST_FORWARD_SPEED : SLOW_FORWARD_SPEED;
     }
 
     public static double getStrafeSpeed() {
-        double SLOW_STRAFE_SPEED = 0.5;
-        double FAST_STRAFE_SPEED = 1;
+        double SLOW_STRAFE_SPEED = 0.25;
+        double FAST_STRAFE_SPEED = 0.5;
         return moveMode.mode==MoveMode.MODE_FAST.mode ? FAST_STRAFE_SPEED : SLOW_STRAFE_SPEED;
     }
 
     public static double getTurnSpeed() {
-        double SLOW_TURN_SPEED = 0.5;
-        double FAST_TURN_SPEED = 1;
+        double SLOW_TURN_SPEED = 0.25;
+        double FAST_TURN_SPEED = 0.5;
         return moveMode.mode==MoveMode.MODE_FAST.mode ? FAST_TURN_SPEED : SLOW_TURN_SPEED;
     }
 

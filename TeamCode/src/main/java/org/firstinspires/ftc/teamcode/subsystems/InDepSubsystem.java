@@ -63,16 +63,25 @@ public class InDepSubsystem extends SubsystemBase {
      * sets the raw power of the arm.
      */
     public void rawPower(double power) {
-        arm.motor.setPower(power);
+        int armPos = arm.motor.getCurrentPosition();
+
+        if (armPos>=0 && power>0) { // more down is more positive
+            arm.motor.setPower(0);
+        } else if (armPos<=Level.BACKBOARD2.target && power<0) {
+            arm.motor.setPower(0);
+        } else {
+            arm.motor.setPower(power);
+        }
 
         // code moved into this method to avoid an edge case where curr pos moves slightly too much or fails to move enough
         // which would mess up curr pos ranges potentially making the wrist act unexpectedly
         // also moving here increases flexibility and avoids hard coding values without
         // having very long variable names
-        int armPos = arm.motor.getCurrentPosition();
-        if (armPos < Level.BACKBOARD2.wristTarget) {
+
+
+        if (armPos <= Level.BACKBOARD2.target) {
             wrist.setPosition(Level.BACKBOARD2.wristTarget);
-        } else if (armPos < Level.BACKBOARD1.wristTarget) {
+        } else if (armPos <= Level.BACKBOARD1.target) {
             wrist.setPosition(Level.BACKBOARD1.wristTarget);
         } else {
             wrist.setPosition(Level.GROUND.wristTarget);
@@ -106,13 +115,6 @@ public class InDepSubsystem extends SubsystemBase {
      */
     public void lowerArm() {
         setLevel(getNearbyLevel(false));
-    }
-
-    public void checkForBrake() {
-        if (opMode.opModeIsActive() && arm.atTargetPosition()) {
-            arm.stopMotor();
-            // complete action
-        }
     }
 
     public void setLevel(Level level) {
