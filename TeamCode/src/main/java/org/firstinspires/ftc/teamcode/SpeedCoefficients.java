@@ -19,7 +19,7 @@ public class SpeedCoefficients {
 
     public static double getForwardSpeed() {
         double SLOW_FORWARD_SPEED = 0.25;
-        double FAST_FORWARD_SPEED = 0.5;
+        double FAST_FORWARD_SPEED = 0.7;
         return moveMode.mode==MoveMode.MODE_FAST.mode ? FAST_FORWARD_SPEED : SLOW_FORWARD_SPEED;
     }
 
@@ -30,8 +30,8 @@ public class SpeedCoefficients {
     }
 
     public static double getTurnSpeed() {
-        double SLOW_TURN_SPEED = 0.25;
-        double FAST_TURN_SPEED = 0.5;
+        double SLOW_TURN_SPEED = 0.55;
+        double FAST_TURN_SPEED = 0.85;
         return moveMode.mode==MoveMode.MODE_FAST.mode ? FAST_TURN_SPEED : SLOW_TURN_SPEED;
     }
 
