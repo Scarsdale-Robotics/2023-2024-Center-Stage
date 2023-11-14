@@ -66,25 +66,13 @@ public class CVSubsystem extends SubsystemBase {
         builder.setCamera(BuiltinCameraDirection.BACK);
         builder.setAutoStopLiveView(false); // keep camera on when not processing
 
-        builder.setCameraResolution(new Size(1280, 960)); // android.util
-        //default 640 480
-
-        // Choose a camera resolution. Not all cameras support all resolutions.
-
-        // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
-        //builder.enableCameraMonitoring(true);
-
-        // Choose whether or not LiveView stops if no processors are enabled.
-        // If set "true", monitor shows solid orange screen if no processors enabled.
-        // If set "false", monitor shows camera view without annotations.
-        //builder.setAutoStopLiveView(true);
+        builder.setCameraResolution(new Size(640, 480)); // android.util
 
         // Set and enable the processor.
         builder.addProcessor(aprilTag);
 
         // Build the Vision Portal, using the above settings.
         visionPortal = builder.build();
-
 
         // Disable or re-enable the aprilTag processor at any time.
         // visionPortal.setProcessorEnabled(aprilTag, true);
