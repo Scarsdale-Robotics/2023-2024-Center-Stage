@@ -182,9 +182,8 @@ public class TeleOpUtil {
     }
 
     public void tick() {
-        // TODO: check if wentao and tutu have pushed the tape detection pipeline that takes into account isRedTeam
-        // DO NOT UNCOMMENT IF STATEMENT UNTIL WENTAO AND TUTU HAVE CODE FOR BEFORE TAPE DETECTION USING isRedTeam
-//        if (gamepad2.y || !cv.isRobotBeforeTape(isRedTeam)) {
+        double DISTANCE_BEFORE_BACKBOARD = 3;  // TEMP
+//        if (gamepad2.y || cv.getAprilTagDistance(isRedTeam ? 5 : 2) > DISTANCE_BEFORE_BACKBOARD) {
             runMotionControl();
             runArmClawControl();
 
