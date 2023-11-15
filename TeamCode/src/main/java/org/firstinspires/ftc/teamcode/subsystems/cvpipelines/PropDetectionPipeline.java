@@ -65,6 +65,7 @@ public class PropDetectionPipeline extends OpenCvPipeline {
                 maxTotalArea = totalArea;
                 best_idx = i;
             }}
+        position = best_idx;
             
         telemetry.addData("best idx", best_idx);
         telemetry.update();
