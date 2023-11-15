@@ -24,8 +24,7 @@ public class AutoTestingBlue extends LinearOpMode {
                 this
         );
         CVSubsystem cvSubsystem = new CVSubsystem(robot.camera,
-                robot.cameraName,drive, telemetry);
-        SpeedCoefficients speedCoefficients = new SpeedCoefficients();
+                robot.cameraName,drive, telemetry, false);
         // Assuming this is in your main OpMode class
         HardwareRobot hardwareRobot = new HardwareRobot(hardwareMap);
 

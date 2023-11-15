@@ -41,7 +41,9 @@ public class CVSubsystem extends SubsystemBase {
     private VisionPortal visionPortal;
     private final WebcamName cameraName;
     private TapeDetectionPipeline tdp;
-    public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry) {
+    private PropDetectionPipeline propPipeline;
+    private PixelDetectionPipeline pixelPipeline;
+    public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam) {
 //        tdp = new TapeDetectionPipeline();
 //        camera.setPipeline(tdp);
         this.camera = camera;
@@ -51,7 +53,11 @@ public class CVSubsystem extends SubsystemBase {
         // create AprilTagProcessor and VisionPortal
         initAprilTag();
 
+        pixelPipeline = new PixelDetectionPipeline();
+        camera.setPipeline(pixelPipeline);
 
+        propPipeline = new PropDetectionPipeline(isRedTeam, telemetry);
+        camera.setPipeline(propPipeline);
     }
 
     private void initAprilTag() {
@@ -161,20 +167,14 @@ public class CVSubsystem extends SubsystemBase {
 
     /**
      * GROUP 2
-     * @param isRedTeam true if our alliance team is red, false otherwise
      * @return whether the AprilTag is left, center, or right in the camera view
      */
-    public int getTeamPropLocation(boolean isRedTeam) {
-        PropDetectionPipeline propPipeline = new PropDetectionPipeline(isRedTeam, telemetry);
-
-        camera.setPipeline(propPipeline);
+    public int getTeamPropLocation() {
         return propPipeline.getPosition();
     }
 
     public int getPixelHorizontalOffset() {
-        PixelDetectionPipeline p = new PixelDetectionPipeline();
-        camera.setPipeline(p);
-        return p.getCenterOffset();
+        return pixelPipeline.getCenterOffset();
     }
 
     /**

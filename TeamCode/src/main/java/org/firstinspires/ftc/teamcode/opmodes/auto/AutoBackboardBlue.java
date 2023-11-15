@@ -24,8 +24,7 @@ public class AutoBackboardBlue extends LinearOpMode {
                 this
         );
         CVSubsystem cvSubsystem = new CVSubsystem(robot.camera,
-                robot.cameraName,drive, telemetry);
-        SpeedCoefficients speedCoefficients = new SpeedCoefficients();
+                robot.cameraName,drive, telemetry, false);
         // Assuming this is in your main OpMode class
         HardwareRobot hardwareRobot = new HardwareRobot(hardwareMap);
 
@@ -42,7 +41,7 @@ public class AutoBackboardBlue extends LinearOpMode {
         waitForStart();
 
         //Start actual Auto now // pretend april tag location has been found, 0 = left, 1 = center, 2 = right
-        int propLocation = cvSubsystem.getTeamPropLocation(false); // 0 = left, 1 = center, 2 = right
+        int propLocation = cvSubsystem.getTeamPropLocation(); // 0 = left, 1 = center, 2 = right
 
 
         if (propLocation == 0) { // left
