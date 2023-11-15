@@ -30,6 +30,7 @@ public class CVSubsystem extends SubsystemBase {
     private final int LOCATION_CENTER =  1;
     private final int LOCATION_RIGHT  =  2;
     private final int NO_LOCATION     = -1;
+    private Telemetry telemetry;
 
     private final double NO_ROTATIONAL_OFFSET = -50000.0;
     private final double NO_DISTANCE = -50000.0;
@@ -40,14 +41,17 @@ public class CVSubsystem extends SubsystemBase {
     private VisionPortal visionPortal;
     private final WebcamName cameraName;
     private TapeDetectionPipeline tdp;
-    public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive) {
-        tdp = new TapeDetectionPipeline();
-        camera.setPipeline(tdp);
+    public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry) {
+//        tdp = new TapeDetectionPipeline();
+//        camera.setPipeline(tdp);
         this.camera = camera;
         this.drive = drive;
+        this.telemetry = telemetry;
         this.cameraName = cameraName;
         // create AprilTagProcessor and VisionPortal
         initAprilTag();
+
+
     }
 
     private void initAprilTag() {
@@ -161,7 +165,8 @@ public class CVSubsystem extends SubsystemBase {
      * @return whether the AprilTag is left, center, or right in the camera view
      */
     public int getTeamPropLocation(boolean isRedTeam) {
-        PropDetectionPipeline propPipeline = new PropDetectionPipeline(isRedTeam);
+        PropDetectionPipeline propPipeline = new PropDetectionPipeline(isRedTeam, telemetry);
+
         camera.setPipeline(propPipeline);
         return propPipeline.getPosition();
     }

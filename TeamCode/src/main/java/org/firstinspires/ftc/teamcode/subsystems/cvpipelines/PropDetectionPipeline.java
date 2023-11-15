@@ -37,10 +37,14 @@ public class PropDetectionPipeline extends OpenCvPipeline {
 
     public AtomicBoolean hasStarted = new AtomicBoolean(false);
 
-    public int position;
+    public int position = -999;
+    // chicken nugget nat nuo tao
+    // kocmoc
+    // co|-o3 HepyWNmhN Pec
 
-    public PropDetectionPipeline(boolean isRedTeam){
+    public PropDetectionPipeline(boolean isRedTeam, Telemetry telemetry){
         this.isRedTeam = isRedTeam;
+        this.telemetry = telemetry;
     }
 
     @Override
@@ -54,7 +58,7 @@ public class PropDetectionPipeline extends OpenCvPipeline {
         this.sub = input;
         
         double maxTotalArea = Double.MIN_VALUE;
-        int best_idx = 0;
+        int best_idx = 1;
         
         for (int i=0; i<3; i++){
             Rect crop = new Rect(width*i/3,0,width/3, height);
@@ -68,7 +72,6 @@ public class PropDetectionPipeline extends OpenCvPipeline {
         position = best_idx;
             
         telemetry.addData("best idx", best_idx);
-        telemetry.update();
         return input;
     }
 

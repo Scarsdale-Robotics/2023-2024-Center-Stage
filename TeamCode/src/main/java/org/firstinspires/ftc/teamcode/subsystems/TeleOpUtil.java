@@ -42,7 +42,7 @@ public class TeleOpUtil {
         cv = new CVSubsystem(
                 robot.camera,
                 robot.cameraName,
-                drive
+                drive, telemetry
         );
         this.isRedTeam = isRedTeam;
         this.gamepad1 = gamepad1;
