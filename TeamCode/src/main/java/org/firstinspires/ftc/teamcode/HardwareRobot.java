@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Bitmap;
+
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -8,11 +10,17 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.ImuOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.function.Consumer;
+import org.firstinspires.ftc.robotcore.external.function.Continuation;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.opencv.core.Core;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
+import org.openftc.easyopencv.OpenCvPipeline;
+import org.openftc.easyopencv.PipelineRecordingParameters;
 
 public class HardwareRobot {
     public final Motor leftFront;
@@ -26,7 +34,7 @@ public class HardwareRobot {
 
     public final IMU imu;
     public final OpenCvCamera camera;
-
+    public final WebcamName cameraName;
     public HardwareRobot(HardwareMap hardwareMap) {
         leftFront = new Motor(hardwareMap, "leftFront", Motor.GoBILDA.RPM_312);
         rightFront = new Motor(hardwareMap, "rightFront", Motor.GoBILDA.RPM_312);
@@ -76,8 +84,10 @@ public class HardwareRobot {
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("Camera 1", "id", hardwareMap.appContext.getPackageName());
+//        camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+        cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        camera = OpenCvCameraFactory.getInstance().createWebcam(cameraName);
     }
 
     public double getYaw() {

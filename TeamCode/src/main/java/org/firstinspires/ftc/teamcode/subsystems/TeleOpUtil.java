@@ -41,6 +41,7 @@ public class TeleOpUtil {
         );
         cv = new CVSubsystem(
                 robot.camera,
+                robot.cameraName,
                 drive
         );
         this.isRedTeam = isRedTeam;
@@ -190,7 +191,7 @@ public class TeleOpUtil {
             // TODO: uncomment test each method below one-by-one
             // runAprilTagParallelAlignControl();
             // runAprilTagAlignmentControl();
-            // teamPropLocationControl();
+             teamPropLocationControl();
             // runPixelAlignmentControl();
 //        }
     }

@@ -6,6 +6,8 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.TapeDetectionPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -16,6 +18,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PropDetectionPipeline;
 
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelDetectionPipeline;
+import org.openftc.easyopencv.OpenCvInternalCamera2;
 
 import java.util.List;
 
@@ -35,12 +38,14 @@ public class CVSubsystem extends SubsystemBase {
 
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
+    private final WebcamName cameraName;
     private TapeDetectionPipeline tdp;
-    public CVSubsystem(OpenCvCamera camera, DriveSubsystem drive) {
+    public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive) {
         tdp = new TapeDetectionPipeline();
         camera.setPipeline(tdp);
         this.camera = camera;
         this.drive = drive;
+        this.cameraName = cameraName;
         // create AprilTagProcessor and VisionPortal
         initAprilTag();
     }
@@ -63,7 +68,8 @@ public class CVSubsystem extends SubsystemBase {
         VisionPortal.Builder builder = new VisionPortal.Builder();
 
         // Set the built-in RC phone camera
-        builder.setCamera(BuiltinCameraDirection.BACK);
+//        builder.setCamera(BuiltinCameraDirection.BACK);
+        builder.setCamera(cameraName);
         builder.setAutoStopLiveView(false); // keep camera on when not processing
 
         builder.setCameraResolution(new Size(640, 480)); // android.util

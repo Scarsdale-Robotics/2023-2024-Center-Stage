@@ -23,7 +23,8 @@ public class AutoBackboardRed extends LinearOpMode {
                 robot.imu,
                 this
         );
-        CVSubsystem cvSubsystem = new CVSubsystem(robot.camera, drive);
+        CVSubsystem cvSubsystem = new CVSubsystem(robot.camera,
+                robot.cameraName,drive);
         SpeedCoefficients speedCoefficients = new SpeedCoefficients();
         // Assuming this is in your main OpMode class
         HardwareRobot hardwareRobot = new HardwareRobot(hardwareMap);

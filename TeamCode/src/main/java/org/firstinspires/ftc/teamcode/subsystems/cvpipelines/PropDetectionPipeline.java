@@ -50,7 +50,7 @@ public class PropDetectionPipeline extends OpenCvPipeline {
         width = input.width();
 
         Core.transpose(input, input);
-        Core.flip(input, input, 1);  // Switch flipCode to 0 if inverted
+        Core.flip(input, input, 0);  // Switch flipCode to 0 if inverted
         this.sub = input;
         
         double maxTotalArea = Double.MIN_VALUE;
