@@ -42,7 +42,7 @@ public class AutoParkFarBlue extends LinearOpMode {
 
         drive.driveByEncoder(0, 0.5, 0, 150); // moving forward toward the pixel placing area
         drive.driveByEncoder(0, 0, -1, 300);  // turn left
-        drive.driveByEncoder(0, 0.5, 0, 500); // continue moving forward toward the parking area
+        drive.driveByEncoder(0, 0.5, 0, 450); // continue moving forward toward the parking area
         stop();
     }
 
