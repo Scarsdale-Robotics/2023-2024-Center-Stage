@@ -36,6 +36,7 @@ public class AutoTestingBlue extends LinearOpMode {
                 this,
                 telemetry
         );
+        //SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
 
 
         waitForStart();
