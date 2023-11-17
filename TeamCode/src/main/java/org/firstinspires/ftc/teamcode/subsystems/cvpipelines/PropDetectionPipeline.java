@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems.cvpipelines;
 
+import android.graphics.Canvas;
+
+import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
+import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -16,9 +20,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class PropDetectionPipeline extends OpenCvPipeline {
-    Telemetry telemetry;
-    boolean isRedTeam = true;
+public class PropDetectionPipeline implements VisionProcessor {
+    boolean isRedTeam = false;
 
     public Mat sub;
     public Mat temp = new Mat();
@@ -42,38 +45,12 @@ public class PropDetectionPipeline extends OpenCvPipeline {
     // kocmoc
     // co|-o3 HepyWNmhN Pec
 
-    public PropDetectionPipeline(boolean isRedTeam, Telemetry telemetry){
-        this.isRedTeam = isRedTeam;
-        this.telemetry = telemetry;
-    }
-
-    @Override
-    public Mat processFrame(Mat input) {
-        position = -90;
-        hasStarted.set(true);
-        height = input.height();
-        width = input.width();
-
-        Core.transpose(input, input);
-        Core.flip(input, input, 0);  // Switch flipCode to 0 if inverted
-        this.sub = input;
-        
-        double maxTotalArea = Double.MIN_VALUE;
-        int best_idx = 1;
-        
-        for (int i=0; i<3; i++){
-            Rect crop = new Rect(width*i/3,0,width/3, height);
-            Imgproc.rectangle(input, crop, new Scalar(255, 255, 0));
-            this.sub = new Mat(input, crop);
-            double totalArea = getTotalContourArea();
-            if (totalArea>maxTotalArea){
-                maxTotalArea = totalArea;
-                best_idx = i;
-            }}
-        position = best_idx;
-            
-        telemetry.addData("best idx", best_idx);
-        return input;
+    public PropDetectionPipeline(){
+//        this.isRedTeam = true;
+//        this.telemetry = telemetry;
+//
+//        telemetry.addData("prop created","");
+//        telemetry.update();
     }
 
     public int getPosition(){
@@ -105,5 +82,43 @@ public class PropDetectionPipeline extends OpenCvPipeline {
         }
 
         return totalArea;
+    }
+
+    @Override
+    public void init(int width, int height, CameraCalibration calibration) {
+        this.isRedTeam = false;
+    }
+
+    @Override
+    public Object processFrame(Mat input, long captureTimeNanos) {
+        position = -90;
+        height = input.height();
+        width = input.width();
+        hasStarted = new AtomicBoolean(true);
+
+//        Core.transpose(input, input);
+//        Core.flip(input, input, 0);  // Switch flipCode to 0 if inverted
+        this.sub = input;
+
+        double maxTotalArea = Double.MIN_VALUE;
+        int best_idx = 1;
+
+        for (int i=0; i<3; i++){
+            Rect crop = new Rect(width*i/3,0,width/3, height);
+            Imgproc.rectangle(input, crop, new Scalar(255, 255, 0));
+            this.sub = new Mat(input, crop);
+            double totalArea = getTotalContourArea();
+            if (totalArea>maxTotalArea){
+                maxTotalArea = totalArea;
+                best_idx = i;
+            }}
+        position = best_idx;
+
+        return input;
+    }
+
+    @Override
+    public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
+
     }
 }

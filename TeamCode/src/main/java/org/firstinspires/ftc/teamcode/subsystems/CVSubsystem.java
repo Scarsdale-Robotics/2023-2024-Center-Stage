@@ -45,6 +45,7 @@ public class CVSubsystem extends SubsystemBase {
     private PropDetectionPipeline propPipeline;
     private PixelDetectionPipeline pixelPipeline;
     public String poo = "Tho";
+    PropDetectionPipeline pdp = new PropDetectionPipeline();
     public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam) {
 //        tdp = new TapeDetectionPipeline();
 //        camera.setPipeline(tdp);
@@ -55,27 +56,28 @@ public class CVSubsystem extends SubsystemBase {
         // create AprilTagProcessor and VisionPortal
         initAprilTag();
 
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
-            @Override
-            public void onOpened()
-            {
-                pixelPipeline = new PixelDetectionPipeline();
-                camera.setPipeline(pixelPipeline);
-                propPipeline = new PropDetectionPipeline(isRedTeam, telemetry);
-                camera.setPipeline(propPipeline);
-                camera.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
-            }
-
-            @Override
-            public void onError(int errorCode)
-            {
-                /*
-                 * This will be called if the camera could not be opened
-                 */
-                poo = "Nathan messed up !!!1!";
-            }
-        });
+        pixelPipeline = new PixelDetectionPipeline();
+//        propPipeline = new PropDetectionPipeline(isRedTeam, telemetry);
+//
+//        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+//        {
+//            @Override
+//            public void onOpened()
+//            {
+//                camera.setPipeline(pixelPipeline);
+////                camera.setPipeline(propPipeline);
+//                camera.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+//            }
+//
+//            @Override
+//            public void onError(int errorCode)
+//            {
+//                /*
+//                 * This will be called if the camera could not be opened
+//                 */
+//                poo = "Nathan messed up !!!1!";
+//            }
+//        });
     }
 
     private void initAprilTag() {
@@ -101,6 +103,8 @@ public class CVSubsystem extends SubsystemBase {
         builder.setAutoStopLiveView(false); // keep camera on when not processing
 
         builder.setCameraResolution(new Size(640, 480)); // android.util
+
+        builder.addProcessor(pdp);
 
         // Set and enable the processor.
         builder.addProcessor(aprilTag);
@@ -189,7 +193,8 @@ public class CVSubsystem extends SubsystemBase {
      * @return whether the AprilTag is left, center, or right in the camera view
      */
     public int getTeamPropLocation() {
-        return propPipeline.getPosition();
+        visionPortal.resumeStreaming();
+        return pdp.getPosition();
     }
 
     public int getPixelHorizontalOffset() {
