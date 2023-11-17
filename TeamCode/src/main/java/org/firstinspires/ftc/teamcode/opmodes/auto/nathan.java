@@ -30,7 +30,7 @@ public class nathan extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            telemetry.addData("team prop loc: ", cv.getTeamPropLocation());
+            telemetry.addData("team prop loc: ", cv.getAprilTagDistance(2));
             telemetry.update();
         }
 

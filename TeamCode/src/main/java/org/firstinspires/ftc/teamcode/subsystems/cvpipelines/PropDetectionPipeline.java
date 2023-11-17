@@ -49,6 +49,7 @@ public class PropDetectionPipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
+        position = -90;
         hasStarted.set(true);
         height = input.height();
         width = input.width();

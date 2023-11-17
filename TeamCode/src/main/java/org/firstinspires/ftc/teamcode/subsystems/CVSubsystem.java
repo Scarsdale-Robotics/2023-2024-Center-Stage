@@ -18,6 +18,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PropDetectionPipeline;
 
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelDetectionPipeline;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera2;
 
 import java.util.List;
@@ -43,6 +44,7 @@ public class CVSubsystem extends SubsystemBase {
     private TapeDetectionPipeline tdp;
     private PropDetectionPipeline propPipeline;
     private PixelDetectionPipeline pixelPipeline;
+    public String poo = "Tho";
     public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam) {
 //        tdp = new TapeDetectionPipeline();
 //        camera.setPipeline(tdp);
@@ -53,15 +55,31 @@ public class CVSubsystem extends SubsystemBase {
         // create AprilTagProcessor and VisionPortal
         initAprilTag();
 
-        pixelPipeline = new PixelDetectionPipeline();
-        camera.setPipeline(pixelPipeline);
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                pixelPipeline = new PixelDetectionPipeline();
+                camera.setPipeline(pixelPipeline);
+                propPipeline = new PropDetectionPipeline(isRedTeam, telemetry);
+                camera.setPipeline(propPipeline);
+                camera.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+            }
 
-        propPipeline = new PropDetectionPipeline(isRedTeam, telemetry);
-        camera.setPipeline(propPipeline);
+            @Override
+            public void onError(int errorCode)
+            {
+                /*
+                 * This will be called if the camera could not be opened
+                 */
+                poo = "Nathan messed up !!!1!";
+            }
+        });
     }
 
     private void initAprilTag() {
-
+        poo = "ick";
         // Create the AprilTag processor.
         aprilTag = new AprilTagProcessor.Builder()
                 .setDrawTagOutline(true)
@@ -146,6 +164,7 @@ public class CVSubsystem extends SubsystemBase {
     }
 
     public double getAprilTagDistance(int tagID) {
+        poo = "nu";
         visionPortal.resumeStreaming();
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();

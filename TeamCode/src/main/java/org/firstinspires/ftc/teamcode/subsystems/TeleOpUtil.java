@@ -42,7 +42,7 @@ public class TeleOpUtil {
         cv = new CVSubsystem(
                 robot.camera,
                 robot.cameraName,
-                drive, telemetry
+                drive, telemetry, isRedTeam
         );
         this.isRedTeam = isRedTeam;
         this.gamepad1 = gamepad1;
@@ -72,7 +72,7 @@ public class TeleOpUtil {
      */
     private void teamPropLocationControl() {
         if (gamepad1.dpad_left) {
-            int teamPropLocation = cv.getTeamPropLocation(isRedTeam);
+            int teamPropLocation = cv.getTeamPropLocation();
             switch (teamPropLocation) {
                 case 0:
                     // left location
