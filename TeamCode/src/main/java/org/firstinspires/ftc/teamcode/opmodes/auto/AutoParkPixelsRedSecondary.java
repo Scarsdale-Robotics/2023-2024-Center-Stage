@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 public class AutoParkPixelsRedSecondary extends LinearOpMode {
     @Override
     // The "Main" code will go in here
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
         HardwareRobot robot = new HardwareRobot(hardwareMap);
         DriveSubsystem drive = new DriveSubsystem(
                 robot.leftFront,
@@ -38,6 +38,7 @@ public class AutoParkPixelsRedSecondary extends LinearOpMode {
 
 
         waitForStart();
+        Thread.sleep(15000); //wait 15 sec for teammate to do auto
 
         drive.driveByEncoder(0, 0.5, 0, 50); // moving forward toward the pixel placing area
         drive.driveByEncoder(0, 0, 1, 300);  // turn right
