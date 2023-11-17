@@ -4,9 +4,7 @@ import android.util.Size;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.TapeDetectionPipeline;
@@ -18,9 +16,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PropDetectionPipeline;
 
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelDetectionPipeline;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera2;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class CVSubsystem extends SubsystemBase {
@@ -41,11 +38,8 @@ public class CVSubsystem extends SubsystemBase {
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
     private final WebcamName cameraName;
-    private TapeDetectionPipeline tdp;
-    private PropDetectionPipeline propPipeline;
-    private PixelDetectionPipeline pixelPipeline;
-    public String poo = "Tho";
-    PropDetectionPipeline pdp = new PropDetectionPipeline();
+    private final PropDetectionPipeline propProcessor;
+    private final PixelDetectionPipeline pixelProcessor;
     public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam) {
 //        tdp = new TapeDetectionPipeline();
 //        camera.setPipeline(tdp);
@@ -56,7 +50,10 @@ public class CVSubsystem extends SubsystemBase {
         // create AprilTagProcessor and VisionPortal
         initAprilTag();
 
-        pixelPipeline = new PixelDetectionPipeline();
+        propProcessor = new PropDetectionPipeline(isRedTeam);
+        pixelProcessor = new PixelDetectionPipeline();
+
+//        pixelPipeline = new PixelDetectionPipeline();
 //        propPipeline = new PropDetectionPipeline(isRedTeam, telemetry);
 //
 //        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
@@ -81,7 +78,6 @@ public class CVSubsystem extends SubsystemBase {
     }
 
     private void initAprilTag() {
-        poo = "ick";
         // Create the AprilTag processor.
         aprilTag = new AprilTagProcessor.Builder()
                 .setDrawTagOutline(true)
@@ -97,17 +93,13 @@ public class CVSubsystem extends SubsystemBase {
         // Create the vision portal by using a builder.
         VisionPortal.Builder builder = new VisionPortal.Builder();
 
-        // Set the built-in RC phone camera
-//        builder.setCamera(BuiltinCameraDirection.BACK);
         builder.setCamera(cameraName);
         builder.setAutoStopLiveView(false); // keep camera on when not processing
 
         builder.setCameraResolution(new Size(640, 480)); // android.util
 
-        builder.addProcessor(pdp);
-
         // Set and enable the processor.
-        builder.addProcessor(aprilTag);
+        builder.addProcessors(aprilTag, propProcessor, pixelProcessor);
 
         // Build the Vision Portal, using the above settings.
         visionPortal = builder.build();
@@ -167,8 +159,31 @@ public class CVSubsystem extends SubsystemBase {
         return rotationalOffset;
     }
 
+    public double getAprilTagDistance(int... tagIDs) {
+        visionPortal.resumeStreaming();
+
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+
+        double tagDistance = Double.MAX_VALUE;
+        // TODO: cvt to tagID to set in the future
+        int[] tagSearchArray = Arrays.stream(tagIDs).toArray();
+
+        // Step through the list of detections and display info for each one.
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+                if (Arrays.stream(tagIDs).anyMatch(x -> x == detection.id)) {
+                    double d = detection.ftcPose.range;
+                    if (d < tagDistance)
+                        tagDistance = d;
+                }
+            }
+        }
+        //visionPortal.stopStreaming();
+
+        return tagDistance;
+    }
+
     public double getAprilTagDistance(int tagID) {
-        poo = "nu";
         visionPortal.resumeStreaming();
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
@@ -185,7 +200,7 @@ public class CVSubsystem extends SubsystemBase {
         }
         //visionPortal.stopStreaming();
 
-        return tagDistance; // TEMPORARY
+        return tagDistance;
     }
 
     /**
@@ -194,20 +209,22 @@ public class CVSubsystem extends SubsystemBase {
      */
     public int getTeamPropLocation() {
         visionPortal.resumeStreaming();
-        return pdp.getPosition();
+        return propProcessor.getPosition();
     }
 
     public int getPixelHorizontalOffset() {
-        return pixelPipeline.getCenterOffset();
+        visionPortal.resumeStreaming();
+        return pixelProcessor.getCenterOffset();
     }
 
     /**
      * GROUP 2
      * @return true if the robot is in front of a piece of tape approximately perpendicular to the camera view, false otherwise
      */
-    public boolean isRobotBeforeTape(boolean isRedTeam) {
-        return tdp.isBeforeTape(isRedTeam);
-    }
+//    public boolean isRobotBeforeTape(boolean isRedTeam) {
+//        visionPortal.resumeStreaming();
+//        return tdp.isBeforeTape(isRedTeam);
+//    }
 
     public void moveToPixel() {
         double ERROR_THRESHOLD = 50;

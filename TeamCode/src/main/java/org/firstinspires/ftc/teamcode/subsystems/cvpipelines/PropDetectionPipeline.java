@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class PropDetectionPipeline implements VisionProcessor {
-    boolean isRedTeam = false;
+    boolean isRedTeam;
 
     public Mat sub;
     public Mat temp = new Mat();
@@ -45,12 +45,8 @@ public class PropDetectionPipeline implements VisionProcessor {
     // kocmoc
     // co|-o3 HepyWNmhN Pec
 
-    public PropDetectionPipeline(){
-//        this.isRedTeam = true;
-//        this.telemetry = telemetry;
-//
-//        telemetry.addData("prop created","");
-//        telemetry.update();
+    public PropDetectionPipeline(boolean isRedTeam){
+        this.isRedTeam = isRedTeam;
     }
 
     public int getPosition(){
@@ -86,12 +82,11 @@ public class PropDetectionPipeline implements VisionProcessor {
 
     @Override
     public void init(int width, int height, CameraCalibration calibration) {
-        this.isRedTeam = false;
+
     }
 
     @Override
     public Object processFrame(Mat input, long captureTimeNanos) {
-        position = -90;
         height = input.height();
         width = input.width();
         hasStarted = new AtomicBoolean(true);
@@ -103,15 +98,16 @@ public class PropDetectionPipeline implements VisionProcessor {
         double maxTotalArea = Double.MIN_VALUE;
         int best_idx = 1;
 
-        for (int i=0; i<3; i++){
-            Rect crop = new Rect(width*i/3,0,width/3, height);
+        for (int i=0; i<3; i++) {
+            Rect crop = new Rect(width*i/3,height / 4,width/3, height * 3 / 4);
             Imgproc.rectangle(input, crop, new Scalar(255, 255, 0));
             this.sub = new Mat(input, crop);
             double totalArea = getTotalContourArea();
             if (totalArea>maxTotalArea){
                 maxTotalArea = totalArea;
                 best_idx = i;
-            }}
+            }
+        }
         position = best_idx;
 
         return input;

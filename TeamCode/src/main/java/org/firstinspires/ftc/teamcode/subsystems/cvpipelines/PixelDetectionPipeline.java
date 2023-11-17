@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems.cvpipelines;
 
+import android.graphics.Canvas;
+
+import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
+import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -16,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 // 320 x 240 camera resolution standard
 
-public class PixelDetectionPipeline extends OpenCvPipeline {
+public class PixelDetectionPipeline implements VisionProcessor {
     public Mat frame;
     public Mat sub;
     public Mat temp = new Mat();
@@ -46,7 +50,46 @@ public class PixelDetectionPipeline extends OpenCvPipeline {
     public int posX = -999;
     public int posY = -999;
 
-    public Mat processFrame(Mat input) {
+    public int getCenterOffset() {
+        return centerOffset;
+    }
+
+    public MatOfPoint getPixelContour() {
+        Mat hsvmat = new Mat();
+        Imgproc.cvtColor(sub, hsvmat, Imgproc.COLOR_RGB2HSV);
+
+        Mat inRange = new Mat();
+        Core.inRange(hsvmat, lowerRange, upperRange, inRange);
+
+        List<MatOfPoint> whiteContourList = new ArrayList<>();
+
+        Imgproc.findContours(inRange, whiteContourList, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        for (int i = 0; i < whiteContourList.size(); i++) {
+            Imgproc.drawContours(sub, whiteContourList, i, new Scalar(255, 255, 0), 2);
+        }
+
+        double maxArea = Double.MIN_VALUE;
+        MatOfPoint maxContour = null;
+        for (MatOfPoint m : whiteContourList) {
+            double area = Imgproc.contourArea(m);
+
+            if (area > maxArea) {
+                maxArea = area;
+                maxContour = m;
+            }
+        }
+
+        return maxContour;
+    }
+
+    @Override
+    public void init(int width, int height, CameraCalibration calibration) {
+
+    }
+
+    @Override
+    public Object processFrame(Mat input, long captureTimeNanos) {
         hasStarted.set(true);
 
         // Open cv defaults to BGR, but we are completely in RGB/HSV, this is because pipeline's input/output RGB
@@ -79,36 +122,9 @@ public class PixelDetectionPipeline extends OpenCvPipeline {
 
         return input;
     }
-    public int getCenterOffset() {
-        return centerOffset;
-    }
 
-    public MatOfPoint getPixelContour() {
-        Mat hsvmat = new Mat();
-        Imgproc.cvtColor(sub, hsvmat, Imgproc.COLOR_RGB2HSV);
+    @Override
+    public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
 
-        Mat inRange = new Mat();
-        Core.inRange(hsvmat, lowerRange, upperRange, inRange);
-
-        List<MatOfPoint> whiteContourList = new ArrayList<>();
-
-        Imgproc.findContours(inRange, whiteContourList, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-
-        for (int i = 0; i < whiteContourList.size(); i++) {
-            Imgproc.drawContours(sub, whiteContourList, i, new Scalar(255, 255, 0), 2);
-        }
-
-        double maxArea = Double.MIN_VALUE;
-        MatOfPoint maxContour = null;
-        for (MatOfPoint m : whiteContourList) {
-            double area = Imgproc.contourArea(m);
-
-            if (area > maxArea) {
-                maxArea = area;
-                maxContour = m;
-            }
-        }
-
-        return maxContour;
     }
 }
