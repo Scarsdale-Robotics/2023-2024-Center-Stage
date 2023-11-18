@@ -18,7 +18,9 @@ import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PropDetectionPipeli
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelDetectionPipeline;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class CVSubsystem extends SubsystemBase {
     private OpenCvCamera camera;
@@ -115,8 +117,7 @@ public class CVSubsystem extends SubsystemBase {
      * @return whether the AprilTag is left, center, or right in the camera view
      */
     public int getAprilTagLocation(int tagID) {
-
-        visionPortal.resumeStreaming();
+//        visionPortal.resumeStreaming();
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
@@ -141,7 +142,7 @@ public class CVSubsystem extends SubsystemBase {
      * @return a double representing the amount the robot should turn to be "parallel" to the AprilTag
      */
     public double getAprilTagRotationalOffset(int tagID) { // return yaw
-        visionPortal.resumeStreaming();
+//        visionPortal.resumeStreaming();
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
@@ -159,32 +160,29 @@ public class CVSubsystem extends SubsystemBase {
         return rotationalOffset;
     }
 
-    public double getAprilTagDistance(int... tagIDs) {
-        visionPortal.resumeStreaming();
+    public double getAprilTagDistance(Integer... tagIDs) {
+//        visionPortal.resumeStreaming();
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
         double tagDistance = Double.MAX_VALUE;
-        // TODO: cvt to tagID to set in the future
-        int[] tagSearchArray = Arrays.stream(tagIDs).toArray();
+        Set<Integer> tagSearchSet = new HashSet<>(Arrays.asList(tagIDs));
 
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
-            if (detection.metadata != null) {
-                if (Arrays.stream(tagIDs).anyMatch(x -> x == detection.id)) {
-                    double d = detection.ftcPose.range;
-                    if (d < tagDistance)
-                        tagDistance = d;
-                }
+            if (detection.metadata != null && tagSearchSet.contains(detection.id)) {
+                double d = detection.ftcPose.range;
+                if (d < tagDistance)
+                    tagDistance = d;
             }
         }
-        //visionPortal.stopStreaming();
+//        visionPortal.stopStreaming();
 
         return tagDistance;
     }
 
     public double getAprilTagDistance(int tagID) {
-        visionPortal.resumeStreaming();
+//        visionPortal.resumeStreaming();
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
@@ -198,7 +196,7 @@ public class CVSubsystem extends SubsystemBase {
                 }
             }
         }
-        //visionPortal.stopStreaming();
+//        visionPortal.stopStreaming();
 
         return tagDistance;
     }

@@ -184,15 +184,15 @@ public class TeleOpUtil {
 
     public void tick() {
         double DISTANCE_BEFORE_BACKBOARD = 3;  // TEMP
-//        if (gamepad2.y || cv.getAprilTagDistance(isRedTeam ? 5 : 2) > DISTANCE_BEFORE_BACKBOARD) {
+        if (gamepad2.y || cv.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3}) > DISTANCE_BEFORE_BACKBOARD) {
             runMotionControl();
             runArmClawControl();
 
             // TODO: uncomment test each method below one-by-one
             // runAprilTagParallelAlignControl();
             // runAprilTagAlignmentControl();
-             teamPropLocationControl();
+//             teamPropLocationControl();
             // runPixelAlignmentControl();
-//        }
+        }
     }
 }
