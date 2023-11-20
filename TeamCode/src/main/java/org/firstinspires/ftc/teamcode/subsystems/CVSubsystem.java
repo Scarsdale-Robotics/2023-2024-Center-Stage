@@ -206,12 +206,12 @@ public class CVSubsystem extends SubsystemBase {
      * @return whether the AprilTag is left, center, or right in the camera view
      */
     public int getTeamPropLocation() {
-        visionPortal.resumeStreaming();
+//        visionPortal.resumeStreaming();
         return propProcessor.getPosition();
     }
 
     public int getPixelHorizontalOffset() {
-        visionPortal.resumeStreaming();
+//        visionPortal.resumeStreaming();
         return pixelProcessor.getCenterOffset();
     }
 

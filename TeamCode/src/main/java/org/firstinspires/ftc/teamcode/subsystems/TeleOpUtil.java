@@ -167,11 +167,10 @@ public class TeleOpUtil {
         }
         if (!gamepad1.y) clawToggle = false;
 
-
-        // FLEX MODE CONTROL
+        // FLEX ARM MOVEMENT MODE CONTROL
         inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed());
 
-        // RIGID MODE CONTROL
+        // RIGID ARM MOVEMENT MODE CONTROL
 //        runArmRigidControl();
 
         // RESET ARM CONTROL
@@ -189,7 +188,7 @@ public class TeleOpUtil {
             runArmClawControl();
 
             // TODO: uncomment test each method below one-by-one
-            // runAprilTagParallelAlignControl();
+//            runAprilTagParallelAlignControl();
             // runAprilTagAlignmentControl();
 //             teamPropLocationControl();
             // runPixelAlignmentControl();
