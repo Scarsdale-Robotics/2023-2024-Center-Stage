@@ -50,10 +50,10 @@ public class AutoTestingBlue2 extends LinearOpMode {
 //        drive.driveByEncoder(0, 0.5, 0, 250); // moving forward to the spike mark tape
         //inDep.changeElevation(-10); // lower claw
         inDep.open(); // open claw to place the pixel
-        inDep.changeElevation(10); // raise claw
-        drive.driveByEncoder(0, -0.5, 0, 1000); // moving forward to the spike mark tape
-        inDep.changeElevation(-10); // lower claw
-        drive.driveByEncoder(0, 0, 1, 300);  // turn left
+        inDep.changeElevation(500); // raise claw
+        drive.driveByEncoder(0, -0.5, 0, 1200); // moving forward to the spike mark tape
+        inDep.changeElevation(-500); // lower claw
+        drive.driveByEncoder(0, 0, 1, 770);  // turn left
 
 
 //        if (propLocation == 0) { // left

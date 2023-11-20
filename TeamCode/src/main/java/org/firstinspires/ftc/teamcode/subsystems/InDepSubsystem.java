@@ -123,6 +123,7 @@ public class InDepSubsystem extends SubsystemBase {
         arm.set(SpeedCoefficients.getArmSpeed());
     }
 
+
     public void resetArmEncoder() {
         arm.resetEncoder();
     }
@@ -144,7 +145,7 @@ public class InDepSubsystem extends SubsystemBase {
     }
 
     public void changeElevation(int ticks) {
-        int newTarget = getArmPosition() + ticks;
+        int newTarget = getArmPosition() - ticks;
         arm.setTargetPosition(newTarget);
         arm.set(SpeedCoefficients.getArmSpeed());
 

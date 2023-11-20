@@ -44,11 +44,13 @@ public class AutoTestingBlue3 extends LinearOpMode {
         //Start actual Auto now // pretend april tag location has been found, 0 = left, 1 = center, 2 = right
         //int propLocation = cvSubsystem.getTeamPropLocation(false); // 0 = left, 1 = center, 2 = right
 
-        //inDep.changeElevation(10); // raise claw
-        drive.driveByEncoder(0, -0.5, 0, 1000); // moving forward toward the pixel placing area
-        drive.driveByEncoder(0, 0, 1, 300);  // turn left
-        inDep.changeElevation(10); // raise claw
-        drive.driveByEncoder(0, -0.5, 0, 250); // moving forward to the spike mark tape
+        inDep.changeElevation(500); // raise claw
+        drive.driveByEncoder(0, -0.5, 0, 1200); // moving forward toward the pixel placing area
+        drive.driveByEncoder(0, 0, 1, 770);  // turn left
+        //drive.driveByEncoder(0, 0.5, 0, 1); // move backwards to brake for tesing
+
+        inDep.changeElevation(-500); // raise claw
+        drive.driveByEncoder(0, -0.5, 0, 150); // moving forward to the spike mark tape
         inDep.open(); // open claw to place the pixel
         inDep.changeElevation(-10); // lower claw
 

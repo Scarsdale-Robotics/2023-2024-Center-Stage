@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 public class SpeedCoefficients {
-    public static MoveMode moveMode;
+    public static MoveMode moveMode = MoveMode.MODE_FAST;
     public enum MoveMode {
         MODE_SLOW(0),
         MODE_FAST(1);
