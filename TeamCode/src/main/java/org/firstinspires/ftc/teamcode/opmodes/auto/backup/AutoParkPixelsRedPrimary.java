@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.auto;
+package org.firstinspires.ftc.teamcode.opmodes.auto.backup;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -8,8 +8,8 @@ import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 
-@Autonomous(name = "Auto Park Backboard Red Primary") //turns first square
-public class AutoParkBackboardRedPrimary extends LinearOpMode {
+@Autonomous(name = "Auto Park Pixels Red Primary") //turns first square
+public class AutoParkPixelsRedPrimary extends LinearOpMode {
     @Override
     // The "Main" code will go in here
     public void runOpMode() throws InterruptedException {
@@ -42,7 +42,7 @@ public class AutoParkBackboardRedPrimary extends LinearOpMode {
 
         drive.driveByEncoder(0, 0.5, 0, 50); // moving forward toward the pixel placing area
         drive.driveByEncoder(0, 0, 1, 300);  // turn right
-        drive.driveByEncoder(0, 0.5, 0, 250); // continue moving forward toward the parking area
+        drive.driveByEncoder(0, 0.5, 0, 500); // continue moving forward toward the parking area
         stop();
     }
 

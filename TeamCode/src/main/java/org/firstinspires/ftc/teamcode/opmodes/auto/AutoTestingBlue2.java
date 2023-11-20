@@ -9,8 +9,8 @@ import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 
-@Autonomous(name = "Auto Testing Blue")
-public class AutoTestingBlue extends LinearOpMode {
+@Autonomous(name = "Auto Testing Blue 2")
+public class AutoTestingBlue2 extends LinearOpMode {
     @Override
     // The "Main" code will go in here
     public void runOpMode() {
@@ -45,12 +45,15 @@ public class AutoTestingBlue extends LinearOpMode {
         //int propLocation = cvSubsystem.getTeamPropLocation(false); // 0 = left, 1 = center, 2 = right
 
         //inDep.changeElevation(10); // raise claw
-        drive.driveByEncoder(0, 0.5, 0, 300); // moving forward toward the pixel placing area
-        drive.driveByEncoder(0, 0, -1, 300);  // turn left
-        drive.driveByEncoder(0, 0.5, 0, 250); // moving forward to the spike mark tape
+//        drive.driveByEncoder(0, 0.5, 0, 300); // moving forward toward the pixel placing area
+//        drive.driveByEncoder(0, 0, -1, 300);  // turn left
+//        drive.driveByEncoder(0, 0.5, 0, 250); // moving forward to the spike mark tape
         //inDep.changeElevation(-10); // lower claw
         inDep.open(); // open claw to place the pixel
-        //inDep.changeElevation(10); // raise claw
+        inDep.changeElevation(10); // raise claw
+        drive.driveByEncoder(0, 0.5, 0, 300); // moving forward to the spike mark tape
+        inDep.changeElevation(-10); // lower claw
+        drive.driveByEncoder(0, 0, -1, 300);  // turn left
 
 
 //        if (propLocation == 0) { // left
