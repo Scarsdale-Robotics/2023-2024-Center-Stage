@@ -99,7 +99,7 @@ public class PropDetectionPipeline implements VisionProcessor {
         int best_idx = 1;
 
         for (int i=0; i<3; i++) {
-            Rect crop = new Rect(width*i/3,height / 4,width/3, height * 3 / 4);
+            Rect crop = new Rect(width*i/3,height * 3 / 4,width/3, height / 4);
             Imgproc.rectangle(input, crop, new Scalar(255, 255, 0));
             this.sub = new Mat(input, crop);
             double totalArea = getTotalContourArea();

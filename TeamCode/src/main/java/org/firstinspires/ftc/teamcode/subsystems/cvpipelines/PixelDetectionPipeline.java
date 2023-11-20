@@ -96,8 +96,8 @@ public class PixelDetectionPipeline implements VisionProcessor {
         height = input.height();
         width = input.width();
 
-        Core.transpose(input, input);
-        Core.flip(input, input, 1);  // Switch flipCode to 0 if inverted
+//        Core.transpose(input, input);
+//        Core.flip(input, input, 1);  // Switch flipCode to 0 if inverted
         this.sub = input;
         posX = width / 2;
         posY = height / 2;

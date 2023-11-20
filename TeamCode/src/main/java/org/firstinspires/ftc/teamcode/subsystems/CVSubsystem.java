@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import android.util.Size;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -35,25 +36,27 @@ public class CVSubsystem extends SubsystemBase {
     private final double NO_ROTATIONAL_OFFSET = -50000.0;
     private final double NO_DISTANCE = -50000.0;
     private final double ERROR   =  3.0;
-    private final double ERROR_ALIGNMENT = 0.5;
+    private final double ERROR_ALIGNMENT = 2;
 
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
     private final WebcamName cameraName;
-    private final PropDetectionPipeline propProcessor;
-    private final PixelDetectionPipeline pixelProcessor;
-    public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam) {
+    private PropDetectionPipeline propProcessor;
+    private PixelDetectionPipeline pixelProcessor;
+    private boolean isRedTeam;
+    private LinearOpMode opMode;
+    public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
 //        tdp = new TapeDetectionPipeline();
 //        camera.setPipeline(tdp);
         this.camera = camera;
         this.drive = drive;
         this.telemetry = telemetry;
         this.cameraName = cameraName;
+        this.isRedTeam = isRedTeam;
+        this.opMode = opMode;
         // create AprilTagProcessor and VisionPortal
         initAprilTag();
 
-        propProcessor = new PropDetectionPipeline(isRedTeam);
-        pixelProcessor = new PixelDetectionPipeline();
 
 //        pixelPipeline = new PixelDetectionPipeline();
 //        propPipeline = new PropDetectionPipeline(isRedTeam, telemetry);
@@ -81,6 +84,8 @@ public class CVSubsystem extends SubsystemBase {
 
     private void initAprilTag() {
         // Create the AprilTag processor.
+        propProcessor = new PropDetectionPipeline(isRedTeam);
+        pixelProcessor = new PixelDetectionPipeline();
         aprilTag = new AprilTagProcessor.Builder()
                 .setDrawTagOutline(true)
                 .build();
@@ -101,7 +106,10 @@ public class CVSubsystem extends SubsystemBase {
         builder.setCameraResolution(new Size(640, 480)); // android.util
 
         // Set and enable the processor.
-        builder.addProcessors(aprilTag, propProcessor, pixelProcessor);
+        builder.addProcessor(aprilTag);
+        builder.addProcessor(pixelProcessor);
+        builder.addProcessor(propProcessor);
+//        builder.addProcessors(aprilTag, pixelProcessor, propProcessor);
 
         // Build the Vision Portal, using the above settings.
         visionPortal = builder.build();
@@ -131,6 +139,7 @@ public class CVSubsystem extends SubsystemBase {
                     else return LOCATION_CENTER;
                 }
             }
+            return -2;
         }
 
         return NO_LOCATION;
@@ -273,8 +282,9 @@ public class CVSubsystem extends SubsystemBase {
      */
     public void alignParallelWithAprilTag(int tagID) {
         double rotOff = getAprilTagRotationalOffset(tagID);
-        while (Math.abs(rotOff) > ERROR_ALIGNMENT) {
-            drive.driveFieldCentric(0, 0, rotOff * 1 * SpeedCoefficients.getTurnSpeed()); // times some scaling factor (temporarily at 1)
+        telemetry.addData("err", Math.abs(rotOff));
+        while (Math.abs(rotOff) > ERROR_ALIGNMENT && opMode.opModeIsActive()) {
+            drive.driveFieldCentric(0, 0, rotOff * 0.1 * SpeedCoefficients.getTurnSpeed()); // times some scaling factor (temporarily at 1)
         }
     }
 }

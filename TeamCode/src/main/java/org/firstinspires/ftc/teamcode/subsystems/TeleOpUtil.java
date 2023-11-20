@@ -42,7 +42,7 @@ public class TeleOpUtil {
         cv = new CVSubsystem(
                 robot.camera,
                 robot.cameraName,
-                drive, telemetry, isRedTeam
+                drive, telemetry, isRedTeam, opMode
         );
         this.isRedTeam = isRedTeam;
         this.gamepad1 = gamepad1;
@@ -70,25 +70,25 @@ public class TeleOpUtil {
      * temp method, will be moved to auto after testing
      * ignore that the controls are inconvenient--they are temporary for testing
      */
-    private void teamPropLocationControl() {
-        if (gamepad1.dpad_left) {
-            int teamPropLocation = cv.getTeamPropLocation();
-            switch (teamPropLocation) {
-                case 0:
-                    // left location
-                    drive.driveRobotCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
-                    break;
-                case 2:
-                    // right location
-                    drive.driveRobotCentric(1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
-                    break;
-                default:
-                    // center location
-                    drive.driveRobotCentric(0, 1 * SpeedCoefficients.getForwardSpeed(), 0);
-                    break;
-            }
-        };
-    }
+//    private void teamPropLocationControl() {
+//        if (gamepad1.dpad_left) {
+//            int teamPropLocation = cv.getTeamPropLocation();
+//            switch (teamPropLocation) {
+//                case 0:
+//                    // left location
+//                    drive.driveRobotCentric(1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+//                    break;
+//                case 2:
+//                    // right location
+//                    drive.driveRobotCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+//                    break;
+//                default:
+//                    // center location
+//                    drive.driveRobotCentric(0, 1 * SpeedCoefficients.getForwardSpeed(), 0);
+//                    break;
+//            }
+//        };
+//    }
 
     private void runAprilTagParallelAlignControl() {
         // check alignParallelWithAprilTag() for details
@@ -182,7 +182,7 @@ public class TeleOpUtil {
     }
 
     public void tick() {
-        double DISTANCE_BEFORE_BACKBOARD = 3;  // TEMP
+        double DISTANCE_BEFORE_BACKBOARD = 5;  // TEMP
         if (gamepad2.y || cv.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3}) > DISTANCE_BEFORE_BACKBOARD) {
             runMotionControl();
             runArmClawControl();
