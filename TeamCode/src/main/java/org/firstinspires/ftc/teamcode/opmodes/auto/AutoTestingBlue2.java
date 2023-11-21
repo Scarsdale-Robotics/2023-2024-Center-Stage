@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
-import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 
@@ -44,16 +43,13 @@ public class AutoTestingBlue2 extends LinearOpMode {
         //Start actual Auto now // pretend april tag location has been found, 0 = left, 1 = center, 2 = right
         //int propLocation = cvSubsystem.getTeamPropLocation(false); // 0 = left, 1 = center, 2 = right
 
-        //inDep.changeElevation(10); // raise claw
-//        drive.driveByEncoder(0, 0.5, 0, 300); // moving forward toward the pixel placing area
-//        drive.driveByEncoder(0, 0, -1, 300);  // turn left
-//        drive.driveByEncoder(0, 0.5, 0, 250); // moving forward to the spike mark tape
-        //inDep.changeElevation(-10); // lower claw
-        inDep.open(); // open claw to place the pixel
-        inDep.changeElevation(500); // raise claw
-        drive.driveByEncoder(0, -0.5, 0, 1200); // moving forward to the spike mark tape
-        inDep.changeElevation(-500); // lower claw
+        drive.driveByEncoder(0, -0.5, 0, 1200); // moving forward toward the pixel placing area
         drive.driveByEncoder(0, 0, 1, 770);  // turn left
+        //drive.driveByEncoder(0, 0.5, 0, 1); // move backwards to brake for tesing
+        drive.driveByEncoder(0, -0.5, 0, 140); // moving forward to the spike mark tape
+        inDep.changeElevation(50); // raise claw - make 100 if doesnt work
+        inDep.open(); // open claw to place the pixel
+        //inDep.changeElevation(10); // raise claw
 
 
 //        if (propLocation == 0) { // left
