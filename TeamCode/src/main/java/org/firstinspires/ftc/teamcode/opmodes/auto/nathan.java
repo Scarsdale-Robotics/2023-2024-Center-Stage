@@ -24,13 +24,13 @@ public class nathan extends LinearOpMode {
                 this
         );
         CVSubsystem cv = new CVSubsystem(robot.camera,
-                robot.cameraName,drive, telemetry, false);
+                robot.cameraName,drive, telemetry, false, this);
 
 
         waitForStart();
 
         while (opModeIsActive()) {
-            telemetry.addData("team prop loc: ", cv.getTeamPropLocation());
+            telemetry.addData("team prop loc: ", cv.getAprilTagLocation(2));
             telemetry.update();
         }
 

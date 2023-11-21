@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems.cvpipelines;
 
+import android.graphics.Canvas;
+
+import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
+import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -16,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 // 320 x 240 camera resolution standard
 
-public class PixelDetectionPipeline extends OpenCvPipeline {
+public class PixelDetectionPipeline implements VisionProcessor {
     public Mat frame;
     public Mat sub;
     public Mat temp = new Mat();
@@ -46,39 +50,6 @@ public class PixelDetectionPipeline extends OpenCvPipeline {
     public int posX = -999;
     public int posY = -999;
 
-    public Mat processFrame(Mat input) {
-        hasStarted.set(true);
-
-        // Open cv defaults to BGR, but we are completely in RGB/HSV, this is because pipeline's input/output RGB
-        height = input.height();
-        width = input.width();
-
-        Core.transpose(input, input);
-        Core.flip(input, input, 1);  // Switch flipCode to 0 if inverted
-        this.sub = input;
-        posX = width / 2;
-        posY = height / 2;
-
-        MatOfPoint contour = getPixelContour();
-
-        if(contour != null) {
-            List<MatOfPoint> pixelContour = new ArrayList<>();
-            Rect b = Imgproc.boundingRect(contour);
-
-            pixelContour.add(contour);
-
-            Imgproc.drawContours(sub, pixelContour, 0, new Scalar(0, 255, 255), 2);
-            posX = b.x + b.width / 2;
-            posY = b.y + b.height / 2;
-            Imgproc.circle(sub, new Point(posX, posY), 4, new Scalar(255, 0, 255)); // RGB DRAW CIRCLE
-
-        }
-
-        centerOffset = posX - (width / 2); //+40?
-        lateralOffset.set(centerOffset);
-
-        return input;
-    }
     public int getCenterOffset() {
         return centerOffset;
     }
@@ -110,5 +81,50 @@ public class PixelDetectionPipeline extends OpenCvPipeline {
         }
 
         return maxContour;
+    }
+
+    @Override
+    public void init(int width, int height, CameraCalibration calibration) {
+
+    }
+
+    @Override
+    public Object processFrame(Mat input, long captureTimeNanos) {
+        hasStarted.set(true);
+
+        // Open cv defaults to BGR, but we are completely in RGB/HSV, this is because pipeline's input/output RGB
+        height = input.height();
+        width = input.width();
+
+//        Core.transpose(input, input);
+//        Core.flip(input, input, 1);  // Switch flipCode to 0 if inverted
+        this.sub = input;
+        posX = width / 2;
+        posY = height / 2;
+
+        MatOfPoint contour = getPixelContour();
+
+        if(contour != null) {
+            List<MatOfPoint> pixelContour = new ArrayList<>();
+            Rect b = Imgproc.boundingRect(contour);
+
+            pixelContour.add(contour);
+
+            Imgproc.drawContours(sub, pixelContour, 0, new Scalar(0, 255, 255), 2);
+            posX = b.x + b.width / 2;
+            posY = b.y + b.height / 2;
+            Imgproc.circle(sub, new Point(posX, posY), 4, new Scalar(255, 0, 255)); // RGB DRAW CIRCLE
+
+        }
+
+        centerOffset = posX - (width / 2); //+40?
+        lateralOffset.set(centerOffset);
+
+        return input;
+    }
+
+    @Override
+    public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
+
     }
 }

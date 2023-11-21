@@ -148,7 +148,6 @@ public class InDepSubsystem extends SubsystemBase {
         int newTarget = getArmPosition() - ticks;
         arm.setTargetPosition(newTarget);
         arm.set(SpeedCoefficients.getArmSpeed());
-
     }
 }
 

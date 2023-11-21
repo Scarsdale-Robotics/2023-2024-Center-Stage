@@ -23,7 +23,7 @@ public class AutoParkPixelsRedPrimary extends LinearOpMode {
                 this
         );
         CVSubsystem cvSubsystem = new CVSubsystem(robot.camera,
-                robot.cameraName,drive, telemetry, false);
+                robot.cameraName,drive, telemetry, false, this);
         // Assuming this is in your main OpMode class
         HardwareRobot hardwareRobot = new HardwareRobot(hardwareMap);
 

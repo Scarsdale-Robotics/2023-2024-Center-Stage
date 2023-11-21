@@ -24,7 +24,7 @@ public class AutoBackboardRed extends LinearOpMode {
                 this
         );
         CVSubsystem cvSubsystem = new CVSubsystem(robot.camera,
-                robot.cameraName,drive, telemetry, true);
+                robot.cameraName,drive, telemetry, true, this);
         // Assuming this is in your main OpMode class
         HardwareRobot hardwareRobot = new HardwareRobot(hardwareMap);
 

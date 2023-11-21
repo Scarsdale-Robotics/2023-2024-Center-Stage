@@ -24,7 +24,7 @@ public class AutoBackboardBlue extends LinearOpMode {
                 this
         );
         CVSubsystem cvSubsystem = new CVSubsystem(robot.camera,
-                robot.cameraName,drive, telemetry, false);
+                robot.cameraName,drive, telemetry, false, this);
         // Assuming this is in your main OpMode class
         HardwareRobot hardwareRobot = new HardwareRobot(hardwareMap);
 
@@ -72,7 +72,7 @@ public class AutoBackboardBlue extends LinearOpMode {
             // park
         }
 
-        else if (propLocation == 2) { // right
+        else { // right
             //inDep.changeElevation(10); // raise claw
             drive.driveByEncoder(0, 0.5, 0, 550); // moving forward more than the center path
             drive.driveByEncoder(0, 0, 1, 300);  // turn right
