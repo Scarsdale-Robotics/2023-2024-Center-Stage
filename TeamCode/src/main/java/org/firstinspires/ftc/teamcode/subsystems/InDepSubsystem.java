@@ -22,8 +22,8 @@ public class InDepSubsystem extends SubsystemBase {
         BACKBOARD1(-1960,0.05),
         BACKBOARD2(-4200,0.125); //temp motor encoder values
 
-        final int target;
-        final double wristTarget;
+        int target;
+        double wristTarget;
 
         Level(int target, double wristTarget) {
             this.target = target;
@@ -47,7 +47,7 @@ public class InDepSubsystem extends SubsystemBase {
      * @return the position of the arm motor, in ticks.
      */
     public int getArmPosition() {
-        return arm.getCurrentPosition();
+        return arm.motor.getCurrentPosition();
     }
 
     /**
@@ -145,9 +145,15 @@ public class InDepSubsystem extends SubsystemBase {
     }
 
     public void changeElevation(int ticks) {
-        int newTarget = getArmPosition() - ticks;
-        arm.setTargetPosition(newTarget);
+        arm.motor.setTargetPosition(arm.motor.getCurrentPosition() - ticks);
+        arm.setTargetPosition(arm.motor.getCurrentPosition() - ticks);
         arm.set(SpeedCoefficients.getArmSpeed());
+
+        while (!arm.atTargetPosition() || !(arm.motor.getCurrentPosition()<arm.motor.getTargetPosition()));
+
+        arm.stopMotor();
+        arm.motor.setPower(0);
+
     }
 }
 

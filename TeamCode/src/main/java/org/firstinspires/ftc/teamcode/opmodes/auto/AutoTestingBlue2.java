@@ -23,7 +23,7 @@ public class AutoTestingBlue2 extends LinearOpMode {
                 this
         );
         CVSubsystem cvSubsystem = new CVSubsystem(robot.camera,
-                robot.cameraName,drive, telemetry, false);
+                robot.cameraName,drive, telemetry, false, this);
         // Assuming this is in your main OpMode class
         HardwareRobot hardwareRobot = new HardwareRobot(hardwareMap);
 
@@ -46,10 +46,12 @@ public class AutoTestingBlue2 extends LinearOpMode {
         drive.driveByEncoder(0, -0.3, 0, 1200); // moving forward toward the pixel placing area
         drive.driveByEncoder(0, 0, 0.5, 875);  // turn left
         //drive.driveByEncoder(0, 0.5, 0, 1); // move backwards to brake for tesin
-        inDep.changeElevation(500); // raise claw - make 100 if doesnt work
-        drive.driveByEncoder(0, -0.3, 0, 140); // moving forward to the spike mark tape
+        inDep.changeElevation(150); // raise claw - make 100 if doesnt work
+        drive.driveByEncoder(0, -0.3, 0, 125); // moving forward to the spike mark tape
+        drive.driveByEncoder(0, 0.3, 0, 1); // moving forward to the spike mark tape
         inDep.open(); // open claw to place the pixel
-        inDep.changeElevation(-500); // raise claw
+        drive.driveByEncoder(0, -0.3, 0, 3500); // moving forward to the spike mark tape
+        inDep.changeElevation(-150); // lower claw
 
 
 //        if (propLocation == 0) { // left

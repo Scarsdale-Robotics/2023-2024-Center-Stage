@@ -23,7 +23,7 @@ public class AutoTestingBlue3 extends LinearOpMode {
                 this
         );
         CVSubsystem cvSubsystem = new CVSubsystem(robot.camera,
-                robot.cameraName,drive, telemetry, false);
+                robot.cameraName,drive, telemetry, false, this);
         // Assuming this is in your main OpMode class
         HardwareRobot hardwareRobot = new HardwareRobot(hardwareMap);
 
@@ -43,16 +43,15 @@ public class AutoTestingBlue3 extends LinearOpMode {
         //Start actual Auto now // pretend april tag location has been found, 0 = left, 1 = center, 2 = right
         //int propLocation = cvSubsystem.getTeamPropLocation(false); // 0 = left, 1 = center, 2 = right
         //only run this when 2 works and vals are updated. may hit truss
-        drive.driveByEncoder(0, -0.5, 0, 1200); // moving forward toward the pixel placing area
-        drive.driveByEncoder(0, 0, 1, 770);  // turn left
-        //drive.driveByEncoder(0, 0.5, 0, 1); // move backwards to brake for tesing
-        drive.driveByEncoder(0, -0.5, 0, 140); // moving forward to the spike mark tape
-        inDep.changeElevation(50); // raise claw - make 100 if doesnt work
+        drive.driveByEncoder(0, -0.3, 0, 1200); // moving forward toward the pixel placing area
+        drive.driveByEncoder(0, 0, 0.5, 875);  // turn left
+        //drive.driveByEncoder(0, 0.5, 0, 1); // move backwards to brake for tesin
+        inDep.changeElevation(150); // raise claw - make 100 if doesnt work
+        drive.driveByEncoder(0, -0.3, 0, 100); // moving forward to the spike mark tape
+        drive.driveByEncoder(0, 0.3, 0, 1); // moving forward to the spike mark tape
         inDep.open(); // open claw to place the pixel
-        drive.driveByEncoder(0, -0.5, 0, 1000); // moving forward to parking area
-        inDep.changeElevation(-50); // raise claw - make 100 if doesnt work
-        drive.driveByEncoder(0, -0.5, 0, 1000); // moving forward to parking area
-
+        drive.driveByEncoder(0, -0.3, 0, 3000); // moving forward to the spike mark tape
+        inDep.changeElevation(-150); // lower claw
 
         //inDep.changeElevation(10); // raise
 
