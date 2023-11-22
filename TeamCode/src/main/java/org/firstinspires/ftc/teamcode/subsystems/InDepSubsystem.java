@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 public class InDepSubsystem extends SubsystemBase {
     private final double CLAW_OPEN_POS = 0.175;
     private final double CLAW_CLOSED_POS = 0;
-
+    private final double errorTolerance = 200;
     private final LinearOpMode opMode;
     private final Motor arm;
     private final Servo claw;
@@ -58,6 +58,7 @@ public class InDepSubsystem extends SubsystemBase {
     public boolean getIsOpen() {
         return isClawOpen;
     }
+
 
     /**
      * sets the raw power of the arm.
@@ -143,14 +144,15 @@ public class InDepSubsystem extends SubsystemBase {
         claw.setPosition(CLAW_CLOSED_POS);
         isClawOpen = false;
     }
-
     public void changeElevation(int ticks) {
-        arm.motor.setTargetPosition(arm.motor.getCurrentPosition() - ticks);
-        arm.setTargetPosition(arm.motor.getCurrentPosition() - ticks);
+        int target = arm.motor.getCurrentPosition() - ticks;
+        arm.setTargetPosition(target);
         arm.set(SpeedCoefficients.getArmSpeed());
 
-        while (!arm.atTargetPosition() || !(arm.motor.getCurrentPosition()<arm.motor.getTargetPosition()));
+        // wait until reached target within errorTolerance
+        while ( !(Math.abs(target-arm.getCurrentPosition()) < errorTolerance) );
 
+        // stop when reached
         arm.stopMotor();
         arm.motor.setPower(0);
 

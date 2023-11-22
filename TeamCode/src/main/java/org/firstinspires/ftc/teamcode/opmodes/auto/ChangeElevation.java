@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.HardwareRobot;
+import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
@@ -33,7 +34,7 @@ public class ChangeElevation extends LinearOpMode {
                 this,
                 telemetry
         );
-        //SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+        SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
 
 
         waitForStart();
@@ -42,15 +43,18 @@ public class ChangeElevation extends LinearOpMode {
         //int propLocation = cvSubsystem.getTeamPropLocation(false); // 0 = left, 1 = center, 2 = right
         //only run this when 2 works and vals are updated. may hit truss
 
-        inDep.changeElevation(500); // raise claw - make 100 if doesnt work
+
         inDep.open();
         while(true){
-            telemetry.addData("Arm Pos: ", robot.arm.motor.getCurrentPosition());
-            telemetry.addData("Target: ", robot.arm.motor.getTargetPosition());
-            telemetry.update();
+            inDep.changeElevation(1600); // raise claw
+            inDep.changeElevation(-1600); // lower claw
+//            telemetry.addData("yay good stuff happened :D hoepufully awp9euvdhoisulhrfsheruwa3utehaw4urauwh3rf87awef nice ", "");
+//            telemetry.addData("Arm Pos: ", robot.arm.motor.getCurrentPosition());
+//            telemetry.addData("Target: ", robot.arm.motor.getTargetPosition());
+//            telemetry.update();
         }
 
-
+//        stop();
         //inDep.changeElevation(10); // raise
 
 

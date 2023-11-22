@@ -44,14 +44,15 @@ public class AutoTestingBlue2_5 extends LinearOpMode {
         //int propLocation = cvSubsystem.getTeamPropLocation(false); // 0 = left, 1 = center, 2 = right
 
         drive.driveByEncoder(0, -0.3, 0, 1200); // moving forward toward the pixel placing area
-        drive.driveByEncoder(0, 0, 0.5, 875);  // turn left
-        //drive.driveByEncoder(0, 0.5, 0, 1); // move backwards to brake for tesin
-        inDep.changeElevation(150); // raise claw - make 100 if doesnt work
-        drive.driveByEncoder(0, -0.3, 0, 125); // moving forward to the spike mark tape
+        drive.driveByEncoder(0, 0, 0.5, 880);  // turn left
+        drive.driveByEncoder(0, 0.5, 0, 1); // move backwards to brake for tesin
+        drive.driveByEncoder(0, -0.3, 0, 100); // moving forward to the spike mark tape
         drive.driveByEncoder(0, 0.3, 0, 1); // moving forward to the spike mark tape
         inDep.open(); // open claw to place the pixel
-        drive.driveByEncoder(0, -0.3, 0, 2500); // moving forward to the spike mark tape
-        inDep.changeElevation(-150); // lower claw
+        inDep.changeElevation(1500); // raise claw - make 100 if doesnt work
+        drive.driveByEncoder(0, -0.3, 0, 3550); // moving forward to the spike mark tape
+        inDep.changeElevation(-1500); // lower claw
+        stop();
 
 
 //        if (propLocation == 0) { // left
