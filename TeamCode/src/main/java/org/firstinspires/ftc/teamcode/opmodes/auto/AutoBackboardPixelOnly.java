@@ -5,12 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
-import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 
-@Autonomous(name = "Auto Testing Blue")
-public class AutoTestingBlue extends LinearOpMode {
+@Autonomous(name = "Auto Backboard Pixel Only")
+public class AutoBackboardPixelOnly extends LinearOpMode {
     @Override
     // The "Main" code will go in here
     public void runOpMode() {
