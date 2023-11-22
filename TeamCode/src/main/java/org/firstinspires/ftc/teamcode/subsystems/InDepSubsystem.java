@@ -9,8 +9,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 
 public class InDepSubsystem extends SubsystemBase {
-    private final double CLAW_OPEN_POS = 0.175;
-    private final double CLAW_CLOSED_POS = 0;
+    private final double CLAW_OPEN_POS = 0;
+    private final double CLAW_CLOSED_POS = 0.175;
     private final double errorTolerance = 200;
     private final LinearOpMode opMode;
     private final Motor arm;
@@ -150,7 +150,21 @@ public class InDepSubsystem extends SubsystemBase {
         arm.set(SpeedCoefficients.getArmSpeed());
 
         // wait until reached target within errorTolerance
-        while ( !(Math.abs(target-arm.getCurrentPosition()) < errorTolerance) );
+        while (opMode.opModeIsActive() && !(Math.abs(target-arm.getCurrentPosition()) < errorTolerance) );
+
+        // stop when reached
+        arm.stopMotor();
+        arm.motor.setPower(0);
+
+    }
+
+    public void resetArm() {
+        int target = 0;
+        arm.setTargetPosition(target);
+        arm.set(SpeedCoefficients.getArmSpeed());
+
+        // wait until reached target within errorTolerance
+        while (opMode.opModeIsActive() && !(Math.abs(target-arm.getCurrentPosition()) < errorTolerance) );
 
         // stop when reached
         arm.stopMotor();

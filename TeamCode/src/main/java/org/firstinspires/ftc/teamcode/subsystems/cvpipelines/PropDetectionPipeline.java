@@ -24,6 +24,7 @@ public class PropDetectionPipeline implements VisionProcessor {
     boolean isRedTeam;
 
     public Mat sub;
+    private Mat output;
     public Mat temp = new Mat();
 
     public int width;
@@ -71,6 +72,8 @@ public class PropDetectionPipeline implements VisionProcessor {
             Core.inRange(hsvmat, blueLowerRange, blueUpperRange, mask);
             Imgproc.findContours(mask, contourList, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         }
+        for (int i = 0; i < contourList.size(); i++)
+            Imgproc.drawContours(output, contourList, i, new Scalar(0, 0, 255));
         double totalArea = 0;
         for (int idx = 0; idx<contourList.size(); idx++) {
             double area = Imgproc.contourArea(contourList.get(idx));
@@ -94,6 +97,7 @@ public class PropDetectionPipeline implements VisionProcessor {
 //        Core.transpose(input, input);
 //        Core.flip(input, input, 0);  // Switch flipCode to 0 if inverted
         this.sub = input;
+        this.output = input;
 
         double maxTotalArea = Double.MIN_VALUE;
         int best_idx = 1;
