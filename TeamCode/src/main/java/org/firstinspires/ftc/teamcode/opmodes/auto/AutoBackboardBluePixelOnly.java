@@ -8,8 +8,8 @@ import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 
-@Autonomous(name = "Auto Backboard Blue")
-public class AutoBackboardBlue extends LinearOpMode {
+@Autonomous(name = "Auto Backboard Blue Pixel Only")
+public class AutoBackboardBluePixelOnly extends LinearOpMode {
     @Override
     // The "Main" code will go in here
     public void runOpMode() {
@@ -69,19 +69,11 @@ public class AutoBackboardBlue extends LinearOpMode {
             drive.driveByEncoder(0, -0.3, 0, 100); // moving forward to the spike mark tape
             drive.driveByEncoder(0, 0.3, 0, 1); // brake
             inDep.open(); // open claw to place the pixel
-            inDep.changeElevation(1500); // raise claw
-            drive.driveByEncoder(0, -0.3, 0, 3550); // moving forward to the spike mark tape
-            inDep.changeElevation(-1500); // lower claw
         } else if (propLocation == 1) {
             // center
             drive.driveByEncoder(0, -0.3, 0, 1300); // moving forward toward the pixel placing area
             drive.driveByEncoder(0, 0.3, 0, 1); // brake
             inDep.open(); // open claw to place the pixel
-            drive.driveByEncoder(0, 0.3, 0, 100); // move backwards to the spike mark tape
-            drive.driveByEncoder(0, -0.3, 0, 1); // brake
-            drive.driveByEncoder(0, 0, 0.5, 885);  // turn left
-            drive.driveByEncoder(0, -0.3, 0, 3550); // moving forward to the spike mark tape
-            inDep.changeElevation(-1500); // lower claw
         } else {
             // right
             drive.driveByEncoder(0, -0.3, 0, 1200); // moving forward toward the pixel placing area
@@ -90,11 +82,6 @@ public class AutoBackboardBlue extends LinearOpMode {
             drive.driveByEncoder(0, -0.3, 0, 100); // moving forward to the spike mark tape
             drive.driveByEncoder(0, 0.3, 0, 1); // brake
             inDep.open(); // open claw to place the pixel
-            drive.driveByEncoder(0, 0.3, 0, 100); // moving back to center
-            drive.driveByEncoder(0, -0.3, 0, 1); // brake
-            //drive.driveByEncoder(0, 0, 0.5, 1770);  // turn left 180º (only needed to place pixel)
-            drive.driveByEncoder(0, 0.3, 0, 3550); // moving backward to the spike mark tape
-            inDep.changeElevation(-1500); // lower claw
         }
         stop();
     }
