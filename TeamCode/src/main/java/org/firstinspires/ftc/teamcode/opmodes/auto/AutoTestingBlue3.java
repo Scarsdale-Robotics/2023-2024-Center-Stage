@@ -38,8 +38,28 @@ public class AutoTestingBlue3 extends LinearOpMode {
 
         waitForStart();
 
-        //Start actual Auto now // pretend april tag location has been found, 0 = left, 1 = center, 2 = right
-        int propLocation = cv.getTeamPropLocation(); // 0 = left, 1 = center, 2 = right
+        // cv or manual location for testing
+        boolean[] buttons = new boolean[4];
+        while (!(buttons[0] || buttons[1] || buttons[2] || buttons[3])) {
+            buttons[0] = gamepad1.triangle;
+            buttons[1] = gamepad1.square;
+            buttons[2] = gamepad1.x;
+            buttons[3] = gamepad1.circle;
+        }
+
+
+        //Start actual Auto now | choose cv or manual prop location
+        int propLocation = 0;
+        if (buttons[0])
+            propLocation = cv.getTeamPropLocation(); // 0 = left, 1 = center, 2 = right
+        else if (buttons[1])
+            propLocation = 0;
+        else if (buttons[2])
+            propLocation = 1;
+        else if (buttons[3])
+            propLocation = 2;
+
+
         //only run this when 2 works and vals are updated. may hit truss
         if (propLocation == 0) {
             // left
@@ -72,7 +92,7 @@ public class AutoTestingBlue3 extends LinearOpMode {
             inDep.open(); // open claw to place the pixel
             drive.driveByEncoder(0, 0.3, 0, 100); // moving back to center
             drive.driveByEncoder(0, -0.3, 0, 1); // brake
-            //drive.driveByEncoder(0, 0, 0.5, 885);  // turn left 180º (only needed to place pixel)
+            //drive.driveByEncoder(0, 0, 0.5, 1770);  // turn left 180º (only needed to place pixel)
             drive.driveByEncoder(0, 0.3, 0, 3550); // moving backward to the spike mark tape
             inDep.changeElevation(-1500); // lower claw
         }
