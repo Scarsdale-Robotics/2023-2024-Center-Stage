@@ -44,15 +44,7 @@ public class ChangeElevation extends LinearOpMode {
         //only run this when 2 works and vals are updated. may hit truss
 
 
-        inDep.open();
-        while(true){
-            inDep.changeElevation(1600); // raise claw
-            inDep.changeElevation(-1600); // lower claw
-//            telemetry.addData("yay good stuff happened :D hoepufully awp9euvdhoisulhrfsheruwa3utehaw4urauwh3rf87awef nice ", "");
-//            telemetry.addData("Arm Pos: ", robot.arm.motor.getCurrentPosition());
-//            telemetry.addData("Target: ", robot.arm.motor.getTargetPosition());
-//            telemetry.update();
-        }
+        inDep.resetArm();
 
 //        stop();
         //inDep.changeElevation(10); // raise
@@ -60,7 +52,7 @@ public class ChangeElevation extends LinearOpMode {
 
 
 //        if (propLocation == 0) { // left
-//            inDep.changeElevation(10); // raise claw
+//            inDep.chsangeElevation(10); // raise claw
 //            drive.driveByEncoder(0, 0.5, 0, 550); // moving forward toward the pixel placing area
 //            drive.driveByEncoder(0, 0, -1, 300);  // turn left
 //            drive.driveByEncoder(0, 0.5, 0, 250); // moving forward to the spike mark tape

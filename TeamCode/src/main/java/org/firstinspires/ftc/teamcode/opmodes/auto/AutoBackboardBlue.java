@@ -48,25 +48,31 @@ public class AutoBackboardBlue extends LinearOpMode {
             // left
             drive.driveByEncoder(0, -0.3, 0, 1200); // moving forward toward the pixel placing area
             drive.driveByEncoder(0, 0.3, 0, 1); // brake
-            drive.driveByEncoder(0, 0, 0.5, 885);  // turn left
-            drive.driveByEncoder(0, -0.3, 0, 100); // moving forward to the spike mark tape
+            drive.driveByEncoder(0, 0, 0.5, 880);  // turn left
+            drive.driveByEncoder(0, -0.3, 0, 50); // moving forward to the spike mark tape
             drive.driveByEncoder(0, 0.3, 0, 1); // brake
+            drive.driveByEncoder(-0.3, 0, 0, 50); // strafe right to place pixel correctly
             inDep.open(); // open claw to place the pixel
             inDep.changeElevation(2500); // raise claw
-            drive.driveByEncoder(0, -0.3, 0, 3550); // moving forward to the spike mark tape
+            //drive.driveByEncoder(0.3, 0, 0, 50); // strafe left to re-align robot
+            drive.driveByEncoder(0, -0.3, 0, 2785); // moving forward to the spike mark tape
             inDep.changeElevation(-2500); // lower claw
+            drive.driveByEncoder(0, 0, 0.5, 1770);  // turn left 180º (only needed to place pixel)
+            drive.driveByEncoder(0, 0.3, 0, 785); // moving forward to the spike mark tape
         } else if (propLocation == 1) {
             // center
-            drive.driveByEncoder(0, -0.3, 0, 1300); // moving forward toward the pixel placing area
+            drive.driveByEncoder(0, -0.3, 0, 1270); // moving forward toward the pixel placing area
             drive.driveByEncoder(0, 0.3, 0, 1); // brake
             inDep.open(); // open claw to place the pixel
             inDep.changeElevation(2500); // raise claw
             drive.driveByEncoder(0, 0.3, 0, 15); // move backwards to the spike mark tape
 //            drive.driveByEncoder(0, -0.3, 0, 1); // brake
-            drive.driveByEncoder(0, 0, 0.5, 835);  // turn left
+            drive.driveByEncoder(0, 0, 0.5, 815);  // turn left
             inDep.changeElevation(-2500); // lower claw
-            drive.driveByEncoder(-0.3, 0, 0, 75); // move backwards to the spike mark tape
-            drive.driveByEncoder(0, -0.3, 0, 3650); // moving forward to the spike mark tape
+            drive.driveByEncoder(-0.3, 0, 0, 50); // move backwards to the spike mark tape
+            drive.driveByEncoder(0, -0.3, 0, 2350); // moving forward to the spike mark tape
+            drive.driveByEncoder(0, 0, 0.5, 1800);  // turn left 180º (only needed to place pixel)
+            drive.driveByEncoder(0, 0.3, 0, 1400); // moving backward to the spike mark tape
         } else if (propLocation == 2) {
             // right
             drive.driveByEncoder(0, -0.3, 0, 1300); // moving forward toward the pixel placing area
@@ -74,11 +80,14 @@ public class AutoBackboardBlue extends LinearOpMode {
             drive.driveByEncoder(0, 0, -0.5, 885);  // turn right
             //drive.driveByEncoder(0, -0.3, 0, 100); // moving forward to the spike mark tape
             //drive.driveByEncoder(0, 0.3, 0, 1); // brake
-            drive.driveByEncoder(0, 0.3, 0, 125); // moving back to center
-            drive.driveByEncoder(0, -0.3, 0, 1); // brake
+            drive.driveByEncoder(0, 0.3, 0, 100); // moving back to center
+            drive.driveByEncoder(0, -0.3, 0, 10); // brake
+            drive.driveByEncoder(0.3, 0, 0, 200); // strafe left
             inDep.open(); // open claw to place the pixel
-            //drive.driveByEncoder(0, 0, 0.5, 1770);  // turn left 180º (only needed to place pixel)
+            inDep.changeElevation(2000); // raise claw
+            drive.driveByEncoder(-0.3, 0, 0, 200); // strafe back right
             drive.driveByEncoder(0, 0.3, 0, 3750); // moving backward to the spike mark tape
+            inDep.changeElevation(-2000); // lower claw
             //inDep.changeElevation(-1500); // lower claw
         }
         stop();

@@ -66,13 +66,16 @@ public class InDepSubsystem extends SubsystemBase {
     public void rawPower(double power) {
         int armPos = arm.motor.getCurrentPosition();
 
-        if (armPos>=0 && power>0) { // more down is more positive
-            arm.motor.setPower(0);
-        } else if (armPos<=Level.BACKBOARD2.target && power<0) {
-            arm.motor.setPower(0);
-        } else {
-            arm.motor.setPower(power);
-        }
+        // set bounds
+//        if (armPos>=0 && power>0) { // more down is more positive
+//            arm.motor.setPower(0);
+//        } else if (armPos<=Level.BACKBOARD2.target && power<0) {
+//            arm.motor.setPower(0);
+//        } else {
+//            arm.motor.setPower(power);
+//        }
+
+        arm.motor.setPower(power);
 
         // code moved into this method to avoid an edge case where curr pos moves slightly too much or fails to move enough
         // which would mess up curr pos ranges potentially making the wrist act unexpectedly
