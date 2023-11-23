@@ -38,27 +38,27 @@ public class AutoTestingBlue3 extends LinearOpMode {
 
         waitForStart();
 
-        // cv or manual location for testing
-        boolean[] buttons = new boolean[4];
-        while (!(buttons[0] || buttons[1] || buttons[2] || buttons[3])) {
-            buttons[0] = gamepad1.triangle;
-            buttons[1] = gamepad1.square;
-            buttons[2] = gamepad1.x;
-            buttons[3] = gamepad1.circle;
-        }
+        // [DISABLED] cv or manual location for testing
+//        boolean[] buttons = new boolean[4];
+//        while (!(buttons[0] || buttons[1] || buttons[2] || buttons[3])) {
+//            buttons[0] = gamepad1.triangle;
+//            buttons[1] = gamepad1.square;
+//            buttons[2] = gamepad1.x;
+//            buttons[3] = gamepad1.circle;
+//        }
 
 
-        //Start actual Auto now | choose cv or manual prop location
-        int propLocation = 0;
-        if (buttons[0])
-            propLocation = cv.getTeamPropLocation(); // 0 = left, 1 = center, 2 = right
-        else if (buttons[1])
-            propLocation = 0;
-        else if (buttons[2])
-            propLocation = 1;
-        else if (buttons[3])
-            propLocation = 2;
-
+        //[DISABLED} Start actual Auto now | choose cv or manual prop location
+//        int propLocation = 0;
+//        if (buttons[0])
+//            propLocation = cv.getTeamPropLocation(); // 0 = left, 1 = center, 2 = right
+//        else if (buttons[1])
+//            propLocation = 0;
+//        else if (buttons[2])
+//            propLocation = 1;
+//        else if (buttons[3])
+//            propLocation = 2;
+        int propLocation = cv.getTeamPropLocation();
 
         //only run this when 2 works and vals are updated. may hit truss
         if (propLocation == 0) {
