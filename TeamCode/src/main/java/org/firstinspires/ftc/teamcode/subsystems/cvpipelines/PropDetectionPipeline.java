@@ -30,14 +30,14 @@ public class PropDetectionPipeline implements VisionProcessor {
     public int width;
     public int height;
 
-    public static Scalar blueUpperRange = new Scalar(100,157,255);  // Range needs fixing
-    public static Scalar blueLowerRange = new Scalar(62,66,41);
+    public static Scalar blueUpperRange = new Scalar(134,255,255);  // Range needs fixing
+    public static Scalar blueLowerRange = new Scalar(86,41,111);
 
-    public static Scalar redUpperRange1 = new Scalar(5,255,160);  // Range needs fixing
-    public static Scalar redLowerRange1 = new Scalar(0,34,106);
+    public static Scalar redUpperRange1 = new Scalar(66,255,255);  // Range needs fixing
+    public static Scalar redLowerRange1 = new Scalar(0,95,196);
 
-    public static Scalar redUpperRange2 = new Scalar(255, 124, 255);  // Range needs fixing
-    public static Scalar redLowerRange2 = new Scalar(168, 62, 126);
+    public static Scalar redUpperRange2 = new Scalar(63, 255, 199);  // Range needs fixing
+    public static Scalar redLowerRange2 = new Scalar(0, 112, 73);
 
     public AtomicBoolean hasStarted = new AtomicBoolean(false);
 
@@ -100,7 +100,7 @@ public class PropDetectionPipeline implements VisionProcessor {
         this.output = input;
 
         double maxTotalArea = Double.MIN_VALUE;
-        int best_idx = 1;
+        int best_idx = -999;
 
         for (int i=0; i<3; i++) {
             Rect crop = new Rect(width*i/3,height * 3 / 4,width/3, height / 4);
