@@ -9,9 +9,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 
 public class InDepSubsystem extends SubsystemBase {
-    private final double CLAW_OPEN_POS = 0.175;
-    private final double CLAW_CLOSED_POS = 0;
-
+    private final double CLAW_OPEN_POS = 0;
+    private final double CLAW_CLOSED_POS = 0.175;
+    private final double errorTolerance = 200;
     private final LinearOpMode opMode;
     private final Motor arm;
     private final Servo claw;
@@ -59,19 +59,23 @@ public class InDepSubsystem extends SubsystemBase {
         return isClawOpen;
     }
 
+
     /**
      * sets the raw power of the arm.
      */
     public void rawPower(double power) {
         int armPos = arm.motor.getCurrentPosition();
 
-        if (armPos>=0 && power>0) { // more down is more positive
-            arm.motor.setPower(0);
-        } else if (armPos<=Level.BACKBOARD2.target && power<0) {
-            arm.motor.setPower(0);
-        } else {
-            arm.motor.setPower(power);
-        }
+        // set bounds
+//        if (armPos>=0 && power>0) { // more down is more positive
+//            arm.motor.setPower(0);
+//        } else if (armPos<=Level.BACKBOARD2.target && power<0) {
+//            arm.motor.setPower(0);
+//        } else {
+//            arm.motor.setPower(power);
+//        }
+
+        arm.motor.setPower(power);
 
         // code moved into this method to avoid an edge case where curr pos moves slightly too much or fails to move enough
         // which would mess up curr pos ranges potentially making the wrist act unexpectedly
@@ -143,17 +147,52 @@ public class InDepSubsystem extends SubsystemBase {
         claw.setPosition(CLAW_CLOSED_POS);
         isClawOpen = false;
     }
-
     public void changeElevation(int ticks) {
-        arm.motor.setTargetPosition(arm.motor.getCurrentPosition() - ticks);
-        arm.setTargetPosition(arm.motor.getCurrentPosition() - ticks);
+        int target = arm.motor.getCurrentPosition() - ticks;
+        arm.setTargetPosition(target);
         arm.set(SpeedCoefficients.getArmSpeed());
 
-        while (!arm.atTargetPosition() || !(arm.motor.getCurrentPosition()<arm.motor.getTargetPosition()));
+        // wait until reached target within errorTolerance
+        while (opMode.opModeIsActive() && !(Math.abs(target-arm.getCurrentPosition()) < errorTolerance) );
 
+        // stop when reached
         arm.stopMotor();
         arm.motor.setPower(0);
 
+    }
+
+    public void resetArm() {
+        int target = 0;
+        arm.setTargetPosition(target);
+        arm.set(SpeedCoefficients.getArmSpeed());
+
+        // wait until reached target within errorTolerance
+        while (opMode.opModeIsActive() && !(Math.abs(target-arm.getCurrentPosition()) < errorTolerance) );
+
+        // stop when reached
+        arm.stopMotor();
+        arm.motor.setPower(0);
+
+    }
+
+    public void changeElevationDeg(double degrees) {
+        // Conversion factor (ticks per degree)
+        final double ticksPerDegree = 4200.0 / 120; // Replace 'maxDegrees' with the max degrees the arm can move
+
+        // Convert degrees to ticks
+        int ticks = (int) (degrees * ticksPerDegree);
+
+        // Calculate target position in ticks
+        int target = arm.motor.getCurrentPosition() - ticks;
+        arm.setTargetPosition(target);
+        arm.set(SpeedCoefficients.getArmSpeed());
+
+        // Wait until the arm reaches the target within error tolerance
+        while (!(Math.abs(target - arm.getCurrentPosition()) < errorTolerance));
+
+        // Stop the motor once the target is reached
+        arm.stopMotor();
+        arm.motor.setPower(0);
     }
 }
 

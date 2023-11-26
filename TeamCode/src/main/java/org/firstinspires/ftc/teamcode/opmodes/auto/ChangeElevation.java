@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.HardwareRobot;
+import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
@@ -33,7 +34,7 @@ public class ChangeElevation extends LinearOpMode {
                 this,
                 telemetry
         );
-        //SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+        SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
 
 
         waitForStart();
@@ -42,21 +43,16 @@ public class ChangeElevation extends LinearOpMode {
         //int propLocation = cvSubsystem.getTeamPropLocation(false); // 0 = left, 1 = center, 2 = right
         //only run this when 2 works and vals are updated. may hit truss
 
-        inDep.changeElevation(500); // raise claw - make 100 if doesnt work
-        inDep.open();
-        while(true){
-            telemetry.addData("Arm Pos: ", robot.arm.motor.getCurrentPosition());
-            telemetry.addData("Target: ", robot.arm.motor.getTargetPosition());
-            telemetry.update();
-        }
 
+        inDep.resetArm();
 
+//        stop();
         //inDep.changeElevation(10); // raise
 
 
 
 //        if (propLocation == 0) { // left
-//            inDep.changeElevation(10); // raise claw
+//            inDep.chsangeElevation(10); // raise claw
 //            drive.driveByEncoder(0, 0.5, 0, 550); // moving forward toward the pixel placing area
 //            drive.driveByEncoder(0, 0, -1, 300);  // turn left
 //            drive.driveByEncoder(0, 0.5, 0, 250); // moving forward to the spike mark tape

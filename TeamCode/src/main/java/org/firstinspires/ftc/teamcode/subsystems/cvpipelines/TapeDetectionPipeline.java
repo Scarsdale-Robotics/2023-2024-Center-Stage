@@ -17,14 +17,14 @@ public class TapeDetectionPipeline extends OpenCvPipeline {
     public double largestArea_=0;
     @Override
     public Mat processFrame(Mat input) {
-        Core.transpose(input, input);
-        Core.flip(input, input, 1);  // Switch flipCode to 0 if inverted
-        Imgproc.rectangle(input,new Rect(0, 330, 640, 100), new Scalar(255, 0, 0), 2);
-        Rect crop = new Rect(0, 330, 640, 100);
-        frame = input.submat(crop);
-        beforeTape = isBeforeTape(false) ? 1 : 0;
-        return frame;
-
+//        Core.transpose(input, input);
+//        Core.flip(input, input, 1);  // Switch flipCode to 0 if inverted
+//        Imgproc.rectangle(input,new Rect(0, 330, 640, 100), new Scalar(255, 0, 0), 2);
+//        Rect crop = new Rect(0, 330, 640, 100);
+//        frame = input.submat(crop);
+//        beforeTape = isBeforeTape(false) ? 1 : 0;
+//        return frame;
+        return null;
     }
     public boolean isBeforeTape(boolean isRedTeam) {
         double areaThreshold = 50;
