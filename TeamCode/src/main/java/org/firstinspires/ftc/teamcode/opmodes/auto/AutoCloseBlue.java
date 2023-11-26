@@ -59,7 +59,7 @@ public class AutoCloseBlue extends LinearOpMode {
             // nathan bb function
             drive.driveByEncoder(0, -0.3, 0, 1111); // move forward a bit
             drive.driveByEncoder(0, 0, -0.5, 1800); // perform 180
-            drive.driveByEncoder(0, 0.3, 0, 700); // move backwards to park
+            drive.driveByEncoder(0, 0.3, 0, 650); // move backwards to park
             inDep.close();
 
             inDep.changeElevation(-2000);
