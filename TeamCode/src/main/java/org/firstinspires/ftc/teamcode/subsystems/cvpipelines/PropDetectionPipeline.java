@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems.cvpipelines;
 
+import android.graphics.Canvas;
+
+import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
+import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -11,80 +15,106 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-// NOTE: changing this code very soon :)
-public class PropDetectionPipeline extends OpenCvPipeline {
-    public Mat frame;
+public class PropDetectionPipeline implements VisionProcessor {
+    boolean isRedTeam;
+
     public Mat sub;
     public Mat temp = new Mat();
 
     public int width;
     public int height;
 
-    public static Scalar upperRange = new Scalar(110.5,255,255);  // Range needs fixing
-    public static Scalar lowerRange = new Scalar(86,214,64);
+    public static Scalar blueUpperRange = new Scalar(100,157,255);  // Range needs fixing
+    public static Scalar blueLowerRange = new Scalar(62,66,41);
+
+    public static Scalar redUpperRange1 = new Scalar(5,255,160);  // Range needs fixing
+    public static Scalar redLowerRange1 = new Scalar(0,34,106);
+
+    public static Scalar redUpperRange2 = new Scalar(255, 124, 255);  // Range needs fixing
+    public static Scalar redLowerRange2 = new Scalar(168, 62, 126);
 
     public AtomicBoolean hasStarted = new AtomicBoolean(false);
-    public AtomicInteger lateralOffset = new AtomicInteger(0);
 
-    public int contour_dim_ratio;
+    public int position = -999;
+    // chicken nugget nat nuo tao
+    // kocmoc
+    // co|-o3 HepyWNmhN Pec
 
-    // ADA's idea: COMPARE RATIOS OF WIDTH : HEIGHT TO BE MORE ACCURATE ON DETECTING TAPE AND POLE
-    @Override
-    public Mat processFrame(Mat input) {
-        hasStarted.set(true);
-        //open cv defaults to bgr, but we are completely in rgb/hsv, this is because pipeline's input/output rgb
-        height = input.height()/3;
-        width = input.width();
-        int y = 2 * height;
-        int x = 0;
-        this.sub = input;
-        this.frame = input;
-        int posy = height/2;
-        int posx = width / 2;
-        MatOfPoint contour = getConeContour();
-        if(contour != null) {
-            List<MatOfPoint> coneContour = new ArrayList<>();
-            Rect b = Imgproc.boundingRect(contour);
-//            contour_dim_ratio=b.width/b.height;
-//            if (contour_dim_ratio < 1) {
-            coneContour.add(contour);
-            Imgproc.drawContours(sub, coneContour, 0, new Scalar(255, 255, 0), 2);
-            posx = b.x + b.width / 2;
-            posy = b.y + b.height / 2;
-            Imgproc.circle(sub, new Point(posx, posy), 2, new Scalar(255, 255, 0)); //rgb DRAW CIRCLE
-//            }
+    public PropDetectionPipeline(boolean isRedTeam){
+        this.isRedTeam = isRedTeam;
+    }
 
+    public int getPosition(){
+        return position;
+    }
+        
+        
+    public double getTotalContourArea() {
+        Mat hsvmat = new Mat();
+        Imgproc.cvtColor(sub, hsvmat, Imgproc.COLOR_RGB2HSV);
+
+        List<MatOfPoint> contourList = new ArrayList<>();
+        if (isRedTeam){
+            Mat mask1 = new Mat();
+            Mat mask2 = new Mat();
+            Core.inRange(hsvmat, redLowerRange1, redUpperRange1, mask1);
+            Core.inRange(hsvmat, redLowerRange2, redUpperRange2, mask2);
+            Imgproc.findContours(mask1, contourList, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+            Imgproc.findContours(mask2, contourList, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        }else {
+            Mat mask = new Mat();
+            Core.inRange(hsvmat, blueLowerRange, blueUpperRange, mask);
+            Imgproc.findContours(mask, contourList, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        }
+        double totalArea = 0;
+        for (int idx = 0; idx<contourList.size(); idx++) {
+            double area = Imgproc.contourArea(contourList.get(idx));
+            totalArea += area;
         }
 
-        int offset = posx - (width / 2 + 40);
-        lateralOffset.set(offset);
+        return totalArea;
+    }
+
+    @Override
+    public void init(int width, int height, CameraCalibration calibration) {
+
+    }
+
+    @Override
+    public Object processFrame(Mat input, long captureTimeNanos) {
+        height = input.height();
+        width = input.width();
+        hasStarted = new AtomicBoolean(true);
+
+//        Core.transpose(input, input);
+//        Core.flip(input, input, 0);  // Switch flipCode to 0 if inverted
+        this.sub = input;
+
+        double maxTotalArea = Double.MIN_VALUE;
+        int best_idx = 1;
+
+        for (int i=0; i<3; i++) {
+            Rect crop = new Rect(width*i/3,height * 3 / 4,width/3, height / 4);
+            Imgproc.rectangle(input, crop, new Scalar(255, 255, 0));
+            this.sub = new Mat(input, crop);
+            double totalArea = getTotalContourArea();
+            if (totalArea>maxTotalArea){
+                maxTotalArea = totalArea;
+                best_idx = i;
+            }
+        }
+        position = best_idx;
 
         return input;
     }
 
-    public MatOfPoint getConeContour() {
-        Mat hsvmat = new Mat();
-        Imgproc.cvtColor(sub, hsvmat, Imgproc.COLOR_RGB2HSV);
+    @Override
+    public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
 
-        Mat inRange = new Mat();
-        Core.inRange(hsvmat, lowerRange, upperRange, inRange);
-
-        List<MatOfPoint> blueContourList = new ArrayList<>();
-        Imgproc.findContours(inRange, blueContourList, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-
-        double maxArea = Double.MIN_VALUE;
-        MatOfPoint maxContour = null;
-        for (MatOfPoint m : blueContourList) {
-            double area = Imgproc.contourArea(m);
-            if (area > maxArea) {
-                maxArea = area;
-                maxContour = m;
-            }
-        }
-
-        return maxContour;
     }
 }

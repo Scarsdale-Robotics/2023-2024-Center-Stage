@@ -9,25 +9,27 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 
 public class InDepSubsystem extends SubsystemBase {
-    private LinearOpMode opMode;
-    private Telemetry telemetry;
-    private Motor arm;
-    private Servo claw;
-    private Servo wrist;
-    private Level level;
-    public enum Level {
-        GROUND(0),
-        BACKBOARD(70); //temp motor encoder values
-        int target;
+    private final double CLAW_OPEN_POS = 0.175;
+    private final double CLAW_CLOSED_POS = 0;
 
-        Level(int target) {
+    private final LinearOpMode opMode;
+    private final Motor arm;
+    private final Servo claw;
+    private final Servo wrist;
+    private boolean isClawOpen;
+    public enum Level {
+        GROUND(0, 0),
+        BACKBOARD1(-1960,0.05),
+        BACKBOARD2(-4200,0.125); //temp motor encoder values
+
+        int target;
+        double wristTarget;
+
+        Level(int target, double wristTarget) {
             this.target = target;
+            this.wristTarget = wristTarget;
         }
     }
-
-    private boolean isWristRaised;
-    private boolean isArmRaised;
-    private boolean isOpen;
 
     public InDepSubsystem(Motor arm, Servo claw, Servo wrist, LinearOpMode opMode, Telemetry telemetry) {
         // initialize objects
@@ -35,104 +37,92 @@ public class InDepSubsystem extends SubsystemBase {
         this.claw = claw;
         this.wrist = wrist;
         this.opMode = opMode;
-        this.telemetry = telemetry;
-
-        // initialize vars
-        level = Level.GROUND;
-        isWristRaised = true;
-        isArmRaised = false;
-        isOpen = false;
 
         // reset the arm and claw states
-        raiseWrist();
-        lowerArm();
         close();
+        setLevel(Level.GROUND);
     }
 
     /**
      * @return the position of the arm motor, in ticks.
      */
     public int getArmPosition() {
-        return arm.getCurrentPosition();
+        return arm.motor.getCurrentPosition();
     }
 
     /**
      * @return true if the claw is open, otherwise false if it is closed.
      */
+
+    //public double getWristPosition(){return wrist.}
     public boolean getIsOpen() {
-        return isOpen;
-    }
-
-    /**
-     * @return true if the arm is raised, otherwise false if it is lowered.
-     */
-    public boolean getIsWristRaised() {
-        return isWristRaised;
-    }
-
-    /**
-     * @return true if the arm is raised, otherwise false if it is lowered.
-     */
-    public boolean getIsArmRaised() {
-        return isArmRaised;
+        return isClawOpen;
     }
 
     /**
      * sets the raw power of the arm.
      */
     public void rawPower(double power) {
-        arm.motor.setPower(power);
+        int armPos = arm.motor.getCurrentPosition();
+
+        if (armPos>=0 && power>0) { // more down is more positive
+            arm.motor.setPower(0);
+        } else if (armPos<=Level.BACKBOARD2.target && power<0) {
+            arm.motor.setPower(0);
+        } else {
+            arm.motor.setPower(power);
+        }
+
+        // code moved into this method to avoid an edge case where curr pos moves slightly too much or fails to move enough
+        // which would mess up curr pos ranges potentially making the wrist act unexpectedly
+        // also moving here increases flexibility and avoids hard coding values without
+        // having very long variable names
+
+
+        if (armPos <= Level.BACKBOARD2.target) {
+            wrist.setPosition(Level.BACKBOARD2.wristTarget);
+        } else if (armPos <= Level.BACKBOARD1.target) {
+            wrist.setPosition(Level.BACKBOARD1.wristTarget);
+        } else {
+            wrist.setPosition(Level.GROUND.wristTarget);
+        }
     }
 
     /**
-     * Raises the wrist.
+     * gets the level immediately above or immediately below the current position
+     * @param getAbove whether to get the above level or below level
+     * @return the nearby level specified (by getAbove)
      */
-    public void raiseWrist() {
-        wrist.setPosition(0); // set wrist position to angled
-        isWristRaised = true;
-    }
-
-    /**
-     * Lowers the wrist.
-     */
-    public void lowerWrist() {
-        wrist.setPosition(0.15); // set wrist position to flattened
-        isWristRaised = false;
+    private Level getNearbyLevel(boolean getAbove) {
+        double armPos = arm.getCurrentPosition();
+        if (armPos > Level.BACKBOARD2.target)
+            return getAbove ? Level.BACKBOARD2 : Level.BACKBOARD1;
+        else if (armPos > Level.BACKBOARD1.target)
+            return getAbove ? Level.BACKBOARD2 : Level.GROUND;
+        else
+            return getAbove ? Level.BACKBOARD1 : Level.GROUND;
     }
 
     /**
      * Raises the arm.
      */
     public void raiseArm() {
-        level = Level.BACKBOARD; // set current level to raised
-        arm.setTargetPosition(level.target);
-
-        while (opMode.opModeIsActive() && !arm.atTargetPosition()) {
-            arm.setTargetPosition(level.target);
-            arm.set(SpeedCoefficients.getArmSpeed());
-        }; // wait until arm is at target position
-
-        // complete action
-        arm.stopMotor();
-        isArmRaised = true;
+        setLevel(getNearbyLevel(true));
     }
 
     /**
      * Lowers the arm.
      */
     public void lowerArm() {
-        level = Level.GROUND; // set current level to lowered
-        arm.setTargetPosition(level.target);
-
-        while (opMode.opModeIsActive() && !arm.atTargetPosition()) {
-            arm.setTargetPosition(level.target);
-            arm.set(SpeedCoefficients.getArmSpeed());
-        }; // wait until arm is at target position
-
-        // complete action
-        arm.stopMotor();
-        isArmRaised = false;
+        setLevel(getNearbyLevel(false));
     }
+
+    public void setLevel(Level level) {
+        arm.setTargetPosition(level.target);
+        wrist.setPosition(level.wristTarget);
+        arm.set(SpeedCoefficients.getArmSpeed());
+    }
+
 
     public void resetArmEncoder() {
         arm.resetEncoder();
@@ -142,22 +132,29 @@ public class InDepSubsystem extends SubsystemBase {
      * Opens the claw.
      */
     public void open() {
-        claw.setPosition(0.175);
-        isOpen = true;
+        claw.setPosition(CLAW_OPEN_POS);
+        isClawOpen = true;
     }
 
     /**
      * Closes the claw.
      */
     public void close() {
-        claw.setPosition(0.0);
-        isOpen = false;
+        claw.setPosition(CLAW_CLOSED_POS);
+        isClawOpen = false;
     }
 
-    /**
-     * @return the level of the arm.
-     */
-    public Level getLevel() {
-        return level;
+    public void changeElevation(int ticks) {
+        arm.motor.setTargetPosition(arm.motor.getCurrentPosition() - ticks);
+        arm.setTargetPosition(arm.motor.getCurrentPosition() - ticks);
+        arm.set(SpeedCoefficients.getArmSpeed());
+
+        while (!arm.atTargetPosition() || !(arm.motor.getCurrentPosition()<arm.motor.getTargetPosition()));
+
+        arm.stopMotor();
+        arm.motor.setPower(0);
+
     }
 }
+
+

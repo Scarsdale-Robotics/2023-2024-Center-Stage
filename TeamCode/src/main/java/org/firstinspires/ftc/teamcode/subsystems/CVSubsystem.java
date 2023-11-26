@@ -3,17 +3,25 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import android.util.Size;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.SpeedCoefficients;
+import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.TapeDetectionPipeline;
+import org.openftc.easyopencv.OpenCvCamera;
 
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.openftc.easyopencv.OpenCvCamera;
+import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PropDetectionPipeline;
 
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelDetectionPipeline;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class CVSubsystem extends SubsystemBase {
     private OpenCvCamera camera;
@@ -23,25 +31,61 @@ public class CVSubsystem extends SubsystemBase {
     private final int LOCATION_CENTER =  1;
     private final int LOCATION_RIGHT  =  2;
     private final int NO_LOCATION     = -1;
+    private Telemetry telemetry;
 
     private final double NO_ROTATIONAL_OFFSET = -50000.0;
     private final double NO_DISTANCE = -50000.0;
     private final double ERROR   =  3.0;
-    private final double ERROR_ALIGNMENT = 0.5;
+    private final double ERROR_ALIGNMENT = 2;
 
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
-
-    public CVSubsystem(OpenCvCamera camera, DriveSubsystem drive) {
+    private final WebcamName cameraName;
+    private PropDetectionPipeline propProcessor;
+    private PixelDetectionPipeline pixelProcessor;
+    private boolean isRedTeam;
+    private LinearOpMode opMode;
+    public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
+//        tdp = new TapeDetectionPipeline();
+//        camera.setPipeline(tdp);
         this.camera = camera;
         this.drive = drive;
+        this.telemetry = telemetry;
+        this.cameraName = cameraName;
+        this.isRedTeam = isRedTeam;
+        this.opMode = opMode;
         // create AprilTagProcessor and VisionPortal
         initAprilTag();
+
+
+//        pixelPipeline = new PixelDetectionPipeline();
+//        propPipeline = new PropDetectionPipeline(isRedTeam, telemetry);
+//
+//        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+//        {
+//            @Override
+//            public void onOpened()
+//            {
+//                camera.setPipeline(pixelPipeline);
+////                camera.setPipeline(propPipeline);
+//                camera.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+//            }
+//
+//            @Override
+//            public void onError(int errorCode)
+//            {
+//                /*
+//                 * This will be called if the camera could not be opened
+//                 */
+//                poo = "Nathan messed up !!!1!";
+//            }
+//        });
     }
 
     private void initAprilTag() {
-
         // Create the AprilTag processor.
+        propProcessor = new PropDetectionPipeline(isRedTeam);
+        pixelProcessor = new PixelDetectionPipeline();
         aprilTag = new AprilTagProcessor.Builder()
                 .setDrawTagOutline(true)
                 .build();
@@ -56,25 +100,16 @@ public class CVSubsystem extends SubsystemBase {
         // Create the vision portal by using a builder.
         VisionPortal.Builder builder = new VisionPortal.Builder();
 
-        // Set the built-in RC phone camera
-        builder.setCamera(BuiltinCameraDirection.BACK);
+        builder.setCamera(cameraName);
         builder.setAutoStopLiveView(false); // keep camera on when not processing
 
-        builder.setCameraResolution(new Size(1280, 960)); // android.util
-        //default 640 480
-
-        // Choose a camera resolution. Not all cameras support all resolutions.
-
-        // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
-        //builder.enableCameraMonitoring(true);
-
-        // Choose whether or not LiveView stops if no processors are enabled.
-        // If set "true", monitor shows solid orange screen if no processors enabled.
-        // If set "false", monitor shows camera view without annotations.
-        //builder.setAutoStopLiveView(true);
+        builder.setCameraResolution(new Size(640, 480)); // android.util
 
         // Set and enable the processor.
         builder.addProcessor(aprilTag);
+        builder.addProcessor(pixelProcessor);
+        builder.addProcessor(propProcessor);
+//        builder.addProcessors(aprilTag, pixelProcessor, propProcessor);
 
         // Build the Vision Portal, using the above settings.
         visionPortal = builder.build();
@@ -90,8 +125,7 @@ public class CVSubsystem extends SubsystemBase {
      * @return whether the AprilTag is left, center, or right in the camera view
      */
     public int getAprilTagLocation(int tagID) {
-
-        visionPortal.resumeStreaming();
+//        visionPortal.resumeStreaming();
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
@@ -105,6 +139,7 @@ public class CVSubsystem extends SubsystemBase {
                     else return LOCATION_CENTER;
                 }
             }
+            return -2;
         }
 
         return NO_LOCATION;
@@ -116,7 +151,7 @@ public class CVSubsystem extends SubsystemBase {
      * @return a double representing the amount the robot should turn to be "parallel" to the AprilTag
      */
     public double getAprilTagRotationalOffset(int tagID) { // return yaw
-        visionPortal.resumeStreaming();
+//        visionPortal.resumeStreaming();
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
@@ -134,8 +169,29 @@ public class CVSubsystem extends SubsystemBase {
         return rotationalOffset;
     }
 
+    public double getAprilTagDistance(Integer... tagIDs) {
+//        visionPortal.resumeStreaming();
+
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+
+        double tagDistance = Double.MAX_VALUE;
+        Set<Integer> tagSearchSet = new HashSet<>(Arrays.asList(tagIDs));
+
+        // Step through the list of detections and display info for each one.
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null && tagSearchSet.contains(detection.id)) {
+                double d = detection.ftcPose.range;
+                if (d < tagDistance)
+                    tagDistance = d;
+            }
+        }
+//        visionPortal.stopStreaming();
+
+        return tagDistance;
+    }
+
     public double getAprilTagDistance(int tagID) {
-        visionPortal.resumeStreaming();
+//        visionPortal.resumeStreaming();
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
@@ -149,31 +205,45 @@ public class CVSubsystem extends SubsystemBase {
                 }
             }
         }
-        //visionPortal.stopStreaming();
+//        visionPortal.stopStreaming();
 
-        return tagDistance; // TEMPORARY
+        return tagDistance;
     }
 
     /**
      * GROUP 2
-     * @param isRedTeam true if our alliance team is red, false otherwise
      * @return whether the AprilTag is left, center, or right in the camera view
      */
-    public int getTeamPropLocation(boolean isRedTeam) {
-        return 0; // TEMPORARY
+    public int getTeamPropLocation() {
+//        visionPortal.resumeStreaming();
+        return propProcessor.getPosition();
     }
+
     public int getPixelHorizontalOffset() {
-        PixelDetectionPipeline p = new PixelDetectionPipeline();
-        camera.setPipeline(p);
-        return p.getCenterOffset();
+//        visionPortal.resumeStreaming();
+        return pixelProcessor.getCenterOffset();
     }
 
     /**
      * GROUP 2
      * @return true if the robot is in front of a piece of tape approximately perpendicular to the camera view, false otherwise
      */
-    public boolean isRobotBeforeTape(boolean isRedTeam) {
-        return false; // TEMPORARY
+//    public boolean isRobotBeforeTape(boolean isRedTeam) {
+//        visionPortal.resumeStreaming();
+//        return tdp.isBeforeTape(isRedTeam);
+//    }
+
+    public void moveToPixel() {
+        double ERROR_THRESHOLD = 50;
+
+        int pixelOffset = getPixelHorizontalOffset();
+        while (Math.abs(pixelOffset) > ERROR_THRESHOLD) {
+            if (pixelOffset < 0)
+                drive.driveRobotCentric(1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+            else
+                drive.driveFieldCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+            pixelOffset = getPixelHorizontalOffset();
+        }
     }
 
     /**
@@ -192,15 +262,15 @@ public class CVSubsystem extends SubsystemBase {
             switch (aprilTagLocation) {
                 case 0:
                     // left location
-                    drive.driveFieldCentric(1, 0, 0);
+                    drive.driveRobotCentric(1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
                     break;
                 case 2:
                     // right location
-                    drive.driveFieldCentric(-1, 0, 0);
+                    drive.driveRobotCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
                     break;
                 default:
                     // center location
-                    drive.driveFieldCentric(0, 1, 0);
+                    drive.driveRobotCentric(0, 1 * SpeedCoefficients.getForwardSpeed(), 0);
                     break;
             }
         }
@@ -212,8 +282,9 @@ public class CVSubsystem extends SubsystemBase {
      */
     public void alignParallelWithAprilTag(int tagID) {
         double rotOff = getAprilTagRotationalOffset(tagID);
-        while (Math.abs(rotOff) > ERROR_ALIGNMENT) {
-            drive.driveFieldCentric(0, 0, rotOff * 1); // times some scaling factor (temporarily at 1)
+        telemetry.addData("err", Math.abs(rotOff));
+        while (Math.abs(rotOff) > ERROR_ALIGNMENT && opMode.opModeIsActive()) {
+            drive.driveFieldCentric(0, 0, rotOff * 0.1 * SpeedCoefficients.getTurnSpeed()); // times some scaling factor (temporarily at 1)
         }
     }
 }
