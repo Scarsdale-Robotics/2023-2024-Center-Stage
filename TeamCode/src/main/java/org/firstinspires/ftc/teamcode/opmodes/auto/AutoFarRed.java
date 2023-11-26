@@ -52,7 +52,7 @@ public class AutoFarRed extends LinearOpMode {
 
         //only run this when 2 works and vals are updated. may hit truss
         if (propLocation == 2) {
-            // left
+            // right
             /*
             drive.driveByEncoder(0, -0.3, 0, 1200); // moving forward toward the pixel placing area
             drive.driveByEncoder(0, 0.3, 0, 1); // brake
@@ -99,7 +99,7 @@ public class AutoFarRed extends LinearOpMode {
             drive.driveByEncoder(0, 0.3, 0, 1000); // continuing backwards to the spike mark tape
             drive.driveByEncoder(0, 0.3, 0, 525); // moving backward to the spike mark tape
         } else if (propLocation == 0) {
-            // right
+            // left
             inDep.changeElevation(2000); // raise claw
 
             drive.driveByEncoder(-0.3, 0, 0, 8192); // strafe back right
