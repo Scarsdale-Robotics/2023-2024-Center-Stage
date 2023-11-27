@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.HardwareRobot;
@@ -8,8 +7,7 @@ import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 
-@Autonomous(name = "Auto Far Blue")
-public class AutoFarBlue extends LinearOpMode {
+public class AutoFarBlueWait extends LinearOpMode {
     @Override
     // The "Main" code will go in here
     public void runOpMode() throws InterruptedException {
@@ -40,6 +38,30 @@ public class AutoFarBlue extends LinearOpMode {
         inDep.close();
 
         waitForStart();
+
+        Thread.sleep(3000); // Different Block
+//        ⠀⠀⠀⠀⠀⣠⡶⠛⠛⠶⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+//⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⠞⠁⠀⠀⠀⠀⠘⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+//⠀⠀⠀⠀⠀⢀⣠⡶⢿⡿⠃⠀⠀⠀⠀⠀⠀⠀⣽⡗⠲⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠴⠯⠭⣉⠙⣦⠀⠀⠀⠀⠀⠀
+//⠀⠀⠀⠀⣴⠟⠉⠀⡼⠁⠀⠀⠀⠀⠀⠀⠀⢠⡏⡇⡘⠓⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢯⣀⠀⠀⣈⠆⢹⣦⠀⠀⠀⠀⠀
+//⠀⠀⢠⡾⠋⠀⠀⣸⠃⠀⠀⠀⠀⠀⠀⠀⢀⣾⡞⢠⣿⣢⣌⣳⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡀⠏⠉⡉⠁⠀⣸⢹⠇⠀⠀⠀⠀
+//⠀⢠⡿⠁⠀⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⢀⡾⢁⡇⢸⢇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣧⠤⠒⡎⢀⣠⠴⠯⣞⡀⠀⠀⠀⠀
+//⠀⡾⠁⠀⠀⠀⠀⢿⣦⡀⠀⠀⠀⠀⣠⠞⠁⡎⣰⣇⠀⠙⣶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⠋⠀⠀⠀⠛⠛⠓⠒⠦⣄⠙⠳⣄⠀⠀
+//⢰⡇⠀⠀⠀⠀⠀⠀⠙⠿⣶⣶⣶⠿⠋⠀⢠⠀⡿⠛⣛⣿⠿⣿⡖⠒⠒⠲⠦⠤⣀⡀⠀⠀⠙⢷⣤⣀⣀⣀⣤⣤⣤⣤⣀⠑⠀⠘⢦⠀
+//⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⢃⡜⠙⠾⡋⠀⠀⠘⣿⡄⠀⠀⠀⠀⠀⠀⠉⠒⠶⣦⣿⣿⣾⠛⠀⠀⠀⠀⠹⣟⡆⠀⠘⣧
+//⠀⢧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡇⢸⡶⢦⣴⠿⠆⠶⣿⡛⢿⡖⠦⣤⣀⡀⠀⠀⠀⠀⠈⠉⠛⠧⠄⣀⣀⠀⣀⣼⡟⠁⠀⠀⣿
+//⠀⠈⢷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡞⢠⠟⠦⡀⠙⠳⠤⣀⠈⠛⠾⣷⡀⢧⡜⠛⢷⢦⣄⡀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠁⠀⠀⠀⢀⣿
+//⠀⠀⠀⢹⣷⣦⣀⠀⠀⠀⠀⠀⠀⢠⠃⣼⣷⣶⡿⣶⠀⠀⢀⣷⡀⠀⠘⣿⣿⣧⠀⠈⠾⣏⠛⠻⣶⣤⣀⡀⠀⠀⠀⠀⠀⠀⢀⣠⣾⡿
+//⠀⠀⠀⢸⣿⠀⠉⠛⠶⢤⣄⣀⢀⡇⣼⣋⠭⣿⢃⠙⡟⢉⣿⠀⢳⡀⢰⣿⠉⢿⠇⠀⣰⠙⣆⠀⠘⣮⠉⠛⠻⠶⢶⣶⣶⣾⠿⠟⠋⠀
+//⠀⠀⠀⠀⠻⣦⣄⠀⠀⣀⢀⠝⢙⣧⣌⡉⠛⠛⠿⠴⠿⠿⠷⠆⣀⣷⣼⣇⣆⡈⣧⣴⣿⣃⣘⣆⠀⢸⠀⣠⠖⠊⠉⢱⢸⠀⠀⠀⠀⠀
+//⠀⠀⠀⠀⠀⠈⠙⢿⣿⠷⠋⢠⠞⣿⠁⠙⢦⡼⠛⠉⠑⠒⣶⢰⡖⠲⠴⠠⠔⠫⢭⡄⠀⣠⣠⡌⣷⢸⡀⡏⠀⠀⠀⠻⠼⠀⠀⠀⠀⠀
+//⠀⠀⠀⠀⠀⠀⠀⠘⢿⣶⣮⡥⠔⣿⠀⠀⠀⠀⠀⠀⠀⠀⢻⣼⠁⠀⠀⠀⠀⠀⠀⢳⢀⡇⠀⠻⣿⢸⠀⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣧⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠀⠀⠀⠀⠀⠀⠀⠈⠛⠁⠀⠀⢻⢸⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣦⣀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⠘⠦⠟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⣿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⡤⠄⠀⠀⠀⠀⠀⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⡇⠀⠀⠀⠀⠀⠀⠀⠀⢀⡟⠉⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣷⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⣸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣷⣄⣀⣀⣀⣀⣀⣠⣼⠇⠀⠘⣧⣄⣀⣀⣀⣠⣤⣾⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 
         //Start actual Auto now | choose cv or manual prop location
         int propLocation = autoUtil.placePurplePixelBlue(500, false,telemetry);
@@ -72,7 +94,7 @@ public class AutoFarBlue extends LinearOpMode {
 
             drive.driveByEncoder(0, -0.3, 0, 3185); // moving forward to the spike mark tape4
             drive.driveByEncoder(0, 0, 0.5, 1830);  // turn left 180º (only needed to place pixel)
-            //drive.driveByEncoder(0.3, 0, 0, 200); // strafe left to finish parking
+            drive.driveByEncoder(0.3, 0, 0, 200); // strafe left to finish parking
             drive.driveByEncoder(0, 0.3, 0, 400); // moving backward to the spike mark tape
             drive.driveByEncoder(0, 0.3, 0, 75+75+75); // moving backward to the spike mark tape
 

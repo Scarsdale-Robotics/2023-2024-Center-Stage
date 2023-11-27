@@ -1,10 +1,11 @@
-package org.firstinspires.ftc.teamcode.opmodes.auto;
+package org.firstinspires.ftc.teamcode.opmodes.auto.Main;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
+import org.firstinspires.ftc.teamcode.opmodes.auto.AutoUtility;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
