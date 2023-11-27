@@ -55,7 +55,7 @@ public class AutoCloseRed extends LinearOpMode {
 
             // nathan bb function
             drive.driveByEncoder(0, -0.3, 0, 1000); // move forward a bit
-            drive.driveByEncoder(0, 0, 0.5, 1776); // perform 180 degree turn left
+            drive.driveByEncoder(0, 0, 0.5, 1855); // perform 180 degree turn left
             drive.driveByEncoder(0, 0.3, 0, 550); // move backwards to park
             inDep.close();
 

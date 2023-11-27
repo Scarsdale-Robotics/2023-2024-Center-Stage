@@ -77,7 +77,7 @@ public class AutoUtility {
             drive.driveByEncoder(0, 0, -0.5, 915 + (isCloseBlue ? -45 : -45));  // turn right
             //drive.driveByEncoder(0, -0.3, 0, 100); // moving forward to the spike mark tape
             //drive.driveByEncoder(0, 0.3, 0, 1); // brake
-            if (!isCloseBlue) drive.driveByEncoder(0, 0.3, 0, 160); // moving back to center
+            if (!isCloseBlue) drive.driveByEncoder(0, 0.3, 0, 160 + (isCloseBlue ? 0 : 80)); // moving back to center
             drive.driveByEncoder(0, -0.3, 0, 10); // brake
             drive.driveByEncoder(0.3, 0, 0, 200); // strafe left
         }
@@ -125,18 +125,18 @@ public class AutoUtility {
         if (propLocation == 2) {
             drive.driveByEncoder(0, -0.3, 0, 700 + moveOffset + (isCloseRed ? 100 : 0)); // moving forward toward the pixel placing area
             drive.driveByEncoder(0, 0.3, 0, 1); // brake
-            drive.driveByEncoder(0, 0, -0.5, 888 + (isCloseRed ? 0 : 0));  // turn right 90 degrees
-            drive.driveByEncoder(0, -0.3 * (isCloseRed ? -1 : -1), 0, 50 + (isCloseRed ? 100 : 0)); // moving forward (or backward) to the spike mark tape
+            drive.driveByEncoder(0, 0, -0.5, 888 + (isCloseRed ? -30 : 0));  // turn right 90 degrees
+            drive.driveByEncoder(0, -0.3 * (isCloseRed ? -1 : -1), 0, 50 + (isCloseRed ? 100 : -50)); // moving forward (or backward) to the spike mark tape
             drive.driveByEncoder(0, 0.3, 0, 1); // brake
             drive.driveByEncoder(0.3, 0, 0, (isCloseRed ? 0 : 300)); // strafe left to place pixel correctly
         } else if (propLocation == 1) {
-            drive.driveByEncoder(0, -0.3, 0, (isCloseRed ? 700.69 + moveOffset : 779 + moveOffset)); // moving forward toward the pixel placing area
+            drive.driveByEncoder(0, -0.3, 0, (isCloseRed ? 669.69 + moveOffset : 779 + moveOffset)); // moving forward toward the pixel placing area
             drive.driveByEncoder(0, 0.3, 0, 1); // brake
         } else if (propLocation == 0) {
             drive.driveByEncoder(0, -0.3, 0, 800 + moveOffset); // moving forward toward the pixel placing area
             drive.driveByEncoder(0, 0.5, 0, 1); // brake
             drive.driveByEncoder(0, 0, 0.5, 915 + (isCloseRed ? -27 : 0));  // turn left
-            drive.driveByEncoder(0, -0.3 * (isCloseRed ? 1 : -1), 0, (isCloseRed ? 85 : 85)); // moving back/approach
+            drive.driveByEncoder(0, -0.3 * (isCloseRed ? 1 : -1), 0, (isCloseRed ? 33 : 155)); // moving back/approach
             drive.driveByEncoder(0, -0.3, 0, 10); // brake
             drive.driveByEncoder(-0.3, 0, 0, (isCloseRed ? 0 : 200)); // strafe right
         }

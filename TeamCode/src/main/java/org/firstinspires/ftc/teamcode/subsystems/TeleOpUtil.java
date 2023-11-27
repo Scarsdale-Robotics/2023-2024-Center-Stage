@@ -21,6 +21,7 @@ public class TeleOpUtil {
     private boolean speedToggle = false;
     private boolean omniToggle = false;
     public boolean omniMode = false;
+    private Telemetry telemetry;
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
         robot = new HardwareRobot(hardwareMap);
         SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
@@ -47,6 +48,7 @@ public class TeleOpUtil {
         this.isRedTeam = isRedTeam;
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
+        this.telemetry = telemetry;
     }
 
     private void runArmRigidControl() {
@@ -182,16 +184,20 @@ public class TeleOpUtil {
     }
 
     public void tick() {
-        double DISTANCE_BEFORE_BACKBOARD = 5;  // TEMP
-        if (gamepad2.y || cv.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3}) > DISTANCE_BEFORE_BACKBOARD) {
-            runMotionControl();
-            runArmClawControl();
-
-            // TODO: uncomment test each method below one-by-one
-//            runAprilTagParallelAlignControl();
-            // runAprilTagAlignmentControl();
-//             teamPropLocationControl();
-            // runPixelAlignmentControl();
+        double DISTANCE_BEFORE_BACKBOARD = 25;  // TEMP
+        double cvDist = cv.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
+        telemetry.addData("cvDist: ", cvDist);
+        telemetry.update();
+        if (!gamepad2.y && cvDist < DISTANCE_BEFORE_BACKBOARD) {
+            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
         }
+        runMotionControl();
+        runArmClawControl();
+
+        // TODO: uncomment test each method below one-by-one
+//            runAprilTagParallelAlignControl();
+         runAprilTagAlignmentControl();
+//             teamPropLocationControl();
+         runPixelAlignmentControl();
     }
 }
