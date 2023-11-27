@@ -35,14 +35,26 @@ public class AutoBackupCloseRed extends LinearOpMode {
                 this,
                 telemetry
         );
-
-
         waitForStart();
-        Thread.sleep(15000); //wait 15 sec for teammate to do auto
 
-        drive.driveByEncoder(0, 0.5, 0, 50); // moving forward toward the pixel placing area
-        drive.driveByEncoder(0, 0, 1, 300);  // turn right
-        drive.driveByEncoder(0, 0.5, 0, 500); // continue moving forward toward the parking area
+        //Theoretically is CV
+        drive.driveByEncoder(0, -0.3, 0, 800 + 600); // moving forward toward the pixel placing area
+        drive.driveByEncoder(0, 0.5, 0, 1); // brake
+        drive.driveByEncoder(0, 0, 0.5, 915 -27);  // turn left
+        drive.driveByEncoder(0, -0.3, 0, 85); // moving back/approach
+        drive.driveByEncoder(0, -0.3, 0, 10); // brake
+        drive.driveByEncoder(-0.3, 0, 0, 0); // strafe right
+
+        Thread.sleep(1000); //wait 1 sec for teammate to do auto
+
+        //Rest of Auto
+        inDep.changeElevation(2000);
+        drive.driveByEncoder(0, 0.3, 0, 250); // move backwards a bit
+        drive.driveByEncoder(0.3, 0, 0, 1400); // move left
+        drive.driveByEncoder(0, 0.3, 0, 1200); // move backwards to park
+        inDep.close();
+
+        inDep.changeElevation(-2000);
         stop();
     }
 

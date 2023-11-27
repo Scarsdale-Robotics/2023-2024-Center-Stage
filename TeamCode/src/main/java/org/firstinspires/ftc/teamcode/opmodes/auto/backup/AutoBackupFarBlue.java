@@ -8,8 +8,8 @@ import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 
-@Autonomous(name = "Auto Backup Close Blue") //turns first square
-public class AutoBackupCloseBlue extends LinearOpMode {
+@Autonomous(name = "Auto Backup Far Blue") //turns first square
+public class AutoBackupFarBlue extends LinearOpMode {
     @Override
     // The "Main" code will go in here
     public void runOpMode() throws InterruptedException {
@@ -35,36 +35,34 @@ public class AutoBackupCloseBlue extends LinearOpMode {
                 this,
                 telemetry
         );
+
+
         waitForStart();
 
-        //The Code below is technically before CV
-        drive.driveByEncoder(0, -0.3, 0, 30); // move forward
-        //drive.driveByEncoder(0, 0, 0.5, 56); // turn left to counter initial offset kinda but not fully, intentionally
-        drive.driveByEncoder(-0.3, 0, 0, 400); // strafe right
+        int moveOffset = 500;
+        boolean isCloseBlue = false;
 
-        //The Code below is technically CV
-        drive.driveByEncoder(0.3, 0, 0, 260); // strafe left
-        drive.driveByEncoder(0, -0.3, 0, 350); // move forward
-        //Farther into CV
-        drive.driveByEncoder(0, -0.3, 0, 720); // moving forward toward the pixel placing area
+        //Technically CV
+        drive.driveByEncoder(0, -0.3, 0, 720 + moveOffset); // moving forward toward the pixel placing area
         drive.driveByEncoder(0, 0.3, 0, 1); // brake
-        drive.driveByEncoder(0, 0, 0.5, 888 -50);  // turn left 90 degrees
-        drive.driveByEncoder(0, -0.3 * -1, 0, 50 + 50); // moving forward (or backward) to the spike mark tape
+        drive.driveByEncoder(0, 0, 0.5, 888 + (isCloseBlue ? -50 : 18));  // turn left 90 degrees
+        drive.driveByEncoder(0, -0.3 * (isCloseBlue ? -1 : 1), 0, 50 + (isCloseBlue ? 50 : 0)); // moving forward (or backward) to the spike mark tape
         drive.driveByEncoder(0, 0.3, 0, 1); // brake
-        drive.driveByEncoder(-0.3, 0, 0, 300 -50); // strafe right to place pixel correctly
+        drive.driveByEncoder(-0.3, 0, 0, 300 + (isCloseBlue ? -50 : 0)); // strafe right to place pixel correctly
 
         Thread.sleep(1000); //wait 1 sec for teammate to do auto
 
-        //Regular Auto things
-
-        inDep.changeElevation(2000);
-        drive.driveByEncoder(0.3, 0, 0, 900); // move left
-        drive.driveByEncoder(0, -0.3, 0, 1111); // move forward a bit
-        drive.driveByEncoder(0, 0, -0.5, 1800); // perform 180
-        drive.driveByEncoder(0, 0.3, 0, 650); // move backwards to park
-        inDep.close();
-
-        inDep.changeElevation(-2000);
+        //Rest of Auto
+        inDep.changeElevation(2200); // raise claw
+        drive.driveByEncoder(0, 0.3, 0, 500); // move backwards
+        drive.driveByEncoder(-0.3, 0, 0, 1100); // strafe right to place pixel correctly
+        inDep.changeElevation(-2200); // lower claw
+        drive.driveByEncoder(0, -0.3, 0, 500); // move forwards
+        drive.driveByEncoder(0, -0.3, 0, 3185); // moving forward to the spike mark tape4
+        drive.driveByEncoder(0, 0, 0.5, 1830);  // turn left 180º (only needed to place pixel)
+        //drive.driveByEncoder(0.3, 0, 0, 200); // strafe left to finish parking
+        drive.driveByEncoder(0, 0.3, 0, 400); // moving backward to the spike mark tape
+        drive.driveByEncoder(0, 0.3, 0, 75+75+75); // moving backward to the spike mark tape
         stop();
     }
 
