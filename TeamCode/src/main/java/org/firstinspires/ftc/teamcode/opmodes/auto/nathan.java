@@ -28,7 +28,7 @@ public class nathan extends LinearOpMode {
                 this
         );
         CVSubsystem cv = new CVSubsystem(robot.camera,
-                robot.cameraName,drive, telemetry, true, this);
+                robot.cameraName,drive, telemetry, false, this);
 
 
         waitForStart();

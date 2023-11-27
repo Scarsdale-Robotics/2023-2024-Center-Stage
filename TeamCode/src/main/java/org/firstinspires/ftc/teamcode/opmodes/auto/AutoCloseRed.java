@@ -45,8 +45,6 @@ public class AutoCloseRed extends LinearOpMode {
         //Start actual Auto now // pretend april tag location has been found, 0 = left, 1 = center, 2 = right
 //        int propLocation = cvSubsystem.getTeamPropLocation(); // 0 = left, 1 = center, 2 = right
 
-
-        drive.driveByEncoder(-0.3, 0, 0, 150); // strafe right
         int propLocation = autoUtil.placePurplePixelRed(600, true, telemetry);
 
 
@@ -55,9 +53,9 @@ public class AutoCloseRed extends LinearOpMode {
             drive.driveByEncoder(-0.3, 0, 0, 1200); // move right
 
             // nathan bb function
-            drive.driveByEncoder(0, -0.3, 0, 1111); // move forward a bit
+            drive.driveByEncoder(0, -0.3, 0, 1000); // move forward a bit
             drive.driveByEncoder(0, 0, 0.5, 1776); // perform 180 degree turn left
-            drive.driveByEncoder(0, 0.3, 0, 650); // move backwards to park
+            drive.driveByEncoder(0, 0.3, 0, 550); // move backwards to park
             inDep.close();
 
             inDep.changeElevation(-2000);

@@ -12,6 +12,7 @@ import java.util.Arrays;
 
 public class AutoUtility {
     private final int SAMPLE_COUNT = 200;
+    private final long SAMPLE_WAIT_MILLISECONDS = 25;
     private CVSubsystem cv;
     private DriveSubsystem drive;
     private LinearOpMode opMode;
@@ -28,11 +29,12 @@ public class AutoUtility {
         // moveOffset param influences how much we move forward before turning
         int propLocation = -1;
         ArrayList<Integer> samples = new ArrayList<>();
+        Thread.sleep(1000);
         for (int i = 0; i < SAMPLE_COUNT; i++) {
             if (!opMode.opModeIsActive()) break;
             propLocation = cv.getTeamPropLocation();
             if (-1 < propLocation && propLocation < 3) samples.add(propLocation);
-            Thread.sleep(10);
+            Thread.sleep(SAMPLE_WAIT_MILLISECONDS);
         }
         // parsing early misreads
         if (samples.size()>1) samples.remove(0);
@@ -47,7 +49,9 @@ public class AutoUtility {
         }
         telemetry.addData("",samples);
         telemetry.addData("loc: ",propLocation);
-        telemetry.addData("locs: ", Arrays.asList(locations));
+        telemetry.addData("locs0: ", locations[0]);
+        telemetry.addData("locs1: ", locations[1]);
+        telemetry.addData("locs2: ", locations[2]);
         telemetry.update();
 
 
@@ -60,7 +64,7 @@ public class AutoUtility {
         if (propLocation == 0) {
             drive.driveByEncoder(0, -0.3, 0, 700 + moveOffset); // moving forward toward the pixel placing area
             drive.driveByEncoder(0, 0.3, 0, 1); // brake
-            drive.driveByEncoder(0, 0, 0.5, 888 + (isCloseBlue ? -50 : 0));  // turn left 90 degrees
+            drive.driveByEncoder(0, 0, 0.5, 888 + (isCloseBlue ? -50 : 18));  // turn left 90 degrees
             drive.driveByEncoder(0, -0.3 * (isCloseBlue ? -1 : 1), 0, 50 + (isCloseBlue ? 50 : 0)); // moving forward (or backward) to the spike mark tape
             drive.driveByEncoder(0, 0.3, 0, 1); // brake
             drive.driveByEncoder(-0.3, 0, 0, 300 + (isCloseBlue ? -50 : 0)); // strafe right to place pixel correctly
@@ -86,11 +90,12 @@ public class AutoUtility {
         // moveOffset param influences how much we move forward before turning
         int propLocation = -1;
         ArrayList<Integer> samples = new ArrayList<>();
+        Thread.sleep(1000);
         for (int i = 0; i < SAMPLE_COUNT; i++) {
             if (!opMode.opModeIsActive()) break;
             propLocation = cv.getTeamPropLocation();
             if (-1 < propLocation && propLocation < 3) samples.add(propLocation);
-            Thread.sleep(10);
+            Thread.sleep(SAMPLE_WAIT_MILLISECONDS);
         }
         // parsing early misreads
         if (samples.size()>1) samples.remove(0);
@@ -116,8 +121,6 @@ public class AutoUtility {
         if (!isCloseRed){
             drive.driveByEncoder(0.3, 0, 0, 260-25); // strafe left
             drive.driveByEncoder(0, -0.3, 0, 350); // move forward
-        } else {
-            drive.driveByEncoder(0.3, 0, 0, 150); // strafe back left
         }
         if (propLocation == 2) {
             drive.driveByEncoder(0, -0.3, 0, 700 + moveOffset + (isCloseRed ? 100 : 0)); // moving forward toward the pixel placing area
@@ -133,7 +136,7 @@ public class AutoUtility {
             drive.driveByEncoder(0, -0.3, 0, 800 + moveOffset); // moving forward toward the pixel placing area
             drive.driveByEncoder(0, 0.5, 0, 1); // brake
             drive.driveByEncoder(0, 0, 0.5, 915 + (isCloseRed ? -27 : 0));  // turn left
-            drive.driveByEncoder(0, -0.3 * (isCloseRed ? 1 : -1), 0, (isCloseRed ? 100 : 85)); // moving back/approach
+            drive.driveByEncoder(0, -0.3 * (isCloseRed ? 1 : -1), 0, (isCloseRed ? 85 : 85)); // moving back/approach
             drive.driveByEncoder(0, -0.3, 0, 10); // brake
             drive.driveByEncoder(-0.3, 0, 0, (isCloseRed ? 0 : 200)); // strafe right
         }
