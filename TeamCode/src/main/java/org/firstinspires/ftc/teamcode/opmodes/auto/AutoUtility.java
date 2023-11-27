@@ -64,7 +64,7 @@ public class AutoUtility {
         if (propLocation == 0) {
             drive.driveByEncoder(0, -0.3, 0, 720 + moveOffset); // moving forward toward the pixel placing area
             drive.driveByEncoder(0, 0.3, 0, 1); // brake
-            drive.driveByEncoder(0, 0, 0.5, 888 + (isCloseBlue ? -50 : 18));  // turn left 90 degrees
+            drive.driveByEncoder(0, 0, 0.5, 888 + (isCloseBlue ? -45         : 18));  // turn left 90 degrees
             drive.driveByEncoder(0, -0.3 * (isCloseBlue ? -1 : 1), 0, 50 + (isCloseBlue ? 50 : 0)); // moving forward (or backward) to the spike mark tape
             drive.driveByEncoder(0, 0.3, 0, 1); // brake
             drive.driveByEncoder(-0.3, 0, 0, 300 + (isCloseBlue ? -50 : 0)); // strafe right to place pixel correctly
@@ -74,7 +74,7 @@ public class AutoUtility {
         } else if (propLocation == 2) {
             drive.driveByEncoder(0, -0.3, 0, 800 + moveOffset); // moving forward toward the pixel placing area
             drive.driveByEncoder(0, 0.5, 0, 1); // brake
-            drive.driveByEncoder(0, 0, -0.5, 915 + (isCloseBlue ? -45 : -40));  // turn right
+            drive.driveByEncoder(0, 0, -0.5, 915 + (isCloseBlue ? -45 : -45));  // turn right
             //drive.driveByEncoder(0, -0.3, 0, 100); // moving forward to the spike mark tape
             //drive.driveByEncoder(0, 0.3, 0, 1); // brake
             if (!isCloseBlue) drive.driveByEncoder(0, 0.3, 0, 160); // moving back to center
