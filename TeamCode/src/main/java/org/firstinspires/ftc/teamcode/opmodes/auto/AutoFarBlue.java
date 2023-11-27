@@ -42,7 +42,7 @@ public class AutoFarBlue extends LinearOpMode {
         waitForStart();
 
         //Start actual Auto now | choose cv or manual prop location
-        int propLocation = autoUtil.placePurplePixelBlue(500, false);
+        int propLocation = autoUtil.placePurplePixelBlue(500, false,telemetry);
         //propLocation = -1;
 
         //only run this when 2 works and vals are updated. may hit truss

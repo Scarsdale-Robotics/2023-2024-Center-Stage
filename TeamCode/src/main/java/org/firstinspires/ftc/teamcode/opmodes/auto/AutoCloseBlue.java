@@ -45,21 +45,21 @@ public class AutoCloseBlue extends LinearOpMode {
         //Start actual Auto now // pretend april tag location has been found, 0 = left, 1 = center, 2 = right
 //        int propLocation = cvSubsystem.getTeamPropLocation(); // 0 = left, 1 = center, 2 = right
 
-        drive.driveByEncoder(0, -0.3, 0, 111); // move forward
-        drive.driveByEncoder(0, 0, 0.5, 56); // turn left to counter initial offset kinda but not fully, intentionally
-        drive.driveByEncoder(0, -0.3, 0, 333); // move forward
-        drive.driveByEncoder(-0.3, 0, 0, 25);
-        int propLocation = autoUtil.placePurplePixelBlue(-250, true);
+        drive.driveByEncoder(0, -0.3, 0, 30); // move forward
+        //drive.driveByEncoder(0, 0, 0.5, 56); // turn left to counter initial offset kinda but not fully, intentionally
+        drive.driveByEncoder(-0.3, 0, 0, 400); // strafe right
+
+        int propLocation = autoUtil.placePurplePixelBlue(0, true,telemetry);
 
 
         if (propLocation == 0) { // left
             inDep.changeElevation(2000);
-            drive.driveByEncoder(0.3, 0, 0, 1100); // move left
+            drive.driveByEncoder(0.3, 0, 0, 900); // move left
 
             // nathan bb function
             drive.driveByEncoder(0, -0.3, 0, 1111); // move forward a bit
             drive.driveByEncoder(0, 0, -0.5, 1800); // perform 180
-            drive.driveByEncoder(0, 0.3, 0, 888); // move backwards to park
+            drive.driveByEncoder(0, 0.3, 0, 650); // move backwards to park
             inDep.close();
 
             inDep.changeElevation(-2000);
@@ -71,14 +71,14 @@ public class AutoCloseBlue extends LinearOpMode {
         else if (propLocation == 1) { // center
             //inDep.changeElevation(10); // raise claw
             inDep.changeElevation(2000);
-            drive.driveByEncoder(0, 0, 0.5, 850); // turn left 90 degs
-            drive.driveByEncoder(0.3, 0, 0, 1000); // move left
+            drive.driveByEncoder(0, 0, 0.5, 800); // turn left 90 degs
+            drive.driveByEncoder(0.3, 0, 0, 900); // move left
 
             // nathan bb function
             drive.driveByEncoder(0, -0.3, 0, 1111); // move forward a bit
             drive.driveByEncoder(0, 0, -0.5, 1800); // perform 180
 //        drive.driveByEncoder(0.3, 0, 0, 2222); // move left
-            drive.driveByEncoder(0, 0.3, 0, 888); // move backwards to park
+            drive.driveByEncoder(0, 0.3, 0, 550); // move backwards to park
             inDep.close();
 
             inDep.changeElevation(-2000);
@@ -97,10 +97,10 @@ public class AutoCloseBlue extends LinearOpMode {
             //inDep.changeElevation(10); // raise claw
             inDep.changeElevation(2000);
             drive.driveByEncoder(0, 0.3, 0, 222); // move backwards a bit
-            drive.driveByEncoder(-0.3, 0, 0, 1222); // move right
+            drive.driveByEncoder(-0.3, 0, 0, 1275); // move right
 
             // nathan bb function
-            drive.driveByEncoder(0, 0.3, 0, 1500); // move backwards to park
+            drive.driveByEncoder(0, 0.3, 0, 1400); // move backwards to park
             inDep.close();
 
             inDep.changeElevation(-2000);
@@ -115,8 +115,6 @@ public class AutoCloseBlue extends LinearOpMode {
             stop();
             // autoUtil.moveToAprilTag(2); //temporary because we don't have april tag id for right
             // park
-        } else {
-
         }
 
     }
