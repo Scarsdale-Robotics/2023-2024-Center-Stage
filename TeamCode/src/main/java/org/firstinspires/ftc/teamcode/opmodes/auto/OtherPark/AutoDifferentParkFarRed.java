@@ -43,10 +43,50 @@ public class AutoDifferentParkFarRed extends LinearOpMode {
         waitForStart();
 
         Thread.sleep(500);
+        int propLocation = autoUtil.placePurplePixelRed(0, false,telemetry);
+        //propLocation = -1; // removes parking
 
-        //Start actual Auto now | choose cv or manual prop location
-        int propLocation = autoUtil.placePurplePixelBlue(0, true,telemetry);
-        //propLocation = -1;
+        //only run this when 2 works and vals are updated. may hit truss
+        if (propLocation == 2) {
+
+            inDep.changeElevation(2200); // raise claw
+
+            drive.driveByEncoder(0, 0.3, 0, 500); // move backwards
+            drive.driveByEncoder(-0.3, 0, 0, 350); // strafe left to place pixel correctly
+            inDep.changeElevation(-2200); // lower claw
+            drive.driveByEncoder(0, 0.3, 0, 500); // move backward
+
+            drive.driveByEncoder(0, 0.3, 0, 3000); // moving forward to the spike mark tape4
+            //drive.driveByEncoder(0, 0, -0.5, 1770);  // turn right 180º (only needed to place pixel)
+            //drive.driveByEncoder(0.3, 0, 0, 200); // strafe right to finish parking
+            drive.driveByEncoder(0, 0.3, 0, 100); // moving backward to the spike mark tape
+            drive.driveByEncoder(0, 0.3, 0, 75+75+75); // moving backward to the spike mark tape
+
+
+        } else if (propLocation == 1) {
+            String teeee = "WARNING: PROP MAY GET CAUGHT AFTER BEING PUSHED";
+            // center
+            inDep.changeElevation(2200); // raise claw
+            drive.driveByEncoder(0, 0.3, 0, 500);
+            //drive.driveByEncoder(0.3, 0, 0, 700); // strafe left to the spike mark tape
+            //drive.driveByEncoder(0, -0.3, 0, 1400); // move forward to the spike mark tape
+//          drive.driveByEncoder(0, -0.3, 0, 1); // brake
+            drive.driveByEncoder(0, 0, -0.5, 920);  // turn left???
+            inDep.changeElevation(-2200); // lower claw
+            //drive.driveByEncoder(0.3, 0, 0, 60); //   strafe left to the spike mark tape
+            drive.driveByEncoder(0, 0.3, 0, 3200); // moving forward to the spike mark tape
+            //drive.driveByEncoder(0, 0, -0.5, 1800);  // turn right 180º (only needed to place pixel)
+            //drive.driveByEncoder(0.3, 0, 0, 226.9); // strafe left
+            drive.driveByEncoder(0, 0.3, 0, 1000); // continuing backwards to the spike mark tape
+            drive.driveByEncoder(0, 0.3, 0, 525); // moving backward to the spike mark tape
+        } else if (propLocation == 0) {
+            // left
+            inDep.changeElevation(2000); // raise claw
+            drive.driveByEncoder(0.3, 0, 0, 500); // strafe back right
+            drive.driveByEncoder(0, 0.3, 0, 3750); // moving backward to the spike mark tape
+            inDep.changeElevation(-2000); // lower claw
+            //inDep.changeElevation(-1500); // lower claw
+        }
         stop();
     }
 
