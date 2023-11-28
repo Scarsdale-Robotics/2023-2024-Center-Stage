@@ -9,8 +9,8 @@ import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 
-@Autonomous(name = "Auto Close Blue CV Only")
-public class AutoCVOnlyCloseBlue extends LinearOpMode {
+@Autonomous(name = "Auto Close Red CV Only")
+public class AutoCVOnlyCloseRed extends LinearOpMode {
     @Override
     // The "Main" code will go in here
     public void runOpMode() throws InterruptedException {
@@ -45,7 +45,7 @@ public class AutoCVOnlyCloseBlue extends LinearOpMode {
         Thread.sleep(500);
 
         //Start actual Auto now | choose cv or manual prop location
-        int propLocation = autoUtil.placePurplePixelBlue(0, true,telemetry);
+        int propLocation = autoUtil.placePurplePixelRed(0, true,telemetry);
         //propLocation = -1;
         stop();
     }
