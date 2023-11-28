@@ -185,9 +185,16 @@ public class TeleOpUtil {
             gamepad2.rumble(500);
         }
 
-        if (gamepad2.x && gamepad2.b) {
+        if (gamepad2.y && gamepad2.b && inDep.armRanges) {
             inDep.armRanges = false;
             gamepad1.rumble(500);
+            gamepad2.rumble(500);
+        }
+        if (gamepad2.y && gamepad2.b && !inDep.armRanges) {
+            inDep.resetArmEncoder();
+            inDep.armRanges = true;
+            gamepad1.rumble(500);
+            gamepad2.rumble(500);
         }
     }
 
@@ -196,8 +203,11 @@ public class TeleOpUtil {
         double cvDist = cv.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
         telemetry.addData("cvDist: ", cvDist);
         telemetry.update();
-        if (!gamepad2.y && cvDist < DISTANCE_BEFORE_BACKBOARD) {
+        if (!gamepad2.x && !gamepad1.x && cvDist < DISTANCE_BEFORE_BACKBOARD) {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
+        } else if (gamepad1.x || gamepad2.x) {
+            gamepad1.rumble(500);
+            gamepad2.rumble(500);
         }
         runMotionControl();
         runArmClawControl();
