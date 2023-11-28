@@ -17,6 +17,7 @@ public class InDepSubsystem extends SubsystemBase {
     private final Servo claw;
     private final Servo wrist;
     private boolean isClawOpen;
+    public boolean armRanges = true;
     public enum Level {
         GROUND(0, 0),
         BACKBOARD1(-1960,0.05),
@@ -67,21 +68,22 @@ public class InDepSubsystem extends SubsystemBase {
         int armPos = arm.motor.getCurrentPosition();
 
         // set bounds
-//        if (armPos>=0 && power>0) { // more down is more positive
-//            arm.motor.setPower(0);
-//        } else if (armPos<=Level.BACKBOARD2.target && power<0) {
-//            arm.motor.setPower(0);
-//        } else {
-//            arm.motor.setPower(power);
-//        }
+        if (armRanges) {
+            if (armPos>=0 && power>0) { // more down is more positive
+                arm.motor.setPower(0);
+            } else if (armPos<=Level.BACKBOARD2.target && power<0) {
+                arm.motor.setPower(0);
+            } else {
+                arm.motor.setPower(power);
+            }
+        }
 
-        arm.motor.setPower(power);
+//        arm.motor.setPower(power);
 
         // code moved into this method to avoid an edge case where curr pos moves slightly too much or fails to move enough
         // which would mess up curr pos ranges potentially making the wrist act unexpectedly
         // also moving here increases flexibility and avoids hard coding values without
         // having very long variable names
-
 
         if (armPos <= Level.BACKBOARD2.target) {
             wrist.setPosition(Level.BACKBOARD2.wristTarget);

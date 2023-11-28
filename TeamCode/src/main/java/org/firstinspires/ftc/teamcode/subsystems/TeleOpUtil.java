@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 
@@ -22,6 +23,7 @@ public class TeleOpUtil {
     private boolean omniToggle = false;
     public boolean omniMode = false;
     private Telemetry telemetry;
+    private double lastTurnStart;
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
         robot = new HardwareRobot(hardwareMap);
         SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
@@ -49,6 +51,7 @@ public class TeleOpUtil {
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
         this.telemetry = telemetry;
+        this.lastTurnStart = robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
 
     private void runArmRigidControl() {
@@ -129,6 +132,10 @@ public class TeleOpUtil {
             if (Math.abs(gamepad1.left_stick_x) > 0.6) {
                 moveInputX = Math.signum(gamepad1.left_stick_x) * SpeedCoefficients.getStrafeSpeed();
                 moveInputY = 0;
+                // TODO: consider: might need a cancel button for below
+                if (moveInputX == -1) {
+                    SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+                }
             } else if (Math.abs(gamepad1.left_stick_y) > 0.6) {
                 moveInputX = 0;
                 moveInputY = Math.signum(gamepad1.left_stick_y) * SpeedCoefficients.getForwardSpeed();
@@ -136,8 +143,9 @@ public class TeleOpUtil {
                 moveInputX = gamepad1.left_stick_x;
                 moveInputY = gamepad1.left_stick_y;
             }
+            double turnInput = gamepad1.right_stick_x;
             // DRIVE CONTROL
-            drive.driveRobotCentric(-moveInputX,moveInputY,-gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed()
+            drive.driveRobotCentric(-moveInputX,moveInputY,-turnInput * SpeedCoefficients.getTurnSpeed()
             );
         } else {
             drive.driveRobotCentric(-gamepad1.left_stick_x * SpeedCoefficients.getStrafeSpeed(),gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed(),-gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed()
@@ -175,6 +183,11 @@ public class TeleOpUtil {
             inDep.resetArmEncoder();
             gamepad1.rumble(500);
             gamepad2.rumble(500);
+        }
+
+        if (gamepad2.x && gamepad2.y) {
+            inDep.armRanges = false;
+            gamepad1.rumble(500);
         }
     }
 
