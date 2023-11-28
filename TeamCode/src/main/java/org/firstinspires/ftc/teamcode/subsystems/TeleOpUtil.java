@@ -185,7 +185,7 @@ public class TeleOpUtil {
             gamepad2.rumble(500);
         }
 
-        if (gamepad2.x && gamepad2.y) {
+        if (gamepad2.x && gamepad2.b) {
             inDep.armRanges = false;
             gamepad1.rumble(500);
         }
