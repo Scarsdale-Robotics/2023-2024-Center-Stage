@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.auto;
+package org.firstinspires.ftc.teamcode.opmodes.auto.OtherPark;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -9,8 +9,8 @@ import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 
-@Autonomous(name = "CV only Far Red")
-public class AutoCVOnlyFarRed extends LinearOpMode {
+@Autonomous(name = "Different Park Auto Far Blue")
+public class AutoDifferentParkFarBlue extends LinearOpMode {
     @Override
     // The "Main" code will go in here
     public void runOpMode() throws InterruptedException {
@@ -24,7 +24,7 @@ public class AutoCVOnlyFarRed extends LinearOpMode {
                 this
         );
         CVSubsystem cv = new CVSubsystem(robot.camera,
-                robot.cameraName,drive, telemetry, true, this);
+                robot.cameraName,drive, telemetry, false, this);
 
         // Initialize InDepSubsystem with the hardware components from HardwareRobot
         InDepSubsystem inDep = new InDepSubsystem(
@@ -41,15 +41,12 @@ public class AutoCVOnlyFarRed extends LinearOpMode {
         inDep.close();
 
         waitForStart();
-        //Thread.sleep(0);
 
-        drive.driveByEncoder(0, -0.3, 0, 30); // move forward
-        //drive.driveByEncoder(0, 0, 0.5, 56); // turn left to counter initial offset kinda but not fully, intentionally
-        drive.driveByEncoder(-0.3, 0, 0, 400-25); // strafe right
+        Thread.sleep(500);
+
         //Start actual Auto now | choose cv or manual prop location
-        Thread.sleep(1000);
-        int propLocation = autoUtil.placePurplePixelRed(0, false,telemetry);
-
+        int propLocation = autoUtil.placePurplePixelBlue(0, true,telemetry);
+        //propLocation = -1;
         stop();
     }
 
