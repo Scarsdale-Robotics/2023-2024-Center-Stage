@@ -110,26 +110,17 @@ public class TeleOpUtil {
      */
     private void runMotionControl() {
         // TOGGLE MOVE SPEED MODE CONTROL
-        if ((gamepad1.dpad_up && !speedToggle)) {
-            speedToggle = true;
-            if (SpeedCoefficients.getMode() == 0) {
-                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
-                speedIsFast = true;
-            } else {
-                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
-                speedIsFast = false;
-            }
-        }
-        if (!gamepad1.dpad_up) {
-            speedToggle = false;
-        }
-        //Toggle Omni Mode
+        if (gamepad1.dpad_up)
+            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+        if (gamepad1.dpad_down)
+            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
 
-        if (gamepad1.dpad_down && !omniToggle) {
+        //Toggle Omni Mode
+        if (gamepad1.square && !omniToggle) {
             omniToggle = true;
             omniMode = !omniMode;
         }
-        if (!gamepad1.dpad_down) omniToggle = false;
+        if (!gamepad1.square) omniToggle = false;
 
         // Drive Robot
         if (!omniMode) {
@@ -163,7 +154,11 @@ public class TeleOpUtil {
 
         if (gamepad1.y && !clawToggle) {
             if (inDep.getIsOpen()) inDep.close();
-            else inDep.open();
+            else {
+                inDep.open();
+                // automagically set fast mode after release
+                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+            }
 
             clawToggle = true;
         }
@@ -196,8 +191,8 @@ public class TeleOpUtil {
 
         // TODO: uncomment test each method below one-by-one
 //            runAprilTagParallelAlignControl();
-         runAprilTagAlignmentControl();
+//         runAprilTagAlignmentControl();
 //             teamPropLocationControl();
-         runPixelAlignmentControl();
+//         runPixelAlignmentControl();
     }
 }
