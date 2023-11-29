@@ -22,6 +22,7 @@ public class TeleOpUtil {
     private boolean speedToggle = false;
     private boolean omniToggle = false;
     public boolean omniMode = false;
+    public boolean aprilTagAlignToggle = false;
     private Telemetry telemetry;
     private double lastTurnStart;
     private double moveInputX;
@@ -99,7 +100,11 @@ public class TeleOpUtil {
 
     private void runAprilTagParallelAlignControl() {
         // check alignParallelWithAprilTag() for details
-        if (gamepad1.b) cv.alignParallelWithAprilTag(isRedTeam ? 5 : 2);
+        if (gamepad1.b && aprilTagAlignToggle == false) {
+            aprilTagAlignToggle = true;
+            cv.alignParallelWithAprilTag(isRedTeam ? 5 : 2);
+        }
+        if (!gamepad1.b) aprilTagAlignToggle = false;
     }
 
     /**

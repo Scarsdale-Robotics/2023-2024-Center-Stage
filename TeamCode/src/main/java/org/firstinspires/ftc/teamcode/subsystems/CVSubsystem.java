@@ -126,6 +126,7 @@ public class CVSubsystem extends SubsystemBase {
      */
     public int getAprilTagLocation(int tagID) {
 //        visionPortal.resumeStreaming();
+        //this is old for testing apriltag team prop thingy
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
@@ -223,6 +224,22 @@ public class CVSubsystem extends SubsystemBase {
 //        visionPortal.resumeStreaming();
         return pixelProcessor.getCenterOffset();
     }
+    public double getAprilTagHorizontalOffset(int tagID) {
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+
+        double tagDistance = NO_DISTANCE;
+
+        // Step through the list of detections and display info for each one.
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+                if (detection.id == tagID) {
+                    tagDistance = detection.ftcPose.z;
+                    return tagDistance;
+                }
+            }
+        }
+        return tagDistance;
+    }
 
     /**
      * GROUP 2
@@ -257,8 +274,12 @@ public class CVSubsystem extends SubsystemBase {
         double DISTANCE_THRESHOLD = 1;  // distance from backboard to stop at
 
         alignParallelWithAprilTag(tagID);
-        while (getAprilTagDistance(tagID) > DISTANCE_THRESHOLD) {
+
+
+
+        while (getAprilTagHorizontalOffset(tagID) > DISTANCE_THRESHOLD) {
             int aprilTagLocation = getAprilTagLocation(tagID);
+
             switch (aprilTagLocation) {
                 case 0:
                     // left location
@@ -273,6 +294,7 @@ public class CVSubsystem extends SubsystemBase {
                     drive.driveRobotCentric(0, 1 * SpeedCoefficients.getForwardSpeed(), 0);
                     break;
             }
+            drive.driveByEncoder(0, 0, 0,0); //brake
         }
     }
 
@@ -281,10 +303,21 @@ public class CVSubsystem extends SubsystemBase {
      * @param tagID the id of the AprilTag from the 36h11 family to align with
      */
     public void alignParallelWithAprilTag(int tagID) {
-        double rotOff = getAprilTagRotationalOffset(tagID);
+        double rotOff = getAprilTagRotationalOffset(tagID); //counter clockwise yaw is positive
         telemetry.addData("err", Math.abs(rotOff));
-        while (Math.abs(rotOff) > ERROR_ALIGNMENT && opMode.opModeIsActive()) {
-            drive.driveFieldCentric(0, 0, rotOff * 0.1 * SpeedCoefficients.getTurnSpeed()); // times some scaling factor (temporarily at 1)
+        if (rotOff == NO_ROTATIONAL_OFFSET) {
+            // maybe do something
+        } else {
+            while (Math.abs(getAprilTagRotationalOffset(tagID)) > ERROR_ALIGNMENT && opMode.opModeIsActive()) {
+                //assume that we don't need to optimize getAprilTagRotationalOffset(tagID) since it runs anyway
+                drive.driveFieldCentric(0, 0, rotOff * 0.1 * SpeedCoefficients.getTurnSpeed()); // times some scaling factor (temporarily at 1)
+            }
+            drive.driveByEncoder(0, 0, 0, 0);
+//            while (Math.abs(rotOff) > ERROR_ALIGNMENT && opMode.opModeIsActive()) {
+//                drive.driveByEncoder(0, 0, 0.2, (double) 1770 * rotOff / 180);
+//            }
+//            drive.driveByEncoder(0, 0, 0, 0);
         }
+
     }
 }
