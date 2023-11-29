@@ -24,6 +24,8 @@ public class TeleOpUtil {
     public boolean omniMode = false;
     private Telemetry telemetry;
     private double lastTurnStart;
+    private double moveInputX;
+    private double moveInputY;
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
         robot = new HardwareRobot(hardwareMap);
         SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
@@ -127,8 +129,8 @@ public class TeleOpUtil {
 
         // Drive Robot
         if (!omniMode) {
-            double moveInputX = 0;
-            double moveInputY = 0;
+            moveInputX = 0;
+            moveInputY = 0;
             if (Math.abs(gamepad1.left_stick_x) > 0.6) {
                 moveInputX = Math.signum(gamepad1.left_stick_x) * SpeedCoefficients.getStrafeSpeed();
                 moveInputY = 0;
@@ -161,7 +163,8 @@ public class TeleOpUtil {
         // CLAW TOGGLE CONTROL
 
         if (gamepad1.y && !clawToggle) {
-            if (inDep.getIsOpen()) inDep.close();
+            if (inDep.getIsOpen())
+                inDep.close();
             else {
                 inDep.open();
                 // automagically set fast mode after release
@@ -173,44 +176,34 @@ public class TeleOpUtil {
         if (!gamepad1.y) clawToggle = false;
 
         // FLEX ARM MOVEMENT MODE CONTROL
-        inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed());
+        inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed(), gamepad1.left_bumper);
 
         // RIGID ARM MOVEMENT MODE CONTROL
 //        runArmRigidControl();
 
         // RESET ARM CONTROL
-        if (gamepad1.a || gamepad2.a) {
+        if (gamepad2.a) {
             inDep.resetArmEncoder();
-            gamepad1.rumble(500);
-            gamepad2.rumble(500);
-        }
-
-        if (gamepad2.y && gamepad2.b && inDep.armRanges) {
-            inDep.armRanges = false;
-            gamepad1.rumble(500);
-            gamepad2.rumble(500);
-        }
-        if (gamepad2.y && gamepad2.b && !inDep.armRanges) {
-            inDep.resetArmEncoder();
-            inDep.armRanges = true;
             gamepad1.rumble(500);
             gamepad2.rumble(500);
         }
     }
 
     public void tick() {
-        double DISTANCE_BEFORE_BACKBOARD = 25;  // TEMP
+        double DISTANCE_BEFORE_BACKBOARD = 45;  // TEMP
         double cvDist = cv.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
-        telemetry.addData("cvDist: ", cvDist);
+        telemetry.addData("cvDist:", cvDist);
+        telemetry.addData("arm pos:", inDep.getArmPosition());
+        telemetry.addData("claw open:", inDep.getIsOpen());
         telemetry.update();
-        if (!gamepad2.x && !gamepad1.x && cvDist < DISTANCE_BEFORE_BACKBOARD) {
+        runMotionControl();
+        runArmClawControl();
+        if (!gamepad2.x && !gamepad1.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsOpen()) {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
         } else if (gamepad1.x || gamepad2.x) {
             gamepad1.rumble(500);
             gamepad2.rumble(500);
         }
-        runMotionControl();
-        runArmClawControl();
 
         // TODO: uncomment test each method below one-by-one
 //            runAprilTagParallelAlignControl();

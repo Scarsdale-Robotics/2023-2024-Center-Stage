@@ -146,7 +146,8 @@ public class MexicanTeleOp extends LinearOpMode {
 
             // Control arm power with triggers
             double totalChange = (gamepad1.right_trigger - gamepad1.left_trigger) * SpeedCoefficients.getArmSpeed();
-            inDep.rawPower(totalChange);
+
+            inDep.rawPower(totalChange, gamepad1.left_bumper);
         }
     }
 }

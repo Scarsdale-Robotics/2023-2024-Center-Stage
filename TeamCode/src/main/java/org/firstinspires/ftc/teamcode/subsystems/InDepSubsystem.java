@@ -17,7 +17,6 @@ public class InDepSubsystem extends SubsystemBase {
     private final Servo claw;
     private final Servo wrist;
     private boolean isClawOpen;
-    public boolean armRanges = true;
     public enum Level {
         GROUND(0, 0),
         BACKBOARD1(-1960,0.05),
@@ -64,18 +63,14 @@ public class InDepSubsystem extends SubsystemBase {
     /**
      * sets the raw power of the arm.
      */
-    public void rawPower(double power) {
+    public void rawPower(double power, boolean lowerBoundDisabled) {
         int armPos = arm.motor.getCurrentPosition();
 
         // set bounds
-        if (armRanges) {
-            if (armPos>=0 && power>0) { // more down is more positive
-                arm.motor.setPower(0);
-            } else if (armPos<=Level.BACKBOARD2.target && power<0) {
-                arm.motor.setPower(0);
-            } else {
-                arm.motor.setPower(power);
-            }
+        if (armPos>=0 && power>0 && !lowerBoundDisabled) { // more down is more positive
+            arm.motor.setPower(0);
+        } else {
+            arm.motor.setPower(power);
         }
 
 //        arm.motor.setPower(power);
