@@ -201,7 +201,7 @@ public class TeleOpUtil {
         if (!gamepad2.x && !gamepad1.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsOpen()) {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
         } else if (gamepad1.x || gamepad2.x) {
-            gamepad1.rumble(500);
+            gamepad1.rumble(500); // big bomboclat
             gamepad2.rumble(500);
         }
 
