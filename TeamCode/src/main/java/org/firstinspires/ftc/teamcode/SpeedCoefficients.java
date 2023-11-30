@@ -24,8 +24,8 @@ public class SpeedCoefficients {
     }
 
     public static double getStrafeSpeed() {
-        double SLOW_STRAFE_SPEED = 0.22;
-        double FAST_STRAFE_SPEED = 0.55;
+        double SLOW_STRAFE_SPEED = 0.33;
+        double FAST_STRAFE_SPEED = 0.77;
         return moveMode.mode==MoveMode.MODE_FAST.mode ? FAST_STRAFE_SPEED : SLOW_STRAFE_SPEED;
     }
 
