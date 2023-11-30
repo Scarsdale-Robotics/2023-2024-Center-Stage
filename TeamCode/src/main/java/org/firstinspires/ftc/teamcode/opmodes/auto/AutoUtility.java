@@ -69,8 +69,9 @@ public class AutoUtility {
             drive.driveByEncoder(0, 0.3, 0, 1); // brake
             drive.driveByEncoder(-0.3, 0, 0, 300 + (isCloseBlue ? -50 : 0)); // strafe right to place pixel correctly
         } else if (propLocation == 1) {
-            drive.driveByEncoder(0, -0.3, 0, (isCloseBlue ? 850 + moveOffset : 800 + moveOffset)); // moving forward toward the pixel placing area
+            drive.driveByEncoder(0, -0.3, 0, (isCloseBlue ? 835 + moveOffset : 800 + moveOffset)); // moving forward toward the pixel placing area
             drive.driveByEncoder(0, 0.3, 0, 1); // brake
+            drive.driveByEncoder(0, 0.3, 0, 55); // move backward to not hit pixel on turn
         } else if (propLocation == 2) {
             drive.driveByEncoder(0, -0.3, 0, 800 + moveOffset); // moving forward toward the pixel placing area
             drive.driveByEncoder(0, 0.5, 0, 1); // brake
