@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 
-@Autonomous(name = "Auto Backup Close Blue") //turns first square
+@Autonomous(name = "No CV Auto Close Blue") //turns first square
 public class AutoBackupCloseBlue extends LinearOpMode {
     @Override
     // The "Main" code will go in here

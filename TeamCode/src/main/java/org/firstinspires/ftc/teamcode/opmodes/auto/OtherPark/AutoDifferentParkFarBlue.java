@@ -54,13 +54,13 @@ public class AutoDifferentParkFarBlue extends LinearOpMode {
             inDep.changeElevation(2200); // raise claw
 
             drive.driveByEncoder(0, 0.3, 0, 500); // move backwards
-            drive.driveByEncoder(0.3, 0, 0, 500); // strafe right to place pixel correctly
+            drive.driveByEncoder(0.3, 0, 0, 1500); // strafe right to place pixel correctly
             inDep.changeElevation(-2200); // lower claw
-            drive.driveByEncoder(0, -0.3, 0, 500); // move forwards
+            //drive.driveByEncoder(0, -0.3, 0, 500); // move forwards
 
             drive.driveByEncoder(0, -0.3, 0, 3185); // moving forward to the spike mark tape4
             drive.driveByEncoder(0, 0, 0.5, 1830);  // turn left 180º (only needed to place pixel)
-            //drive.driveByEncoder(0.3, 0, 0, 200); // strafe left to finish parking
+            drive.driveByEncoder(0.3, 0, 0, 200); // strafe left to finish parking
             drive.driveByEncoder(0, 0.3, 0, 400); // moving backward to the spike mark tape
             drive.driveByEncoder(0, 0.3, 0, 75+75+75); // moving backward to the spike mark tape
 
@@ -68,20 +68,19 @@ public class AutoDifferentParkFarBlue extends LinearOpMode {
         } else if (propLocation == 1) {
             // center
             inDep.changeElevation(2200); // raise claw
-            drive.driveByEncoder(0, 0.3, 0, 800);
+            drive.driveByEncoder(0, 0.3, 0, 950);
             //drive.driveByEncoder(0, -0.3, 0, 1300); // move backwards to the spike mark tape
 //            drive.driveByEncoder(0, -0.3, 0, 1); // brake
-            drive.driveByEncoder(0, 0, 0.5, 890);  // turn left
+            drive.driveByEncoder(0, 0, -0.5, 855);  // turn right
             inDep.changeElevation(-2200); // lower claw
-            drive.driveByEncoder(-0.3, 0, 0, 100); // strafe right to the spike mark tape
-            drive.driveByEncoder(0, -0.3, 0, 4200); // moving forward to the spike mark tape
-            drive.driveByEncoder(0, 0, 0.5, 1800);  // turn left 180º (only needed to place pixel)
-            drive.driveByEncoder(0, 0.3, 0, 525); // moving backward to the spike mark tape
+            //drive.driveByEncoder(-0.3, 0, 0, 300); // strafe right to the spike mark tape
+            drive.driveByEncoder(0, 0.3, 0, 3750); // moving forward to the spike mark tape
+            //drive.driveByEncoder(0, 0, 0.5, 1800);  // turn left 180º (only needed to place pixel)
+            //drive.driveByEncoder(0, 0.3, 0, 525); // moving backward to the spike mark tape
         } else if (propLocation == 2) {
             // right
             inDep.changeElevation(2000); // raise claw
-
-            drive.driveByEncoder(-0.3, 0, 0, 700); // strafe back left
+            drive.driveByEncoder(-0.3, 0, 0, 1550); // strafe right
             drive.driveByEncoder(0, 0.3, 0, 3750); // moving backward to the spike mark tape
             inDep.changeElevation(-2000); // lower claw
             //inDep.changeElevation(-1500); // lower claw

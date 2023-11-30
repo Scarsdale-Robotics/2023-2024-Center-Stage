@@ -82,9 +82,9 @@ public class AutoDifferentParkFarRed extends LinearOpMode {
         } else if (propLocation == 0) {
             // left
             inDep.changeElevation(2000); // raise claw
-            drive.driveByEncoder(0.3, 0, 0, 500); // strafe back right
-            drive.driveByEncoder(0, 0.3, 0, 3750); // moving backward to the spike mark tape
+            drive.driveByEncoder(0.3, 0, 0, 1550); // strafe left
             inDep.changeElevation(-2000); // lower claw
+            drive.driveByEncoder(0, 0.3, 0, 3750); // moving backward to the spike mark tape
             //inDep.changeElevation(-1500); // lower claw
         }
         stop();
