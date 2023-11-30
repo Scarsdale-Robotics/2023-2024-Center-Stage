@@ -59,11 +59,22 @@ public class InDepSubsystem extends SubsystemBase {
         return isClawOpen;
     }
 
+    private int targetPosition = Level.GROUND.target;
+    private boolean movingToTarget = false;
+    public void setMoveAsyncToPosition(int position) {
+        targetPosition = position;
+        movingToTarget = true;
+    }
 
-    /**
-     * sets the raw power of the arm.
-     */
-    public void rawPower(double power, boolean lowerBoundDisabled) {
+    public void tickMoveAsyncToPosition(double power, boolean lowerBoundDisabled) {
+        int ERROR = 20;
+        int diff = arm.motor.getCurrentPosition() - targetPosition;
+        if (movingToTarget && Math.abs(diff) <= ERROR) {
+            rawPowerBase(power * (diff < 0 ? 1 : -1), lowerBoundDisabled);
+        }
+    }
+
+    private void rawPowerBase(double power, boolean lowerBoundDisabled) {
         int armPos = arm.motor.getCurrentPosition();
 
         // set bounds
@@ -87,6 +98,14 @@ public class InDepSubsystem extends SubsystemBase {
         } else {
             wrist.setPosition(Level.GROUND.wristTarget);
         }
+    }
+
+    /**
+     * sets the raw power of the arm.
+     */
+    public void rawPower(double power, boolean lowerBoundDisabled) {
+        movingToTarget = false;
+        rawPowerBase(power, lowerBoundDisabled);
     }
 
     /**

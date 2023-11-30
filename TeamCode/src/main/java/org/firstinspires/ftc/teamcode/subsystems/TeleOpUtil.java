@@ -58,10 +58,15 @@ public class TeleOpUtil {
     }
 
     private void runArmRigidControl() {
-        if (gamepad1.right_bumper)
-            inDep.raiseArm();
-        else if (gamepad1.left_bumper)
-            inDep.lowerArm();
+        if (gamepad1.left_bumper) {
+            inDep.setMoveAsyncToPosition(InDepSubsystem.Level.GROUND.target);
+        } else if (gamepad2.right_bumper) {
+            inDep.setMoveAsyncToPosition(InDepSubsystem.Level.BACKBOARD2.target);
+        }
+//        if (gamepad1.right_bumper)
+//            inDep.raiseArm();
+//        else if (gamepad1.left_bumper)
+//            inDep.lowerArm();
     }
 
 
@@ -181,7 +186,7 @@ public class TeleOpUtil {
         if (!gamepad1.y) clawToggle = false;
 
         // FLEX ARM MOVEMENT MODE CONTROL
-        inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed(), gamepad1.left_bumper);
+        inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed(), gamepad1.a);
 
         // RIGID ARM MOVEMENT MODE CONTROL
 //        runArmRigidControl();
@@ -203,6 +208,7 @@ public class TeleOpUtil {
         telemetry.update();
         runMotionControl();
         runArmClawControl();
+        inDep.tickMoveAsyncToPosition(SpeedCoefficients.getArmSpeed(), gamepad1.a);
         if (!gamepad2.x && !gamepad1.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsOpen()) {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
         } else if (gamepad1.x || gamepad2.x) {
