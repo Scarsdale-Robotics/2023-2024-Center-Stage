@@ -189,7 +189,7 @@ public class TeleOpUtil {
         inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed(), gamepad1.a);
 
         // RIGID ARM MOVEMENT MODE CONTROL
-        runArmRigidControl();
+//        runArmRigidControl();
 
         // RESET ARM CONTROL
         if (gamepad2.a) {
