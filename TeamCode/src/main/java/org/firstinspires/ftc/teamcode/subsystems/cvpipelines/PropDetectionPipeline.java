@@ -33,8 +33,11 @@ public class PropDetectionPipeline implements VisionProcessor {
     public static Scalar blueUpperRange = new Scalar(134,255,255);  // Range needs fixing
     public static Scalar blueLowerRange = new Scalar(86,41,111);
 
-    public static Scalar redUpperRange = new Scalar(255,255,255);  // Range needs fixing
-    public static Scalar redLowerRange = new Scalar(158,180,92);
+    public static Scalar redUpperRange1 = new Scalar(66,255,255);  // Range needs fixing
+    public static Scalar redLowerRange1 = new Scalar(0,95,196);
+
+    public static Scalar redUpperRange2 = new Scalar(63, 255, 199);  // Range needs fixing
+    public static Scalar redLowerRange2 = new Scalar(0, 112, 73);
 
     public AtomicBoolean hasStarted = new AtomicBoolean(false);
 
@@ -58,9 +61,12 @@ public class PropDetectionPipeline implements VisionProcessor {
 
         List<MatOfPoint> contourList = new ArrayList<>();
         if (isRedTeam){
-            Mat mask = new Mat();
-            Core.inRange(hsvmat, redLowerRange, redUpperRange, mask);
-            Imgproc.findContours(mask, contourList, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+            Mat mask1 = new Mat();
+            Mat mask2 = new Mat();
+            Core.inRange(hsvmat, redLowerRange1, redUpperRange1, mask1);
+            Core.inRange(hsvmat, redLowerRange2, redUpperRange2, mask2);
+            Imgproc.findContours(mask1, contourList, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+            Imgproc.findContours(mask2, contourList, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         }else {
             Mat mask = new Mat();
             Core.inRange(hsvmat, blueLowerRange, blueUpperRange, mask);

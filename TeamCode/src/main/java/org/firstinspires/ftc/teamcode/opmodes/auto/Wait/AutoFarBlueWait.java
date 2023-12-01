@@ -42,7 +42,7 @@ public class AutoFarBlueWait extends LinearOpMode {
 
         waitForStart();
 
-        Thread.sleep(3000); // Different Block
+        Thread.sleep(4000); // Different Block
 //        ⠀⠀⠀⠀⠀⣠⡶⠛⠛⠶⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 //⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⠞⠁⠀⠀⠀⠀⠘⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 //⠀⠀⠀⠀⠀⢀⣠⡶⢿⡿⠃⠀⠀⠀⠀⠀⠀⠀⣽⡗⠲⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠴⠯⠭⣉⠙⣦⠀⠀⠀⠀⠀⠀
@@ -72,21 +72,6 @@ public class AutoFarBlueWait extends LinearOpMode {
 
         //only run this when 2 works and vals are updated. may hit truss
         if (propLocation == 0) {
-            // left
-            /*
-            drive.driveByEncoder(0, -0.3, 0, 1200); // moving forward toward the pixel placing area
-            drive.driveByEncoder(0, 0.3, 0, 1); // brake
-            drive.driveByEncoder(0, 0, 0.5, 880);  // turn left
-            drive.driveByEncoder(0, -0.3, 0, 50); // moving forward to the spike mark tape
-            drive.driveByEncoder(0, 0.3, 0, 1); // brake
-            drive.driveByEncoder(-0.3, 0, 0, 50); // strafe right to place pixel correctly
-            inDep.open(); // open claw to place the pixel
-            inDep.changeElevation(2500); // raise claw
-            drive.driveByEncoder(0, -0.3, 0, 2785); // moving forward to the spike mark tape4
-            drive.driveByEncoder(0, 0, 0.5, 1770);  // turn left 180º (only needed to place pixel)
-            drive.driveByEncoder(0, 0.3, 0, 785); // moving backward to the spike mark tape
-            inDep.changeElevation(-2500); // lower claw
-            */
 
             inDep.changeElevation(2200); // raise claw
 
@@ -97,7 +82,7 @@ public class AutoFarBlueWait extends LinearOpMode {
 
             drive.driveByEncoder(0, -0.3, 0, 3185); // moving forward to the spike mark tape4
             drive.driveByEncoder(0, 0, 0.5, 1830);  // turn left 180º (only needed to place pixel)
-            drive.driveByEncoder(0.3, 0, 0, 200); // strafe left to finish parking
+            //drive.driveByEncoder(0.3, 0, 0, 200); // strafe left to finish parking
             drive.driveByEncoder(0, 0.3, 0, 400); // moving backward to the spike mark tape
             drive.driveByEncoder(0, 0.3, 0, 75+75+75); // moving backward to the spike mark tape
 

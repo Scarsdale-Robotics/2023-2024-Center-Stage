@@ -57,7 +57,7 @@ public class AutoFarRed extends LinearOpMode {
             inDep.changeElevation(2200); // raise claw
 
             drive.driveByEncoder(0, 0.3, 0, 500); // move backwards
-            drive.driveByEncoder(0.3, 0, 0, 869); // strafe left to place pixel correctly
+            drive.driveByEncoder(0.3, 0, 0, 1250); // strafe left to place pixel correctly
             inDep.changeElevation(-2200); // lower claw
             drive.driveByEncoder(0, -0.3, 0, 500); // move forwards
 
@@ -73,7 +73,7 @@ public class AutoFarRed extends LinearOpMode {
             // center
             inDep.changeElevation(2200); // raise claw
             drive.driveByEncoder(0, 0.3, 0, 300);
-            drive.driveByEncoder(0.3, 0, 0, 700); // strafe left to the spike mark tape
+            drive.driveByEncoder(0.3, 0, 0, 800); // strafe left to the spike mark tape
             drive.driveByEncoder(0, -0.3, 0, 1400); // move forward to the spike mark tape
 //            drive.driveByEncoder(0, -0.3, 0, 1); // brake
             drive.driveByEncoder(0, 0, -0.5, 920);  // turn right

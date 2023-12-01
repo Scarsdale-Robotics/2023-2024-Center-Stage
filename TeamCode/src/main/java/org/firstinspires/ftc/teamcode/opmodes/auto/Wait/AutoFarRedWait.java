@@ -42,7 +42,7 @@ public class AutoFarRedWait extends LinearOpMode {
 
         waitForStart();
 
-        Thread.sleep(3000); // Different Block
+        Thread.sleep(4000); // Different Block
 //        ⠀⠀⠀⠀⠀⣠⡶⠛⠛⠶⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 //⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⠞⠁⠀⠀⠀⠀⠘⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 //⠀⠀⠀⠀⠀⢀⣠⡶⢿⡿⠃⠀⠀⠀⠀⠀⠀⠀⣽⡗⠲⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠴⠯⠭⣉⠙⣦⠀⠀⠀⠀⠀⠀
@@ -70,28 +70,15 @@ public class AutoFarRedWait extends LinearOpMode {
         int propLocation = autoUtil.placePurplePixelRed(0, false,telemetry);
         //propLocation = -1; // removes parking
 
+        //propLocation = -1; // removes parking
+
         //only run this when 2 works and vals are updated. may hit truss
         if (propLocation == 2) {
-            // right
-            /*
-            drive.driveByEncoder(0, -0.3, 0, 1200); // moving forward toward the pixel placing area
-            drive.driveByEncoder(0, 0.3, 0, 1); // brake
-            drive.driveByEncoder(0, 0, 0.5, 880);  // turn left
-            drive.driveByEncoder(0, -0.3, 0, 50); // moving forward to the spike mark tape
-            drive.driveByEncoder(0, 0.3, 0, 1); // brake
-            drive.driveByEncoder(-0.3, 0, 0, 50); // strafe right to place pixel correctly
-            inDep.open(); // open claw to place the pixel
-            inDep.changeElevation(2500); // raise claw
-            drive.driveByEncoder(0, -0.3, 0, 2785); // moving forward to the spike mark tape4
-            drive.driveByEncoder(0, 0, 0.5, 1770);  // turn left 180º (only needed to place pixel)
-            drive.driveByEncoder(0, 0.3, 0, 785); // moving backward to the spike mark tape
-            inDep.changeElevation(-2500); // lower claw
-            */
 
             inDep.changeElevation(2200); // raise claw
 
             drive.driveByEncoder(0, 0.3, 0, 500); // move backwards
-            drive.driveByEncoder(0.3, 0, 0, 869); // strafe left to place pixel correctly
+            drive.driveByEncoder(0.3, 0, 0, 1250); // strafe left to place pixel correctly
             inDep.changeElevation(-2200); // lower claw
             drive.driveByEncoder(0, -0.3, 0, 500); // move forwards
 
