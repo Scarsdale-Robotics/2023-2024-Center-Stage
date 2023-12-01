@@ -145,9 +145,9 @@ public class TeleOpUtil {
                 moveInputX = Math.signum(gamepad1.left_stick_x) * SpeedCoefficients.getStrafeSpeed();
                 moveInputY = 0;
                 // TODO: consider: might need a cancel button for below
-                if (moveInputX == -1) {
-                    SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
-                }
+//                if (moveInputX == -1) {
+//                    SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+//                }
             } else if (Math.abs(gamepad1.left_stick_y) > 0.6) {
                 moveInputX = 0;
                 moveInputY = Math.signum(gamepad1.left_stick_y) * SpeedCoefficients.getForwardSpeed();
