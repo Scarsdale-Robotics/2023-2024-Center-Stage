@@ -137,7 +137,7 @@ public class AutoUtility {
             drive.driveByEncoder(0, -0.3, 0, 800 + moveOffset); // moving forward toward the pixel placing area
             drive.driveByEncoder(0, 0.5, 0, 1); // brake
             drive.driveByEncoder(0, 0, 0.5, 915 + (isCloseRed ? -27 : -50));  // turn left
-            drive.driveByEncoder(0, -0.3 * (isCloseRed ? 1 : -1), 0, (isCloseRed ? 33 : 155)); // moving back/approach
+            drive.driveByEncoder(0, -0.3 * (isCloseRed ? 1 : -1), 0, (isCloseRed ? 80 : 155)); // moving back/approach
             drive.driveByEncoder(0, -0.3, 0, 10); // brake
             drive.driveByEncoder(-0.3, 0, 0, (isCloseRed ? 0 : 200)); // strafe right
         }
