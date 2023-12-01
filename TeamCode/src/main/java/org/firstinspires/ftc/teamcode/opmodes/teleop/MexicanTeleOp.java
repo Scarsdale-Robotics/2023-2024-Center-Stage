@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 
-@TeleOp(name = "mexican teleop")
+@TeleOp(name = "DO NOT USE THIS TELEOP THIS IS SUS AND DISQUALIFYING mexican teleop")
 public class MexicanTeleOp extends LinearOpMode {
     private final int TICKS_PER_SECOND = 20;
     private final long MILLISECOND_TOLERANCE = 5;
