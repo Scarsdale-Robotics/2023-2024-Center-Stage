@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.SpeedCoefficients;
-import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.TapeDetectionPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -294,7 +293,7 @@ public class CVSubsystem extends SubsystemBase {
                     drive.driveRobotCentric(0, 1 * SpeedCoefficients.getForwardSpeed(), 0);
                     break;
             }
-            drive.driveByEncoder(0, 0, 0,0); //brake
+            drive.driveByEncoderRobotCentric(0, 0, 0,0); //brake
         }
     }
 
@@ -312,7 +311,7 @@ public class CVSubsystem extends SubsystemBase {
                 //assume that we don't need to optimize getAprilTagRotationalOffset(tagID) since it runs anyway
                 drive.driveFieldCentric(0, 0, rotOff * 0.1 * SpeedCoefficients.getTurnSpeed()); // times some scaling factor (temporarily at 1)
             }
-            drive.driveByEncoder(0, 0, 0, 0);
+            drive.driveByEncoderRobotCentric(0, 0, 0, 0);
 //            while (Math.abs(rotOff) > ERROR_ALIGNMENT && opMode.opModeIsActive()) {
 //                drive.driveByEncoder(0, 0, 0.2, (double) 1770 * rotOff / 180);
 //            }

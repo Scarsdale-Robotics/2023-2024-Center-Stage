@@ -76,23 +76,28 @@ public class DriveSubsystem extends SubsystemBase {
 
     /**
      * Use only for autonomous. Move a certain distance in steps. Drive is field centric.
-     * @param rightSpeed    How fast the robot should strafe to the right (negative values = strafe left).
-     * @param forwardSpeed  How fast the robot should move forward (negative values = strafe backwards).
-     * @param turnSpeed     How fast the robot should turn.
-     * @param steps         How far the robot should move.
+     * @param leftSpeed      How fast the robot should strafe to the right (negative values = strafe left).
+     * @param backwardSpeed  How fast the robot should move forward (negative values = strafe backwards).
+     * @param turnSpeed      How fast the robot should turn (clockwise?).
+     * @param steps          How far the robot should move.
      */
-    public void driveByEncoder(double rightSpeed, double forwardSpeed, double turnSpeed, double steps) {
+    public void driveByEncoderRobotCentric(double leftSpeed, double backwardSpeed, double turnSpeed, double steps) {
         double startEncoder = rightBack.getCurrentPosition();
 
         while (opMode.opModeIsActive() && Math.abs(rightBack.getCurrentPosition() - startEncoder) < steps) {
-            driveRobotCentric(rightSpeed, forwardSpeed, turnSpeed);
+            driveRobotCentric(leftSpeed, backwardSpeed, turnSpeed);
         }
 
         controller.stop();
     }
 
-    public void driveByEncoder(Direction direction, double steps) {
-        driveByEncoder(
+    public void driveByEncoderRobotCentricTiles(double rightSpeed, double forwardSpeed, double turnSpeed, double tiles) {
+        int STEPS_PER_TILE = 777;
+        driveByEncoderRobotCentric(rightSpeed, forwardSpeed, turnSpeed, tiles * STEPS_PER_TILE);
+    }
+
+    public void driveByEncoderRobotCentric(Direction direction, double steps) {
+        driveByEncoderRobotCentric(
                 direction.rightSpeed * SpeedCoefficients.getStrafeSpeed(),
                 direction.forwardSpeed * SpeedCoefficients.getForwardSpeed(),
                 direction.turnSpeed * SpeedCoefficients.getTurnSpeed(),
