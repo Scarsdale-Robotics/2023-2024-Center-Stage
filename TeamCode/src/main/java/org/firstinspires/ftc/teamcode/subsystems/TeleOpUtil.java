@@ -126,7 +126,7 @@ public class TeleOpUtil {
     private void runMotionControl() {
         // TOGGLE MOVE SPEED MODE CONTROL
         if (gamepad1.dpad_up)
-            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST); // bomboclatt rassclatt
         if (gamepad1.dpad_down)
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
 
@@ -216,8 +216,9 @@ public class TeleOpUtil {
             gamepad2.rumble(500);
         }
 
+        runAprilTagParallelAlignControl();
         // TODO: uncomment test each method below one-by-one
-//            runAprilTagParallelAlignControl();
+
 //         runAprilTagAlignmentControl();
 //             teamPropLocationControl();
 //         runPixelAlignmentControl();
