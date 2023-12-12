@@ -22,8 +22,8 @@ public class InDepSubsystem extends SubsystemBase {
         BACKBOARD1(-1960,0.05),
         BACKBOARD2(-4200,0.125); //temp motor encoder values
 
-        int target;
-        double wristTarget;
+        public int target;
+        public double wristTarget;
 
         Level(int target, double wristTarget) {
             this.target = target;
@@ -163,18 +163,21 @@ public class InDepSubsystem extends SubsystemBase {
         claw.setPosition(CLAW_CLOSED_POS);
         isClawOpen = false;
     }
-    public void changeElevation(int ticks) {
-        int target = arm.motor.getCurrentPosition() - ticks;
-        arm.setTargetPosition(target);
-        arm.set(SpeedCoefficients.getArmSpeed());
 
-        // wait until reached target within errorTolerance
-        while (opMode.opModeIsActive() && !(Math.abs(target-arm.getCurrentPosition()) < errorTolerance) );
+    /**
+     * Use only for autonomous. Change the elevation of the arm by a certain angle in ticks.
+     * @param power      How fast the arm should raise (negative values = lower arm).
+     * @param ticks      The angle to displace the arm by in ticks.
+     */
+    public void raiseByEncoder(double power, double ticks) {
+        double startEncoder = arm.motor.getCurrentPosition();
 
-        // stop when reached
+        while (opMode.opModeIsActive() && Math.abs(arm.motor.getCurrentPosition() - startEncoder) < ticks) {
+            arm.set(power);
+        }
+
         arm.stopMotor();
         arm.motor.setPower(0);
-
     }
 
     public void resetArm() {
@@ -189,26 +192,6 @@ public class InDepSubsystem extends SubsystemBase {
         arm.stopMotor();
         arm.motor.setPower(0);
 
-    }
-
-    public void changeElevationDeg(double degrees) {
-        // Conversion factor (ticks per degree)
-        final double ticksPerDegree = 4200.0 / 120; // Replace 'maxDegrees' with the max degrees the arm can move
-
-        // Convert degrees to ticks
-        int ticks = (int) (degrees * ticksPerDegree);
-
-        // Calculate target position in ticks
-        int target = arm.motor.getCurrentPosition() - ticks;
-        arm.setTargetPosition(target);
-        arm.set(SpeedCoefficients.getArmSpeed());
-
-        // Wait until the arm reaches the target within error tolerance
-        while (!(Math.abs(target - arm.getCurrentPosition()) < errorTolerance));
-
-        // Stop the motor once the target is reached
-        arm.stopMotor();
-        arm.motor.setPower(0);
     }
 }
 

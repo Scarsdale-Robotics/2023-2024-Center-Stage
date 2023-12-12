@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.TeleOpUtil;
+import org.firstinspires.ftc.teamcode.util.TeleOpUtil;
 
 @TeleOp(name = "BLUE Drive TeleOp")
 public class DriveTeleOpBlue extends LinearOpMode {
