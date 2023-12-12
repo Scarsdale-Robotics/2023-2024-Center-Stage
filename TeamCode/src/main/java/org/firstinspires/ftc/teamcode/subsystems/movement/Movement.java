@@ -13,6 +13,8 @@ public class Movement {
     // 8 - open claw
     // 9 - lower arm
     // 10 - raise arm
+
+    // ^can't you use strings instead?^
     public int MOVEMENT_TYPE;
     public double INCHES_FORWARD, INCHES_STRAFE, DEGREES_TURN, DEGREES_ELEVATION;
     public long WAIT;
