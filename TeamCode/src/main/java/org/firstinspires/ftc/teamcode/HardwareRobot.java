@@ -56,13 +56,19 @@ public class HardwareRobot {
         leftBack.setRunMode(Motor.RunMode.VelocityControl);
         rightBack.setRunMode(Motor.RunMode.VelocityControl);
 
+        leftFront.setInverted(true);
+        rightFront.setInverted(true);
+        leftBack.setInverted(true);
+        rightBack.setInverted(true);
+
         leftFront.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftFront.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rightFront.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFront.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         leftBack.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rightBack.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        leftFront.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        leftBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rightBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
         leftFront.setPositionTolerance(10);
@@ -85,7 +91,6 @@ public class HardwareRobot {
 
         wrist = hardwareMap.servo.get("wrist");
         wrist.scaleRange(0, 1);
-        wrist.setPosition(0.15); // starting position is angled to the ground
 
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.FORWARD;
@@ -93,8 +98,6 @@ public class HardwareRobot {
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
-//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("Camera 1", "id", hardwareMap.appContext.getPackageName());
-//        camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
         cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
         camera = OpenCvCameraFactory.getInstance().createWebcam(cameraName);
     }

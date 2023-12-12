@@ -1,0 +1,171 @@
+
+
+    /**
+     * Use only for autonomous. Move forward a certain distance in ticks. Drive is robot centric.
+     * @param power      Absolute (positive) motor power.
+     * @param ticks      How far the robot should move.
+     */
+    public void forward(double power, double ticks) {
+        driveByEncoder(0, power, 0, ticks);
+    }
+
+    /**
+     * Use only for autonomous. Move backward a certain distance in ticks. Drive is robot centric.
+     * @param power      Absolute (positive) motor power.
+     * @param ticks      How far the robot should move.
+     */
+    public void backward(double power, double ticks) {
+        driveByEncoder(0, -power, 0, ticks);
+    }
+
+    /**
+     * Use only for autonomous. Strafe left a certain distance in ticks. Drive is robot centric.
+     * @param power      Absolute (positive) motor power.
+     * @param ticks      How far the robot should move.
+     */
+    public void left(double power, double ticks) {
+        driveByEncoder(-power, 0, 0, ticks);
+    }
+
+    /**
+     * Use only for autonomous. Strafe right a certain distance in ticks. Drive is robot centric.
+     * @param power      Absolute (positive) motor power.
+     * @param ticks      How far the robot should move.
+     */
+    public void right(double power, double ticks) {
+        driveByEncoder(power, 0, 0, ticks);
+    }
+
+    /**
+     * Use only for autonomous. Turn left a certain angle in ticks.
+     * @param power      Absolute (positive) motor power.
+     * @param ticks      How much the robot should turn.
+     */
+    public void turnLeft(double power, double ticks) {
+        driveByEncoder(0, 0, -power, ticks);
+    }
+
+    /**
+     * Use only for autonomous. Turn right a certain angle in ticks.
+     * @param power      Absolute (positive) motor power.
+     * @param ticks      How much the robot should turn.
+     */
+    public void turnRight(double power, double ticks) {
+        driveByEncoder(0, 0, power, ticks);
+    }
+
+    /**
+     * Use only for autonomous. Move forward a certain distance in floor tiles. Drive is robot centric.
+     * @param power      Absolute (positive) motor power.
+     * @param tiles      How many tiles the robot should move.
+     */
+    public void forward(double power, MoveMetric moveMetric) {
+        driveByEncoder(0, power, 0, moveMetric.TICKS_FORWARD);
+    }
+
+    /**
+     * Use only for autonomous. Move backward a certain distance in floor tiles. Drive is robot centric.
+     * @param power      Absolute (positive) motor power.
+     * @param tiles      How many tiles the robot should move.
+     */
+    public void backward(double power, Tile tiles) {
+        driveByEncoder(0, -power, 0, tiles.TICKS_FORWARD);
+    }
+
+    /**
+     * Use only for autonomous. Strafe left a certain distance in floor tiles. Drive is robot centric.
+     * @param power      Absolute (positive) motor power.
+     * @param tiles      How many tiles the robot should move.
+     */
+    public void left(double power, Tile tiles) {
+        driveByEncoder(-power, 0, 0, tiles.TICKS_STRAFE);
+    }
+
+    /**
+     * Use only for autonomous. Strafe right a certain distance in floor tiles. Drive is robot centric.
+     * @param power      Absolute (positive) motor power.
+     * @param tiles      How many tiles the robot should move.
+     */
+    public void right(double power, Tile tiles) {
+        driveByEncoder(power, 0, 0, tiles.TICKS_STRAFE);
+    }
+
+    /**
+     * Use only for autonomous. Turn left a certain angle in degrees.
+     * @param power      Absolute (positive) motor power.
+     * @param degrees      How much the robot should turn.
+     */
+    public void turnLeft(double power, Degree degrees) {
+        driveByEncoder(0, 0, -power, degrees.TICKS_TURN);
+    }
+
+    /**
+     * Use only for autonomous. Turn right a certain angle in degrees.
+     * @param power      Absolute (positive) motor power.
+     * @param degrees      How much the robot should turn.
+     */
+    public void turnRight(double power, Degree degrees) {
+        driveByEncoder(0, 0, power, degrees.TICKS_TURN);
+    }
+
+    /**
+     * Use only for autonomous. Turn left a certain angle in radians.
+     * @param power      Absolute (positive) motor power.
+     * @param radians      How much the robot should turn.
+     */
+    public void turnLeft(double power, Radian radians) {
+        driveByEncoder(0, 0, -power, radians.TICKS_TURN);
+    }
+
+    /**
+     * Use only for autonomous. Turn right a certain angle in radians.
+     * @param power      Absolute (positive) motor power.
+     * @param radians      How much the robot should turn.
+     */
+    public void turnRight(double power, Radian radians) {
+        driveByEncoder(0, 0, power, radians.TICKS_TURN);
+    }
+
+
+    // a new Builder Pattern class for now
+    public static class MoveMetric {
+        private static final double TICKS_PER_TILE_FORWARD = 777;
+        private static final double TICKS_PER_TILE_STRAFE = 1500;
+        private static final double TICKS_PER_DEGREE = 10.0;
+        private static final double TICKS_PER_RADIAN = 572.95780;
+        public double TICKS_FORWARD, TICKS_STRAFE, TICKS_TURN;
+
+        /**
+         * Use only for autonomous. Conversions from physical metrics to encoder ticks for robot movement.
+         */
+        public MoveMetric() { }
+
+        /**
+         * Conversion from tiles to encoder ticks for movement.
+         * @param tiles      Number of tiles.
+         */
+        public MoveMetric tiles(double tiles) {
+            this.TICKS_FORWARD = TICKS_PER_TILE_FORWARD * tiles;
+            this.TICKS_STRAFE = TICKS_PER_TILE_STRAFE * tiles;
+            return this;
+        }
+
+        /**
+         * Conversion from degrees to encoder ticks for turning.
+         * @param degrees      Number of degrees.
+         */
+        public MoveMetric degrees(double degrees) {
+            this.TICKS_TURN = TICKS_PER_DEGREE * degrees;
+            return this;
+        }
+
+        /**
+         * Conversion from radians to encoder ticks for turning.
+         * @param radians      Number of radians.
+         */
+        public MoveMetric radians(double radians) {
+            this.TICKS_TURN = TICKS_PER_RADIAN * radians;
+            return this;
+        }
+
+    }

@@ -40,4 +40,17 @@ public class SpeedCoefficients {
         double FAST_ARM_SPEED = 1;
         return moveMode.mode==MoveMode.MODE_FAST.mode ? FAST_ARM_SPEED : SLOW_ARM_SPEED;
     }
+
+    public static double getAutonomousForwardSpeed() {
+        return 0.3;
+    }
+
+    public static double getAutonomousStrafeSpeed() {
+        return 0.3;
+    }
+
+    public static double getAutonomousTurnSpeed() {
+        return 0.5;
+    }
+
 }

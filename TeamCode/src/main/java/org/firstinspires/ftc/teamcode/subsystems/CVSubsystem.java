@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PropDetectionPipeli
 
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelDetectionPipeline;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +27,8 @@ public class CVSubsystem extends SubsystemBase {
     private OpenCvCamera camera;
     private DriveSubsystem drive;
 
+    private final int SAMPLE_COUNT = 200;
+    private final long SAMPLE_WAIT_MILLISECONDS = 25;
     private final int LOCATION_LEFT   =  0;
     private final int LOCATION_CENTER =  1;
     private final int LOCATION_RIGHT  =  2;
@@ -212,11 +215,36 @@ public class CVSubsystem extends SubsystemBase {
 
     /**
      * GROUP 2
-     * @return whether the AprilTag is left, center, or right in the camera view
+     * @return whether the AprilTag is left, center, or right in the camera view based on a mode of samples
      */
-    public int getTeamPropLocation() {
-//        visionPortal.resumeStreaming();
-        return propProcessor.getPosition();
+    public int getPropLocation() throws InterruptedException {
+        int propLocation = -1;
+        ArrayList<Integer> samples = new ArrayList<>();
+        Thread.sleep(1000);
+        for (int i = 0; i < SAMPLE_COUNT; i++) {
+            if (!opMode.opModeIsActive()) break;
+            propLocation = propProcessor.getPosition();
+            if (-1 < propLocation && propLocation < 3) samples.add(propLocation);
+            Thread.sleep(SAMPLE_WAIT_MILLISECONDS);
+        }
+        // parsing early misreads
+        if (samples.size()>1) samples.remove(0);
+        int[] locations = new int[3];
+        for (int i : samples) locations[i]++;
+        int max = 0;
+        for (int i = 0; i < 3; i++) {
+            if (locations[i] > max) {
+                max = locations[i];
+                propLocation = i;
+            }
+        }
+        telemetry.addData("",samples);
+        telemetry.addData("loc: ",propLocation);
+        telemetry.addData("locs0: ", locations[0]);
+        telemetry.addData("locs1: ", locations[1]);
+        telemetry.addData("locs2: ", locations[2]);
+        telemetry.update();
+        return propLocation;
     }
 
     public int getPixelHorizontalOffset() {
@@ -293,7 +321,7 @@ public class CVSubsystem extends SubsystemBase {
                     drive.driveRobotCentric(0, 1 * SpeedCoefficients.getForwardSpeed(), 0);
                     break;
             }
-            drive.driveByEncoderRobotCentric(0, 0, 0,0); //brake
+            drive.driveByEncoder(0, 0, 0,0); //brake
         }
     }
 
@@ -311,7 +339,7 @@ public class CVSubsystem extends SubsystemBase {
                 //assume that we don't need to optimize getAprilTagRotationalOffset(tagID) since it runs anyway
                 drive.driveFieldCentric(0, 0, rotOff * 0.1 * SpeedCoefficients.getTurnSpeed()); // times some scaling factor (temporarily at 1)
             }
-            drive.driveByEncoderRobotCentric(0, 0, 0, 0);
+            drive.driveByEncoder(0, 0, 0, 0);
 //            while (Math.abs(rotOff) > ERROR_ALIGNMENT && opMode.opModeIsActive()) {
 //                drive.driveByEncoder(0, 0, 0.2, (double) 1770 * rotOff / 180);
 //            }
