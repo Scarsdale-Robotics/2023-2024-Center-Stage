@@ -72,7 +72,7 @@ public class MovementSequenceBuilder {
      * @param ms      The wait time in milliseconds.
      */
     public MovementSequenceBuilder waitFor(long ms) {
-        movements.add(new Movement(6, 0, 0, 0, ms, 0));
+        movements.add(new Movement(6, 0, 0, 0, 0, ms));
         return this;
     }
 
@@ -93,11 +93,20 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a change arm elevation event to the MovementSequenceBuilder.
-     * @param degrees      The angle for the arm to be displaced by in degrees.
+     * Appends a lower arm event to the MovementSequenceBuilder.
+     * @param degrees      The angle for the arm to be elevated in degrees.
      */
-    public MovementSequenceBuilder changeElevation(int degrees) {
-        movements.add(new Movement(9, 0, 0, 0, 0, degrees));
+    public MovementSequenceBuilder lowerArm(double degrees) {
+        movements.add(new Movement(9, 0, 0, 0, degrees, 0));
+        return this;
+    }
+
+    /**
+     * Appends a raise arm event to the MovementSequenceBuilder.
+     * @param degrees      The angle for the arm to be elevated in degrees.
+     */
+    public MovementSequenceBuilder raiseArm(double degrees) {
+        movements.add(new Movement(10, 0, 0, 0, degrees, 0));
         return this;
     }
 }

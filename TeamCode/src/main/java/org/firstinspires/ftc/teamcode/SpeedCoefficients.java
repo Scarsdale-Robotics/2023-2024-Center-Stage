@@ -53,4 +53,6 @@ public class SpeedCoefficients {
         return 0.5;
     }
 
+    public static double getAutonomousArmSpeed() {return 1;}
+
 }

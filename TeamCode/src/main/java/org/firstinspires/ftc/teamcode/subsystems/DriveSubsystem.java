@@ -116,12 +116,14 @@ public class DriveSubsystem extends SubsystemBase {
                 // open claw
                 case 8: inDep.open();
                         break;
-                // open claw
-                case 9: inDep.changeElevation(movement.ELEVATION * TICKS_PER_DEGREE_ARM);
+                // lower arm
+                case 9: inDep.raiseByEncoder(-SpeedCoefficients.getAutonomousArmSpeed(),movement.DEGREES_ELEVATION * TICKS_PER_DEGREE_ARM);
+                        break;
+                // raise arm
+                case 10: inDep.raiseByEncoder(SpeedCoefficients.getAutonomousArmSpeed(),movement.DEGREES_ELEVATION * TICKS_PER_DEGREE_ARM);
                         break;
                 // invalid
-                default: controller.stop();
-                        break;
+                default: break;
             }
         }
 

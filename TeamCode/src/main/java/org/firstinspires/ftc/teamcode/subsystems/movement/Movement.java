@@ -11,18 +11,18 @@ public class Movement {
     // 6 - delay/no movement
     // 7 - close claw
     // 8 - open claw
-    // 9 - change elevation
+    // 9 - lower arm
+    // 10 - raise arm
     public int MOVEMENT_TYPE;
-    public double INCHES_FORWARD, INCHES_STRAFE, DEGREES_TURN;
+    public double INCHES_FORWARD, INCHES_STRAFE, DEGREES_TURN, DEGREES_ELEVATION;
     public long WAIT;
-    public int ELEVATION;
 
-    Movement(int type, double forward, double strafe, double turn, long wait, int elevation) {
+    Movement(int type, double forward, double strafe, double turn, double elevation, long wait) {
         this.MOVEMENT_TYPE = type;
         this.INCHES_FORWARD = forward;
         this.INCHES_STRAFE = strafe;
         this.DEGREES_TURN = turn;
+        this.DEGREES_ELEVATION = elevation;
         this.WAIT = wait;
-        this.ELEVATION = elevation;
     }
 }

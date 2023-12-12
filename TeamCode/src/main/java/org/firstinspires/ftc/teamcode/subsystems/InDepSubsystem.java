@@ -163,18 +163,21 @@ public class InDepSubsystem extends SubsystemBase {
         claw.setPosition(CLAW_CLOSED_POS);
         isClawOpen = false;
     }
-    public void changeElevation(double ticks) {
-        int target = arm.motor.getCurrentPosition() - (int) ticks;
-        arm.setTargetPosition(target);
-        arm.set(SpeedCoefficients.getArmSpeed());
 
-        // wait until reached target within errorTolerance
-        while (opMode.opModeIsActive() && !(Math.abs(target-arm.getCurrentPosition()) < errorTolerance) );
+    /**
+     * Use only for autonomous. Change the elevation of the arm by a certain angle in ticks.
+     * @param power      How fast the arm should raise (negative values = lower arm).
+     * @param ticks      The angle to displace the arm by in ticks.
+     */
+    public void raiseByEncoder(double power, double ticks) {
+        double startEncoder = arm.motor.getCurrentPosition();
 
-        // stop when reached
+        while (opMode.opModeIsActive() && Math.abs(arm.motor.getCurrentPosition() - startEncoder) < ticks) {
+            arm.set(power);
+        }
+
         arm.stopMotor();
         arm.motor.setPower(0);
-
     }
 
     public void resetArm() {

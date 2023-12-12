@@ -54,30 +54,29 @@ public class AutoFarBlue extends LinearOpMode {
         // Start actual Auto now | cv
         int propLocation = cv.getPropLocation();
 
+        MovementSequence approachTape = new MovementSequenceBuilder().build(),
+                parkInBackdrop = new MovementSequenceBuilder().build();
+
         if (propLocation == 0) {
             // left
 
             // build the sequence of movements here
-            MovementSequence approachTape = new MovementSequenceBuilder()
+            approachTape = new MovementSequenceBuilder()
                     .forward(37.7) // moving forward toward the pixel placing area
                     .turnLeft(90) // turn left 90 degrees
                     .forward(2.5) // moving forward to the spike mark tape
                     .right(4.8) // strafe right to place pixel correctly
                     .openClaw() // open claw to place the pixel
-                    .changeElevation(63) // raise arm
+                    .raiseArm(63) // raise arm
                     .build();
-            MovementSequence parkInBackdrop = new MovementSequenceBuilder()
+            parkInBackdrop = new MovementSequenceBuilder()
                     .backward(15.4) // move backwards
                     .right(17.6) // strafe right
-                    .changeElevation(-63) // lower arm
+                    .lowerArm(63) // lower arm
                     .forward(113.7) // move forwards towards the backstage
                     .turnLeft(183) // turn left 180º (only needed to place pixel)
                     .backward(19.3) // moving backward towards the backstage
                     .build();
-
-            // perform the actual movements here in sequence
-            drive.followMovementSequence(approachTape);
-            drive.followMovementSequence(parkInBackdrop);
 
         } else if (propLocation == 1) {
             // center
@@ -86,6 +85,10 @@ public class AutoFarBlue extends LinearOpMode {
             // right
 
         }
+
+        // perform the actual movements here in sequence
+        drive.followMovementSequence(approachTape);
+        drive.followMovementSequence(parkInBackdrop);
 
         stopRobot();
     }
