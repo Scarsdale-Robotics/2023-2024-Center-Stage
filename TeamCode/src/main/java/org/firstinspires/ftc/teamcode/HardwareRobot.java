@@ -106,4 +106,26 @@ public class HardwareRobot {
         double angle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
         return angle;
     }
+
+    public void setPositionControl() {
+        leftFront.setRunMode(Motor.RunMode.PositionControl);
+        rightFront.setRunMode(Motor.RunMode.PositionControl);
+        leftBack.setRunMode(Motor.RunMode.PositionControl);
+        rightBack.setRunMode(Motor.RunMode.PositionControl);
+
+        leftFront.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBack.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBack.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        leftFront.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        leftBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        rightBack.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+
+        leftFront.setPositionTolerance(10);
+        rightFront.setPositionTolerance(10);
+        leftBack.setPositionTolerance(10);
+        rightBack.setPositionTolerance(10);
+    }
 }

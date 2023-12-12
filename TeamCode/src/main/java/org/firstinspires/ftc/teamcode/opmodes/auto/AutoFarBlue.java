@@ -1,20 +1,19 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
-import android.service.quicksettings.Tile;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem.*;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
 
 @Autonomous(name = "Auto Far Blue")
 public class AutoFarBlue extends LinearOpMode {
+    final private ElapsedTime runtime = new ElapsedTime();
     private HardwareRobot robot;
     private InDepSubsystem inDep;
     private DriveSubsystem drive;
@@ -23,6 +22,7 @@ public class AutoFarBlue extends LinearOpMode {
     // The "Main" code will go in here
     public void runOpMode() throws InterruptedException {
         robot = new HardwareRobot(hardwareMap);
+        robot.setPositionControl();
         inDep = new InDepSubsystem(
                 robot.arm,
                 robot.claw,
@@ -46,10 +46,11 @@ public class AutoFarBlue extends LinearOpMode {
                 false,
                 this);
         inDep.close();
+        runtime.reset();
 
         waitForStart();
 
-        Thread.sleep(500);
+        sleepFor(500);
 
         // Start actual Auto now | cv
         int propLocation = cv.getPropLocation();
@@ -91,6 +92,15 @@ public class AutoFarBlue extends LinearOpMode {
         drive.followMovementSequence(parkInBackdrop);
 
         stopRobot();
+    }
+
+    /**
+     * Smart sleep with opMode running check.
+     * @param ms Timeout in milliseconds.
+     */
+    private void sleepFor(long ms) {
+        runtime.reset();
+        while (opModeIsActive() && (runtime.milliseconds() < ms));
     }
 
     public void stopRobot() {

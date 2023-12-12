@@ -4,6 +4,7 @@ import android.util.Size;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -34,6 +35,7 @@ public class CVSubsystem extends SubsystemBase {
     private final int LOCATION_RIGHT  =  2;
     private final int NO_LOCATION     = -1;
     private Telemetry telemetry;
+    final private ElapsedTime runtime = new ElapsedTime();
 
     private final double NO_ROTATIONAL_OFFSET = -50000.0;
     private final double NO_DISTANCE = -50000.0;
@@ -56,6 +58,7 @@ public class CVSubsystem extends SubsystemBase {
         this.cameraName = cameraName;
         this.isRedTeam = isRedTeam;
         this.opMode = opMode;
+        runtime.reset();
         // create AprilTagProcessor and VisionPortal
         initAprilTag();
 
@@ -220,12 +223,12 @@ public class CVSubsystem extends SubsystemBase {
     public int getPropLocation() throws InterruptedException {
         int propLocation = -1;
         ArrayList<Integer> samples = new ArrayList<>();
-        Thread.sleep(1000);
+        sleepFor(1000);
         for (int i = 0; i < SAMPLE_COUNT; i++) {
             if (!opMode.opModeIsActive()) break;
             propLocation = propProcessor.getPosition();
             if (-1 < propLocation && propLocation < 3) samples.add(propLocation);
-            Thread.sleep(SAMPLE_WAIT_MILLISECONDS);
+            sleepFor(SAMPLE_WAIT_MILLISECONDS);
         }
         // parsing early misreads
         if (samples.size()>1) samples.remove(0);
@@ -346,5 +349,14 @@ public class CVSubsystem extends SubsystemBase {
 //            drive.driveByEncoder(0, 0, 0, 0);
         }
 
+    }
+
+    /**
+     * Smart sleep with opMode running check.
+     * @param ms Timeout in milliseconds.
+     */
+    private void sleepFor(long ms) {
+        runtime.reset();
+        while (opMode.opModeIsActive() && (runtime.milliseconds() < ms));
     }
 }

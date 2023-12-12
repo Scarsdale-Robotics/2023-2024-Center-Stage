@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.SpeedCoefficients;
@@ -16,8 +17,9 @@ import java.util.ArrayDeque;
 public class DriveSubsystem extends SubsystemBase {
     private static final double TICKS_PER_INCH_FORWARD = 32.4;
     private static final double TICKS_PER_INCH_STRAFE = 62.5;
-    private static final double TICKS_PER_DEGREE = 10.0;
+    private static final double TICKS_PER_DEGREE_TURN = 10.0;
     private static final double TICKS_PER_DEGREE_ARM = 35.0;
+    final private ElapsedTime runtime = new ElapsedTime();
     private MecanumDrive controller;
     private IMU imu;
     private LinearOpMode opMode;
@@ -35,6 +37,7 @@ public class DriveSubsystem extends SubsystemBase {
         this.imu = imu;
         this.opMode = opMode;
         this.inDep = inDep;
+        runtime.reset();
     }
 
     /**
@@ -67,10 +70,13 @@ public class DriveSubsystem extends SubsystemBase {
      * @param ticks          How far the robot should move.
      */
     public void driveByEncoder(double rightSpeed, double forwardSpeed, double turnSpeed, double ticks) {
-        double startEncoder = rightBack.getCurrentPosition();
+        double startEncoder = rightBack.getCurrentPosition(), targetEncoder = startEncoder + ticks;
+        double kP = 0.01, d_error = 10.0, kV, delta; // kP will need tuning
 
         while (opMode.opModeIsActive() && Math.abs(rightBack.getCurrentPosition() - startEncoder) < ticks) {
-            driveRobotCentric(rightSpeed, forwardSpeed, turnSpeed);
+            delta = Math.abs(targetEncoder - rightBack.getCurrentPosition() + d_error);
+            kV = Math.min(1.0, delta * kP);
+            driveRobotCentric(rightSpeed * kV, forwardSpeed * kV, turnSpeed * kV);
         }
 
         controller.stop();
@@ -83,51 +89,52 @@ public class DriveSubsystem extends SubsystemBase {
     public void followMovementSequence(MovementSequence movementSequence) throws InterruptedException {
         double  POWER_FORWARD = SpeedCoefficients.getAutonomousForwardSpeed(),
                 POWER_STRAFE = SpeedCoefficients.getAutonomousStrafeSpeed(),
-                POWER_TURN = SpeedCoefficients.getAutonomousTurnSpeed();
+                POWER_TURN = SpeedCoefficients.getAutonomousTurnSpeed(),
+                POWER_ARM = SpeedCoefficients.getAutonomousArmSpeed();
+
         ArrayDeque<Movement> movements = movementSequence.movements.clone();
 
         while (opMode.opModeIsActive() && !movements.isEmpty()) {
             Movement movement = movements.pollFirst();
-            switch (movement.MOVEMENT_TYPE) {
-                // forward
-                case 0: driveByEncoder(0, POWER_FORWARD, 0, movement.INCHES_FORWARD * TICKS_PER_INCH_FORWARD);
-                        break;
-                // backward
-                case 1: driveByEncoder(0, -POWER_FORWARD, 0, movement.INCHES_FORWARD * TICKS_PER_INCH_FORWARD);
-                        break;
-                // left
-                case 2: driveByEncoder(-POWER_STRAFE, 0, 0, movement.INCHES_STRAFE * TICKS_PER_INCH_STRAFE);
-                        break;
-                // right
-                case 3: driveByEncoder(POWER_STRAFE, 0, 0, movement.INCHES_STRAFE * TICKS_PER_INCH_STRAFE);
-                        break;
-                // turn left
-                case 4: driveByEncoder(0, 0, -POWER_TURN, movement.DEGREES_TURN * TICKS_PER_DEGREE);
-                        break;
-                // turn right
-                case 5: driveByEncoder(0, 0, POWER_TURN, movement.DEGREES_TURN * TICKS_PER_DEGREE);
-                        break;
-                // delay/no movement
-                case 6: Thread.sleep(movement.WAIT);
-                        break;
-                // close claw
-                case 7: inDep.close();
-                        break;
-                // open claw
-                case 8: inDep.open();
-                        break;
-                // lower arm
-                case 9: inDep.raiseByEncoder(-SpeedCoefficients.getAutonomousArmSpeed(),movement.DEGREES_ELEVATION * TICKS_PER_DEGREE_ARM);
-                        break;
-                // raise arm
-                case 10: inDep.raiseByEncoder(SpeedCoefficients.getAutonomousArmSpeed(),movement.DEGREES_ELEVATION * TICKS_PER_DEGREE_ARM);
-                        break;
-                // invalid
-                default: break;
+            Movement.MovementType type = movement.MOVEMENT_TYPE;
+
+            driveByEncoder(
+                    POWER_STRAFE * type.k_strafe,
+                    POWER_FORWARD * type.k_forward,
+                    POWER_TURN * type.k_turn,
+                    movement.INCHES_STRAFE * TICKS_PER_INCH_STRAFE * Math.abs(type.k_strafe) +
+                            movement.INCHES_FORWARD * TICKS_PER_INCH_FORWARD * Math.abs(type.k_forward) +
+                            movement.DEGREES_TURN * TICKS_PER_DEGREE_TURN * Math.abs(type.k_turn)
+            );
+
+            inDep.raiseByEncoder(
+                    POWER_ARM * type.k_elevation,
+                    movement.DEGREES_ELEVATION * TICKS_PER_DEGREE_ARM * Math.abs(type.k_elevation)
+            );
+
+            if (type == Movement.MovementType.DELAY) {
+                sleepFor(movement.WAIT);
+            }
+
+            if (type == Movement.MovementType.CLOSE_CLAW) {
+                inDep.close();
+            }
+
+            if (type == Movement.MovementType.OPEN_CLAW) {
+                inDep.open();
             }
         }
 
         controller.stop();
+    }
+
+    /**
+     * Smart sleep with opMode running check.
+     * @param ms Timeout in milliseconds.
+     */
+    private void sleepFor(long ms) {
+        runtime.reset();
+        while (opMode.opModeIsActive() && (runtime.milliseconds() < ms));
     }
 
     /**

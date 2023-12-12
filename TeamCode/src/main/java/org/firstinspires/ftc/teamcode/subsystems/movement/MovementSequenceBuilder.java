@@ -18,7 +18,7 @@ public class MovementSequenceBuilder {
      * @param inches      How far the robot should move in inches.
      */
     public MovementSequenceBuilder forward(double inches) {
-        movements.add(new Movement(0, inches, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.FORWARD, inches, 0, 0, 0, 0));
         return this;
     }
 
@@ -27,7 +27,7 @@ public class MovementSequenceBuilder {
      * @param inches      How far the robot should move in inches.
      */
     public MovementSequenceBuilder backward(double inches) {
-        movements.add(new Movement(1, inches, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.BACKWARD, inches, 0, 0, 0, 0));
         return this;
     }
 
@@ -36,7 +36,7 @@ public class MovementSequenceBuilder {
      * @param inches      How far the robot should strafe in inches.
      */
     public MovementSequenceBuilder left(double inches) {
-        movements.add(new Movement(2, 0, inches, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.STRAFE_LEFT, 0, inches, 0, 0, 0));
         return this;
     }
 
@@ -45,7 +45,7 @@ public class MovementSequenceBuilder {
      * @param inches      How far the robot should strafe in inches.
      */
     public MovementSequenceBuilder right(double inches) {
-        movements.add(new Movement(3, 0, inches, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.STRAFE_RIGHT, 0, inches, 0, 0, 0));
         return this;
     }
 
@@ -54,7 +54,7 @@ public class MovementSequenceBuilder {
      * @param degrees      How much the robot should turn in degrees.
      */
     public MovementSequenceBuilder turnLeft(double degrees) {
-        movements.add(new Movement(4, 0, 0, degrees, 0, 0));
+        movements.add(new Movement(Movement.MovementType.TURN_LEFT, 0, 0, degrees, 0, 0));
         return this;
     }
 
@@ -63,7 +63,7 @@ public class MovementSequenceBuilder {
      * @param degrees      How much the robot should turn in degrees.
      */
     public MovementSequenceBuilder turnRight(double degrees) {
-        movements.add(new Movement(5, 0, 0, degrees, 0, 0));
+        movements.add(new Movement(Movement.MovementType.TURN_RIGHT, 0, 0, degrees, 0, 0));
         return this;
     }
 
@@ -71,8 +71,8 @@ public class MovementSequenceBuilder {
      * Appends a timeout to the MovementSequenceBuilder.
      * @param ms      The wait time in milliseconds.
      */
-    public MovementSequenceBuilder waitFor(long ms) {
-        movements.add(new Movement(6, 0, 0, 0, 0, ms));
+    public MovementSequenceBuilder sleepFor(long ms) {
+        movements.add(new Movement(Movement.MovementType.DELAY, 0, 0, 0, 0, ms));
         return this;
     }
 
@@ -80,7 +80,7 @@ public class MovementSequenceBuilder {
      * Appends a close claw event to the MovementSequenceBuilder.
      */
     public MovementSequenceBuilder closeClaw() {
-        movements.add(new Movement(7, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.CLOSE_CLAW, 0, 0, 0, 0, 0));
         return this;
     }
 
@@ -88,7 +88,7 @@ public class MovementSequenceBuilder {
      * Appends an open claw event to the MovementSequenceBuilder.
      */
     public MovementSequenceBuilder openClaw() {
-        movements.add(new Movement(8, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.OPEN_CLAW, 0, 0, 0, 0, 0));
         return this;
     }
 
@@ -97,7 +97,7 @@ public class MovementSequenceBuilder {
      * @param degrees      The angle for the arm to be elevated in degrees.
      */
     public MovementSequenceBuilder lowerArm(double degrees) {
-        movements.add(new Movement(9, 0, 0, 0, degrees, 0));
+        movements.add(new Movement(Movement.MovementType.LOWER_ARM, 0, 0, 0, degrees, 0));
         return this;
     }
 
@@ -106,7 +106,7 @@ public class MovementSequenceBuilder {
      * @param degrees      The angle for the arm to be elevated in degrees.
      */
     public MovementSequenceBuilder raiseArm(double degrees) {
-        movements.add(new Movement(10, 0, 0, 0, degrees, 0));
+        movements.add(new Movement(Movement.MovementType.RAISE_ARM, 0, 0, 0, degrees, 0));
         return this;
     }
 }

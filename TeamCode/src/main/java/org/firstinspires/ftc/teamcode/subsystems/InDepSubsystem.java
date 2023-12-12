@@ -171,9 +171,11 @@ public class InDepSubsystem extends SubsystemBase {
      */
     public void raiseByEncoder(double power, double ticks) {
         double startEncoder = arm.motor.getCurrentPosition();
+        // do we need PID here?
+        // if placing on the backboard during auto then we should atleast use kP and kI
 
         while (opMode.opModeIsActive() && Math.abs(arm.motor.getCurrentPosition() - startEncoder) < ticks) {
-            arm.set(power);
+            arm.motor.setPower(power);
         }
 
         arm.stopMotor();
