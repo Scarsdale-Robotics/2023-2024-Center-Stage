@@ -11,8 +11,8 @@ public class Movement {
         DELAY (0.0,0.0,0.0,0.0),
         CLOSE_CLAW (0.0,0.0,0.0,0.0),
         OPEN_CLAW (0.0,0.0,0.0,0.0),
-        LOWER_ARM (0.0,0.0,0.0,-1.0),
-        RAISE_ARM (0.0,0.0,0.0,1.0);
+        LOWER_ARM (0.0,0.0,0.0,1.0),
+        RAISE_ARM (0.0,0.0,0.0,-1.0);
 
         public double k_forward;
         public double k_strafe;
