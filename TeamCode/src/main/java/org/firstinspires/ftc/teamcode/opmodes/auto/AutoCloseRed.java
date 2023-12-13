@@ -23,9 +23,12 @@ public class AutoCloseRed extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         robot = new HardwareRobot(hardwareMap);
         inDep = new InDepSubsystem(
-                robot.arm,
-                robot.claw,
+                robot.arm1,
+                robot.arm2,
+                robot.rightClaw,
+                robot.leftClaw,
                 robot.wrist,
+                robot.elbow,
                 this,
                 telemetry
         );
@@ -44,7 +47,7 @@ public class AutoCloseRed extends LinearOpMode {
                 telemetry,
                 true,
                 this);
-        inDep.close();
+        inDep.closeClaws();
         runtime.reset();
 
         waitForStart();

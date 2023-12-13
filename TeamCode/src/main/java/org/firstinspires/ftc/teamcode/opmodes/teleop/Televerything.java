@@ -1,12 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.checkerframework.checker.units.qual.Speed;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
@@ -23,9 +19,12 @@ public class Televerything extends LinearOpMode {
         HardwareRobot robot = new HardwareRobot(hardwareMap);
         SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
         InDepSubsystem inDep = new InDepSubsystem(
-                robot.arm,
-                robot.claw,
+                robot.arm1,
+                robot.arm2,
+                robot.rightClaw,
+                robot.leftClaw,
                 robot.wrist,
+                robot.elbow,
                 this,
                 telemetry
         );
@@ -98,9 +97,9 @@ public class Televerything extends LinearOpMode {
             // Claw Toggling
             if (gamepad1.y && !clawToggle) {
                 if (inDep.getIsOpen())
-                    inDep.close();
+                    inDep.closeClaws();
                 else {
-                    inDep.open();
+                    inDep.openClaws();
                     // Set Fast Mode
                     SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
                 }
@@ -154,8 +153,8 @@ public class Televerything extends LinearOpMode {
             telemetry.addData("wrist.getPosition: ", robot.wrist.getPosition());
             telemetry.addData("wrist.getPosition: ", robot.wrist.getPosition());
             telemetry.addData("claw.getPosition: ", robot.claw.getPosition());
-            telemetry.addData("arm.getCurrentPosition:", robot.arm.motor.getCurrentPosition());
-            telemetry.addData("arm.getPower: ", robot.arm.motor.getPower());
+            telemetry.addData("arm.getCurrentPosition:", robot.arm1.motor.getCurrentPosition());
+            telemetry.addData("arm.getPower: ", robot.arm1.motor.getPower());
             telemetry.addData("cvDist:", cvDist);
             telemetry.update();
         }

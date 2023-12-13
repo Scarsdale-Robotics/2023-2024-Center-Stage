@@ -5,11 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
-import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
-
-import java.util.ArrayList;
 
 @Autonomous(name = "temp nathan")
 public class nathan extends LinearOpMode {
@@ -19,9 +16,12 @@ public class nathan extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         HardwareRobot robot = new HardwareRobot(hardwareMap);
         InDepSubsystem inDep = new InDepSubsystem(
-                robot.arm,
-                robot.claw,
+                robot.arm1,
+                robot.arm2,
+                robot.rightClaw,
+                robot.leftClaw,
                 robot.wrist,
+                robot.elbow,
                 this,
                 telemetry
         );

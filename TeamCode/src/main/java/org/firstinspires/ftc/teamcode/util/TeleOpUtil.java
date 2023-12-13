@@ -30,13 +30,18 @@ public class TeleOpUtil {
     private double lastTurnStart;
     private double moveInputX;
     private double moveInputY;
+
+
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
         robot = new HardwareRobot(hardwareMap);
         SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
         inDep = new InDepSubsystem(
-                robot.arm,
-                robot.claw,
+                robot.arm1,
+                robot.arm2,
+                robot.rightClaw,
+                robot.leftClaw,
                 robot.wrist,
+                robot.elbow,
                 opMode,
                 telemetry
         );
@@ -63,9 +68,9 @@ public class TeleOpUtil {
 
     private void runArmRigidControl() {
         if (gamepad1.left_bumper) {
-            inDep.setMoveAsyncToPosition(InDepSubsystem.Level.GROUND.target);
-        } else if (gamepad2.right_bumper) {
-            inDep.setMoveAsyncToPosition(InDepSubsystem.Level.BACKBOARD2.target);
+            inDep.lowerArm();
+        } else if (gamepad1.right_bumper) {
+            inDep.raiseArm();
         }
 //        if (gamepad1.right_bumper)
 //            inDep.raiseArm();
@@ -178,9 +183,9 @@ public class TeleOpUtil {
 
         if (gamepad1.y && !clawToggle) {
             if (inDep.getIsOpen())
-                inDep.close();
+                inDep.closeClaws();
             else {
-                inDep.open();
+                inDep.openClaws();
                 // automagically set fast mode after release
                 SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
             }
