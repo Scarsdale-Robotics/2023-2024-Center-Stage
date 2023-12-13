@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
 
-@Autonomous(name = "Auto Far Blue")
-public class AutoFarBlue extends LinearOpMode {
+@Autonomous(name = "Auto Close Red")
+public class AutoCloseRed extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
     private HardwareRobot robot;
     private InDepSubsystem inDep;
@@ -42,7 +42,7 @@ public class AutoFarBlue extends LinearOpMode {
                 robot.cameraName,
                 drive,
                 telemetry,
-                false,
+                true,
                 this);
         inDep.close();
         runtime.reset();
@@ -57,64 +57,57 @@ public class AutoFarBlue extends LinearOpMode {
         MovementSequence approachTape = new MovementSequenceBuilder().build(),
                 parkInBackdrop = new MovementSequenceBuilder().build();
 
-        if (propLocation == 0) {
-            // left
-
-            // build the sequence of movements here
-            approachTape = new MovementSequenceBuilder()
-                    .forward(37.7) // moving forward toward the pixel placing area
-                    .turnLeft(90) // turn left 90 degrees
-                    .forward(2.5) // moving forward to the spike mark tape
-                    .right(4.8) // strafe right to place pixel correctly
-                    .openClaw() // open claw to place the pixel
-                    .raiseArm(63) // raise arm
-                    .build();
-            parkInBackdrop = new MovementSequenceBuilder()
-                    .backward(15.4) // move backwards
-                    .right(17.6) // strafe right
-                    .lowerArm(63) // lower arm
-                    .forward(113.7) // move forwards towards the backstage
-                    .turnLeft(183) // turn left 180º (only needed to place pixel)
-                    .backward(19.3) // moving backward towards the backstage
-                    .build();
-
-        } else if (propLocation == 1) {
-            approachTape = new MovementSequenceBuilder()
-                    .forward(24.69) // Moving forward toward the pixel placing area
-                    .backward(1.70) // Move backward to not hit pixel on turn
-                    .raiseArm(63) // raise arm
-                    .build();
-
-            parkInBackdrop = new MovementSequenceBuilder()
-                    .backward(9.26) // Move backward
-                    .right(11.2) // Strafe right
-                    .forward(40.12) // Move forward
-                    .turnLeft(89) // Turn left
-                    .lowerArm(62.86) // Lower arm
-                    .right(1.6) // Strafe right
-                    .forward(129.63) // Move forward
-                    .turnLeft(180) // Turn left
-                    .backward(16.20) // Move backward
-                    .build();
-
-
-        } else if (propLocation == 2) {
+        if (propLocation == 2) { // right
             approachTape = new MovementSequenceBuilder()
                     .forward(24.69) // Moving forward toward the pixel placing area
                     .forward(0.03) // Brake
-                    .turnRight(85.5) // Turn right
-                    .backward(6.48) // Moving back to center
-                    .forward(0.31) // Brake
-                    .left(3.2) // Strafe left
+                    .turnRight(85.8) // Turn right 90 degrees
+                    .backward(4.63) // Moving forward (or backward) to the spike mark tape
+                    .forward(0.03) // Brake
+                    .left(0.0) // Strafe left to place pixel correctly
                     .raiseArm(57.14) // Raise claw
                     .build();
 
             parkInBackdrop = new MovementSequenceBuilder()
-                    .left(16.0) // Strafe left
-                    .backward(115.74) // Move backward
+                    .right(19.2) // Strafe right
+                    .forward(30.86) // Move forward
+                    .turnLeft(185.5) // Turn left
+                    .backward(16.98) // Move backward
+                    .closeClaw() // Close claw
+                    .lowerArm(57.14) // Lower claw
+                    .build();
+        } else if (propLocation == 1) { // center
+            approachTape = new MovementSequenceBuilder()
+                    .forward(20.67) // Moving forward toward the pixel placing area
+                    .raiseArm(57.14) // Raise claw
+                    .build();
+
+            parkInBackdrop = new MovementSequenceBuilder()
+                    .backward(32.41) // Move backward
+                    .turnLeft(87.8) // Turn left
+                    .backward(43.21) // Move backward
+                    .closeClaw() // Close claw
+                    .lowerArm(57.14) // Lower claw
+                    .build();
+        } else if (propLocation == 0) { // left
+            approachTape = new MovementSequenceBuilder()
+                    .forward(24.69) // Moving forward toward the pixel placing area
+                    .turnLeft(88.8) // Turn left
+                    .forward(2.47) // Moving back/approach
+                    .forward(0.31) // Brake
+                    .right(0.0) // Strafe right
+                    .raiseArm(57.14) // Raise claw
+                    .build();
+
+            parkInBackdrop = new MovementSequenceBuilder()
+                    .backward(7.72) // Move backward
+                    .left(22.4) // Strafe left
+                    .backward(37.04) // Move backward
+                    .closeClaw() // Close claw
                     .lowerArm(57.14) // Lower claw
                     .build();
         }
+
 
         // perform the actual movements here in sequence
         drive.followMovementSequence(approachTape);

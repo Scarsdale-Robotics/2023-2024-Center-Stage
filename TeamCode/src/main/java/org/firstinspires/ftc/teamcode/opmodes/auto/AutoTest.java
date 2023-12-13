@@ -58,7 +58,7 @@ public class AutoTest extends LinearOpMode {
                 .openClaw()
                 .sleepFor(500)
                 .closeClaw()
-                .sleepFor(5000)
+                .sleepFor(2000)
                 .openClaw()
                 .sleepFor(500)
                 .closeClaw()
