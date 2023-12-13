@@ -71,12 +71,12 @@ public class DriveSubsystem extends SubsystemBase {
      */
     public void driveByEncoder(double rightSpeed, double forwardSpeed, double turnSpeed, double ticks) {
         double startEncoder = rightBack.getCurrentPosition(), targetEncoder = startEncoder + ticks;
-        double kP = 0.01, d_error = 10.0, kV, delta; // kP will need tuning
+        double kP = 1, d_error = 10.0, kV, delta; // kP will need tuning
 
         while (opMode.opModeIsActive() && Math.abs(rightBack.getCurrentPosition() - startEncoder) < ticks) {
             delta = Math.abs(targetEncoder - rightBack.getCurrentPosition() + d_error);
             kV = Math.min(1.0, delta * kP);
-            driveRobotCentric(rightSpeed * kV, forwardSpeed * kV, turnSpeed * kV);
+            driveRobotCentric(rightSpeed, forwardSpeed, turnSpeed);
         }
 
         controller.stop();

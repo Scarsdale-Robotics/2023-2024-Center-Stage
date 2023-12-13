@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
 
-@Autonomous(name = "Auto Far Blue")
-public class AutoFarBlue extends LinearOpMode {
+@Autonomous(name = "Auto Test")
+public class AutoTest extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
     private HardwareRobot robot;
     private InDepSubsystem inDep;
@@ -49,47 +49,31 @@ public class AutoFarBlue extends LinearOpMode {
 
         waitForStart();
 
-        sleepFor(500);
+        // build a MovementSequence here
+        MovementSequence testSequence = new MovementSequenceBuilder()
+                .forward(12)
+                .backward(12)
+                .left(12)
+                .right(12)
+                .openClaw()
+                .sleepFor(500)
+                .closeClaw()
+                .sleepFor(5000)
+                .openClaw()
+                .sleepFor(500)
+                .closeClaw()
+                .turnRight(90)
+                .turnLeft(90)
+                .raiseArm(60)
+                .lowerArm(60)
+                .build();
 
-        // Start actual Auto now | cv
-        int propLocation = cv.getPropLocation();
+        telemetry.addData("aaron's mother","");
+        telemetry.update();
 
-        MovementSequence approachTape = new MovementSequenceBuilder().build(),
-                parkInBackdrop = new MovementSequenceBuilder().build();
-
-        if (propLocation == 0) {
-            // left
-
-            // build the sequence of movements here
-            approachTape = new MovementSequenceBuilder()
-                    .forward(37.7) // moving forward toward the pixel placing area
-                    .turnLeft(90) // turn left 90 degrees
-                    .forward(2.5) // moving forward to the spike mark tape
-                    .right(4.8) // strafe right to place pixel correctly
-                    .openClaw() // open claw to place the pixel
-                    .raiseArm(63) // raise arm
-                    .build();
-            parkInBackdrop = new MovementSequenceBuilder()
-                    .backward(15.4) // move backwards
-                    .right(17.6) // strafe right
-                    .lowerArm(63) // lower arm
-                    .forward(113.7) // move forwards towards the backstage
-                    .turnLeft(183) // turn left 180º (only needed to place pixel)
-                    .backward(19.3) // moving backward towards the backstage
-                    .build();
-
-        } else if (propLocation == 1) {
-            // center
-
-        } else if (propLocation == 2) {
-            // right
-
-        }
-
-        // perform the actual movements here in sequence
-        drive.followMovementSequence(approachTape);
-        drive.followMovementSequence(parkInBackdrop);
-
+//         perform the actual movements here in sequence
+        drive.followMovementSequence(testSequence);
+        sleepFor(690);
         stopRobot();
     }
 
