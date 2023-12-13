@@ -152,10 +152,33 @@ public class Televerything extends LinearOpMode {
             telemetry.addData("turnInput: ", turnInput);
             telemetry.addData("wrist.getPosition: ", robot.wrist.getPosition());
             telemetry.addData("wrist.getPosition: ", robot.wrist.getPosition());
-            telemetry.addData("claw.getPosition: ", robot.claw.getPosition());
+            telemetry.addData("leftClaw.getPosition: ", robot.leftClaw.getPosition());
+            telemetry.addData("rightClaw.getPosition: ", robot.rightClaw.getPosition());
             telemetry.addData("arm.getCurrentPosition:", robot.arm1.motor.getCurrentPosition());
             telemetry.addData("arm.getPower: ", robot.arm1.motor.getPower());
             telemetry.addData("cvDist:", cvDist);
+            telemetry.addData("rotOff: ",cv.getAprilTagRotationalOffset(isRedTeam ? 5 : 2));
+
+
+            telemetry.addData("⠀⢸⠂⠀⠀⠀⠘⣧⠀⠀⣟⠛⠲⢤⡀⠀⠀⣰⠏⠀⠀⠀⠀⠀⢹⡀", 0);
+            telemetry.addData("⠀⡿⠀⠀⠀⠀⠀⠈⢷⡀⢻⡀⠀⠀⠙⢦⣰⠏⠀⠀⠀⠀⠀⠀⢸⠀", 0);
+            telemetry.addData("⠀⡇⠀⠀⠀⠀⠀⠀⢀⣻⠞⠛⠀⠀⠀⠀⠻⠀⠀⠀⠀⠀⠀⠀⢸⠀", 0);
+            telemetry.addData("⠀⡇⠀⠀⠀⠀⠀⠀⠛⠓⠒⠓⠓⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀", 0);
+            telemetry.addData("⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⠀", 0);
+            telemetry.addData("⠀⢿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⠀⠀⢀⡟⠀", 0);
+            telemetry.addData("⠀⠘⣇⠀⠘⣿⠋⢹⠛⣿⡇⠀⠀⠀⠀⣿⣿⡇⠀⢳⠉⠀⣠⡾⠁⠀", 0);
+            telemetry.addData("⣦⣤⣽⣆⢀⡇⠀⢸⡇⣾⡇⠀⠀⠀⠀⣿⣿⡷⠀⢸⡇⠐⠛⠛⣿⠀", 0);
+            telemetry.addData("⠹⣦⠀⠀⠸⡇⠀⠸⣿⡿⠁⢀⡀⠀⠀⠿⠿⠃⠀⢸⠇⠀⢀⡾⠁⠀", 0);
+            telemetry.addData("⠀⠈⡿⢠⢶⣡⡄⠀⠀⠀⠀⠉⠁⠀⠀⠀⠀⠀⣴⣧⠆⠀⢻⡄⠀⠀", 0);
+            telemetry.addData("⠀⢸⠃⠀⠘⠉⠀⠀⠀⠠⣄⡴⠲⠶⠴⠃⠀⠀⠀⠉⡀⠀⠀⢻⡄⠀", 0);
+            telemetry.addData("⠀⠘⠒⠒⠻⢦⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣤⠞⠛⠒⠛⠋⠁⠀", 0);
+            telemetry.addData("⠀⠀⠀⠀⠀⠀⠸⣟⠓⠒⠂⠀⠀⠀⠀⠀⠈⢷⡀⠀⠀⠀⠀⠀⠀⠀", 0);
+            telemetry.addData("⠀⠀⠀⠀⠀⠀⠀⠙⣦⠀⠀⠀⠀⠀⠀⠀⠀⠈⢷⠀⠀⠀⠀⠀⠀⠀", 0);
+            telemetry.addData("⠀⠀⠀⠀⠀⠀⠀⣼⣃⡀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣆⠀⠀⠀⠀⠀⠀", 0);
+            telemetry.addData("⠀⠀⠀⠀⠀⠀⠀⠉⣹⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⠀⠀⠀⠀⠀⠀", 0);
+            telemetry.addData("⠀⠀⠀⠀⠀⠀⠀⠀⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡆⠀⠀⠀⠀⠀", 0);
+
+
             telemetry.update();
         }
     }

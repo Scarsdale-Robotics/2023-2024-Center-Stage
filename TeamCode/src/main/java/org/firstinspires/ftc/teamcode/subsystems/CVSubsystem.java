@@ -28,19 +28,19 @@ public class CVSubsystem extends SubsystemBase {
     private OpenCvCamera camera;
     private DriveSubsystem drive;
 
-    private final int SAMPLE_COUNT = 200;
-    private final long SAMPLE_WAIT_MILLISECONDS = 25;
-    private final int LOCATION_LEFT   =  0;
-    private final int LOCATION_CENTER =  1;
-    private final int LOCATION_RIGHT  =  2;
-    private final int NO_LOCATION     = -1;
+    public final int SAMPLE_COUNT = 200;
+    public final long SAMPLE_WAIT_MILLISECONDS = 25;
+    public final int LOCATION_LEFT   =  0;
+    public final int LOCATION_CENTER =  1;
+    public final int LOCATION_RIGHT  =  2;
+    public final int NO_LOCATION     = -1;
     private Telemetry telemetry;
     final private ElapsedTime runtime = new ElapsedTime();
 
-    private final double NO_ROTATIONAL_OFFSET = -50000.0;
-    private final double NO_DISTANCE = -50000.0;
-    private final double ERROR   =  3.0;
-    private final double ERROR_ALIGNMENT = 2;
+    public final double NO_ROTATIONAL_OFFSET = -50000.0;
+    public final double NO_DISTANCE = -50000.0;
+    public final double ERROR   =  3.0;
+    public final double ERROR_ALIGNMENT = 4;
 
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
