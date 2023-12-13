@@ -15,8 +15,9 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PropDetectionPipeline;
-
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelDetectionPipeline;
+
+import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.WhitePixelDetectionPipeline;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +48,7 @@ public class CVSubsystem extends SubsystemBase {
     private final WebcamName cameraName;
     private PropDetectionPipeline propProcessor;
     private PixelDetectionPipeline pixelProcessor;
+    private WhitePixelDetectionPipeline whitePixelProcessor;
     private boolean isRedTeam;
     private LinearOpMode opMode;
     public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
@@ -254,6 +256,11 @@ public class CVSubsystem extends SubsystemBase {
 //        visionPortal.resumeStreaming();
         return pixelProcessor.getCenterOffset();
     }
+
+    public int getWhitePixelHorizontalOffset() {
+        return whitePixelProcessor.getCenterOffset();
+    }
+
     public double getAprilTagHorizontalOffset(int tagID) {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
@@ -290,6 +297,19 @@ public class CVSubsystem extends SubsystemBase {
             else
                 drive.driveFieldCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
             pixelOffset = getPixelHorizontalOffset();
+        }
+    }
+
+    public void moveToWhitePixel() {
+        double ERROR_THRESHOLD = 50;
+
+        int pixelOffset = getWhitePixelHorizontalOffset();
+        while (Math.abs(pixelOffset) > ERROR_THRESHOLD) {
+            if (pixelOffset < 0)
+                drive.driveRobotCentric(1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+            else
+                drive.driveFieldCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+            pixelOffset = getWhitePixelHorizontalOffset();
         }
     }
 
