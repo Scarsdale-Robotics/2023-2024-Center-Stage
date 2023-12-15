@@ -116,12 +116,18 @@ public class DriveSubsystem extends SubsystemBase {
                 sleepFor(movement.WAIT);
             }
 
-            if (type == Movement.MovementType.CLOSE_CLAW) {
-                inDep.close();
+            if (type == Movement.MovementType.CLOSE_CLAW_RIGHT) {
+                inDep.closeRightClaw();
+            }
+            if (type == Movement.MovementType.OPEN_CLAW_RIGHT) {
+                inDep.openRightClaw();
             }
 
-            if (type == Movement.MovementType.OPEN_CLAW) {
-                inDep.open();
+            if (type == Movement.MovementType.CLOSE_CLAW_LEFT) {
+                inDep.closeLeftClaw();
+            }
+            if (type == Movement.MovementType.OPEN_CLAW_LEFT) {
+                inDep.openLeftClaw();
             }
         }
 

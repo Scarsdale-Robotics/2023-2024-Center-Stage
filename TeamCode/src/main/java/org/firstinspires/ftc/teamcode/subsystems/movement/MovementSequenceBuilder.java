@@ -93,7 +93,7 @@ public class MovementSequenceBuilder {
      * @param inchesRight        How much the robot should strafe right in inches.
      */
     public MovementSequenceBuilder backwardRight(double inchesBackward, double inchesRight) {
-        movements.add(new Movement(Movement.MovementType.BACKWARD_RIGHT, inchesForward, inchesRight, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.BACKWARD_RIGHT, inchesBackward, inchesRight, 0, 0, 0));
         return this;
     }
 
@@ -127,7 +127,16 @@ public class MovementSequenceBuilder {
     /**
      * Appends an open claw event to the MovementSequenceBuilder.
      */
-    public MovementSequenceBuilder openClaw() {
+    public MovementSequenceBuilder openClaws() {
+        movements.add(new Movement(Movement.MovementType.OPEN_CLAW, 0, 0, 0, 0, 0));
+        return this;
+    }
+
+    public MovementSequenceBuilder openClawLeft() {
+        movements.add(new Movement(Movement.MovementType.OPEN_CLAW, 0, 0, 0, 0, 0));
+        return this;
+    }
+    public MovementSequenceBuilder openClawRight() {
         movements.add(new Movement(Movement.MovementType.OPEN_CLAW, 0, 0, 0, 0, 0));
         return this;
     }

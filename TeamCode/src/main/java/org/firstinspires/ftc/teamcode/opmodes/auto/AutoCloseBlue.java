@@ -55,19 +55,26 @@ public class AutoCloseBlue extends LinearOpMode {
         sleepFor(500);
 
         // Start actual Auto now | cv
-        int propLocation = cv.getPropLocation();
-
-        MovementSequence approachTape = new MovementSequenceBuilder().build(),
-                parkInBackdrop = new MovementSequenceBuilder().build();
-
         MovementSequence initCV = new MovementSequenceBuilder()
                 .left(4.16) // Strafe left
                 .forward(10.80) // Move forward
                 .build();
+        drive.followMovementSequence(initCV);
+        int propLocation = cv.getPropLocation();
+
+        MovementSequence placePurple = new MovementSequenceBuilder().build(),
+                moveToBackdrop = new MovementSequenceBuilder().build(),
+                placeYellow = new MovementSequenceBuilder().build();
+
 
         if (propLocation == 0) {
             // left
-
+            placeYellow = new MovementSequenceBuilder()
+                    .forwardLeft(20, 46) // place yellow first, move to backdrop
+                    .turnRight(90) // face back to backdrop to place on backdrop
+                    .raiseArm(120) // raise arm to place pixel
+                    .openClaw() // drop yellow pixel
+                    .build();
             // build the sequence of movements here
             approachTape = new MovementSequenceBuilder()
                     .forward(22.22) // Moving forward toward the pixel placing area

@@ -66,44 +66,51 @@ public class AutoFarBlue extends LinearOpMode {
 
             // build the sequence of movements here
             placePurple = new MovementSequenceBuilder()
-                    .forward(37.7) // moving forward toward the pixel placing area
+                    .forward(50) // moving forward toward the pixel placing area
                     .turnLeft(90) // turn left 90 degrees
-                    .forwardRight(2.5, 4.8) // align with tape
+                    .forward(2.5) // align with tape
                     .openClaw() // open claw to place the pixel
-                    .raiseArm(63) // raise arm
+                    .raiseArm(63) // raise arm to not hit pixel
                     .build();
             moveToBackdrop = new MovementSequenceBuilder()
-                    .backwardRight(15.4, 17.6) // move to align with truss
+                    .backward(5) // move backwards to not hid pixel
+                    .right(26) // move to align with truss
                     .lowerArm(63) // lower arm
-                    .forward(113.7) // move forwards towards the backstage
-                    .turnLeft(183) // turn left 180º (only needed to place pixel)
+                    .forward(72) // move forwards towards the backdrop
+                    .turnLeft(180) // turn left 180º for pixel placement
+                    .build();
+            placeYellow = new MovementSequenceBuilder()
+                    .backwardRight(11, 28) // moving backward towards the backdrop
+                    // include some april tag alignment maybe
+                    .raiseArm(120) // raise to place on backdrop
+                    .openClaw() // release pixel
+                    .left(30) // move to park
+                    .lowerArm(120) // lower arm after pixel release
+                    .closeClaw() // close claw
+                    .turnLeft(90)  // face correct direction for tele-op start
+                    .left(11.1) // park next to wall
+                    .build();
+        } else if (propLocation == 1) {
+
+            //WIP
+            placePurple = new MovementSequenceBuilder()
+                    .forward(26.69) // Moving forward toward the pixel placing area
+                    .openClaw() // place pixel
+                    .backward(5) // Move backward to not hit pixel on turn
+                    .raiseArm(63) // raise arm to not hit pixel on term
+                    .build();
+            moveToBackdrop = new MovementSequenceBuilder()
+                    .forwardRight(24, 24)
                     .build();
             placeYellow = new MovementSequenceBuilder()
                     .backwardRight(19.3, 12.3) // moving backward towards the backdrop
-                    .raiseArm(120)
-                    .openClaw()
-                    .lowerArm(120)
-                    .closeClaw()
-                    .turnLeft(90)
-                    .build();
-
-        } else if (propLocation == 1) {
-            placePurple = new MovementSequenceBuilder()
-                    .forward(24.69) // Moving forward toward the pixel placing area
-                    .backward(1.70) // Move backward to not hit pixel on turn
-                    .raiseArm(63) // raise arm
-                    .build();
-
-            moveToBackdrop = new MovementSequenceBuilder()
-                    .backward(9.26) // Move backward
-                    .right(11.2) // Strafe right
-                    .forward(40.12) // Move forward
-                    .turnLeft(89) // Turn left
-                    .lowerArm(62.86) // Lower arm
-                    .right(1.6) // Strafe right
-                    .forward(129.63) // Move forward
-                    .turnLeft(180) // Turn left
-                    .backward(16.20) // Move backward
+                    .raiseArm(120) // raise to place on backdrop
+                    .openClaw() // release pixel
+                    .lowerArm(120) // rotate arm after pixel release
+                    .left(10) // move to park
+                    .closeClaw() // close claw
+                    .turnLeft(90)  // face correct direction for tele-op start
+                    .left(20)  // park next to wall
                     .build();
 
 
