@@ -2,6 +2,10 @@ package org.firstinspires.ftc.teamcode.subsystems.movement;
 
 public class Movement {
     public enum MovementType {
+        FORWARD_RIGHT (1.0,1.0,0.0,0.0),
+        FORWARD_LEFT (1.0,-1.0,0.0,0.0),
+        BACKWARD_RIGHT (-1.0,1.0,0.0,0.0),
+        BACKWARD_LEFT (-1.0,-1.0,0.0,0.0),
         FORWARD (1.0,0.0,0.0,0.0),
         BACKWARD (-1.0,0.0,0.0,0.0),
         STRAFE_LEFT (0.0,-1.0,0.0,0.0),
