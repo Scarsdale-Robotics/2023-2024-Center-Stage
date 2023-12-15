@@ -49,6 +49,8 @@ public class WhitePixelDetectionPipeline implements VisionProcessor {
     public int posX = -999;
     public int posY = -999;
 
+    public int getCameraWidth() {return width;}
+
     public int getCenterOffset() {
         return centerOffset;
     }
