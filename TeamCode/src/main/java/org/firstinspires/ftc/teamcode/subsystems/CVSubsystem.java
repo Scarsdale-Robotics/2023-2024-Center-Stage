@@ -261,6 +261,10 @@ public class CVSubsystem extends SubsystemBase {
         return whitePixelProcessor.getCenterOffset();
     }
 
+    public int getCameraWidth() {
+        return whitePixelProcessor.getCameraWidth();
+    }
+
     public double getAprilTagHorizontalOffset(int tagID) {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
@@ -292,23 +296,25 @@ public class CVSubsystem extends SubsystemBase {
 
         int pixelOffset = getPixelHorizontalOffset();
         while (Math.abs(pixelOffset) > ERROR_THRESHOLD) {
-            if (pixelOffset < 0)
+            if (pixelOffset < 0){
                 drive.driveRobotCentric(1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
-            else
+            }else{
                 drive.driveFieldCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+            }
             pixelOffset = getPixelHorizontalOffset();
         }
     }
 
     public void moveToWhitePixel() {
         double ERROR_THRESHOLD = 50;
-
+        int width = getCameraWidth();
         int pixelOffset = getWhitePixelHorizontalOffset();
         while (Math.abs(pixelOffset) > ERROR_THRESHOLD) {
-            if (pixelOffset < 0)
-                drive.driveRobotCentric(1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
-            else
-                drive.driveFieldCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+            if (pixelOffset < 0){
+                drive.driveRobotCentric((Math.abs(pixelOffset)*2/width) * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+            }else{
+                drive.driveFieldCentric(-(Math.abs(pixelOffset)*2/width) * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+            }
             pixelOffset = getWhitePixelHorizontalOffset();
         }
     }
