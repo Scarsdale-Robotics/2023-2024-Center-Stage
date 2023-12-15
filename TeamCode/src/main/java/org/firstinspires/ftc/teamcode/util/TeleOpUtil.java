@@ -26,17 +26,25 @@ public class TeleOpUtil {
     private boolean omniToggle = false;
     public boolean omniMode = false;
     public boolean aprilTagAlignToggle = false;
+    public boolean alignAprilTagRunning = false;
+    public boolean macrosRunning = true;
+    public boolean alignPixelRunning = false;
     private Telemetry telemetry;
     private double lastTurnStart;
     private double moveInputX;
     private double moveInputY;
+    public int macroCapacity = 0;
+
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
         robot = new HardwareRobot(hardwareMap);
         SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
         inDep = new InDepSubsystem(
-                robot.arm,
-                robot.claw,
+                robot.arm1,
+                robot.arm2,
+                robot.rightClaw,
+                robot.leftClaw,
                 robot.wrist,
+                robot.elbow,
                 opMode,
                 telemetry
         );
@@ -63,9 +71,9 @@ public class TeleOpUtil {
 
     private void runArmRigidControl() {
         if (gamepad1.left_bumper) {
-            inDep.setMoveAsyncToPosition(InDepSubsystem.Level.GROUND.target);
-        } else if (gamepad2.right_bumper) {
-            inDep.setMoveAsyncToPosition(InDepSubsystem.Level.BACKBOARD2.target);
+            inDep.lowerArm();
+        } else if (gamepad1.right_bumper) {
+            inDep.raiseArm();
         }
 //        if (gamepad1.right_bumper)
 //            inDep.raiseArm();
@@ -80,6 +88,7 @@ public class TeleOpUtil {
      * controls are for testing as well
      */
     private void runAprilTagAlignmentControl() {
+        // are we still using this? This was april tag position checker
         if (gamepad1.dpad_right) cv.moveToAprilTag(1);  // feel free to adjust id from 1-6 inclusive
     }
 
@@ -106,14 +115,36 @@ public class TeleOpUtil {
 //            }
 //        };
 //    }
+    private void macroFailSafe() {
+        macroCapacity++;
+        if (gamepad1.dpad_left) {
+            macrosRunning = false;
+            macroCapacity = 0;
+        } else if (macroCapacity > 6 && macrosRunning == false) {
+            macrosRunning = true;
+        }
+
+    }
 
     private void runAprilTagParallelAlignControl() {
-        // check alignParallelWithAprilTag() for details
-        if (gamepad1.b && aprilTagAlignToggle == false) {
+        // iterative version
+        if (((gamepad1.b && aprilTagAlignToggle == false) || alignAprilTagRunning == true) && macrosRunning) {
             aprilTagAlignToggle = true;
-            cv.alignParallelWithAprilTag(isRedTeam ? 5 : 2);
+            alignAprilTagRunning = true;
+            //cv.alignParallelWithAprilTag(isRedTeam ? 5 : 2);
+            double rotOff = cv.getAprilTagRotationalOffset(isRedTeam ? 5 : 2);
+            if (Math.abs(rotOff) < cv.ERROR_ALIGNMENT) {
+                alignAprilTagRunning = false;
+            } else if (rotOff < 0 && rotOff != cv.NO_ROTATIONAL_OFFSET) {
+                drive.driveFieldCentric(0, 0, rotOff * 0.1 * SpeedCoefficients.getTurnSpeed());
+            } else if (rotOff > 0 && rotOff != cv.NO_ROTATIONAL_OFFSET) {
+                drive.driveFieldCentric(0, 0, rotOff * 0.1 * SpeedCoefficients.getTurnSpeed());
+            }
         }
-        if (!gamepad1.b) aprilTagAlignToggle = false;
+        if ((!gamepad1.b && !alignAprilTagRunning) || !macrosRunning) {
+            aprilTagAlignToggle = false;
+            alignAprilTagRunning = false;
+        }
     }
 
     /**
@@ -121,7 +152,23 @@ public class TeleOpUtil {
      * also don't question the one-line methods... have to keep a consistent style...
      */
     private void runPixelAlignmentControl() {
-        if (gamepad1.b) cv.moveToPixel();
+        if ((gamepad1.b) || (alignPixelRunning == true && macrosRunning)) {
+            double ERROR_THRESHOLD = 50;
+            alignPixelRunning = true;
+            int pixelOffset = cv.getPixelHorizontalOffset();
+            if (Math.abs(pixelOffset) <= ERROR_THRESHOLD) {
+                alignPixelRunning = false;
+            } else if (1 == 0) {
+                cv.moveToPixel(); // old ver. unused
+            } else if (1 == 1) {
+                if (pixelOffset < 0)
+                    drive.driveRobotCentric(1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+                else
+                    drive.driveFieldCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+            }
+        }
+        if (!macrosRunning) alignPixelRunning = false;
+
     }
 
     /**
@@ -178,9 +225,9 @@ public class TeleOpUtil {
 
         if (gamepad1.y && !clawToggle) {
             if (inDep.getIsOpen())
-                inDep.close();
+                inDep.closeClaws();
             else {
-                inDep.open();
+                inDep.openClaws();
                 // automagically set fast mode after release
                 SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
             }
@@ -209,6 +256,7 @@ public class TeleOpUtil {
         telemetry.addData("cvDist:", cvDist);
         telemetry.addData("arm pos:", inDep.getArmPosition());
         telemetry.addData("claw open:", inDep.getIsOpen());
+        telemetry.addData("пуяза 你好何余安", "θωθ");
         telemetry.update();
         runMotionControl();
         runArmClawControl();
@@ -221,7 +269,8 @@ public class TeleOpUtil {
         }
 
         // TODO: uncomment test each method below one-by-one
-//            runAprilTagParallelAlignControl();
+
+        runAprilTagParallelAlignControl();
 //         runAprilTagAlignmentControl();
 //             teamPropLocationControl();
 //         runPixelAlignmentControl();

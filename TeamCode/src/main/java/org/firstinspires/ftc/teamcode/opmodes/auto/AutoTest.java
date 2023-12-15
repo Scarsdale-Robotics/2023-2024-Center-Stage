@@ -23,9 +23,12 @@ public class AutoTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         robot = new HardwareRobot(hardwareMap);
         inDep = new InDepSubsystem(
-                robot.arm,
-                robot.claw,
+                robot.arm1,
+                robot.arm2,
+                robot.rightClaw,
+                robot.leftClaw,
                 robot.wrist,
+                robot.elbow,
                 this,
                 telemetry
         );
@@ -44,7 +47,7 @@ public class AutoTest extends LinearOpMode {
                 telemetry,
                 false,
                 this);
-        inDep.close();
+        inDep.closeClaws();
         runtime.reset();
 
         waitForStart();
@@ -58,7 +61,7 @@ public class AutoTest extends LinearOpMode {
                 .openClaw()
                 .sleepFor(500)
                 .closeClaw()
-                .sleepFor(5000)
+                .sleepFor(2000)
                 .openClaw()
                 .sleepFor(500)
                 .closeClaw()

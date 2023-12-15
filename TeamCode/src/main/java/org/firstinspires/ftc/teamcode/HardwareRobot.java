@@ -1,35 +1,27 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Bitmap;
-
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.ImuOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.function.Consumer;
-import org.firstinspires.ftc.robotcore.external.function.Continuation;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.opencv.core.Core;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
-import org.openftc.easyopencv.OpenCvPipeline;
-import org.openftc.easyopencv.PipelineRecordingParameters;
 
 public class HardwareRobot {
     public final Motor leftFront;
     public final Motor rightFront;
     public final Motor leftBack;
     public final Motor rightBack;
-    public final Motor arm;
-
-    public final Servo claw;
+    public final Motor arm1;
+    public final Motor arm2;
+    public final Servo elbow;
+    public final Servo leftClaw;
+    public final Servo rightClaw;
     public final Servo wrist;
 
     public final IMU imu;
@@ -76,18 +68,34 @@ public class HardwareRobot {
         leftBack.setPositionTolerance(10);
         rightBack.setPositionTolerance(10);
 
-        arm = new Motor(hardwareMap, "arm", Motor.GoBILDA.RPM_312);
-        arm.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        arm.setRunMode(Motor.RunMode.PositionControl);
-        arm.resetEncoder();
-        arm.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        arm.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        arm.setPositionTolerance(10);
-        arm.setPositionCoefficient(0.01);
+        arm1 = new Motor(hardwareMap, "arm1", Motor.GoBILDA.RPM_312);
+        arm1.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm1.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        arm1.setRunMode(Motor.RunMode.PositionControl);
+        arm1.resetEncoder();
+        arm1.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        arm1.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        arm1.setPositionTolerance(10);
+        arm1.setPositionCoefficient(0.01);
 
-        claw = hardwareMap.servo.get("claw");
-        claw.scaleRange(0, 1);
+        arm2 = new Motor(hardwareMap, "arm2", Motor.GoBILDA.RPM_312);
+        arm2.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm2.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        arm2.setRunMode(Motor.RunMode.PositionControl);
+        arm2.resetEncoder();
+        arm2.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        arm2.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        arm2.setPositionTolerance(10);
+        arm2.setPositionCoefficient(0.01);
+
+        leftClaw = hardwareMap.servo.get("leftClaw");
+        leftClaw.scaleRange(0, 1);
+
+        rightClaw = hardwareMap.servo.get("rightClaw");
+        rightClaw.scaleRange(0, 1);
+
+        elbow = hardwareMap.servo.get("elbow");
+        elbow.scaleRange(0, 1);
 
         wrist = hardwareMap.servo.get("wrist");
         wrist.scaleRange(0, 1);
