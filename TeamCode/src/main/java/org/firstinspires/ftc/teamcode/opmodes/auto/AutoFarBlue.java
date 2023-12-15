@@ -57,38 +57,44 @@ public class AutoFarBlue extends LinearOpMode {
         // Start actual Auto now | cv
         int propLocation = cv.getPropLocation();
 
-        MovementSequence approachTape = new MovementSequenceBuilder().build(),
-                parkInBackdrop = new MovementSequenceBuilder().build();
+        MovementSequence placePurple = new MovementSequenceBuilder().build(),
+                moveToBackdrop = new MovementSequenceBuilder().build(),
+        placeYellow = new MovementSequenceBuilder().build();
 
         if (propLocation == 0) {
             // left
 
             // build the sequence of movements here
-            approachTape = new MovementSequenceBuilder()
+            placePurple = new MovementSequenceBuilder()
                     .forward(37.7) // moving forward toward the pixel placing area
                     .turnLeft(90) // turn left 90 degrees
-                    .forward(2.5) // moving forward to the spike mark tape
-                    .right(4.8) // strafe right to place pixel correctly
+                    .forwardRight(2.5, 4.8) // align with tape
                     .openClaw() // open claw to place the pixel
                     .raiseArm(63) // raise arm
                     .build();
-            parkInBackdrop = new MovementSequenceBuilder()
-                    .backward(15.4) // move backwards
-                    .right(17.6) // strafe right
+            moveToBackdrop = new MovementSequenceBuilder()
+                    .backwardRight(15.4, 17.6) // move to align with truss
                     .lowerArm(63) // lower arm
                     .forward(113.7) // move forwards towards the backstage
                     .turnLeft(183) // turn left 180º (only needed to place pixel)
-                    .backward(19.3) // moving backward towards the backstage
+                    .build();
+            placeYellow = new MovementSequenceBuilder()
+                    .backwardRight(19.3, 12.3) // moving backward towards the backdrop
+                    .raiseArm(120)
+                    .openClaw()
+                    .lowerArm(120)
+                    .closeClaw()
+                    .turnLeft(90)
                     .build();
 
         } else if (propLocation == 1) {
-            approachTape = new MovementSequenceBuilder()
+            placePurple = new MovementSequenceBuilder()
                     .forward(24.69) // Moving forward toward the pixel placing area
                     .backward(1.70) // Move backward to not hit pixel on turn
                     .raiseArm(63) // raise arm
                     .build();
 
-            parkInBackdrop = new MovementSequenceBuilder()
+            moveToBackdrop = new MovementSequenceBuilder()
                     .backward(9.26) // Move backward
                     .right(11.2) // Strafe right
                     .forward(40.12) // Move forward
@@ -102,7 +108,7 @@ public class AutoFarBlue extends LinearOpMode {
 
 
         } else if (propLocation == 2) {
-            approachTape = new MovementSequenceBuilder()
+            placePurple = new MovementSequenceBuilder()
                     .forward(24.69) // Moving forward toward the pixel placing area
                     .forward(0.03) // Brake
                     .turnRight(85.5) // Turn right
@@ -112,7 +118,7 @@ public class AutoFarBlue extends LinearOpMode {
                     .raiseArm(57.14) // Raise claw
                     .build();
 
-            parkInBackdrop = new MovementSequenceBuilder()
+            moveToBackdrop = new MovementSequenceBuilder()
                     .left(16.0) // Strafe left
                     .backward(115.74) // Move backward
                     .lowerArm(57.14) // Lower claw
@@ -120,8 +126,9 @@ public class AutoFarBlue extends LinearOpMode {
         }
 
         // perform the actual movements here in sequence
-        drive.followMovementSequence(approachTape);
-        drive.followMovementSequence(parkInBackdrop);
+        drive.followMovementSequence(placePurple);
+        drive.followMovementSequence(moveToBackdrop);
+        drive.followMovementSequence(placeYellow);
 
         stopRobot();
     }
