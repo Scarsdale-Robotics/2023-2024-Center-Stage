@@ -15,6 +15,11 @@ import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import java.util.ArrayDeque;
 
 public class DriveSubsystem extends SubsystemBase {
+    private static final double Kp = 0.01;
+    private static final double Ki = 0;
+    private static final double Kd = 0;
+    private final double errorTolerance_p = 5.0;
+    private final double errorTolerance_v = 0.05;
     private static final double TICKS_PER_INCH_FORWARD = 32.4;
     private static final double TICKS_PER_INCH_STRAFE = 62.5;
     private static final double TICKS_PER_DEGREE_TURN = 10.0;
@@ -70,13 +75,18 @@ public class DriveSubsystem extends SubsystemBase {
      * @param ticks          How far the robot should move.
      */
     public void driveByEncoder(double rightSpeed, double forwardSpeed, double turnSpeed, double ticks) {
-        double startEncoder = rightBack.getCurrentPosition(), targetEncoder = startEncoder + ticks;
-        double kP = 1, d_error = 10.0, kV, delta; // kP will need tuning
+        double startEncoder = rightBack.getCurrentPosition();
+        double setPoint = startEncoder + ticks;
+        double pidMultiplier;
+        PIDController pidController = new PIDController(Kp, Ki, Kd, setPoint);
 
-        while (opMode.opModeIsActive() && Math.abs(rightBack.getCurrentPosition() - startEncoder) < ticks) {
-            delta = Math.abs(targetEncoder - rightBack.getCurrentPosition() + d_error);
-            kV = Math.min(1.0, delta * kP);
-            driveRobotCentric(rightSpeed, forwardSpeed, turnSpeed);
+        while (
+                opMode.opModeIsActive() &&
+                Math.abs(setPoint-getWheelPosition()) > errorTolerance_p &&
+                Math.abs(getWheelVelocity()) > errorTolerance_v
+        ) {
+            pidMultiplier = pidController.update(rightBack.getCurrentPosition());
+            driveRobotCentric(rightSpeed * pidMultiplier, forwardSpeed * pidMultiplier, turnSpeed * pidMultiplier);
         }
 
         controller.stop();
@@ -142,6 +152,13 @@ public class DriveSubsystem extends SubsystemBase {
      */
     public int getWheelPosition() {
         return rightBack.getCurrentPosition();
+    }
+
+    /**
+     * @return the current power of the robot's wheels.
+     */
+    public double getWheelVelocity() {
+        return rightBack.getCorrectedVelocity();
     }
 
     public void resetIMU() {

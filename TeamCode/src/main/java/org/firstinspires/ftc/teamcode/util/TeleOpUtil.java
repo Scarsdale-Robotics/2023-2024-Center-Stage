@@ -224,10 +224,10 @@ public class TeleOpUtil {
         // CLAW TOGGLE CONTROL
 
         if (gamepad1.y && !clawToggle) {
-            if (inDep.getIsOpen())
-                inDep.closeClaws();
+            if (inDep.getIsLeftClawOpen())
+                inDep.close();
             else {
-                inDep.openClaws();
+                inDep.open();
                 // automagically set fast mode after release
                 SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
             }
@@ -255,13 +255,13 @@ public class TeleOpUtil {
         double cvDist = cv.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
         telemetry.addData("cvDist:", cvDist);
         telemetry.addData("arm pos:", inDep.getArmPosition());
-        telemetry.addData("claw open:", inDep.getIsOpen());
+        telemetry.addData("claw open:", inDep.getIsLeftClawOpen());
         telemetry.addData("пуяза 你好何余安", "θωθ");
         telemetry.update();
         runMotionControl();
         runArmClawControl();
         inDep.tickMoveAsyncToPosition(SpeedCoefficients.getArmSpeed(), gamepad1.a);
-        if (!gamepad2.x && !gamepad1.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsOpen()) {
+        if (!gamepad2.x && !gamepad1.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsLeftClawOpen()) {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
         } else if (gamepad1.x || gamepad2.x) {
             gamepad1.rumble(500); // big bomboclat

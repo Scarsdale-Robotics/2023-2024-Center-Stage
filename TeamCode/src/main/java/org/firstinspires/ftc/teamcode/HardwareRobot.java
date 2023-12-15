@@ -71,7 +71,7 @@ public class HardwareRobot {
         arm1 = new Motor(hardwareMap, "arm1", Motor.GoBILDA.RPM_312);
         arm1.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         arm1.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        arm1.setRunMode(Motor.RunMode.PositionControl);
+        arm1.setRunMode(Motor.RunMode.VelocityControl);
         arm1.resetEncoder();
         arm1.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         arm1.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
@@ -81,7 +81,7 @@ public class HardwareRobot {
         arm2 = new Motor(hardwareMap, "arm2", Motor.GoBILDA.RPM_312);
         arm2.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         arm2.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        arm2.setRunMode(Motor.RunMode.PositionControl);
+        arm2.setRunMode(Motor.RunMode.VelocityControl);
         arm2.resetEncoder();
         arm2.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         arm2.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
@@ -89,16 +89,15 @@ public class HardwareRobot {
         arm2.setPositionCoefficient(0.01);
 
         leftClaw = hardwareMap.servo.get("leftClaw");
-        leftClaw.scaleRange(0, 1);
-
         rightClaw = hardwareMap.servo.get("rightClaw");
-        rightClaw.scaleRange(0, 1);
-
+        wrist = hardwareMap.servo.get("wrist");
         elbow = hardwareMap.servo.get("elbow");
+
+        leftClaw.scaleRange(0, 1);
+        rightClaw.scaleRange(0, 1);
+        wrist.scaleRange(0, 1);
         elbow.scaleRange(0, 1);
 
-        wrist = hardwareMap.servo.get("wrist");
-        wrist.scaleRange(0, 1);
 
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.FORWARD;

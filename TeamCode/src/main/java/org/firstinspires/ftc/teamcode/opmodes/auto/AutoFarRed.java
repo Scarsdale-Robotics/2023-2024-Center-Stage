@@ -46,7 +46,7 @@ public class AutoFarRed extends LinearOpMode {
                 telemetry,
                 true,
                 this);
-        inDep.closeClaws();
+        inDep.close();
         runtime.reset();
 
         waitForStart();
@@ -74,7 +74,7 @@ public class AutoFarRed extends LinearOpMode {
                     .build();
 
             parkInBackdrop = new MovementSequenceBuilder()
-                    .backward(15.43) // Move backward
+                    .backward(15.43) // Move backward bomboclat
                     .left(20.0) // Strafe left
                     .lowerArm(62.86) // Lower claw
                     .forward(15.43) // Move forward

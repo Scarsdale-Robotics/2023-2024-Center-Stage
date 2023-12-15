@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.teleop;
+package org.firstinspires.ftc.teamcode.opmodes.telemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -96,10 +96,10 @@ public class Televerything extends LinearOpMode {
 
             // Claw Toggling
             if (gamepad1.y && !clawToggle) {
-                if (inDep.getIsOpen())
-                    inDep.closeClaws();
+                if (inDep.getIsLeftClawOpen())
+                    inDep.close();
                 else {
-                    inDep.openClaws();
+                    inDep.open();
                     // Set Fast Mode
                     SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
                 }
@@ -129,7 +129,7 @@ public class Televerything extends LinearOpMode {
             cvDist = cv.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
 
             // Crash Prevention
-            if (!gamepad2.x && !gamepad1.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsOpen()) {
+            if (!gamepad2.x && !gamepad1.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsLeftClawOpen()) {
                 SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
             } else if (gamepad1.x || gamepad2.x) {
                 gamepad1.rumble(500);
