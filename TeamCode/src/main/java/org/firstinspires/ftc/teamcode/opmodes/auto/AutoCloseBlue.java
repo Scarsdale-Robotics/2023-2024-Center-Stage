@@ -63,8 +63,10 @@ public class AutoCloseBlue extends LinearOpMode {
         int propLocation = cv.getPropLocation();
 
         MovementSequence placePurple = new MovementSequenceBuilder().build(),
-                moveToBackdrop = new MovementSequenceBuilder().build(),
-                placeYellow = new MovementSequenceBuilder().build();
+                approachWhite = new MovementSequenceBuilder().build(),
+                placeWhite = new MovementSequenceBuilder().build(),
+                placeYellow = new MovementSequenceBuilder().build(),
+                park = new MovementSequenceBuilder().build();
 
 
         if (propLocation == 0) {
@@ -73,28 +75,37 @@ public class AutoCloseBlue extends LinearOpMode {
                     .forwardLeft(20, 46) // place yellow first, move to backdrop
                     .turnRight(90) // face back to backdrop to place on backdrop
                     .raiseArm(120) // raise arm to place pixel
-                    .openClaw() // drop yellow pixel
+                    .openClawLeft() // drop yellow pixel
                     .build();
-            // build the sequence of movements here
-            approachTape = new MovementSequenceBuilder()
-                    .forward(22.22) // Moving forward toward the pixel placing area
-                    .forward(0.03) // Brake
-                    .turnLeft(84.3) // Turn left 90 degrees
-                    .backward(3.09) // Moving forward (or backward) to the spike mark tape
-                    .forward(0.03) // Brake
-                    .right(4.0) // Strafe right to place pixel correctly
+            placePurple = new MovementSequenceBuilder()
+                    .forwardLeft(7.65, 5.67) // move forward to purple pixel loc
+                    .lowerArm(120) // lower arm
+                    .openClawRight() // drop purple pixel
+                    .raiseArm(11) // raise arm to not hit purple pixel and to align with white pixel
+                    // lets run a test to see if we can try not lowering the arm
+                    .backwardLeft(10,24) // move to align with truss
                     .build();
-
-            parkInBackdrop = new MovementSequenceBuilder()
-                    .raiseArm(57.14) // Raise claw
-                    .left(14.4) // Strafe left
-                    .forward(34.29) // Move forward
-                    .turnRight(180) // Turn right
-                    .backward(20.06) // Move backward
-                    .closeClaw() // Close claw
-                    .lowerArm(57.14) // Lower claw
+            approachWhite = new MovementSequenceBuilder()
+                    .forward(88) // move to white pixels
+                    .alignWhitePixel() // i wonder what this does
+                    .forward(11) // move a bit more after align with white
+                    .closeClawRight() // intake 2 white pixels
                     .build();
-
+            placeWhite = new MovementSequenceBuilder()
+                    .backward(99) // move towards backdrop
+                    .backwardRight(11, 24) // move towards backdrop
+                    .raiseArm(120) // raise arm to place pixels
+                    .openClawRight() // open right claw to release 1 pixel
+                    .sleepFor(200) // allow 1st pixel to fall
+                    .closeClawRight() // close right claw to prevent 2nd pixel release
+                    .right(3) // move to drop 2nd pixel
+                    .openClawRight() // drop 2nd pixel
+                    .forwardLeft(20, 24) // align with truss
+                    .build();
+            park = new MovementSequenceBuilder()
+                    .turnLeft(90) // turn to post-auto (pre-teleop) ideal pos
+                    .left(35) // drive to park
+                    .build();
 
         } else if (propLocation == 1) {
             approachTape = new MovementSequenceBuilder()
@@ -135,8 +146,14 @@ public class AutoCloseBlue extends LinearOpMode {
         }
 
         // perform the actual movements here in sequence
-        drive.followMovementSequence(approachTape);
-        drive.followMovementSequence(parkInBackdrop);
+        drive.followMovementSequence(placeYellow);
+        drive.followMovementSequence(placePurple);
+        for (int i=0;i<2;i++)
+        {
+            drive.followMovementSequence(approachWhite);
+            drive.followMovementSequence(placeWhite);
+        }
+        drive.followMovementSequence(park);
 
         stopRobot();
     }

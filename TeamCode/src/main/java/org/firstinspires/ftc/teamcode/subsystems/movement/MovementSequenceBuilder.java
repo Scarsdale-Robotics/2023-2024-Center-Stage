@@ -13,6 +13,11 @@ public class MovementSequenceBuilder {
      */
     public MovementSequence build() {return new MovementSequence(movements);}
 
+    public MovementSequenceBuilder alignWhitePixel() {
+        // TODO: this
+        return this;
+    }
+
     /**
      * Appends a forward movement to the MovementSequenceBuilder.
      * @param inches      How far the robot should move in inches.
@@ -116,28 +121,29 @@ public class MovementSequenceBuilder {
         return this;
     }
 
-    /**
-     * Appends a close claw event to the MovementSequenceBuilder.
-     */
-    public MovementSequenceBuilder closeClaw() {
-        movements.add(new Movement(Movement.MovementType.CLOSE_CLAW, 0, 0, 0, 0, 0));
+//    public MovementSequenceBuilder openClaws() {
+//        movements.add(new Movement(Movement.MovementType.OPEN_CLAW, 0, 0, 0, 0, 0));
+//        return this;
+//    }
+    public MovementSequenceBuilder closeClawLeft() {
+        movements.add(new Movement(Movement.MovementType.CLOSE_CLAW_LEFT, 0, 0, 0, 0, 0));
+        return this;
+    }
+    public MovementSequenceBuilder closeClawRight() {
+        movements.add(new Movement(Movement.MovementType.CLOSE_CLAW_RIGHT, 0, 0, 0, 0, 0));
         return this;
     }
 
-    /**
-     * Appends an open claw event to the MovementSequenceBuilder.
-     */
-    public MovementSequenceBuilder openClaws() {
-        movements.add(new Movement(Movement.MovementType.OPEN_CLAW, 0, 0, 0, 0, 0));
-        return this;
-    }
-
+//    public MovementSequenceBuilder openClaws() {
+//        movements.add(new Movement(Movement.MovementType.OPEN_CLAW, 0, 0, 0, 0, 0));
+//        return this;
+//    }
     public MovementSequenceBuilder openClawLeft() {
-        movements.add(new Movement(Movement.MovementType.OPEN_CLAW, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.OPEN_CLAW_LEFT, 0, 0, 0, 0, 0));
         return this;
     }
     public MovementSequenceBuilder openClawRight() {
-        movements.add(new Movement(Movement.MovementType.OPEN_CLAW, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.OPEN_CLAW_RIGHT, 0, 0, 0, 0, 0));
         return this;
     }
 
