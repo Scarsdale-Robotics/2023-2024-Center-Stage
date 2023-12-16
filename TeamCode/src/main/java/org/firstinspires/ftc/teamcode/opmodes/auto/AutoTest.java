@@ -74,6 +74,10 @@ public class AutoTest extends LinearOpMode {
                 .backwardRight(10,10)
                 .forwardRight(10,10)
                 .backwardLeft(10,10)
+                .forward(10)
+                .raiseArm(60, true)
+                .backward(10)
+                .lowerArm(60, true)
                 .build();
 
         telemetry.addData("aaron's mother","");
