@@ -18,12 +18,14 @@ public class DriveSubsystem extends SubsystemBase {
     private static final double Kp = 0.01;
     private static final double Ki = 0;
     private static final double Kd = 0;
-    private final double errorTolerance_p = 5.0;
-    private final double errorTolerance_v = 0.05;
+    private static final double errorTolerance_p = 5.0;
+    private static final double errorTolerance_v = 0.05;
+
     private static final double TICKS_PER_INCH_FORWARD = 32.4;
     private static final double TICKS_PER_INCH_STRAFE = 62.5;
     private static final double TICKS_PER_DEGREE_TURN = 10.0;
     private static final double TICKS_PER_DEGREE_ARM = 35.0;
+
     final private ElapsedTime runtime = new ElapsedTime();
     private MecanumDrive controller;
     private IMU imu;
@@ -113,9 +115,12 @@ public class DriveSubsystem extends SubsystemBase {
                     POWER_STRAFE * type.K_strafe,
                     POWER_FORWARD * type.K_forward,
                     POWER_TURN * type.K_turn,
-                    movement.INCHES_STRAFE * TICKS_PER_INCH_STRAFE * Math.abs(type.K_strafe) +
-                            movement.INCHES_FORWARD * TICKS_PER_INCH_FORWARD * Math.abs(type.K_forward) +
-                            movement.DEGREES_TURN * TICKS_PER_DEGREE_TURN * Math.abs(type.K_turn)
+                    Math.sqrt(
+                            // Pythagorean Theorem for diagonal movement
+                            Math.pow(movement.INCHES_STRAFE * TICKS_PER_INCH_STRAFE * Math.abs(type.K_strafe),2) +
+                            Math.pow(movement.INCHES_FORWARD * TICKS_PER_INCH_FORWARD * Math.abs(type.K_forward),2)
+                    ) +
+                    movement.DEGREES_TURN * TICKS_PER_DEGREE_TURN * Math.abs(type.K_turn)
             );
 
             // ELEVATION CASES
@@ -125,23 +130,18 @@ public class DriveSubsystem extends SubsystemBase {
             );
 
             // DELAY CASE
-            if (type == Movement.MovementType.DELAY) {
+            if (type == Movement.MovementType.DELAY)
                 sleepFor(movement.WAIT);
-            }
 
-            if (type == Movement.MovementType.CLOSE_CLAW_RIGHT) {
-                inDep.closeLeft();
-            }
-            if (type == Movement.MovementType.OPEN_CLAW_RIGHT) {
+            // CLAW CASES
+            if (type == Movement.MovementType.OPEN_LEFT_CLAW)
+                inDep.openLeft();
+            if (type == Movement.MovementType.OPEN_RIGHT_CLAW)
                 inDep.openRight();
-            }
-
-            if (type == Movement.MovementType.CLOSE_CLAW_LEFT) {
+            if (type == Movement.MovementType.CLOSE_RIGHT_CLAW)
+                inDep.closeRight();
+            if (type == Movement.MovementType.CLOSE_LEFT_CLAW)
                 inDep.closeLeft();
-            }
-            if (type == Movement.MovementType.OPEN_CLAW_LEFT) {
-                inDep.openRight();
-            }
 
         }
 
@@ -169,6 +169,13 @@ public class DriveSubsystem extends SubsystemBase {
      */
     public double getWheelVelocity() {
         return rightBack.getCorrectedVelocity();
+    }
+
+    /**
+     * Stop the motors.
+     */
+    public void stopController() {
+        controller.stop();
     }
 
     public void resetIMU() {

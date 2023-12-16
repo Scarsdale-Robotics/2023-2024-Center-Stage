@@ -77,6 +77,7 @@ public class HardwareRobot {
         arm1.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         arm1.setPositionTolerance(10);
         arm1.setPositionCoefficient(0.01);
+        arm1.setInverted(true);
 
         arm2 = new Motor(hardwareMap, "arm2", Motor.GoBILDA.RPM_312);
         arm2.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -87,6 +88,7 @@ public class HardwareRobot {
         arm2.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         arm2.setPositionTolerance(10);
         arm2.setPositionCoefficient(0.01);
+        arm2.setInverted(true);
 
         leftClaw = hardwareMap.servo.get("leftClaw");
         rightClaw = hardwareMap.servo.get("rightClaw");

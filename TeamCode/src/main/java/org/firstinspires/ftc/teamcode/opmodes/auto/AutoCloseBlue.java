@@ -77,12 +77,12 @@ public class AutoCloseBlue extends LinearOpMode {
                     .forwardLeft(20, 46) // place yellow first, move to backdrop
                     .turnRight(90) // face back to backdrop to place on backdrop
                     .raiseArm(120) // raise arm to place pixel
-                    .openClawLeft() // drop yellow pixel
+                    .openLeftClaw() // drop yellow pixel
                     .build();
             placePurple = new MovementSequenceBuilder()
                     .lowerArm(120) // lower arm
                     .forwardLeft(7.65, 15.67) // move forward to purple pixel loc
-                    .openClawRight() // drop purple pixel
+                    .openRightClaw() // drop purple pixel
                     .raiseArm(WHITE_PX_HEIGHT) // raise arm to not hit purple pixel and to align with white pixel
                     // lets run a test to see if we can try not lowering the arm
                     .backwardLeft(5, 15) // move to align with truss
@@ -91,17 +91,17 @@ public class AutoCloseBlue extends LinearOpMode {
                     .forward(88) // move to white pixels
                     .alignWhitePixel() // i wonder what this does
                     .forward(11) // move a bit more after align with white
-                    .closeClawRight() // intake 2 white pixels
+                    .closeRightClaw() // intake 2 white pixels
                     .build();
             placeWhite = new MovementSequenceBuilder()
                     .backward(99) // move towards backdrop
                     .backwardRight(11, 24) // move towards backdrop
                     .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
-                    .openClawRight() // open right claw to release 1 pixel
+                    .openRightClaw() // open right claw to release 1 pixel
                     .sleepFor(200) // allow 1st pixel to fall
-                    .closeClawRight() // close right claw to prevent 2nd pixel release
+                    .closeRightClaw() // close right claw to prevent 2nd pixel release
                     .right(3) // move to drop 2nd pixel
-                    .openClawRight() // drop 2nd pixel
+                    .openRightClaw() // drop 2nd pixel
                     .forwardLeft(20, 24) // align with truss
                     .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
                     .build();
@@ -116,12 +116,12 @@ public class AutoCloseBlue extends LinearOpMode {
                     .forwardLeft(26, 52) // place yellow first, move to backdrop
                     .turnRight(90) // face back to backdrop to place on backdrop
                     .raiseArm(120) // raise arm to place pixel
-                    .openClawLeft() // drop yellow pixel
+                    .openLeftClaw() // drop yellow pixel
                     .build();
             placePurple = new MovementSequenceBuilder()
                     .lowerArm(120) // lower arm
                     .forwardLeft(15.6789012345, 7.5643210987) // move forward to purple pixel loc
-                    .openClawRight() // drop purple pixel
+                    .openRightClaw() // drop purple pixel
                     .raiseArm(WHITE_PX_HEIGHT) // raise arm to not hit purple pixel and to align with white pixel
                     // lets run a test to see if we can try not lowering the arm now
                     .left(15) // move to align with truss
@@ -130,17 +130,17 @@ public class AutoCloseBlue extends LinearOpMode {
                     .forward(77) // move to white pixels
                     .alignWhitePixel() // i wonder what this does
                     .forward(11) // move a bit more after align with white
-                    .closeClawRight() // intake 2 white pixels
+                    .closeRightClaw() // intake 2 white pixels
                     .build();
             placeWhite = new MovementSequenceBuilder()
                     .backward(99) // move towards backdrop
                     .backwardRight(11, 24) // move towards backdrop
                     .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
-                    .openClawRight() // open right claw to release 1 pixel
+                    .openRightClaw() // open right claw to release 1 pixel
                     .sleepFor(200) // allow 1st pixel to fall
-                    .closeClawRight() // close right claw to prevent 2nd pixel release
+                    .closeRightClaw() // close right claw to prevent 2nd pixel release
                     .right(3) // move to drop 2nd pixel
-                    .openClawRight() // drop 2nd pixel
+                    .openRightClaw() // drop 2nd pixel
                     .forwardLeft(31, 18) // align with truss
                     .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
                     .build();
@@ -154,12 +154,12 @@ public class AutoCloseBlue extends LinearOpMode {
                     .forwardLeft(32, 52) // place yellow first, move to backdrop
                     .turnRight(90) // face back to backdrop to place on backdrop
                     .raiseArm(120) // raise arm to place pixel
-                    .openClawLeft() // drop yellow pixel
+                    .openLeftClaw() // drop yellow pixel
                     .build();
             placePurple = new MovementSequenceBuilder()
                     .lowerArm(120) // lower arm
                     .forwardRight(28.8888888888, 2) // move forward to purple pixel loc
-                    .openClawRight() // drop purple pixel
+                    .openRightClaw() // drop purple pixel
                     .raiseArm(WHITE_PX_HEIGHT) // raise arm to not hit purple pixel and to align with white pixel
                     // lets run a test to see if we can try not lowering the arm now
                     .left(15) // move to align with truss
@@ -168,17 +168,17 @@ public class AutoCloseBlue extends LinearOpMode {
                     .forward(66) // move to white pixels
                     .alignWhitePixel() // i wonder what this does
                     .forward(11) // move a bit more after align with white
-                    .closeClawRight() // intake 2 white pixels
+                    .closeRightClaw() // intake 2 white pixels
                     .build();
             placeWhite = new MovementSequenceBuilder()
                     .backward(99) // move towards backdrop
                     .backwardRight(11, 12) // move towards backdrop
                     .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
-                    .openClawRight() // open right claw to release 1 pixel
+                    .openRightClaw() // open right claw to release 1 pixel
                     .sleepFor(200) // allow 1st pixel to fall
-                    .closeClawRight() // close right claw to prevent 2nd pixel release
+                    .closeRightClaw() // close right claw to prevent 2nd pixel release
                     .right(3) // move to drop 2nd pixel
-                    .openClawRight() // drop 2nd pixel
+                    .openRightClaw() // drop 2nd pixel
                     .forwardLeft(42, 24) // align with truss
                     .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
                     .build();
@@ -198,7 +198,7 @@ public class AutoCloseBlue extends LinearOpMode {
         }
         drive.followMovementSequence(park);
 
-        stopRobot();
+        drive.stopController();
     }
 
     /**
@@ -208,9 +208,5 @@ public class AutoCloseBlue extends LinearOpMode {
     private void sleepFor(long ms) {
         runtime.reset();
         while (opModeIsActive() && (runtime.milliseconds() < ms));
-    }
-
-    public void stopRobot() {
-        drive.driveByEncoder(0, 0, 0, 0);
     }
 }

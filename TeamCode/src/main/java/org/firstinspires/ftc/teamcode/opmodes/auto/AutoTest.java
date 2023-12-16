@@ -58,26 +58,35 @@ public class AutoTest extends LinearOpMode {
                 .backward(12)
                 .left(12)
                 .right(12)
-                .openClaw()
+                .openClaws()
                 .sleepFor(500)
-                .closeClaw()
+                .closeClaws()
+                .sleepFor(500)
+                .openRightClaw()
+                .sleepFor(500)
+                .openLeftClaw()
+                .sleepFor(500)
+                .closeRightClaw()
+                .sleepFor(500)
+                .closeLeftClaw()
                 .sleepFor(2000)
-                .openClaw()
-                .sleepFor(500)
-                .closeClaw()
                 .turnRight(90)
                 .turnLeft(90)
                 .raiseArm(60)
                 .lowerArm(60)
+                .forwardLeft(10,10)
+                .backwardRight(10,10)
+                .forwardRight(10,10)
+                .backwardLeft(10,10)
                 .build();
 
         telemetry.addData("aaron's mother","");
         telemetry.update();
 
-//      perform the actual movements here in sequence
+        //perform the actual movements here in sequence
         drive.followMovementSequence(testSequence);
+        drive.stopController();
         sleepFor(690);
-        stopRobot();
     }
 
     /**
@@ -87,9 +96,5 @@ public class AutoTest extends LinearOpMode {
     private void sleepFor(long ms) {
         runtime.reset();
         while (opModeIsActive() && (runtime.milliseconds() < ms));
-    }
-
-    public void stopRobot() {
-        drive.driveByEncoder(0, 0, 0, 0);
     }
 }

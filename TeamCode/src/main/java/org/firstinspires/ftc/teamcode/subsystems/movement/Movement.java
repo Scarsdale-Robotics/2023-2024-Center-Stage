@@ -13,12 +13,12 @@ public class Movement {
         TURN_LEFT (0.0,0.0,-1.0,0.0),
         TURN_RIGHT (0.0,0.0,1.0,0.0),
         DELAY (0.0,0.0,0.0,0.0),
-        CLOSE_CLAW_LEFT (0.0,0.0,0.0,0.0),
-        OPEN_CLAW_LEFT (0.0,0.0,0.0,0.0),
-        CLOSE_CLAW_RIGHT (0.0,0.0,0.0,0.0),
-        OPEN_CLAW_RIGHT (0.0,0.0,0.0,0.0),
-        LOWER_ARM (0.0,0.0,0.0,1.0),
-        RAISE_ARM (0.0,0.0,0.0,-1.0);
+        CLOSE_LEFT_CLAW(0.0,0.0,0.0,0.0),
+        OPEN_LEFT_CLAW(0.0,0.0,0.0,0.0),
+        CLOSE_RIGHT_CLAW(0.0,0.0,0.0,0.0),
+        OPEN_RIGHT_CLAW(0.0,0.0,0.0,0.0),
+        LOWER_ARM (0.0,0.0,0.0,-1.0),
+        RAISE_ARM (0.0,0.0,0.0,1.0);
 
         public double K_forward;
         public double K_strafe;

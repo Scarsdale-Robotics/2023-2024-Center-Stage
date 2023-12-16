@@ -71,7 +71,7 @@ public class AutoFarBlue extends LinearOpMode {
             placePurple = new MovementSequenceBuilder()
                     .forwardLeft(28, 2) // move towards left spike mark
                     .turnLeft(90) // turn to left spike mark
-                    .openClawRight() // release purple pixel
+                    .openRightClaw() // release purple pixel
                     .build();
             approachFirstWhite = new MovementSequenceBuilder()
                     .raiseArm(WHITE_PX_HEIGHT) // raise for white pixel
@@ -79,31 +79,31 @@ public class AutoFarBlue extends LinearOpMode {
                     .turnLeft(180) // 180 to face white stack
                     .alignWhitePixel() // align w/ white stack obv. lol
                     .forward(6) // move towards stack
-                    .closeClawRight() // intake from stack
+                    .closeRightClaw() // intake from stack
                     .build();
             placeYellow = new MovementSequenceBuilder()
                     .backward(96) // move towards backdrop
                     .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to pixel placement pos
                     .backwardRight(11, 24) // move towards backdrop
-                    .openClawLeft() // release yellow
-                    .openClawRight() // release white
+                    .openLeftClaw() // release yellow
+                    .openRightClaw() // release white
                     .forwardLeft(20, 33) // align with truss to head towards white stack
                     .build(); // build lol
             approachWhite = new MovementSequenceBuilder()
                     .forward(88) // move to white pixels
                     .alignWhitePixel() // i wonder what this does
                     .forward(11) // move a bit more after align with white
-                    .closeClawRight() // intake 2 white pixels
+                    .closeRightClaw() // intake 2 white pixels
                     .build();
             placeWhite = new MovementSequenceBuilder()
                     .backward(99) // move towards backdrop
                     .backwardRight(11, 24) // move towards backdrop
                     .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
-                    .openClawRight() // open right claw to release 1 pixel
+                    .openRightClaw() // open right claw to release 1 pixel
                     .sleepFor(200) // allow 1st pixel to fall
-                    .closeClawRight() // close right claw to prevent 2nd pixel release
+                    .closeRightClaw() // close right claw to prevent 2nd pixel release
                     .right(3) // move to drop 2nd pixel
-                    .openClawRight() // drop 2nd pixel
+                    .openRightClaw() // drop 2nd pixel
                     .forwardLeft(20, 24) // align with truss
                     .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
                     .build();
@@ -114,7 +114,7 @@ public class AutoFarBlue extends LinearOpMode {
         } else if (propLocation == 1) {
             placePurple = new MovementSequenceBuilder()
                     .forward(26.69) // Moving forward toward the pixel placing area
-                    .openClawRight() // place purple
+                    .openRightClaw() // place purple
                     .backward(5) // Move backward to not hit pixel on turn
                     .raiseArm(WHITE_PX_HEIGHT) // raise arm to not hit pixel on term
                     .build();
@@ -123,31 +123,31 @@ public class AutoFarBlue extends LinearOpMode {
                     .forwardLeft(20, 24) // move towards white pixel stack (closest to center one)
                     .alignWhitePixel() // thing
                     .forward(6) // move to pixel stack
-                    .closeClawRight() // intake white pixel
+                    .closeRightClaw() // intake white pixel
                     .build();
             placeYellow = new MovementSequenceBuilder()
                     .backward(96) // move towards backdrop
                     .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to pixel placement pos
                     .backwardRight(11, 18) // move towards backdrop
-                    .openClawLeft() // release yellow
-                    .openClawRight() // release white
+                    .openLeftClaw() // release yellow
+                    .openRightClaw() // release white
                     .forwardLeft(20, 39) // align with truss to head towards white stack
                     .build(); // build lol
             approachWhite = new MovementSequenceBuilder()
                     .forward(77) // move to white pixels
                     .alignWhitePixel() // i wonder what this does
                     .forward(11) // move a bit more after align with white
-                    .closeClawRight() // intake 2 white pixels
+                    .closeRightClaw() // intake 2 white pixels
                     .build();
             placeWhite = new MovementSequenceBuilder()
                     .backward(99) // move towards backdrop
                     .backwardRight(11, 24) // move towards backdrop
                     .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
-                    .openClawRight() // open right claw to release 1 pixel
+                    .openRightClaw() // open right claw to release 1 pixel
                     .sleepFor(200) // allow 1st pixel to fall
-                    .closeClawRight() // close right claw to prevent 2nd pixel release
+                    .closeRightClaw() // close right claw to prevent 2nd pixel release
                     .right(3) // move to drop 2nd pixel
-                    .openClawRight() // drop 2nd pixel
+                    .openRightClaw() // drop 2nd pixel
                     .forwardLeft(31, 18) // align with truss
                     .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
                     .build();
@@ -159,7 +159,7 @@ public class AutoFarBlue extends LinearOpMode {
             placePurple = new MovementSequenceBuilder()
                     .forwardLeft(30, 2) // move to right spike mark
                     .turnRight(90) // turn towards right spike mark
-                    .openClawRight() // release purple
+                    .openRightClaw() // release purple
                     .raiseArm(WHITE_PX_HEIGHT) // raise arm to not hit pixel on turn
                     .backward(5) // move backward to not collide with pixel
                     .build();
@@ -167,31 +167,31 @@ public class AutoFarBlue extends LinearOpMode {
                     .left(15) // move towards white pixel stack (the one closest to the center)
                     .alignWhitePixel() // chicken nugget
                     .forward(22) // move towards pixel stack
-                    .closeClawRight() // intake white pixel
+                    .closeRightClaw() // intake white pixel
                     .build();
             approachWhite = new MovementSequenceBuilder()
                     .forward(66) // move to white pixels
                     .alignWhitePixel() // i wonder what this does
                     .forward(11) // move a bit more after align with white
-                    .closeClawRight() // intake 2 white pixels
+                    .closeRightClaw() // intake 2 white pixels
                     .build();
             placeYellow = new MovementSequenceBuilder()
                     .backward(96) // move towards backdrop
                     .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to pixel placement pos
                     .backwardRight(11, 12) // move towards backdrop
-                    .openClawLeft() // release yellow
-                    .openClawRight() // release white
+                    .openLeftClaw() // release yellow
+                    .openRightClaw() // release white
                     .forwardLeft(20, 45) // align with truss to head towards white stack
                     .build(); // build lol
             placeWhite = new MovementSequenceBuilder()
                     .backward(99) // move towards backdrop
                     .backwardRight(11, 12) // move towards backdrop
                     .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
-                    .openClawRight() // open right claw to release 1 pixel
+                    .openRightClaw() // open right claw to release 1 pixel
                     .sleepFor(200) // allow 1st pixel to fall
-                    .closeClawRight() // close right claw to prevent 2nd pixel release
+                    .closeRightClaw() // close right claw to prevent 2nd pixel release
                     .right(3) // move to drop 2nd pixel
-                    .openClawRight() // drop 2nd pixel
+                    .openRightClaw() // drop 2nd pixel
                     .forwardLeft(42, 24) // align with truss
                     .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
                     .build();
@@ -212,7 +212,7 @@ public class AutoFarBlue extends LinearOpMode {
         }
         drive.followMovementSequence(park);
 
-        stopRobot();
+        drive.stopController();
     }
 
     /**
@@ -222,9 +222,5 @@ public class AutoFarBlue extends LinearOpMode {
     private void sleepFor(long ms) {
         runtime.reset();
         while (opModeIsActive() && (runtime.milliseconds() < ms));
-    }
-
-    public void stopRobot() {
-        drive.driveByEncoder(0, 0, 0, 0);
     }
 }

@@ -12,8 +12,8 @@ public class InDepSubsystem extends SubsystemBase {
     private static final double Kp = 0.01;
     private static final double Ki = 0;
     private static final double Kd = 0;
-    private final double errorTolerance_p = 1.0;
-    private final double errorTolerance_v = 0.01;
+    private static final double errorTolerance_p = 1.0;
+    private static final double errorTolerance_v = 0.01;
 
     private final Motor arm1;
     private final Motor arm2;
@@ -81,9 +81,11 @@ public class InDepSubsystem extends SubsystemBase {
 
         this.opMode = opMode;
 
-        // reset the arm and claw states
-        close();
-        setLevel(Level.GROUND);
+        // reset everything
+        setLevel(Level.GROUND); // arm, wrist
+        rest(); // elbow
+        close(); // claw
+
     }
 
     /**
@@ -112,10 +114,10 @@ public class InDepSubsystem extends SubsystemBase {
                 Math.abs(getArmVelocity()) > errorTolerance_v
         ) {
             pidMultiplier = pidController.update(getArmPosition());
-            arm1.motor.setPower(power * pidMultiplier);
-            arm2.motor.setPower(power * pidMultiplier);
+            rawPower(power * pidMultiplier);
         }
 
+        // brake
         arm1.stopMotor();
         arm2.stopMotor();
         arm1.motor.setPower(0);

@@ -121,29 +121,49 @@ public class MovementSequenceBuilder {
         return this;
     }
 
-//    public MovementSequenceBuilder openClaws() {
-//        movements.add(new Movement(Movement.MovementType.OPEN_CLAW, 0, 0, 0, 0, 0));
-//        return this;
-//    }
-    public MovementSequenceBuilder closeClawLeft() {
-        movements.add(new Movement(Movement.MovementType.CLOSE_CLAW_LEFT, 0, 0, 0, 0, 0));
-        return this;
+    /**
+     * Appends an open claw event for both claws to the MovementSequenceBuilder.
+     */
+    public MovementSequenceBuilder openClaws() {
+        return this.openLeftClaw().openRightClaw();
     }
-    public MovementSequenceBuilder closeClawRight() {
-        movements.add(new Movement(Movement.MovementType.CLOSE_CLAW_RIGHT, 0, 0, 0, 0, 0));
+
+    /**
+     * Appends a close claw event for both claws to the MovementSequenceBuilder.
+     */
+    public MovementSequenceBuilder closeClaws() {
+        return this.closeLeftClaw().closeRightClaw();
+    }
+
+    /**
+     * Appends an open left claw event for both claws to the MovementSequenceBuilder.
+     */
+    public MovementSequenceBuilder openLeftClaw() {
+        movements.add(new Movement(Movement.MovementType.OPEN_LEFT_CLAW, 0, 0, 0, 0, 0));
         return this;
     }
 
-//    public MovementSequenceBuilder openClaws() {
-//        movements.add(new Movement(Movement.MovementType.OPEN_CLAW, 0, 0, 0, 0, 0));
-//        return this;
-//    }
-    public MovementSequenceBuilder openClawLeft() {
-        movements.add(new Movement(Movement.MovementType.OPEN_CLAW_LEFT, 0, 0, 0, 0, 0));
+    /**
+     * Appends an open right claw event for both claws to the MovementSequenceBuilder.
+     */
+    public MovementSequenceBuilder openRightClaw() {
+        movements.add(new Movement(Movement.MovementType.OPEN_RIGHT_CLAW, 0, 0, 0, 0, 0));
         return this;
     }
-    public MovementSequenceBuilder openClawRight() {
-        movements.add(new Movement(Movement.MovementType.OPEN_CLAW_RIGHT, 0, 0, 0, 0, 0));
+
+    /**
+     * Appends a close left claw event for both claws to the MovementSequenceBuilder.
+     */
+    public MovementSequenceBuilder closeLeftClaw() {
+        movements.add(new Movement(Movement.MovementType.CLOSE_LEFT_CLAW, 0, 0, 0, 0, 0));
+        return this;
+    }
+
+    /**
+     * Appends a close right claw event for both claws to the MovementSequenceBuilder.
+     */
+    public MovementSequenceBuilder closeRightClaw() {
+        movements.add(new Movement(Movement.MovementType.CLOSE_RIGHT_CLAW, 0, 0, 0, 0, 0));
         return this;
     }
 
