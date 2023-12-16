@@ -310,7 +310,7 @@ public class CVSubsystem extends SubsystemBase {
         int width = getCameraWidth();
         int pixelOffset = getWhitePixelHorizontalOffset();
         while (Math.abs(pixelOffset) > ERROR_THRESHOLD) {
-            if (pixelOffset < 0){
+            if (pixelOffset < 0){ //NOT TESTED IDEA, PROB NEEDS FIXING: GO FASTER WHEN DISTANCE TO PIXEL STACK IS LARGE, THEN SLOW DOWN AS IT NEARS IT.
                 drive.driveRobotCentric((Math.abs(pixelOffset)*2/width) * SpeedCoefficients.getStrafeSpeed(), 0, 0);
             }else{
                 drive.driveFieldCentric(-(Math.abs(pixelOffset)*2/width) * SpeedCoefficients.getStrafeSpeed(), 0, 0);
