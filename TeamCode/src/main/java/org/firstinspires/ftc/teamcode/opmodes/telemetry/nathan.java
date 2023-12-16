@@ -13,7 +13,7 @@ public class nathan extends LinearOpMode {
 
     @Override
     // The "Main" code will go in here
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
         HardwareRobot robot = new HardwareRobot(hardwareMap);
         InDepSubsystem inDep = new InDepSubsystem(
                 robot.arm1,

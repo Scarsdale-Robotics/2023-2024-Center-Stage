@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 
-public class EndgameSubsystem extends SubsystemBase{
+public class EndgameSubsystem extends SubsystemBase {
 
 //    private final Motor lift1;
 //    private final Motor lift2;

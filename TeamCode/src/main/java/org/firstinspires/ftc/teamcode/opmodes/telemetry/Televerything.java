@@ -108,7 +108,7 @@ public class Televerything extends LinearOpMode {
             if (!gamepad1.y) clawToggle = false;
 
             // Flexible Arm Control
-            inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed(), gamepad1.a);
+            inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed());
 
             // Emergency Reset Arm
             if (gamepad2.a) {

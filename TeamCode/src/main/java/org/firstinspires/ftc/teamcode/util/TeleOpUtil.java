@@ -237,7 +237,7 @@ public class TeleOpUtil {
         if (!gamepad1.y) clawToggle = false;
 
         // FLEX ARM MOVEMENT MODE CONTROL
-        inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed(), gamepad1.a);
+        inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed());
 
         // RIGID ARM MOVEMENT MODE CONTROL
 //        runArmRigidControl();
@@ -260,7 +260,6 @@ public class TeleOpUtil {
         telemetry.update();
         runMotionControl();
         runArmClawControl();
-        inDep.tickMoveAsyncToPosition(SpeedCoefficients.getArmSpeed(), gamepad1.a);
         if (!gamepad2.x && !gamepad1.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsLeftClawOpen()) {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
         } else if (gamepad1.x || gamepad2.x) {

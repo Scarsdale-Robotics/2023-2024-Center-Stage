@@ -20,7 +20,7 @@ public class AutoTest extends LinearOpMode {
     private CVSubsystem cv;
     @Override
     // The "Main" code will go in here
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
         robot = new HardwareRobot(hardwareMap);
         inDep = new InDepSubsystem(
                 robot.arm1,
@@ -47,7 +47,7 @@ public class AutoTest extends LinearOpMode {
                 telemetry,
                 false,
                 this);
-        inDep.closeClaws();
+        inDep.close();
         runtime.reset();
 
         waitForStart();
@@ -74,7 +74,7 @@ public class AutoTest extends LinearOpMode {
         telemetry.addData("aaron's mother","");
         telemetry.update();
 
-//         perform the actual movements here in sequence
+//      perform the actual movements here in sequence
         drive.followMovementSequence(testSequence);
         sleepFor(690);
         stopRobot();

@@ -220,7 +220,7 @@ public class CVSubsystem extends SubsystemBase {
      * GROUP 2
      * @return whether the AprilTag is left, center, or right in the camera view based on a mode of samples
      */
-    public int getPropLocation() throws InterruptedException {
+    public int getPropLocation() {
         int propLocation = -1;
         ArrayList<Integer> samples = new ArrayList<>();
         sleepFor(1000);

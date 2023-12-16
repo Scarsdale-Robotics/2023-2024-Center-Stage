@@ -96,7 +96,7 @@ public class DriveSubsystem extends SubsystemBase {
      * Use only for autonomous. Follow the passed MovementSequence. Drive is robot centric.
      * @param movementSequence      The MovementSequence to be followed.
      */
-    public void followMovementSequence(MovementSequence movementSequence) throws InterruptedException {
+    public void followMovementSequence(MovementSequence movementSequence) {
         double  POWER_FORWARD = SpeedCoefficients.getAutonomousForwardSpeed(),
                 POWER_STRAFE = SpeedCoefficients.getAutonomousStrafeSpeed(),
                 POWER_TURN = SpeedCoefficients.getAutonomousTurnSpeed(),
@@ -108,31 +108,35 @@ public class DriveSubsystem extends SubsystemBase {
             Movement movement = movements.pollFirst();
             Movement.MovementType type = movement.MOVEMENT_TYPE;
 
+            // GENERIC DRIVE CASES
             driveByEncoder(
-                    POWER_STRAFE * type.k_strafe,
-                    POWER_FORWARD * type.k_forward,
-                    POWER_TURN * type.k_turn,
-                    movement.INCHES_STRAFE * TICKS_PER_INCH_STRAFE * Math.abs(type.k_strafe) +
-                            movement.INCHES_FORWARD * TICKS_PER_INCH_FORWARD * Math.abs(type.k_forward) +
-                            movement.DEGREES_TURN * TICKS_PER_DEGREE_TURN * Math.abs(type.k_turn)
+                    POWER_STRAFE * type.K_strafe,
+                    POWER_FORWARD * type.K_forward,
+                    POWER_TURN * type.K_turn,
+                    movement.INCHES_STRAFE * TICKS_PER_INCH_STRAFE * Math.abs(type.K_strafe) +
+                            movement.INCHES_FORWARD * TICKS_PER_INCH_FORWARD * Math.abs(type.K_forward) +
+                            movement.DEGREES_TURN * TICKS_PER_DEGREE_TURN * Math.abs(type.K_turn)
             );
 
+            // ELEVATION CASES
             inDep.raiseByEncoder(
-                    POWER_ARM * type.k_elevation,
-                    movement.DEGREES_ELEVATION * TICKS_PER_DEGREE_ARM * Math.abs(type.k_elevation)
+                    POWER_ARM * type.K_elevation,
+                    movement.DEGREES_ELEVATION * TICKS_PER_DEGREE_ARM * Math.abs(type.K_elevation)
             );
 
+            // DELAY CASE
             if (type == Movement.MovementType.DELAY) {
                 sleepFor(movement.WAIT);
             }
 
+            // CLAW CASES
             if (type == Movement.MovementType.CLOSE_CLAW) {
                 inDep.close();
             }
-
             if (type == Movement.MovementType.OPEN_CLAW) {
                 inDep.open();
             }
+
         }
 
         controller.stop();

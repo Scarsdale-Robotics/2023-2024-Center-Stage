@@ -19,7 +19,7 @@ public class AutoFarRed extends LinearOpMode {
     private CVSubsystem cv;
     @Override
     // The "Main" code will go in here
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
         robot = new HardwareRobot(hardwareMap);
         inDep = new InDepSubsystem(
                 robot.arm1,

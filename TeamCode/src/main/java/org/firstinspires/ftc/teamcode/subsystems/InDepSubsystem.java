@@ -14,25 +14,24 @@ public class InDepSubsystem extends SubsystemBase {
     private static final double Kd = 0;
     private final double errorTolerance_p = 1.0;
     private final double errorTolerance_v = 0.01;
-    private final double CLAW_OPEN_POS = 0;
-    private final double CLAW_CLOSED_POS = 0.175;
-    private final double ELBOW_TURN_180 = 1;
-    private final double ELBOW_TURN_REGULARPOS = 0;
 
-    private final LinearOpMode opMode;
     private final Motor arm1;
     private final Motor arm2;
-    private final Servo rightClaw;
+
     private final Servo leftClaw;
+    private final Servo rightClaw;
     private final Servo elbow;
-    private Level level;
     private final Servo wrist;
+
     private boolean isLeftClawOpen;
     private boolean isRightClawOpen;
     private boolean isElbowFlipped;
 
+    private final LinearOpMode opMode;
+
+    private Level level;
     public enum Level {
-        GROUND(0, 0),
+        GROUND(0, 0.0),
         BACKBOARD1(-1960,0.05),
         BACKBOARD2(-4200,0.125), //temp motor encoder values
         BACKBOARD3(-6000, 0.25);
@@ -57,6 +56,18 @@ public class InDepSubsystem extends SubsystemBase {
             else return GROUND;
         }
     }
+    public enum EndEffector {
+        CLAW_OPEN(0.0),
+        CLAW_CLOSED(0.175),
+        ELBOW_REST(0.0),
+        ELBOW_FLIPPED(1.0);
+        public double servoPosition;
+
+        EndEffector(double servoPosition) {
+            this.servoPosition = servoPosition;
+        }
+    }
+
     public InDepSubsystem(Motor arm1, Motor arm2, Servo rightClaw, Servo leftClaw, Servo wrist, Servo elbow, LinearOpMode opMode, Telemetry telemetry) {
         // initialize objects
         this.arm1 = arm1;
@@ -66,10 +77,8 @@ public class InDepSubsystem extends SubsystemBase {
         this.leftClaw = leftClaw;
 
         this.elbow = elbow;
-
-//        this.rightClaw = rightClaw;
-//        this.leftClaw = leftClaw;
         this.wrist = wrist;
+
         this.opMode = opMode;
 
         // reset the arm and claw states
@@ -77,46 +86,12 @@ public class InDepSubsystem extends SubsystemBase {
         setLevel(Level.GROUND);
     }
 
-    private int targetPosition = Level.GROUND.target;
-    private boolean movingToTarget = false;
-    public void setMoveAsyncToPosition(int position) {
-        targetPosition = position;
-        movingToTarget = true;
-    }
-
-    public void tickMoveAsyncToPosition(double power, boolean lowerBoundDisabled) {
-        int ERROR = 20;
-        int diff = arm1.motor.getCurrentPosition() - targetPosition;
-        if (movingToTarget && Math.abs(diff) <= ERROR) {
-//            rawPowerBase(power * (diff < 0 ? 1 : -1), lowerBoundDisabled);
-        }
-    }
-
-//    private void rawPowerBase(double power, boolean lowerBoundDisabled) {
-//        int armPos = arm.motor.getCurrentPosition();
-//
-//        // set bounds
-//        if (armPos>=0 && power>0 && !lowerBoundDisabled) { // more down is more positive
-//            arm.motor.setPower(0);
-//        } else {
-//            arm.motor.setPower(power);
-//        }
-//
-//        if (armPos <= Level.BACKBOARD2.target) {
-//            wrist.setPosition(Level.BACKBOARD2.wristTarget);
-//        } else if (armPos <= Level.BACKBOARD1.target) {
-//            wrist.setPosition(Level.BACKBOARD1.wristTarget);
-//        } else {
-//            wrist.setPosition(Level.GROUND.wristTarget);
-//        }
-//    }
-
     /**
-     * sets the raw power of the arm.
+     * Sets the raw power of the arm.
      */
-    public void rawPower(double power, boolean lowerBoundDisabled) {
-        movingToTarget = false;
-//        rawPowerBase(power, lowerBoundDisabled);
+    public void rawPower(double power) {
+        arm1.motor.setPower(power);
+        arm2.motor.setPower(power);
     }
 
     /**
@@ -189,8 +164,8 @@ public class InDepSubsystem extends SubsystemBase {
      * Opens both claws.
      */
     public void open() {
-        leftClaw.setPosition(CLAW_OPEN_POS);
-        rightClaw.setPosition(CLAW_OPEN_POS);
+        leftClaw.setPosition(EndEffector.CLAW_OPEN.servoPosition);
+        rightClaw.setPosition(EndEffector.CLAW_OPEN.servoPosition);
         isLeftClawOpen = true;
         isRightClawOpen = true;
     }
@@ -199,8 +174,8 @@ public class InDepSubsystem extends SubsystemBase {
      * Closes both claws.
      */
     public void close() {
-        leftClaw.setPosition(CLAW_CLOSED_POS);
-        rightClaw.setPosition(CLAW_CLOSED_POS);
+        leftClaw.setPosition(EndEffector.CLAW_CLOSED.servoPosition);
+        rightClaw.setPosition(EndEffector.CLAW_CLOSED.servoPosition);
         isLeftClawOpen = false;
         isRightClawOpen = false;
     }
@@ -209,7 +184,7 @@ public class InDepSubsystem extends SubsystemBase {
      * Opens the left claw.
      */
     public void openLeft() {
-        leftClaw.setPosition(CLAW_OPEN_POS);
+        leftClaw.setPosition(EndEffector.CLAW_OPEN.servoPosition);
         isLeftClawOpen = true;
     }
 
@@ -217,7 +192,7 @@ public class InDepSubsystem extends SubsystemBase {
      * Opens the right claw.
      */
     public void openRight() {
-        rightClaw.setPosition(CLAW_OPEN_POS);
+        rightClaw.setPosition(EndEffector.CLAW_OPEN.servoPosition);
         isRightClawOpen = true;
     }
 
@@ -225,7 +200,7 @@ public class InDepSubsystem extends SubsystemBase {
      * Closes the left claw.
      */
     public void closeLeft() {
-        leftClaw.setPosition(CLAW_CLOSED_POS);
+        leftClaw.setPosition(EndEffector.CLAW_CLOSED.servoPosition);
         isLeftClawOpen = false;
     }
 
@@ -233,7 +208,7 @@ public class InDepSubsystem extends SubsystemBase {
      * Closes the right claw.
      */
     public void closeRight() {
-        rightClaw.setPosition(CLAW_CLOSED_POS);
+        rightClaw.setPosition(EndEffector.CLAW_CLOSED.servoPosition);
         isRightClawOpen = false;
     }
 
@@ -241,7 +216,7 @@ public class InDepSubsystem extends SubsystemBase {
      * Turns the elbow servo to its flip state.
      */
     public void flip() {
-        elbow.setPosition(ELBOW_TURN_180);
+        elbow.setPosition(EndEffector.ELBOW_FLIPPED.servoPosition);
         isElbowFlipped = true;
     }
 
@@ -249,7 +224,7 @@ public class InDepSubsystem extends SubsystemBase {
      * Turns the elbow servo to its unflipped state.
      */
     public void rest() {
-        elbow.setPosition(ELBOW_TURN_REGULARPOS);
+        elbow.setPosition(EndEffector.ELBOW_REST.servoPosition);
         isElbowFlipped = false;
     }
 

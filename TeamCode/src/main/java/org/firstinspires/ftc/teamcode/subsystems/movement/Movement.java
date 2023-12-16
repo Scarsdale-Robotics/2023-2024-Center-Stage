@@ -14,15 +14,15 @@ public class Movement {
         LOWER_ARM (0.0,0.0,0.0,1.0),
         RAISE_ARM (0.0,0.0,0.0,-1.0);
 
-        public double k_forward;
-        public double k_strafe;
-        public double k_turn;
-        public double k_elevation;
-        MovementType(double k_forward, double k_strafe, double k_turn, double k_elevation) {
-            this.k_forward = k_forward;
-            this.k_strafe = k_strafe;
-            this.k_turn = k_turn;
-            this.k_elevation = k_elevation;
+        public double K_forward;
+        public double K_strafe;
+        public double K_turn;
+        public double K_elevation;
+        MovementType(double K_forward, double K_strafe, double K_turn, double K_elevation) {
+            this.K_forward = K_forward;
+            this.K_strafe = K_strafe;
+            this.K_turn = K_turn;
+            this.K_elevation = K_elevation;
         }
     }
     public MovementType MOVEMENT_TYPE;
