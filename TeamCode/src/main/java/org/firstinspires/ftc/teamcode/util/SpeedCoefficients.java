@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.util;
 
 public class SpeedCoefficients {
     public static MoveMode moveMode = MoveMode.MODE_FAST;

@@ -25,12 +25,8 @@ public class AutoTest extends LinearOpMode {
         inDep = new InDepSubsystem(
                 robot.arm1,
                 robot.arm2,
-                robot.rightClaw,
-                robot.leftClaw,
-                robot.wrist,
-                robot.elbow,
-                this,
-                telemetry
+                robot.elbow, robot.wrist, robot.leftClaw, robot.rightClaw,
+                this
         );
         drive = new DriveSubsystem(
                 robot.leftFront,
@@ -58,9 +54,9 @@ public class AutoTest extends LinearOpMode {
                 .backward(12)
                 .left(12)
                 .right(12)
-                .openClaws()
+                .openBothClaws()
                 .sleepFor(500)
-                .closeClaws()
+                .closeBothClaws()
                 .sleepFor(500)
                 .openRightClaw()
                 .sleepFor(500)

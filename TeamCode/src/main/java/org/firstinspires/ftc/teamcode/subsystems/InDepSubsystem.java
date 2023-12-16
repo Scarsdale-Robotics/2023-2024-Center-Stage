@@ -5,8 +5,8 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.SpeedCoefficients;
+import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
+import org.firstinspires.ftc.teamcode.util.PIDController;
 
 public class InDepSubsystem extends SubsystemBase {
     private static final double Kp = 0.01;
@@ -26,6 +26,7 @@ public class InDepSubsystem extends SubsystemBase {
     private boolean isLeftClawOpen;
     private boolean isRightClawOpen;
     private boolean isElbowFlipped;
+    private boolean isBusy;
 
     private final LinearOpMode opMode;
 
@@ -68,7 +69,7 @@ public class InDepSubsystem extends SubsystemBase {
         }
     }
 
-    public InDepSubsystem(Motor arm1, Motor arm2, Servo rightClaw, Servo leftClaw, Servo wrist, Servo elbow, LinearOpMode opMode, Telemetry telemetry) {
+    public InDepSubsystem(Motor arm1, Motor arm2, Servo elbow, Servo wrist, Servo leftClaw, Servo rightClaw, LinearOpMode opMode) {
         // initialize objects
         this.arm1 = arm1;
         this.arm2 = arm2;
@@ -86,6 +87,8 @@ public class InDepSubsystem extends SubsystemBase {
         rest(); // elbow
         close(); // claw
 
+        isBusy = false;
+
     }
 
     /**
@@ -102,6 +105,12 @@ public class InDepSubsystem extends SubsystemBase {
      * @param ticks      The angle to displace the arm by in ticks.
      */
     public void raiseByEncoder(double power, double ticks) {
+        // check for clashing actions
+        if (isBusy) {
+            throw new RuntimeException("Tried to run two arm actions at once (isBusy = true)");
+        }
+
+        // begin action
         double startEncoder = arm1.motor.getCurrentPosition(); // arm1 is our reference for encoders
         double setPoint = startEncoder + ticks;
         double pidMultiplier;
@@ -115,6 +124,7 @@ public class InDepSubsystem extends SubsystemBase {
         ) {
             pidMultiplier = pidController.update(getArmPosition());
             rawPower(power * pidMultiplier);
+            isBusy = true;
         }
 
         // brake
@@ -122,6 +132,7 @@ public class InDepSubsystem extends SubsystemBase {
         arm2.stopMotor();
         arm1.motor.setPower(0);
         arm2.motor.setPower(0);
+        isBusy = false;
     }
 
     /**
@@ -270,6 +281,13 @@ public class InDepSubsystem extends SubsystemBase {
      */
     public boolean getIsElbowFlipped() {
         return isElbowFlipped;
+    }
+
+    /**
+     * @return whether or not the arm is in an action.
+     */
+    public boolean isBusy() {
+        return isBusy;
     }
 
     /**

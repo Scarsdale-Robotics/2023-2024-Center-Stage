@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
-import org.firstinspires.ftc.teamcode.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
@@ -41,12 +40,8 @@ public class TeleOpUtil {
         inDep = new InDepSubsystem(
                 robot.arm1,
                 robot.arm2,
-                robot.rightClaw,
-                robot.leftClaw,
-                robot.wrist,
-                robot.elbow,
-                opMode,
-                telemetry
+                robot.elbow, robot.wrist, robot.leftClaw, robot.rightClaw,
+                opMode
         );
         drive = new DriveSubsystem(
                 robot.leftFront,

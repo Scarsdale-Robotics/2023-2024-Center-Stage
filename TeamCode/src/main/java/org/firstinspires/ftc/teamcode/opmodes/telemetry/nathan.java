@@ -18,12 +18,8 @@ public class nathan extends LinearOpMode {
         InDepSubsystem inDep = new InDepSubsystem(
                 robot.arm1,
                 robot.arm2,
-                robot.rightClaw,
-                robot.leftClaw,
-                robot.wrist,
-                robot.elbow,
-                this,
-                telemetry
+                robot.elbow, robot.wrist, robot.leftClaw, robot.rightClaw,
+                this
         );
         DriveSubsystem drive = new DriveSubsystem(
                 robot.leftFront,

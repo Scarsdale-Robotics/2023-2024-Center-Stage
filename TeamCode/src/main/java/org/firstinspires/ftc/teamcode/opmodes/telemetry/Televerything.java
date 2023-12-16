@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.HardwareRobot;
-import org.firstinspires.ftc.teamcode.SpeedCoefficients;
+import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
@@ -21,12 +21,8 @@ public class Televerything extends LinearOpMode {
         InDepSubsystem inDep = new InDepSubsystem(
                 robot.arm1,
                 robot.arm2,
-                robot.rightClaw,
-                robot.leftClaw,
-                robot.wrist,
-                robot.elbow,
-                this,
-                telemetry
+                robot.elbow, robot.wrist, robot.leftClaw, robot.rightClaw,
+                this
         );
         DriveSubsystem drive = new DriveSubsystem(
                 robot.leftFront,

@@ -8,11 +8,14 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.SpeedCoefficients;
+import org.firstinspires.ftc.teamcode.subsystems.movement.MovementThread;
+import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.movement.Movement;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
+import org.firstinspires.ftc.teamcode.util.PIDController;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 
 public class DriveSubsystem extends SubsystemBase {
     private static final double Kp = 0.01;
@@ -21,12 +24,7 @@ public class DriveSubsystem extends SubsystemBase {
     private static final double errorTolerance_p = 5.0;
     private static final double errorTolerance_v = 0.05;
 
-    private static final double TICKS_PER_INCH_FORWARD = 32.4;
-    private static final double TICKS_PER_INCH_STRAFE = 62.5;
-    private static final double TICKS_PER_DEGREE_TURN = 10.0;
-    private static final double TICKS_PER_DEGREE_ARM = 35.0;
-
-    final private ElapsedTime runtime = new ElapsedTime();
+    private boolean isBusy;
     private MecanumDrive controller;
     private IMU imu;
     private LinearOpMode opMode;
@@ -44,7 +42,7 @@ public class DriveSubsystem extends SubsystemBase {
         this.imu = imu;
         this.opMode = opMode;
         this.inDep = inDep;
-        runtime.reset();
+        isBusy = false;
     }
 
     /**
@@ -77,6 +75,12 @@ public class DriveSubsystem extends SubsystemBase {
      * @param ticks          How far the robot should move.
      */
     public void driveByEncoder(double rightSpeed, double forwardSpeed, double turnSpeed, double ticks) {
+        // check for clashing actions
+        if (isBusy) {
+            throw new RuntimeException("Tried to run two arm actions at once (isBusy = true)");
+        }
+
+        // begin action
         double startEncoder = rightBack.getCurrentPosition();
         double setPoint = startEncoder + ticks;
         double pidMultiplier;
@@ -89,9 +93,11 @@ public class DriveSubsystem extends SubsystemBase {
         ) {
             pidMultiplier = pidController.update(rightBack.getCurrentPosition());
             driveRobotCentric(rightSpeed * pidMultiplier, forwardSpeed * pidMultiplier, turnSpeed * pidMultiplier);
+            isBusy = true;
         }
 
         controller.stop();
+        isBusy = false;
     }
 
     /**
@@ -99,62 +105,35 @@ public class DriveSubsystem extends SubsystemBase {
      * @param movementSequence      The MovementSequence to be followed.
      */
     public void followMovementSequence(MovementSequence movementSequence) {
-        double  POWER_FORWARD = SpeedCoefficients.getAutonomousForwardSpeed(),
-                POWER_STRAFE = SpeedCoefficients.getAutonomousStrafeSpeed(),
-                POWER_TURN = SpeedCoefficients.getAutonomousTurnSpeed(),
-                POWER_ARM = SpeedCoefficients.getAutonomousArmSpeed();
+
 
         ArrayDeque<Movement> movements = movementSequence.movements.clone();
 
         while (opMode.opModeIsActive() && !movements.isEmpty()) {
-            Movement movement = movements.pollFirst();
-            Movement.MovementType type = movement.MOVEMENT_TYPE;
+            ArrayList<Thread> threads = new ArrayList<>();
 
-            // GENERIC DRIVE CASES
-            driveByEncoder(
-                    POWER_STRAFE * type.K_strafe,
-                    POWER_FORWARD * type.K_forward,
-                    POWER_TURN * type.K_turn,
-                    Math.sqrt(
-                            // Pythagorean Theorem for diagonal movement
-                            Math.pow(movement.INCHES_STRAFE * TICKS_PER_INCH_STRAFE * Math.abs(type.K_strafe),2) +
-                            Math.pow(movement.INCHES_FORWARD * TICKS_PER_INCH_FORWARD * Math.abs(type.K_forward),2)
-                    ) +
-                    movement.DEGREES_TURN * TICKS_PER_DEGREE_TURN * Math.abs(type.K_turn)
-            );
+            // fetch all linked movements
+            boolean linked = true;
+            while (!movements.isEmpty() && linked) {
+                Movement movement = movements.pollFirst();
+                MovementThread thread = new MovementThread(movement, this, inDep, opMode);
+                linked = movement.linkedToNext;
+                threads.add(new Thread(thread));
+            }
 
-            // ELEVATION CASES
-            inDep.raiseByEncoder(
-                    POWER_ARM * type.K_elevation,
-                    movement.DEGREES_ELEVATION * TICKS_PER_DEGREE_ARM * Math.abs(type.K_elevation)
-            );
+            // start all movements
+            for (Thread thread : threads) thread.start();
 
-            // DELAY CASE
-            if (type == Movement.MovementType.DELAY)
-                sleepFor(movement.WAIT);
-
-            // CLAW CASES
-            if (type == Movement.MovementType.OPEN_LEFT_CLAW)
-                inDep.openLeft();
-            if (type == Movement.MovementType.OPEN_RIGHT_CLAW)
-                inDep.openRight();
-            if (type == Movement.MovementType.CLOSE_RIGHT_CLAW)
-                inDep.closeRight();
-            if (type == Movement.MovementType.CLOSE_LEFT_CLAW)
-                inDep.closeLeft();
+            // wait until all movements are completed
+            boolean running = true;
+            while (opMode.opModeIsActive() && running) {
+                running = false;
+                for (Thread thread : threads) running = thread.isAlive() || running; // running is only false if all threads are inactive
+            }
 
         }
 
         controller.stop();
-    }
-
-    /**
-     * Smart sleep with opMode running check.
-     * @param ms Timeout in milliseconds.
-     */
-    private void sleepFor(long ms) {
-        runtime.reset();
-        while (opMode.opModeIsActive() && (runtime.milliseconds() < ms));
     }
 
     /**
@@ -169,6 +148,13 @@ public class DriveSubsystem extends SubsystemBase {
      */
     public double getWheelVelocity() {
         return rightBack.getCorrectedVelocity();
+    }
+
+    /**
+     * @return whether or not the drivetrain is in an action.
+     */
+    public boolean isBusy() {
+        return isBusy;
     }
 
     /**

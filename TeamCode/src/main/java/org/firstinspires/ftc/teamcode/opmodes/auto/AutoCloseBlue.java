@@ -25,12 +25,8 @@ public class AutoCloseBlue extends LinearOpMode {
         inDep = new InDepSubsystem(
                 robot.arm1,
                 robot.arm2,
-                robot.rightClaw,
-                robot.leftClaw,
-                robot.wrist,
-                robot.elbow,
-                this,
-                telemetry
+                robot.elbow, robot.wrist, robot.leftClaw, robot.rightClaw,
+                this
         );
         drive = new DriveSubsystem(
                 robot.leftFront,
@@ -89,7 +85,7 @@ public class AutoCloseBlue extends LinearOpMode {
                     .build();
             approachWhite = new MovementSequenceBuilder()
                     .forward(88) // move to white pixels
-                    .alignWhitePixel() // i wonder what this does
+                    .alignWithWhitePixel() // i wonder what this does
                     .forward(11) // move a bit more after align with white
                     .closeRightClaw() // intake 2 white pixels
                     .build();
@@ -128,7 +124,7 @@ public class AutoCloseBlue extends LinearOpMode {
                     .build();
             approachWhite = new MovementSequenceBuilder()
                     .forward(77) // move to white pixels
-                    .alignWhitePixel() // i wonder what this does
+                    .alignWithWhitePixel() // i wonder what this does
                     .forward(11) // move a bit more after align with white
                     .closeRightClaw() // intake 2 white pixels
                     .build();
@@ -166,7 +162,7 @@ public class AutoCloseBlue extends LinearOpMode {
                     .build();
             approachWhite = new MovementSequenceBuilder()
                     .forward(66) // move to white pixels
-                    .alignWhitePixel() // i wonder what this does
+                    .alignWithWhitePixel() // i wonder what this does
                     .forward(11) // move a bit more after align with white
                     .closeRightClaw() // intake 2 white pixels
                     .build();
