@@ -58,84 +58,159 @@ public class AutoFarBlue extends LinearOpMode {
         int propLocation = cv.getPropLocation();
 
         MovementSequence placePurple = new MovementSequenceBuilder().build(),
-                moveToBackdrop = new MovementSequenceBuilder().build(),
-        placeYellow = new MovementSequenceBuilder().build();
+                approachFirstWhite = new MovementSequenceBuilder().build(),
+                approachWhite = new MovementSequenceBuilder().build(),
+                placeWhite = new MovementSequenceBuilder().build(),
+                placeYellow = new MovementSequenceBuilder().build(),
+                park = new MovementSequenceBuilder().build();
+
+        double WHITE_PX_HEIGHT = 22;
 
         if (propLocation == 0) {
             // left
-
-            // build the sequence of movements here
             placePurple = new MovementSequenceBuilder()
-                    .forward(50) // moving forward toward the pixel placing area
-                    .turnLeft(90) // turn left 90 degrees
-                    .forward(2.5) // align with tape
-                    .openClaw() // open claw to place the pixel
-                    .raiseArm(63) // raise arm to not hit pixel
+                    .forwardLeft(28, 2) // move towards left spike mark
+                    .turnLeft(90) // turn to left spike mark
+                    .openClawRight() // release purple pixel
                     .build();
-            moveToBackdrop = new MovementSequenceBuilder()
-                    .backward(5) // move backwards to not hid pixel
-                    .right(26) // move to align with truss
-                    .lowerArm(63) // lower arm
-                    .forward(72) // move forwards towards the backdrop
-                    .turnLeft(180) // turn left 180º for pixel placement
+            approachFirstWhite = new MovementSequenceBuilder()
+                    .raiseArm(WHITE_PX_HEIGHT) // raise for white pixel
+                    .backwardRight(2, 24) // move towards white stack (closest to center)
+                    .turnLeft(180) // 180 to face white stack
+                    .alignWhitePixel() // align w/ white stack obv. lol
+                    .forward(6) // move towards stack
+                    .closeClawRight() // intake from stack
                     .build();
             placeYellow = new MovementSequenceBuilder()
-                    .backwardRight(11, 28) // moving backward towards the backdrop
-                    // include some april tag alignment maybe
-                    .raiseArm(120) // raise to place on backdrop
-                    .openClaw() // release pixel
-                    .left(30) // move to park
-                    .lowerArm(120) // lower arm after pixel release
-                    .closeClaw() // close claw
-                    .turnLeft(90)  // face correct direction for tele-op start
-                    .left(11.1) // park next to wall
+                    .backward(96) // move towards backdrop
+                    .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to pixel placement pos
+                    .backwardRight(11, 24) // move towards backdrop
+                    .openClawLeft() // release yellow
+                    .openClawRight() // release white
+                    .forwardLeft(20, 33) // align with truss to head towards white stack
+                    .build(); // build lol
+            approachWhite = new MovementSequenceBuilder()
+                    .forward(88) // move to white pixels
+                    .alignWhitePixel() // i wonder what this does
+                    .forward(11) // move a bit more after align with white
+                    .closeClawRight() // intake 2 white pixels
+                    .build();
+            placeWhite = new MovementSequenceBuilder()
+                    .backward(99) // move towards backdrop
+                    .backwardRight(11, 24) // move towards backdrop
+                    .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
+                    .openClawRight() // open right claw to release 1 pixel
+                    .sleepFor(200) // allow 1st pixel to fall
+                    .closeClawRight() // close right claw to prevent 2nd pixel release
+                    .right(3) // move to drop 2nd pixel
+                    .openClawRight() // drop 2nd pixel
+                    .forwardLeft(20, 24) // align with truss
+                    .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
+                    .build();
+            park = new MovementSequenceBuilder()
+                    .turnLeft(90) // turn to post-auto (pre-teleop) ideal pos
+                    .left(35) // drive to park
                     .build();
         } else if (propLocation == 1) {
-
-            //WIP
             placePurple = new MovementSequenceBuilder()
                     .forward(26.69) // Moving forward toward the pixel placing area
-                    .openClaw() // place pixel
+                    .openClawRight() // place purple
                     .backward(5) // Move backward to not hit pixel on turn
-                    .raiseArm(63) // raise arm to not hit pixel on term
+                    .raiseArm(WHITE_PX_HEIGHT) // raise arm to not hit pixel on term
                     .build();
-            moveToBackdrop = new MovementSequenceBuilder()
-                    .forwardRight(24, 24)
+            approachFirstWhite = new MovementSequenceBuilder()
+                    .turnRight(90) // turn to face white pixel stacks
+                    .forwardLeft(20, 24) // move towards white pixel stack (closest to center one)
+                    .alignWhitePixel() // thing
+                    .forward(6) // move to pixel stack
+                    .closeClawRight() // intake white pixel
                     .build();
             placeYellow = new MovementSequenceBuilder()
-                    .backwardRight(19.3, 12.3) // moving backward towards the backdrop
-                    .raiseArm(120) // raise to place on backdrop
-                    .openClaw() // release pixel
-                    .lowerArm(120) // rotate arm after pixel release
-                    .left(10) // move to park
-                    .closeClaw() // close claw
-                    .turnLeft(90)  // face correct direction for tele-op start
-                    .left(20)  // park next to wall
+                    .backward(96) // move towards backdrop
+                    .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to pixel placement pos
+                    .backwardRight(11, 18) // move towards backdrop
+                    .openClawLeft() // release yellow
+                    .openClawRight() // release white
+                    .forwardLeft(20, 39) // align with truss to head towards white stack
+                    .build(); // build lol
+            approachWhite = new MovementSequenceBuilder()
+                    .forward(77) // move to white pixels
+                    .alignWhitePixel() // i wonder what this does
+                    .forward(11) // move a bit more after align with white
+                    .closeClawRight() // intake 2 white pixels
                     .build();
-
-
+            placeWhite = new MovementSequenceBuilder()
+                    .backward(99) // move towards backdrop
+                    .backwardRight(11, 24) // move towards backdrop
+                    .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
+                    .openClawRight() // open right claw to release 1 pixel
+                    .sleepFor(200) // allow 1st pixel to fall
+                    .closeClawRight() // close right claw to prevent 2nd pixel release
+                    .right(3) // move to drop 2nd pixel
+                    .openClawRight() // drop 2nd pixel
+                    .forwardLeft(31, 18) // align with truss
+                    .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
+                    .build();
+            park = new MovementSequenceBuilder()
+                    .turnLeft(90) // turn to post-auto (pre-teleop) ideal pos
+                    .left(46) // drive to park
+                    .build();
         } else if (propLocation == 2) {
             placePurple = new MovementSequenceBuilder()
-                    .forward(24.69) // Moving forward toward the pixel placing area
-                    .forward(0.03) // Brake
-                    .turnRight(85.5) // Turn right
-                    .backward(6.48) // Moving back to center
-                    .forward(0.31) // Brake
-                    .left(3.2) // Strafe left
-                    .raiseArm(57.14) // Raise claw
+                    .forwardLeft(30, 2) // move to right spike mark
+                    .turnRight(90) // turn towards right spike mark
+                    .openClawRight() // release purple
+                    .raiseArm(WHITE_PX_HEIGHT) // raise arm to not hit pixel on turn
+                    .backward(5) // move backward to not collide with pixel
                     .build();
-
-            moveToBackdrop = new MovementSequenceBuilder()
-                    .left(16.0) // Strafe left
-                    .backward(115.74) // Move backward
-                    .lowerArm(57.14) // Lower claw
+            approachFirstWhite = new MovementSequenceBuilder()
+                    .left(15) // move towards white pixel stack (the one closest to the center)
+                    .alignWhitePixel() // chicken nugget
+                    .forward(22) // move towards pixel stack
+                    .closeClawRight() // intake white pixel
+                    .build();
+            approachWhite = new MovementSequenceBuilder()
+                    .forward(66) // move to white pixels
+                    .alignWhitePixel() // i wonder what this does
+                    .forward(11) // move a bit more after align with white
+                    .closeClawRight() // intake 2 white pixels
+                    .build();
+            placeYellow = new MovementSequenceBuilder()
+                    .backward(96) // move towards backdrop
+                    .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to pixel placement pos
+                    .backwardRight(11, 12) // move towards backdrop
+                    .openClawLeft() // release yellow
+                    .openClawRight() // release white
+                    .forwardLeft(20, 45) // align with truss to head towards white stack
+                    .build(); // build lol
+            placeWhite = new MovementSequenceBuilder()
+                    .backward(99) // move towards backdrop
+                    .backwardRight(11, 12) // move towards backdrop
+                    .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
+                    .openClawRight() // open right claw to release 1 pixel
+                    .sleepFor(200) // allow 1st pixel to fall
+                    .closeClawRight() // close right claw to prevent 2nd pixel release
+                    .right(3) // move to drop 2nd pixel
+                    .openClawRight() // drop 2nd pixel
+                    .forwardLeft(42, 24) // align with truss
+                    .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
+                    .build();
+            park = new MovementSequenceBuilder()
+                    .turnLeft(90) // turn to post-auto (pre-teleop) ideal pos
+                    .left(57) // drive to park
                     .build();
         }
 
         // perform the actual movements here in sequence
         drive.followMovementSequence(placePurple);
-        drive.followMovementSequence(moveToBackdrop);
+        drive.followMovementSequence(approachFirstWhite);
         drive.followMovementSequence(placeYellow);
+        for (int i = 0;i<2;i++)
+        {
+            drive.followMovementSequence(approachWhite);
+            drive.followMovementSequence(placeWhite);
+        }
+        drive.followMovementSequence(park);
 
         stopRobot();
     }

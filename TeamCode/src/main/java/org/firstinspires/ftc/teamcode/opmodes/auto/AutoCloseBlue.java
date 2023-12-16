@@ -108,7 +108,6 @@ public class AutoCloseBlue extends LinearOpMode {
             park = new MovementSequenceBuilder()
                     .turnLeft(90) // turn to post-auto (pre-teleop) ideal pos
                     .left(35) // drive to park
-
                     .build();
 
         } else if (propLocation == 1) {
@@ -142,12 +141,12 @@ public class AutoCloseBlue extends LinearOpMode {
                     .closeClawRight() // close right claw to prevent 2nd pixel release
                     .right(3) // move to drop 2nd pixel
                     .openClawRight() // drop 2nd pixel
-                    .forwardLeft(31, 24) // align with truss
+                    .forwardLeft(31, 18) // align with truss
                     .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
                     .build();
             park = new MovementSequenceBuilder()
                     .turnLeft(90) // turn to post-auto (pre-teleop) ideal pos
-                    .left(35) // drive to park
+                    .left(46) // drive to park
                     .build();
 
         } else if (propLocation == 2) {
@@ -173,7 +172,7 @@ public class AutoCloseBlue extends LinearOpMode {
                     .build();
             placeWhite = new MovementSequenceBuilder()
                     .backward(99) // move towards backdrop
-                    .backwardRight(11, 24) // move towards backdrop
+                    .backwardRight(11, 12) // move towards backdrop
                     .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
                     .openClawRight() // open right claw to release 1 pixel
                     .sleepFor(200) // allow 1st pixel to fall
@@ -185,7 +184,7 @@ public class AutoCloseBlue extends LinearOpMode {
                     .build();
             park = new MovementSequenceBuilder()
                     .turnLeft(90) // turn to post-auto (pre-teleop) ideal pos
-                    .left(35) // drive to park
+                    .left(57) // drive to park
                     .build();
         }
 
