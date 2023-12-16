@@ -128,7 +128,7 @@ public class InDepSubsystem extends SubsystemBase {
      * Moves the arm to a target encoder value.
      */
     public void raiseToSetPoint(double power, double setPoint) {
-        raiseByEncoder(power, setPoint - getArmPosition());
+        new Thread(() -> raiseByEncoder(power, setPoint - getArmPosition())).start();
     }
 
     /**

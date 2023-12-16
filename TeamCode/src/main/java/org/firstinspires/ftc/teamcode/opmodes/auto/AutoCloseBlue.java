@@ -74,9 +74,9 @@ public class AutoCloseBlue extends LinearOpMode {
         if (propLocation == 0) {
             // left
             placeYellow = new MovementSequenceBuilder()
-                    .forwardLeft(20, 46) // place yellow first, move to backdrop
-                    .turnRight(90) // face back to backdrop to place on backdrop
                     .raiseArm(120) // raise arm to place pixel
+                    .forwardLeft(20, 46) // move to backdrop
+                    .turnRight(90) // face back to backdrop to place on backdrop
                     .openLeftClaw() // drop yellow pixel
                     .build();
             placePurple = new MovementSequenceBuilder()
@@ -84,7 +84,7 @@ public class AutoCloseBlue extends LinearOpMode {
                     .forwardLeft(7.65, 15.67) // move forward to purple pixel loc
                     .openRightClaw() // drop purple pixel
                     .raiseArm(WHITE_PX_HEIGHT) // raise arm to not hit purple pixel and to align with white pixel
-                    // lets run a test to see if we can try not lowering the arm
+                    // lets run a test to see if we can try not lowering the arm now
                     .backwardLeft(5, 15) // move to align with truss
                     .build();
             approachWhite = new MovementSequenceBuilder()
@@ -95,8 +95,8 @@ public class AutoCloseBlue extends LinearOpMode {
                     .build();
             placeWhite = new MovementSequenceBuilder()
                     .backward(99) // move towards backdrop
-                    .backwardRight(11, 24) // move towards backdrop
                     .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
+                    .backwardRight(11, 24) // move towards backdrop
                     .openRightClaw() // open right claw to release 1 pixel
                     .sleepFor(200) // allow 1st pixel to fall
                     .closeRightClaw() // close right claw to prevent 2nd pixel release
@@ -113,9 +113,9 @@ public class AutoCloseBlue extends LinearOpMode {
         } else if (propLocation == 1) {
 
             placeYellow = new MovementSequenceBuilder()
-                    .forwardLeft(26, 52) // place yellow first, move to backdrop
-                    .turnRight(90) // face back to backdrop to place on backdrop
                     .raiseArm(120) // raise arm to place pixel
+                    .forwardLeft(26, 52) // move to backdrop
+                    .turnRight(90) // face back to backdrop to place on backdrop
                     .openLeftClaw() // drop yellow pixel
                     .build();
             placePurple = new MovementSequenceBuilder()
@@ -134,8 +134,8 @@ public class AutoCloseBlue extends LinearOpMode {
                     .build();
             placeWhite = new MovementSequenceBuilder()
                     .backward(99) // move towards backdrop
-                    .backwardRight(11, 24) // move towards backdrop
                     .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
+                    .backwardRight(11, 24) // move towards backdrop
                     .openRightClaw() // open right claw to release 1 pixel
                     .sleepFor(200) // allow 1st pixel to fall
                     .closeRightClaw() // close right claw to prevent 2nd pixel release
@@ -151,9 +151,9 @@ public class AutoCloseBlue extends LinearOpMode {
 
         } else if (propLocation == 2) {
             placeYellow = new MovementSequenceBuilder()
-                    .forwardLeft(32, 52) // place yellow first, move to backdrop
-                    .turnRight(90) // face back to backdrop to place on backdrop
                     .raiseArm(120) // raise arm to place pixel
+                    .forwardLeft(32, 52) // move to backdrop
+                    .turnRight(90) // face back to backdrop to place on backdrop
                     .openLeftClaw() // drop yellow pixel
                     .build();
             placePurple = new MovementSequenceBuilder()
@@ -172,8 +172,8 @@ public class AutoCloseBlue extends LinearOpMode {
                     .build();
             placeWhite = new MovementSequenceBuilder()
                     .backward(99) // move towards backdrop
-                    .backwardRight(11, 12) // move towards backdrop
                     .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
+                    .backwardRight(11, 12) // move towards backdrop
                     .openRightClaw() // open right claw to release 1 pixel
                     .sleepFor(200) // allow 1st pixel to fall
                     .closeRightClaw() // close right claw to prevent 2nd pixel release

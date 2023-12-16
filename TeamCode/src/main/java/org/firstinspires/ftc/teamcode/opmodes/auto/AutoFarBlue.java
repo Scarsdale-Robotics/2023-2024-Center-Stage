@@ -97,15 +97,15 @@ public class AutoFarBlue extends LinearOpMode {
                     .build();
             placeWhite = new MovementSequenceBuilder()
                     .backward(99) // move towards backdrop
-                    .backwardRight(11, 24) // move towards backdrop
                     .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
+                    .backwardRight(11, 24) // move towards backdrop
                     .openRightClaw() // open right claw to release 1 pixel
                     .sleepFor(200) // allow 1st pixel to fall
                     .closeRightClaw() // close right claw to prevent 2nd pixel release
                     .right(3) // move to drop 2nd pixel
                     .openRightClaw() // drop 2nd pixel
-                    .forwardLeft(20, 24) // align with truss
                     .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
+                    .forwardLeft(20, 24) // align with truss
                     .build();
             park = new MovementSequenceBuilder()
                     .turnLeft(90) // turn to post-auto (pre-teleop) ideal pos
@@ -115,8 +115,8 @@ public class AutoFarBlue extends LinearOpMode {
             placePurple = new MovementSequenceBuilder()
                     .forward(26.69) // Moving forward toward the pixel placing area
                     .openRightClaw() // place purple
-                    .backward(5) // Move backward to not hit pixel on turn
                     .raiseArm(WHITE_PX_HEIGHT) // raise arm to not hit pixel on term
+                    .backward(5) // Move backward to not hit pixel on turn
                     .build();
             approachFirstWhite = new MovementSequenceBuilder()
                     .turnRight(90) // turn to face white pixel stacks
@@ -141,15 +141,15 @@ public class AutoFarBlue extends LinearOpMode {
                     .build();
             placeWhite = new MovementSequenceBuilder()
                     .backward(99) // move towards backdrop
-                    .backwardRight(11, 24) // move towards backdrop
                     .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
+                    .backwardRight(11, 24) // move towards backdrop
                     .openRightClaw() // open right claw to release 1 pixel
                     .sleepFor(200) // allow 1st pixel to fall
                     .closeRightClaw() // close right claw to prevent 2nd pixel release
                     .right(3) // move to drop 2nd pixel
                     .openRightClaw() // drop 2nd pixel
-                    .forwardLeft(31, 18) // align with truss
                     .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
+                    .forwardLeft(31, 18) // align with truss
                     .build();
             park = new MovementSequenceBuilder()
                     .turnLeft(90) // turn to post-auto (pre-teleop) ideal pos
@@ -169,12 +169,6 @@ public class AutoFarBlue extends LinearOpMode {
                     .forward(22) // move towards pixel stack
                     .closeRightClaw() // intake white pixel
                     .build();
-            approachWhite = new MovementSequenceBuilder()
-                    .forward(66) // move to white pixels
-                    .alignWhitePixel() // i wonder what this does
-                    .forward(11) // move a bit more after align with white
-                    .closeRightClaw() // intake 2 white pixels
-                    .build();
             placeYellow = new MovementSequenceBuilder()
                     .backward(96) // move towards backdrop
                     .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to pixel placement pos
@@ -182,18 +176,26 @@ public class AutoFarBlue extends LinearOpMode {
                     .openLeftClaw() // release yellow
                     .openRightClaw() // release white
                     .forwardLeft(20, 45) // align with truss to head towards white stack
+                    .lowerArm(120 - (WHITE_PX_HEIGHT * 4 / 5)) // lower arm to white pixel intake pos
                     .build(); // build lol
+            approachWhite = new MovementSequenceBuilder()
+                    .forward(66) // move to white pixels
+                    .alignWhitePixel() // i wonder what this does
+                    .forward(11) // move a bit more after align with white
+                    .closeRightClaw() // intake 2 white pixels
+                    .build();
             placeWhite = new MovementSequenceBuilder()
                     .backward(99) // move towards backdrop
-                    .backwardRight(11, 12) // move towards backdrop
                     .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
+                    .backwardRight(11, 12) // move towards backdrop
                     .openRightClaw() // open right claw to release 1 pixel
                     .sleepFor(200) // allow 1st pixel to fall
                     .closeRightClaw() // close right claw to prevent 2nd pixel release
                     .right(3) // move to drop 2nd pixel
                     .openRightClaw() // drop 2nd pixel
+                    // CONSIDER MAYBE JUST OPENING (at near-vertical angle?), MAYBE IT WILL DROP BOTH IN THE RIGHT SPOTS
+                    .lowerArm(120 - (WHITE_PX_HEIGHT * 2 / 5)) // arm is about 120 before this point, now lower to 2nd white pxl pos
                     .forwardLeft(42, 24) // align with truss
-                    .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
                     .build();
             park = new MovementSequenceBuilder()
                     .turnLeft(90) // turn to post-auto (pre-teleop) ideal pos
