@@ -129,12 +129,18 @@ public class DriveSubsystem extends SubsystemBase {
                 sleepFor(movement.WAIT);
             }
 
-            // CLAW CASES
-            if (type == Movement.MovementType.CLOSE_CLAW) {
-                inDep.close();
+            if (type == Movement.MovementType.CLOSE_CLAW_RIGHT) {
+                inDep.closeLeft();
             }
-            if (type == Movement.MovementType.OPEN_CLAW) {
-                inDep.open();
+            if (type == Movement.MovementType.OPEN_CLAW_RIGHT) {
+                inDep.openRight();
+            }
+
+            if (type == Movement.MovementType.CLOSE_CLAW_LEFT) {
+                inDep.closeLeft();
+            }
+            if (type == Movement.MovementType.OPEN_CLAW_LEFT) {
+                inDep.openRight();
             }
 
         }

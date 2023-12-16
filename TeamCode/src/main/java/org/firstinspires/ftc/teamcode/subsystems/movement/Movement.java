@@ -2,6 +2,10 @@ package org.firstinspires.ftc.teamcode.subsystems.movement;
 
 public class Movement {
     public enum MovementType {
+        FORWARD_RIGHT (1.0,1.0,0.0,0.0),
+        FORWARD_LEFT (1.0,-1.0,0.0,0.0),
+        BACKWARD_RIGHT (-1.0,1.0,0.0,0.0),
+        BACKWARD_LEFT (-1.0,-1.0,0.0,0.0),
         FORWARD (1.0,0.0,0.0,0.0),
         BACKWARD (-1.0,0.0,0.0,0.0),
         STRAFE_LEFT (0.0,-1.0,0.0,0.0),
@@ -9,8 +13,10 @@ public class Movement {
         TURN_LEFT (0.0,0.0,-1.0,0.0),
         TURN_RIGHT (0.0,0.0,1.0,0.0),
         DELAY (0.0,0.0,0.0,0.0),
-        CLOSE_CLAW (0.0,0.0,0.0,0.0),
-        OPEN_CLAW (0.0,0.0,0.0,0.0),
+        CLOSE_CLAW_LEFT (0.0,0.0,0.0,0.0),
+        OPEN_CLAW_LEFT (0.0,0.0,0.0,0.0),
+        CLOSE_CLAW_RIGHT (0.0,0.0,0.0,0.0),
+        OPEN_CLAW_RIGHT (0.0,0.0,0.0,0.0),
         LOWER_ARM (0.0,0.0,0.0,1.0),
         RAISE_ARM (0.0,0.0,0.0,-1.0);
 

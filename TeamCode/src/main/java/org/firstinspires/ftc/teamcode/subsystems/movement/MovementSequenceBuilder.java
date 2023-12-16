@@ -13,6 +13,11 @@ public class MovementSequenceBuilder {
      */
     public MovementSequence build() {return new MovementSequence(movements);}
 
+    public MovementSequenceBuilder alignWhitePixel() {
+        // TODO: this
+        return this;
+    }
+
     /**
      * Appends a forward movement to the MovementSequenceBuilder.
      * @param inches      How far the robot should move in inches.
@@ -68,6 +73,46 @@ public class MovementSequenceBuilder {
     }
 
     /**
+     * Appends a forward-right movement to the MovementSequenceBuilder.
+     * @param inchesForward      How much the robot should move forward in inches.
+     * @param inchesRight        How much the robot should strafe right in inches.
+     */
+    public MovementSequenceBuilder forwardRight(double inchesForward, double inchesRight) {
+        movements.add(new Movement(Movement.MovementType.FORWARD_RIGHT, inchesForward, inchesRight, 0, 0, 0));
+        return this;
+    }
+
+    /**
+     * Appends a forward-left movement to the MovementSequenceBuilder.
+     * @param inchesForward      How much the robot should move forward in inches.
+     * @param inchesLeft         How much the robot should strafe left in inches.
+     */
+    public MovementSequenceBuilder forwardLeft(double inchesForward, double inchesLeft) {
+        movements.add(new Movement(Movement.MovementType.FORWARD_LEFT, inchesForward, inchesLeft, 0, 0, 0));
+        return this;
+    }
+
+    /**
+     * Appends a backward-right movement to the MovementSequenceBuilder.
+     * @param inchesBackward     How much the robot should move backward in inches.
+     * @param inchesRight        How much the robot should strafe right in inches.
+     */
+    public MovementSequenceBuilder backwardRight(double inchesBackward, double inchesRight) {
+        movements.add(new Movement(Movement.MovementType.BACKWARD_RIGHT, inchesBackward, inchesRight, 0, 0, 0));
+        return this;
+    }
+
+    /**
+     * Appends a backward-left movement to the MovementSequenceBuilder.
+     * @param inchesBackward     How much the robot should move backward in inches.
+     * @param inchesLeft         How much the robot should strafe left in inches.
+     */
+    public MovementSequenceBuilder backwardLeft(double inchesBackward, double inchesLeft) {
+        movements.add(new Movement(Movement.MovementType.BACKWARD_LEFT, inchesBackward, inchesLeft, 0, 0, 0));
+        return this;
+    }
+
+    /**
      * Appends a timeout to the MovementSequenceBuilder.
      * @param ms      The wait time in milliseconds.
      */
@@ -76,19 +121,29 @@ public class MovementSequenceBuilder {
         return this;
     }
 
-    /**
-     * Appends a close claw event to the MovementSequenceBuilder.
-     */
-    public MovementSequenceBuilder closeClaw() {
-        movements.add(new Movement(Movement.MovementType.CLOSE_CLAW, 0, 0, 0, 0, 0));
+//    public MovementSequenceBuilder openClaws() {
+//        movements.add(new Movement(Movement.MovementType.OPEN_CLAW, 0, 0, 0, 0, 0));
+//        return this;
+//    }
+    public MovementSequenceBuilder closeClawLeft() {
+        movements.add(new Movement(Movement.MovementType.CLOSE_CLAW_LEFT, 0, 0, 0, 0, 0));
+        return this;
+    }
+    public MovementSequenceBuilder closeClawRight() {
+        movements.add(new Movement(Movement.MovementType.CLOSE_CLAW_RIGHT, 0, 0, 0, 0, 0));
         return this;
     }
 
-    /**
-     * Appends an open claw event to the MovementSequenceBuilder.
-     */
-    public MovementSequenceBuilder openClaw() {
-        movements.add(new Movement(Movement.MovementType.OPEN_CLAW, 0, 0, 0, 0, 0));
+//    public MovementSequenceBuilder openClaws() {
+//        movements.add(new Movement(Movement.MovementType.OPEN_CLAW, 0, 0, 0, 0, 0));
+//        return this;
+//    }
+    public MovementSequenceBuilder openClawLeft() {
+        movements.add(new Movement(Movement.MovementType.OPEN_CLAW_LEFT, 0, 0, 0, 0, 0));
+        return this;
+    }
+    public MovementSequenceBuilder openClawRight() {
+        movements.add(new Movement(Movement.MovementType.OPEN_CLAW_RIGHT, 0, 0, 0, 0, 0));
         return this;
     }
 
