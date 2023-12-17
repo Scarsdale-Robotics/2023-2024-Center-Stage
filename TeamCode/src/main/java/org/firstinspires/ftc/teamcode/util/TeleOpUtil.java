@@ -7,14 +7,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
-import org.firstinspires.ftc.teamcode.opmodes.SubsystemInitializer;
+import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.movement.MovementThread;
 
 public class TeleOpUtil {
-    public HardwareRobot robot;
     public DriveSubsystem drive;
     public InDepSubsystem inDep;
     public CVSubsystem cvFront;
@@ -38,15 +36,15 @@ public class TeleOpUtil {
     public int macroCapacity = 0;
 
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
-        SubsystemInitializer subsystems = new SubsystemInitializer(new HardwareRobot(hardwareMap), isRedTeam, opMode, telemetry);
-        drive = subsystems.getDrive();
-        cvFront = subsystems.getCVFront();
-        cvBack = subsystems.getCVBack();
+        RobotSystem robot = new RobotSystem(hardwareMap, isRedTeam, opMode, telemetry);
+        drive = robot.getDrive();
+        cvFront = robot.getCVFront();
+        cvBack = robot.getCVBack();
         this.isRedTeam = isRedTeam;
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
         this.telemetry = telemetry;
-        this.lastTurnStart = robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        this.lastTurnStart = robot.getIMU().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
 
     private void runArmRigidControl() {

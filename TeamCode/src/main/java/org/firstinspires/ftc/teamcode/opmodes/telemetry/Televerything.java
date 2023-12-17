@@ -4,8 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.HardwareRobot;
-import org.firstinspires.ftc.teamcode.opmodes.SubsystemInitializer;
-import org.firstinspires.ftc.teamcode.subsystems.movement.MovementThread;
+import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
@@ -16,15 +15,14 @@ public class Televerything extends LinearOpMode {
     private final boolean isRedTeam = false;
     private DriveSubsystem drive;
     private InDepSubsystem inDep;
-    private HardwareRobot robot;
     private CVSubsystem cvBack;
 
     @Override
     public void runOpMode() {
-        robot = new HardwareRobot(hardwareMap);
-        SubsystemInitializer subsystems = new SubsystemInitializer(robot, false, this, telemetry);
-        subsystems.getInDep().close();
-        drive = subsystems.getDrive();inDep = subsystems.getInDep();
+        RobotSystem robot = new RobotSystem(hardwareMap, false, this, telemetry);
+        robot.getInDep().close();
+        drive = robot.getDrive();
+        inDep = robot.getInDep();
 
         waitForStart();
 
@@ -131,15 +129,16 @@ public class Televerything extends LinearOpMode {
             telemetry.addData("moveInputX: ", moveInputX);
             telemetry.addData("moveInputY: ", moveInputY);
             telemetry.addData("turnInput: ", turnInput);
-            telemetry.addData("wrist.getPosition: ", robot.wrist.getPosition());
-            telemetry.addData("wrist.getPosition: ", robot.wrist.getPosition());
-            telemetry.addData("leftClaw.getPosition: ", robot.leftClaw.getPosition());
-            telemetry.addData("rightClaw.getPosition: ", robot.rightClaw.getPosition());
-            telemetry.addData("arm.getCurrentPosition:", robot.arm1.motor.getCurrentPosition());
-            telemetry.addData("arm.getPower: ", robot.arm1.motor.getPower());
+            telemetry.addData("wrist.getPosition: ", inDep.getWristPosition());
+            telemetry.addData("elbow.getPosition: ", inDep.getElbowPosition());
+            telemetry.addData("leftClaw.getPosition: ", inDep.getLeftClawPosition());
+            telemetry.addData("rightClaw.getPosition: ", inDep.getRightClawPosition());
+            telemetry.addData("arm.getCurrentPosition:", inDep.getArmPosition());
+            telemetry.addData("arm.getPower: ", inDep.getArmVelocity());
             telemetry.addData("cvDist:", cvDist);
             telemetry.addData("rotOff: ",cvBack.getAprilTagRotationalOffset(isRedTeam ? 5 : 2));
 
+/* why just why
 
             telemetry.addData("⠀⢸⠂⠀⠀⠀⠘⣧⠀⠀⣟⠛⠲⢤⡀⠀⠀⣰⠏⠀⠀⠀⠀⠀⢹⡀", 0);
             telemetry.addData("⠀⡿⠀⠀⠀⠀⠀⠈⢷⡀⢻⡀⠀⠀⠙⢦⣰⠏⠀⠀⠀⠀⠀⠀⢸⠀", 0);
@@ -158,7 +157,7 @@ public class Televerything extends LinearOpMode {
             telemetry.addData("⠀⠀⠀⠀⠀⠀⠀⣼⣃⡀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣆⠀⠀⠀⠀⠀⠀", 0);
             telemetry.addData("⠀⠀⠀⠀⠀⠀⠀⠉⣹⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⠀⠀⠀⠀⠀⠀", 0);
             telemetry.addData("⠀⠀⠀⠀⠀⠀⠀⠀⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡆⠀⠀⠀⠀⠀", 0);
-
+*/
 
             telemetry.update();
         }

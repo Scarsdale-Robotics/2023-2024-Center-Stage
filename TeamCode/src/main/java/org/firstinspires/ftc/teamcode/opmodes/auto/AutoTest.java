@@ -5,27 +5,25 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.HardwareRobot;
-import org.firstinspires.ftc.teamcode.opmodes.SubsystemInitializer;
+import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
-import org.firstinspires.ftc.teamcode.subsystems.movement.MovementThread;
 
 @Autonomous(name = "Auto Test")
 public class AutoTest extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
-    private HardwareRobot robot;
     private InDepSubsystem inDep;
     private DriveSubsystem drive;
     private CVSubsystem cvFront;
     @Override
     // The "Main" code will go in here
     public void runOpMode() {
-        SubsystemInitializer subsystems = new SubsystemInitializer(new HardwareRobot(hardwareMap), false, this, telemetry);
-        subsystems.getInDep().close();
-        drive = subsystems.getDrive();
+        RobotSystem robot = new RobotSystem(hardwareMap, false, this, telemetry);
+        robot.getInDep().close();
+        drive = robot.getDrive();
         runtime.reset();
         inDep.close();
 

@@ -256,10 +256,31 @@ public class InDepSubsystem extends SubsystemBase {
     }
 
     /**
+     * @return the position of the elbow servo
+     */
+    public double getElbowPosition() {
+        return elbow.getPosition();
+    }
+
+    /**
      * @return the position of the wrist servo
      */
     public double getWristPosition() {
         return wrist.getPosition();
+    }
+
+    /**
+     * @return the position of the left claw servo
+     */
+    public double getLeftClawPosition() {
+        return leftClaw.getPosition();
+    }
+
+    /**
+     * @return the position of the right claw servo
+     */
+    public double getRightClawPosition() {
+        return rightClaw.getPosition();
     }
 
     /**
