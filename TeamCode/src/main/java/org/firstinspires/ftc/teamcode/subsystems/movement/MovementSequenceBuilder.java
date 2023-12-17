@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.movement;
 
+import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
+
 import java.util.ArrayDeque;
 
 public class MovementSequenceBuilder {
@@ -14,7 +16,7 @@ public class MovementSequenceBuilder {
     public MovementSequence build() {return new MovementSequence(movements);}
 
     public MovementSequenceBuilder alignWithWhitePixel() {
-        // TODO: this
+        movements.add(new Movement(Movement.MovementType.WHITE_PXL_ALIGN, 0, 0, 0, 0, 0));
         return this;
     }
 

@@ -25,8 +25,10 @@ public class HardwareRobot {
     public final Servo wrist;
 
     public final IMU imu;
-    public final OpenCvCamera camera;
-    public final WebcamName cameraName;
+    public final OpenCvCamera frontCam;
+    public final WebcamName frontCamName;
+    public final OpenCvCamera backCam;
+    public final WebcamName backCamName;
     public HardwareRobot(HardwareMap hardwareMap) {
         leftFront = new Motor(hardwareMap, "leftFront", Motor.GoBILDA.RPM_312);
         rightFront = new Motor(hardwareMap, "rightFront", Motor.GoBILDA.RPM_312);
@@ -107,8 +109,11 @@ public class HardwareRobot {
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
-        cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
-        camera = OpenCvCameraFactory.getInstance().createWebcam(cameraName);
+        frontCamName = hardwareMap.get(WebcamName.class, "Webcam Front");
+        frontCam = OpenCvCameraFactory.getInstance().createWebcam(frontCamName);
+
+        backCamName = hardwareMap.get(WebcamName.class, "Webcam Back");
+        backCam = OpenCvCameraFactory.getInstance().createWebcam(backCamName);
     }
 
     public double getYaw() {

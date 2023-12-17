@@ -37,8 +37,8 @@ public class AutoFarBlue extends LinearOpMode {
                 inDep,
                 this
         );
-        cv = new CVSubsystem(robot.camera,
-                robot.cameraName,
+        cv = new CVSubsystem(robot.frontCam,
+                robot.frontCamName,
                 drive,
                 telemetry,
                 false,
@@ -88,7 +88,7 @@ public class AutoFarBlue extends LinearOpMode {
             approachWhite = new MovementSequenceBuilder()
                     .forward(88) // move to white pixels
                     .alignWithWhitePixel() // i wonder what this does
-                    .forward(11) // move a bit more after align with white
+//                    .forward(11) // move a bit more after align with white
                     .closeRightClaw() // intake 2 white pixels
                     .build();
             placeWhite = new MovementSequenceBuilder()
@@ -118,7 +118,7 @@ public class AutoFarBlue extends LinearOpMode {
                     .turnRight(90) // turn to face white pixel stacks
                     .forwardLeft(20, 24) // move towards white pixel stack (closest to center one)
                     .alignWithWhitePixel() // thing
-                    .forward(6) // move to pixel stack
+//                    .forward(6) // move to pixel stack
                     .closeRightClaw() // intake white pixel
                     .build();
             placeYellow = new MovementSequenceBuilder()
@@ -132,7 +132,7 @@ public class AutoFarBlue extends LinearOpMode {
             approachWhite = new MovementSequenceBuilder()
                     .forward(77) // move to white pixels
                     .alignWithWhitePixel() // i wonder what this does
-                    .forward(11) // move a bit more after align with white
+//                    .forward(11) // move a bit more after align with white
                     .closeRightClaw() // intake 2 white pixels
                     .build();
             placeWhite = new MovementSequenceBuilder()
@@ -162,7 +162,7 @@ public class AutoFarBlue extends LinearOpMode {
             approachFirstWhite = new MovementSequenceBuilder()
                     .left(15) // move towards white pixel stack (the one closest to the center)
                     .alignWithWhitePixel() // chicken nugget
-                    .forward(22) // move towards pixel stack
+//                    .forward(22) // move towards pixel stack
                     .closeRightClaw() // intake white pixel
                     .build();
             placeYellow = new MovementSequenceBuilder()
@@ -177,7 +177,7 @@ public class AutoFarBlue extends LinearOpMode {
             approachWhite = new MovementSequenceBuilder()
                     .forward(66) // move to white pixels
                     .alignWithWhitePixel() // i wonder what this does
-                    .forward(11) // move a bit more after align with white
+//                    .forward(11) // move a bit more after align with white
                     .closeRightClaw() // intake 2 white pixels
                     .build();
             placeWhite = new MovementSequenceBuilder()
