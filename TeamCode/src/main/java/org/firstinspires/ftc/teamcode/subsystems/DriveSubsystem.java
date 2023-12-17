@@ -5,17 +5,18 @@ import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementThread;
-import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.movement.Movement;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class DriveSubsystem extends SubsystemBase {
     private static final double Kp = 0.01;
@@ -24,12 +25,13 @@ public class DriveSubsystem extends SubsystemBase {
     private static final double errorTolerance_p = 5.0;
     private static final double errorTolerance_v = 0.05;
 
-    private boolean isBusy;
-    private MecanumDrive controller;
-    private IMU imu;
-    private LinearOpMode opMode;
-    private Motor rightBack;
-    private InDepSubsystem inDep;
+    private static volatile boolean isBusy;
+    private static volatile ExecutorService threadPool;
+    private final MecanumDrive controller;
+    private final IMU imu;
+    private final LinearOpMode opMode;
+    private final Motor rightBack;
+    private final InDepSubsystem inDep;
 
     public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, IMU imu, InDepSubsystem inDep, LinearOpMode opMode) {
         this.rightBack = rightBack;
@@ -43,6 +45,7 @@ public class DriveSubsystem extends SubsystemBase {
         this.opMode = opMode;
         this.inDep = inDep;
         isBusy = false;
+        threadPool = Executors.newCachedThreadPool();
     }
 
     /**
@@ -76,14 +79,15 @@ public class DriveSubsystem extends SubsystemBase {
      */
     public void driveByEncoder(double rightSpeed, double forwardSpeed, double turnSpeed, double ticks) {
         // check for clashing actions
-        if (isBusy) {
-            throw new RuntimeException("Tried to run two arm actions at once (isBusy = true)");
+        if (DriveSubsystem.isBusy()) {
+            throw new RuntimeException("Tried to run two drive actions at once (drivetrain is busy)");
         }
 
         // begin action
         double startEncoder = rightBack.getCurrentPosition();
         double setPoint = startEncoder + ticks;
         double pidMultiplier;
+
         PIDController pidController = new PIDController(Kp, Ki, Kd, setPoint);
 
         while (
@@ -91,11 +95,12 @@ public class DriveSubsystem extends SubsystemBase {
                 Math.abs(setPoint-getWheelPosition()) > errorTolerance_p &&
                 Math.abs(getWheelVelocity()) > errorTolerance_v
         ) {
-            pidMultiplier = pidController.update(rightBack.getCurrentPosition());
+            pidMultiplier = pidController.update(getWheelPosition());
             driveRobotCentric(rightSpeed * pidMultiplier, forwardSpeed * pidMultiplier, turnSpeed * pidMultiplier);
             isBusy = true;
         }
 
+        // brake
         controller.stop();
         isBusy = false;
     }
@@ -106,34 +111,39 @@ public class DriveSubsystem extends SubsystemBase {
      */
     public void followMovementSequence(MovementSequence movementSequence) {
 
-
         ArrayDeque<Movement> movements = movementSequence.movements.clone();
 
         while (opMode.opModeIsActive() && !movements.isEmpty()) {
-            ArrayList<Thread> threads = new ArrayList<>();
+            ArrayList<Future<?>> threadStatus = new ArrayList<>();
 
             // fetch all linked movements
             boolean linked = true;
             while (!movements.isEmpty() && linked) {
-                Movement movement = movements.pollFirst();
-                MovementThread thread = new MovementThread(movement, this, inDep, opMode);
+                Movement movement = movements.removeFirst();
                 linked = movement.linkedToNext;
-                threads.add(new Thread(thread));
+                MovementThread thread = new MovementThread(movement, this, inDep, opMode);
+                Future<?> status = threadPool.submit(thread);
+                threadStatus.add(status); // start the MovementThread
             }
 
-            // start all movements
-            for (Thread thread : threads) thread.start();
-
-            // wait until all movements are completed
+            // wait until all linked movements are completed
             boolean running = true;
             while (opMode.opModeIsActive() && running) {
                 running = false;
-                for (Thread thread : threads) running = thread.isAlive() || running; // running is only false if all threads are inactive
+                for (Future<?> status : threadStatus)
+                    running = !status.isDone() || running; // running is only false if all threads are inactive
             }
 
         }
 
         controller.stop();
+    }
+
+    /**
+     * @return whether or not the drivetrain is in an action.
+     */
+    public static boolean isBusy() {
+        return isBusy;
     }
 
     /**
@@ -148,13 +158,6 @@ public class DriveSubsystem extends SubsystemBase {
      */
     public double getWheelVelocity() {
         return rightBack.getCorrectedVelocity();
-    }
-
-    /**
-     * @return whether or not the drivetrain is in an action.
-     */
-    public boolean isBusy() {
-        return isBusy;
     }
 
     /**

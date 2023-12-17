@@ -23,10 +23,10 @@ public class InDepSubsystem extends SubsystemBase {
     private final Servo elbow;
     private final Servo wrist;
 
+    private static volatile boolean isBusy;
     private boolean isLeftClawOpen;
     private boolean isRightClawOpen;
     private boolean isElbowFlipped;
-    private boolean isBusy;
 
     private final LinearOpMode opMode;
 
@@ -37,8 +37,8 @@ public class InDepSubsystem extends SubsystemBase {
         BACKBOARD2(-4200,0.125), //temp motor encoder values
         BACKBOARD3(-6000, 0.25);
 
-        public int target;
-        public double wristTarget;
+        public final int target;
+        public final double wristTarget;
 
         Level(int target, double wristTarget) {
             this.target = target;
@@ -62,7 +62,7 @@ public class InDepSubsystem extends SubsystemBase {
         CLAW_CLOSED(0.175),
         ELBOW_REST(0.0),
         ELBOW_FLIPPED(1.0);
-        public double servoPosition;
+        public final double servoPosition;
 
         EndEffector(double servoPosition) {
             this.servoPosition = servoPosition;
@@ -106,8 +106,8 @@ public class InDepSubsystem extends SubsystemBase {
      */
     public void raiseByEncoder(double power, double ticks) {
         // check for clashing actions
-        if (isBusy) {
-            throw new RuntimeException("Tried to run two arm actions at once (isBusy = true)");
+        if (InDepSubsystem.isBusy()) {
+            throw new RuntimeException("Tried to run two arm actions at once (arm is busy)");
         }
 
         // begin action
@@ -234,7 +234,7 @@ public class InDepSubsystem extends SubsystemBase {
     }
 
     /**
-     * Turns the elbow servo to its unflipped state.
+     * Turns the elbow servo to its non-flipped state.
      */
     public void rest() {
         elbow.setPosition(EndEffector.ELBOW_REST.servoPosition);
@@ -286,7 +286,7 @@ public class InDepSubsystem extends SubsystemBase {
     /**
      * @return whether or not the arm is in an action.
      */
-    public boolean isBusy() {
+    public static boolean isBusy() {
         return isBusy;
     }
 

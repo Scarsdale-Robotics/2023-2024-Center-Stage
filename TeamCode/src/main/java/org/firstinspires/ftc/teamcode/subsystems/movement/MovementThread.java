@@ -19,21 +19,20 @@ public class MovementThread implements Runnable {
     private static final double POWER_TURN = SpeedCoefficients.getAutonomousTurnSpeed();
     private static final double POWER_ARM = SpeedCoefficients.getAutonomousArmSpeed();
 
-    final private ElapsedTime runtime;
-    final private Movement movement;
-    final private DriveSubsystem drive;
-    final private InDepSubsystem inDep;
-    final private LinearOpMode opMode;
-    final private CVSubsystem cvBack;
+    private final ElapsedTime runtime;
+    private final Movement movement;
+    private static volatile DriveSubsystem drive;
+    private static volatile InDepSubsystem inDep;
+    private static volatile LinearOpMode opMode;
 
     public MovementThread(Movement movement, DriveSubsystem drive, InDepSubsystem inDep, CVSubsystem cvBack, LinearOpMode opMode) {
         this.movement = movement;
-        this.drive = drive;
-        this.inDep = inDep;
-        this.cvBack = cvBack;
-        this.opMode = opMode;
         runtime = new ElapsedTime();
         runtime.reset();
+
+        MovementThread.drive = drive;
+        MovementThread.inDep = inDep;
+        MovementThread.opMode = opMode;
     }
 
     @Override
