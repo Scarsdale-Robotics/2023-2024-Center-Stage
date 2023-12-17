@@ -121,7 +121,7 @@ public class DriveSubsystem extends SubsystemBase {
             while (!movements.isEmpty() && linked) {
                 Movement movement = movements.removeFirst();
                 linked = movement.linkedToNext;
-                MovementThread thread = new MovementThread(movement, this, inDep, opMode);
+                MovementThread thread = new MovementThread(movement);
                 Future<?> status = threadPool.submit(thread);
                 threadStatus.add(status); // start the MovementThread
             }

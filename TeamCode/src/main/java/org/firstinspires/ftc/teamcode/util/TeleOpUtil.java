@@ -7,9 +7,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
+import org.firstinspires.ftc.teamcode.opmodes.SubsystemInitializer;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.movement.MovementThread;
 
 public class TeleOpUtil {
     public HardwareRobot robot;
@@ -36,33 +38,10 @@ public class TeleOpUtil {
     public int macroCapacity = 0;
 
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
-        robot = new HardwareRobot(hardwareMap);
-        SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
-        inDep = new InDepSubsystem(
-                robot.arm1,
-                robot.arm2,
-                robot.elbow, robot.wrist, robot.leftClaw, robot.rightClaw,
-                opMode
-        );
-        drive = new DriveSubsystem(
-                robot.leftFront,
-                robot.rightFront,
-                robot.leftBack,
-                robot.rightBack,
-                robot.imu,
-                inDep,
-                opMode
-        );
-        cvFront = new CVSubsystem(
-                robot.frontCam,
-                robot.frontCamName,
-                drive, telemetry, isRedTeam, opMode
-        );
-        cvBack = new CVSubsystem(
-                robot.frontCam,
-                robot.frontCamName,
-                drive, telemetry, isRedTeam, opMode
-        );
+        SubsystemInitializer subsystems = new SubsystemInitializer(new HardwareRobot(hardwareMap), isRedTeam, opMode, telemetry);
+        drive = subsystems.getDrive();
+        cvFront = subsystems.getCVFront();
+        cvBack = subsystems.getCVBack();
         this.isRedTeam = isRedTeam;
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;

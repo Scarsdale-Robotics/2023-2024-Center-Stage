@@ -23,16 +23,23 @@ public class MovementThread implements Runnable {
     private final Movement movement;
     private static volatile DriveSubsystem drive;
     private static volatile InDepSubsystem inDep;
+    private static volatile CVSubsystem cvFront;
+    private static volatile CVSubsystem cvBack;
     private static volatile LinearOpMode opMode;
 
-    public MovementThread(Movement movement, DriveSubsystem drive, InDepSubsystem inDep, CVSubsystem cvBack, LinearOpMode opMode) {
+    public MovementThread(Movement movement) {
         this.movement = movement;
         runtime = new ElapsedTime();
         runtime.reset();
 
+    }
+
+    public static void initSubsystems(DriveSubsystem drive, InDepSubsystem inDep, CVSubsystem cvFront, CVSubsystem cvBack, LinearOpMode opMode) {
         MovementThread.drive = drive;
         MovementThread.inDep = inDep;
         MovementThread.opMode = opMode;
+        MovementThread.cvFront = cvFront;
+        MovementThread.cvBack = cvBack;
     }
 
     @Override
@@ -74,6 +81,8 @@ public class MovementThread implements Runnable {
 
         // CV CASES
         if (type == Movement.MovementType.WHITE_PXL_ALIGN)
+            cvFront.moveToWhitePixel();
+        if (type == Movement.MovementType.APRIL_TAG_ALIGN)
             cvBack.moveToWhitePixel();
     }
 

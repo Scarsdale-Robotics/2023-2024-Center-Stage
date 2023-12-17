@@ -261,7 +261,9 @@ public class CVSubsystem extends SubsystemBase {
         return whitePixelProcessor.getCenterOffset();
     }
 
-    public double getWhitePixelDiameterPx() {}
+    public double getWhitePixelDiameterPx() {
+        return 0; // TODO: WRITE
+    }
 
     public int getCameraWidth() {
         return whitePixelProcessor.getCameraWidth();
@@ -302,58 +304,17 @@ public class CVSubsystem extends SubsystemBase {
         int width = getCameraWidth();
         double HORIZ_THRESHOLD = width / 11.1;
         double DIAM_THRESHOLD = width / 4.0;
-        new Thread(() -> {
-            int pixelOffset = getWhitePixelHorizontalOffset();
-            while (Math.abs(pixelOffset) > HORIZ_THRESHOLD) {
-                if (pixelOffset < 0){ //NOT TESTED IDEA, PROB NEEDS FIXING: GO FASTER WHEN DISTANCE TO PIXEL STACK IS LARGE, THEN SLOW DOWN AS IT NEARS IT.
-                    drive.driveRobotCentric((Math.abs(pixelOffset)*2/width) * SpeedCoefficients.getAutonomousStrafeSpeed(), 0, 0);
-                }else{
-                    drive.driveRobotCentric(-(Math.abs(pixelOffset)*2/width) * SpeedCoefficients.getAutonomousStrafeSpeed(), 0, 0);
-                }
-                pixelOffset = getWhitePixelHorizontalOffset();
-        }}).start();
-        new Thread(() -> {
-            double pixelDiam = getWhitePixelDiameterPx();
-            while (Math.abs(pixelDiam) < DIAM_THRESHOLD) {  // unsure if formula works lol i suck at math
-                drive.driveRobotCentric(0, SpeedCoefficients.getAutonomousForwardSpeed() * Math.min(2*DIAM_THRESHOLD, Math.sqrt(Math.abs(pixelDiam)) * 2) / DIAM_THRESHOLD, 0);
-                pixelDiam = getWhitePixelDiameterPx();
-            }
-        }).start();
+        int pixelOffset = getWhitePixelHorizontalOffset();
+        double pixelDiam = getWhitePixelDiameterPx();
+        while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDiam) < DIAM_THRESHOLD) {
+            drive.driveRobotCentric(SpeedCoefficients.getAutonomousStrafeSpeed() * Math.min(HORIZ_THRESHOLD, Math.pow(pixelOffset, 2)) * 2 / HORIZ_THRESHOLD, SpeedCoefficients.getAutonomousForwardSpeed() * Math.min(DIAM_THRESHOLD, Math.sqrt(Math.abs(pixelDiam))) * 2 / DIAM_THRESHOLD, 0);
+            pixelOffset = getWhitePixelHorizontalOffset();
+            pixelDiam = getWhitePixelDiameterPx();
+        }
     }
 
-    /**
-     * GROUP 1
-     * get a given AprilTag's position and moves in front of it
-     * use alignParallelWithAprilTag() and getAprilTagPosition()
-     *
-     * @param tagID the id of the AprilTag from the 36h11 family to move to
-     */
-    public void moveToAprilTag(int tagID) {
-        double DISTANCE_THRESHOLD = 1;  // distance from backboard to stop at
-
-        alignParallelWithAprilTag(tagID);
-
-
-
-        while (getAprilTagHorizontalOffset(tagID) > DISTANCE_THRESHOLD) {
-            int aprilTagLocation = getAprilTagLocation(tagID);
-
-            switch (aprilTagLocation) {
-                case 0:
-                    // left location
-                    drive.driveRobotCentric(1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
-                    break;
-                case 2:
-                    // right location
-                    drive.driveRobotCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
-                    break;
-                default:
-                    // center location
-                    drive.driveRobotCentric(0, 1 * SpeedCoefficients.getForwardSpeed(), 0);
-                    break;
-            }
-            drive.driveByEncoder(0, 0, 0,0); //brake
-        }
+    public void moveToAprilTag() {
+        // TODO
     }
 
     /**
