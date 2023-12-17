@@ -34,8 +34,8 @@ public class Televerything extends LinearOpMode {
                 this
         );
         CVSubsystem cv = new CVSubsystem(
-                robot.camera,
-                robot.cameraName,
+                robot.frontCam,
+                robot.frontCamName,
                 drive, telemetry,
                 isRedTeam,
                 this

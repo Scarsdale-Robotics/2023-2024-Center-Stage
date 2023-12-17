@@ -37,8 +37,8 @@ public class AutoCloseBlue extends LinearOpMode {
                 inDep,
                 this
         );
-        cv = new CVSubsystem(robot.camera,
-                robot.cameraName,
+        cv = new CVSubsystem(robot.frontCam,
+                robot.frontCamName,
                 drive,
                 telemetry,
                 false,
@@ -86,7 +86,7 @@ public class AutoCloseBlue extends LinearOpMode {
             approachWhite = new MovementSequenceBuilder()
                     .forward(88) // move to white pixels
                     .alignWithWhitePixel() // i wonder what this does
-                    .forward(11) // move a bit more after align with white
+//                    .forward(11) // move a bit more after align with white
                     .closeRightClaw() // intake 2 white pixels
                     .build();
             placeWhite = new MovementSequenceBuilder()
@@ -125,7 +125,7 @@ public class AutoCloseBlue extends LinearOpMode {
             approachWhite = new MovementSequenceBuilder()
                     .forward(77) // move to white pixels
                     .alignWithWhitePixel() // i wonder what this does
-                    .forward(11) // move a bit more after align with white
+//                    .forward(11) // move a bit more after align with white
                     .closeRightClaw() // intake 2 white pixels
                     .build();
             placeWhite = new MovementSequenceBuilder()
@@ -163,7 +163,7 @@ public class AutoCloseBlue extends LinearOpMode {
             approachWhite = new MovementSequenceBuilder()
                     .forward(66) // move to white pixels
                     .alignWithWhitePixel() // i wonder what this does
-                    .forward(11) // move a bit more after align with white
+//                    .forward(11) // move a bit more after align with white
                     .closeRightClaw() // intake 2 white pixels
                     .build();
             placeWhite = new MovementSequenceBuilder()

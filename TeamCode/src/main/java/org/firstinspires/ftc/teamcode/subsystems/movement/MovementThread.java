@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.movement;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
@@ -24,7 +25,7 @@ public class MovementThread implements Runnable {
     private static volatile InDepSubsystem inDep;
     private static volatile LinearOpMode opMode;
 
-    public MovementThread(Movement movement, DriveSubsystem drive, InDepSubsystem inDep, LinearOpMode opMode) {
+    public MovementThread(Movement movement, DriveSubsystem drive, InDepSubsystem inDep, CVSubsystem cvBack, LinearOpMode opMode) {
         this.movement = movement;
         runtime = new ElapsedTime();
         runtime.reset();
@@ -70,6 +71,10 @@ public class MovementThread implements Runnable {
             inDep.closeRight();
         if (type == Movement.MovementType.CLOSE_LEFT_CLAW)
             inDep.closeLeft();
+
+        // CV CASES
+        if (type == Movement.MovementType.WHITE_PXL_ALIGN)
+            cvBack.moveToWhitePixel();
     }
 
     /**

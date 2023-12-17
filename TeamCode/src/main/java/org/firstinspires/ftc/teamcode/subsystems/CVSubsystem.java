@@ -261,6 +261,8 @@ public class CVSubsystem extends SubsystemBase {
         return whitePixelProcessor.getCenterOffset();
     }
 
+    public double getWhitePixelDiameterPx() {}
+
     public int getCameraWidth() {
         return whitePixelProcessor.getCameraWidth();
     }
@@ -282,15 +284,6 @@ public class CVSubsystem extends SubsystemBase {
         return tagDistance;
     }
 
-    /**
-     * GROUP 2
-     * @return true if the robot is in front of a piece of tape approximately perpendicular to the camera view, false otherwise
-     */
-//    public boolean isRobotBeforeTape(boolean isRedTeam) {
-//        visionPortal.resumeStreaming();
-//        return tdp.isBeforeTape(isRedTeam);
-//    }
-
     public void moveToPixel() {
         double ERROR_THRESHOLD = 50;
 
@@ -299,24 +292,33 @@ public class CVSubsystem extends SubsystemBase {
             if (pixelOffset < 0){
                 drive.driveRobotCentric(1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
             }else{
-                drive.driveFieldCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+                drive.driveRobotCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
             }
             pixelOffset = getPixelHorizontalOffset();
         }
     }
 
     public void moveToWhitePixel() {
-        double ERROR_THRESHOLD = 50;
         int width = getCameraWidth();
-        int pixelOffset = getWhitePixelHorizontalOffset();
-        while (Math.abs(pixelOffset) > ERROR_THRESHOLD) {
-            if (pixelOffset < 0){ //NOT TESTED IDEA, PROB NEEDS FIXING: GO FASTER WHEN DISTANCE TO PIXEL STACK IS LARGE, THEN SLOW DOWN AS IT NEARS IT.
-                drive.driveRobotCentric((Math.abs(pixelOffset)*2/width) * SpeedCoefficients.getStrafeSpeed(), 0, 0);
-            }else{
-                drive.driveFieldCentric(-(Math.abs(pixelOffset)*2/width) * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+        double HORIZ_THRESHOLD = width / 11.1;
+        double DIAM_THRESHOLD = width / 4.0;
+        new Thread(() -> {
+            int pixelOffset = getWhitePixelHorizontalOffset();
+            while (Math.abs(pixelOffset) > HORIZ_THRESHOLD) {
+                if (pixelOffset < 0){ //NOT TESTED IDEA, PROB NEEDS FIXING: GO FASTER WHEN DISTANCE TO PIXEL STACK IS LARGE, THEN SLOW DOWN AS IT NEARS IT.
+                    drive.driveRobotCentric((Math.abs(pixelOffset)*2/width) * SpeedCoefficients.getAutonomousStrafeSpeed(), 0, 0);
+                }else{
+                    drive.driveRobotCentric(-(Math.abs(pixelOffset)*2/width) * SpeedCoefficients.getAutonomousStrafeSpeed(), 0, 0);
+                }
+                pixelOffset = getWhitePixelHorizontalOffset();
+        }}).start();
+        new Thread(() -> {
+            double pixelDiam = getWhitePixelDiameterPx();
+            while (Math.abs(pixelDiam) < DIAM_THRESHOLD) {  // unsure if formula works lol i suck at math
+                drive.driveRobotCentric(0, SpeedCoefficients.getAutonomousForwardSpeed() * Math.min(2*DIAM_THRESHOLD, Math.sqrt(Math.abs(pixelDiam)) * 2) / DIAM_THRESHOLD, 0);
+                pixelDiam = getWhitePixelDiameterPx();
             }
-            pixelOffset = getWhitePixelHorizontalOffset();
-        }
+        }).start();
     }
 
     /**

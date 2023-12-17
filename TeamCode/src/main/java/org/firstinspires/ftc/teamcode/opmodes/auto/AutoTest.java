@@ -37,8 +37,8 @@ public class AutoTest extends LinearOpMode {
                 inDep,
                 this
         );
-        cv = new CVSubsystem(robot.camera,
-                robot.cameraName,
+        cv = new CVSubsystem(robot.frontCam,
+                robot.frontCamName,
                 drive,
                 telemetry,
                 false,
