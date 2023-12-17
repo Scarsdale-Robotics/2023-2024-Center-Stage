@@ -19,7 +19,8 @@ public class Movement {
         OPEN_RIGHT_CLAW(0.0,0.0,0.0,0.0),
         LOWER_ARM(0.0,0.0,0.0,-1.0),
         RAISE_ARM(0.0,0.0,0.0,1.0),
-        WHITE_PXL_ALIGN(1.0, 1.0, 1.0, 0.0);
+        WHITE_PXL_ALIGN(1.0, 1.0, 1.0, 0.0),
+        APRIL_TAG_ALIGN(1.0, 1.0, 1.0, 0.0);
 
         public double K_forward;
         public double K_strafe;

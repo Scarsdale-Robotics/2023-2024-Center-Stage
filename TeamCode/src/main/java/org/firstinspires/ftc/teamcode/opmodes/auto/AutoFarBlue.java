@@ -5,53 +5,29 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.HardwareRobot;
+import org.firstinspires.ftc.teamcode.opmodes.SubsystemInitializer;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
+import org.firstinspires.ftc.teamcode.subsystems.movement.MovementThread;
 
 @Autonomous(name = "Auto Far Blue")
 public class AutoFarBlue extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
-    private HardwareRobot robot;
-    private InDepSubsystem inDep;
     private DriveSubsystem drive;
-    private CVSubsystem cv;
     @Override
     // The "Main" code will go in here
     public void runOpMode() {
-        robot = new HardwareRobot(hardwareMap);
-        inDep = new InDepSubsystem(
-                robot.arm1,
-                robot.arm2,
-                robot.elbow, robot.wrist, robot.leftClaw, robot.rightClaw,
-                this
-        );
-        drive = new DriveSubsystem(
-                robot.leftFront,
-                robot.rightFront,
-                robot.leftBack,
-                robot.rightBack,
-                robot.imu,
-                inDep,
-                this
-        );
-        cv = new CVSubsystem(robot.frontCam,
-                robot.frontCamName,
-                drive,
-                telemetry,
-                false,
-                this);
-        inDep.close();
+        SubsystemInitializer subsystems = new SubsystemInitializer(new HardwareRobot(hardwareMap), false, this, telemetry);
+        subsystems.getInDep().close();
+        drive = subsystems.getDrive();
         runtime.reset();
 
+        int propLocation = subsystems.getCVFront().getPropLocation();
+
         waitForStart();
-
-        sleepFor(500);
-
-        // Start actual Auto now | cv
-        int propLocation = cv.getPropLocation();
 
         MovementSequence placePurple = new MovementSequenceBuilder().build(),
                 approachFirstWhite = new MovementSequenceBuilder().build(),

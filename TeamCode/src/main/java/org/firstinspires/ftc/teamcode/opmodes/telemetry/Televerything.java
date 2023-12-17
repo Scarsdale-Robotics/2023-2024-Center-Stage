@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.HardwareRobot;
+import org.firstinspires.ftc.teamcode.opmodes.SubsystemInitializer;
+import org.firstinspires.ftc.teamcode.subsystems.movement.MovementThread;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
@@ -12,34 +14,17 @@ import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 @TeleOp(name = "televerything (telemetry everything)")
 public class Televerything extends LinearOpMode {
     private final boolean isRedTeam = false;
+    private DriveSubsystem drive;
+    private InDepSubsystem inDep;
+    private HardwareRobot robot;
+    private CVSubsystem cvBack;
 
     @Override
     public void runOpMode() {
-
-        HardwareRobot robot = new HardwareRobot(hardwareMap);
-        SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
-        InDepSubsystem inDep = new InDepSubsystem(
-                robot.arm1,
-                robot.arm2,
-                robot.elbow, robot.wrist, robot.leftClaw, robot.rightClaw,
-                this
-        );
-        DriveSubsystem drive = new DriveSubsystem(
-                robot.leftFront,
-                robot.rightFront,
-                robot.leftBack,
-                robot.rightBack,
-                robot.imu,
-                inDep,
-                this
-        );
-        CVSubsystem cv = new CVSubsystem(
-                robot.frontCam,
-                robot.frontCamName,
-                drive, telemetry,
-                isRedTeam,
-                this
-        );
+        robot = new HardwareRobot(hardwareMap);
+        SubsystemInitializer subsystems = new SubsystemInitializer(robot, false, this, telemetry);
+        subsystems.getInDep().close();
+        drive = subsystems.getDrive();inDep = subsystems.getInDep();
 
         waitForStart();
 
@@ -122,7 +107,7 @@ public class Televerything extends LinearOpMode {
             // COMPUTER VISION //
             /////////////////////
 
-            cvDist = cv.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
+            cvDist = cvBack.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
 
             // Crash Prevention
             if (!gamepad2.x && !gamepad1.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsLeftClawOpen()) {
@@ -153,7 +138,7 @@ public class Televerything extends LinearOpMode {
             telemetry.addData("arm.getCurrentPosition:", robot.arm1.motor.getCurrentPosition());
             telemetry.addData("arm.getPower: ", robot.arm1.motor.getPower());
             telemetry.addData("cvDist:", cvDist);
-            telemetry.addData("rotOff: ",cv.getAprilTagRotationalOffset(isRedTeam ? 5 : 2));
+            telemetry.addData("rotOff: ",cvBack.getAprilTagRotationalOffset(isRedTeam ? 5 : 2));
 
 
             telemetry.addData("⠀⢸⠂⠀⠀⠀⠘⣧⠀⠀⣟⠛⠲⢤⡀⠀⠀⣰⠏⠀⠀⠀⠀⠀⢹⡀", 0);

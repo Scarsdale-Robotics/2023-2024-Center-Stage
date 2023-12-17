@@ -5,11 +5,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.HardwareRobot;
+import org.firstinspires.ftc.teamcode.opmodes.SubsystemInitializer;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
+import org.firstinspires.ftc.teamcode.subsystems.movement.MovementThread;
 
 @Autonomous(name = "Auto Close Blue")
 public class AutoCloseBlue extends LinearOpMode {
@@ -17,38 +19,17 @@ public class AutoCloseBlue extends LinearOpMode {
     private HardwareRobot robot;
     private InDepSubsystem inDep;
     private DriveSubsystem drive;
-    private CVSubsystem cv;
+    private CVSubsystem cvFront;
+    private CVSubsystem cvBack;
     @Override
     // The "Main" code will go in here
     public void runOpMode() {
-        robot = new HardwareRobot(hardwareMap);
-        inDep = new InDepSubsystem(
-                robot.arm1,
-                robot.arm2,
-                robot.elbow, robot.wrist, robot.leftClaw, robot.rightClaw,
-                this
-        );
-        drive = new DriveSubsystem(
-                robot.leftFront,
-                robot.rightFront,
-                robot.leftBack,
-                robot.rightBack,
-                robot.imu,
-                inDep,
-                this
-        );
-        cv = new CVSubsystem(robot.frontCam,
-                robot.frontCamName,
-                drive,
-                telemetry,
-                false,
-                this);
-        inDep.close();
+        SubsystemInitializer subsystems = new SubsystemInitializer(new HardwareRobot(hardwareMap), false, this, telemetry);
+        subsystems.getInDep().close();
+        drive = subsystems.getDrive();
         runtime.reset();
 
         waitForStart();
-
-        sleepFor(500);
 
         // Start actual Auto now | cv
         MovementSequence initCV = new MovementSequenceBuilder()
@@ -56,7 +37,7 @@ public class AutoCloseBlue extends LinearOpMode {
                 .forward(10.80) // Move forward
                 .build();
         drive.followMovementSequence(initCV);
-        int propLocation = cv.getPropLocation();
+        int propLocation = subsystems.getCVFront().getPropLocation();
 
         MovementSequence placePurple = new MovementSequenceBuilder().build(),
                 approachWhite = new MovementSequenceBuilder().build(),
