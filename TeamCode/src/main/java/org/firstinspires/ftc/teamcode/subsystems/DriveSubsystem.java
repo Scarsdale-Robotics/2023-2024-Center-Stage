@@ -95,7 +95,7 @@ public class DriveSubsystem extends SubsystemBase {
                 Math.abs(setPoint-getWheelPosition()) > errorTolerance_p &&
                 Math.abs(getWheelVelocity()) > errorTolerance_v
         ) {
-            pidMultiplier = pidController.update(getWheelPosition();
+            pidMultiplier = pidController.update(getWheelPosition());
             driveRobotCentric(rightSpeed * pidMultiplier, forwardSpeed * pidMultiplier, turnSpeed * pidMultiplier);
             isBusy = true;
         }
