@@ -109,21 +109,33 @@ public class InDepSubsystem extends SubsystemBase {
         if (InDepSubsystem.isBusy()) {
             throw new RuntimeException("Tried to run two arm actions at once (arm is busy)");
         }
-
         // begin action
         double startEncoder = arm1.motor.getCurrentPosition(); // arm1 is our reference for encoders
         double setPoint = startEncoder + ticks;
         double pidMultiplier;
-
         PIDController pidController = new PIDController(Kp, Ki, Kd, setPoint);
-
         while (
                 opMode.opModeIsActive() &&
-                Math.abs(setPoint-getArmPosition()) > errorTolerance_p &&
+                Math.abs(setPoint - getArmPosition()) > errorTolerance_p &&
                 Math.abs(getArmVelocity()) > errorTolerance_v
         ) {
             pidMultiplier = pidController.update(getArmPosition());
             rawPower(power * pidMultiplier);
+            if(getArmPosition() == Level.GROUND.target) {
+                wrist.setPosition(Level.GROUND.wristTarget);
+            }
+            else if (getArmPosition() >= Level.BACKBOARD1.target) {
+                wrist.setPosition(Level.BACKBOARD1.wristTarget);
+            }
+            else if (getArmPosition() >= Level.BACKBOARD2.target) {
+                wrist.setPosition(Level.BACKBOARD2.target);
+            }
+            else if (getArmPosition() >= Level.BACKBOARD3.target) {
+                wrist.setPosition(Level.BACKBOARD3.target);
+            }
+            else {
+                wrist.setPosition(1.0);
+            }
             isBusy = true;
         }
 

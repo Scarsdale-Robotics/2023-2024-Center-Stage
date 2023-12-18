@@ -313,8 +313,17 @@ public class CVSubsystem extends SubsystemBase {
         }
     }
 
-    public void moveToAprilTag() {
-        // TODO
+    public void moveToAprilTag(int wantedAprilTag) { // Notice this does not work probably
+        int width = getCameraWidth();
+        double HORIZ_THRESHOLD = width / 11.1;
+        double DIAM_THRESHOLD = width / 4.0;
+        double aprilTagOffset = getAprilTagHorizontalOffset(wantedAprilTag);
+        double aprilTagDiam = getAprilTagDistance();
+        while (Math.abs(aprilTagOffset) > HORIZ_THRESHOLD || Math.abs(aprilTagDiam) < DIAM_THRESHOLD) {
+            drive.driveRobotCentric(SpeedCoefficients.getAutonomousStrafeSpeed() * Math.min(HORIZ_THRESHOLD, Math.pow(aprilTagOffset, 2)) * 2 / HORIZ_THRESHOLD, SpeedCoefficients.getAutonomousForwardSpeed() * Math.min(DIAM_THRESHOLD, Math.sqrt(Math.abs(aprilTagDiam))) * 2 / DIAM_THRESHOLD, 0);
+            aprilTagOffset = getWhitePixelHorizontalOffset();
+            aprilTagDiam = getWhitePixelDiameterPx();
+        }
     }
 
     /**
