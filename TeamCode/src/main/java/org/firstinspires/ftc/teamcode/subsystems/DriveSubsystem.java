@@ -5,26 +5,33 @@ import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.SpeedCoefficients;
+import org.firstinspires.ftc.teamcode.subsystems.movement.MovementThread;
 import org.firstinspires.ftc.teamcode.subsystems.movement.Movement;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
+import org.firstinspires.ftc.teamcode.util.PIDController;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class DriveSubsystem extends SubsystemBase {
-    private static final double TICKS_PER_INCH_FORWARD = 32.4;
-    private static final double TICKS_PER_INCH_STRAFE = 62.5;
-    private static final double TICKS_PER_DEGREE_TURN = 10.0;
-    private static final double TICKS_PER_DEGREE_ARM = 35.0;
-    final private ElapsedTime runtime = new ElapsedTime();
-    private MecanumDrive controller;
-    private IMU imu;
-    private LinearOpMode opMode;
-    private Motor rightBack;
-    private InDepSubsystem inDep;
+    private static final double Kp = 0.01;
+    private static final double Ki = 0;
+    private static final double Kd = 0;
+    private static final double errorTolerance_p = 5.0;
+    private static final double errorTolerance_v = 0.05;
+
+    private static volatile boolean isBusy;
+    private static volatile ExecutorService threadPool;
+    private final MecanumDrive controller;
+    private final IMU imu;
+    private final LinearOpMode opMode;
+    private final Motor rightBack;
+    private final InDepSubsystem inDep;
 
     public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, IMU imu, InDepSubsystem inDep, LinearOpMode opMode) {
         this.rightBack = rightBack;
@@ -37,7 +44,8 @@ public class DriveSubsystem extends SubsystemBase {
         this.imu = imu;
         this.opMode = opMode;
         this.inDep = inDep;
-        runtime.reset();
+        isBusy = false;
+        threadPool = Executors.newCachedThreadPool();
     }
 
     /**
@@ -70,71 +78,72 @@ public class DriveSubsystem extends SubsystemBase {
      * @param ticks          How far the robot should move.
      */
     public void driveByEncoder(double rightSpeed, double forwardSpeed, double turnSpeed, double ticks) {
-        double startEncoder = rightBack.getCurrentPosition(), targetEncoder = startEncoder + ticks;
-        double kP = 1, d_error = 10.0, kV, delta; // kP will need tuning
-
-        while (opMode.opModeIsActive() && Math.abs(rightBack.getCurrentPosition() - startEncoder) < ticks) {
-            delta = Math.abs(targetEncoder - rightBack.getCurrentPosition() + d_error);
-            kV = Math.min(1.0, delta * kP);
-            driveRobotCentric(rightSpeed, forwardSpeed, turnSpeed);
+        // check for clashing actions
+        if (DriveSubsystem.isBusy()) {
+            throw new RuntimeException("Tried to run two drive actions at once (drivetrain is busy)");
         }
 
+        // begin action
+        double startEncoder = rightBack.getCurrentPosition();
+        double setPoint = startEncoder + ticks;
+        double pidMultiplier;
+
+        PIDController pidController = new PIDController(Kp, Ki, Kd, setPoint);
+
+        while (
+                opMode.opModeIsActive() &&
+                Math.abs(setPoint-getWheelPosition()) > errorTolerance_p &&
+                Math.abs(getWheelVelocity()) > errorTolerance_v
+        ) {
+            pidMultiplier = pidController.update(getWheelPosition());
+            driveRobotCentric(rightSpeed * pidMultiplier, forwardSpeed * pidMultiplier, turnSpeed * pidMultiplier);
+            isBusy = true;
+        }
+
+        // brake
         controller.stop();
+        isBusy = false;
     }
 
     /**
      * Use only for autonomous. Follow the passed MovementSequence. Drive is robot centric.
      * @param movementSequence      The MovementSequence to be followed.
      */
-    public void followMovementSequence(MovementSequence movementSequence) throws InterruptedException {
-        double  POWER_FORWARD = SpeedCoefficients.getAutonomousForwardSpeed(),
-                POWER_STRAFE = SpeedCoefficients.getAutonomousStrafeSpeed(),
-                POWER_TURN = SpeedCoefficients.getAutonomousTurnSpeed(),
-                POWER_ARM = SpeedCoefficients.getAutonomousArmSpeed();
+    public void followMovementSequence(MovementSequence movementSequence) {
 
         ArrayDeque<Movement> movements = movementSequence.movements.clone();
 
         while (opMode.opModeIsActive() && !movements.isEmpty()) {
-            Movement movement = movements.pollFirst();
-            Movement.MovementType type = movement.MOVEMENT_TYPE;
+            ArrayList<Future<?>> threadStatus = new ArrayList<>();
 
-            driveByEncoder(
-                    POWER_STRAFE * type.k_strafe,
-                    POWER_FORWARD * type.k_forward,
-                    POWER_TURN * type.k_turn,
-                    movement.INCHES_STRAFE * TICKS_PER_INCH_STRAFE * Math.abs(type.k_strafe) +
-                            movement.INCHES_FORWARD * TICKS_PER_INCH_FORWARD * Math.abs(type.k_forward) +
-                            movement.DEGREES_TURN * TICKS_PER_DEGREE_TURN * Math.abs(type.k_turn)
-            );
-
-            inDep.raiseByEncoder(
-                    POWER_ARM * type.k_elevation,
-                    movement.DEGREES_ELEVATION * TICKS_PER_DEGREE_ARM * Math.abs(type.k_elevation)
-            );
-
-            if (type == Movement.MovementType.DELAY) {
-                sleepFor(movement.WAIT);
+            // fetch all linked movements
+            boolean linked = true;
+            while (!movements.isEmpty() && linked) {
+                Movement movement = movements.removeFirst();
+                linked = movement.linkedToNext;
+                MovementThread thread = new MovementThread(movement);
+                Future<?> status = threadPool.submit(thread);
+                threadStatus.add(status); // start the MovementThread
             }
 
-            if (type == Movement.MovementType.CLOSE_CLAW) {
-                inDep.close();
+            // wait until all linked movements are completed
+            boolean running = true;
+            while (opMode.opModeIsActive() && running) {
+                running = false;
+                for (Future<?> status : threadStatus)
+                    running = !status.isDone() || running; // running is only false if all threads are inactive
             }
 
-            if (type == Movement.MovementType.OPEN_CLAW) {
-                inDep.open();
-            }
         }
 
         controller.stop();
     }
 
     /**
-     * Smart sleep with opMode running check.
-     * @param ms Timeout in milliseconds.
+     * @return whether or not the drivetrain is in an action.
      */
-    private void sleepFor(long ms) {
-        runtime.reset();
-        while (opMode.opModeIsActive() && (runtime.milliseconds() < ms));
+    public static boolean isBusy() {
+        return isBusy;
     }
 
     /**
@@ -142,6 +151,20 @@ public class DriveSubsystem extends SubsystemBase {
      */
     public int getWheelPosition() {
         return rightBack.getCurrentPosition();
+    }
+
+    /**
+     * @return the current power of the robot's wheels.
+     */
+    public double getWheelVelocity() {
+        return rightBack.getCorrectedVelocity();
+    }
+
+    /**
+     * Stop the motors.
+     */
+    public void stopController() {
+        controller.stop();
     }
 
     public void resetIMU() {

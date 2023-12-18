@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.SpeedCoefficients;
+import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 import org.openftc.easyopencv.OpenCvCamera;
 
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -222,7 +222,7 @@ public class CVSubsystem extends SubsystemBase {
      * GROUP 2
      * @return whether the AprilTag is left, center, or right in the camera view based on a mode of samples
      */
-    public int getPropLocation() throws InterruptedException {
+    public int getPropLocation() {
         int propLocation = -1;
         ArrayList<Integer> samples = new ArrayList<>();
         sleepFor(1000);
@@ -261,6 +261,10 @@ public class CVSubsystem extends SubsystemBase {
         return whitePixelProcessor.getCenterOffset();
     }
 
+    public double getWhitePixelDiameterPx() {
+        return 0; // TODO: WRITE
+    }
+
     public int getCameraWidth() {
         return whitePixelProcessor.getCameraWidth();
     }
@@ -282,15 +286,6 @@ public class CVSubsystem extends SubsystemBase {
         return tagDistance;
     }
 
-    /**
-     * GROUP 2
-     * @return true if the robot is in front of a piece of tape approximately perpendicular to the camera view, false otherwise
-     */
-//    public boolean isRobotBeforeTape(boolean isRedTeam) {
-//        visionPortal.resumeStreaming();
-//        return tdp.isBeforeTape(isRedTeam);
-//    }
-
     public void moveToPixel() {
         double ERROR_THRESHOLD = 50;
 
@@ -299,59 +294,27 @@ public class CVSubsystem extends SubsystemBase {
             if (pixelOffset < 0){
                 drive.driveRobotCentric(1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
             }else{
-                drive.driveFieldCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
+                drive.driveRobotCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
             }
             pixelOffset = getPixelHorizontalOffset();
         }
     }
 
     public void moveToWhitePixel() {
-        double ERROR_THRESHOLD = 50;
         int width = getCameraWidth();
+        double HORIZ_THRESHOLD = width / 11.1;
+        double DIAM_THRESHOLD = width / 4.0;
         int pixelOffset = getWhitePixelHorizontalOffset();
-        while (Math.abs(pixelOffset) > ERROR_THRESHOLD) {
-            if (pixelOffset < 0){
-                drive.driveRobotCentric((Math.abs(pixelOffset)*2/width) * SpeedCoefficients.getStrafeSpeed(), 0, 0);
-            }else{
-                drive.driveFieldCentric(-(Math.abs(pixelOffset)*2/width) * SpeedCoefficients.getStrafeSpeed(), 0, 0);
-            }
+        double pixelDiam = getWhitePixelDiameterPx();
+        while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDiam) < DIAM_THRESHOLD) {
+            drive.driveRobotCentric(SpeedCoefficients.getAutonomousStrafeSpeed() * Math.min(HORIZ_THRESHOLD, Math.pow(pixelOffset, 2)) * 2 / HORIZ_THRESHOLD, SpeedCoefficients.getAutonomousForwardSpeed() * Math.min(DIAM_THRESHOLD, Math.sqrt(Math.abs(pixelDiam))) * 2 / DIAM_THRESHOLD, 0);
             pixelOffset = getWhitePixelHorizontalOffset();
+            pixelDiam = getWhitePixelDiameterPx();
         }
     }
 
-    /**
-     * GROUP 1
-     * get a given AprilTag's position and moves in front of it
-     * use alignParallelWithAprilTag() and getAprilTagPosition()
-     *
-     * @param tagID the id of the AprilTag from the 36h11 family to move to
-     */
-    public void moveToAprilTag(int tagID) {
-        double DISTANCE_THRESHOLD = 1;  // distance from backboard to stop at
-
-        alignParallelWithAprilTag(tagID);
-
-
-
-        while (getAprilTagHorizontalOffset(tagID) > DISTANCE_THRESHOLD) {
-            int aprilTagLocation = getAprilTagLocation(tagID);
-
-            switch (aprilTagLocation) {
-                case 0:
-                    // left location
-                    drive.driveRobotCentric(1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
-                    break;
-                case 2:
-                    // right location
-                    drive.driveRobotCentric(-1 * SpeedCoefficients.getStrafeSpeed(), 0, 0);
-                    break;
-                default:
-                    // center location
-                    drive.driveRobotCentric(0, 1 * SpeedCoefficients.getForwardSpeed(), 0);
-                    break;
-            }
-            drive.driveByEncoder(0, 0, 0,0); //brake
-        }
+    public void moveToAprilTag() {
+        // TODO
     }
 
     /**

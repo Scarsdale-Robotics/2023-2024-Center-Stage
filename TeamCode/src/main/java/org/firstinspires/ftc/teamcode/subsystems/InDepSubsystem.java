@@ -5,35 +5,40 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.SpeedCoefficients;
+import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
+import org.firstinspires.ftc.teamcode.util.PIDController;
 
 public class InDepSubsystem extends SubsystemBase {
-    private final double CLAW_OPEN_POS = 0;
-    private final double CLAW_CLOSED_POS = 0.175;
-    private final double ELBOW_TURN_180 = 1;
-    private final double ELBOW_TURN_REGULARPOS = 0;
-    private final double errorTolerance = 200;
+    private static final double Kp = 0.01;
+    private static final double Ki = 0;
+    private static final double Kd = 0;
+    private static final double errorTolerance_p = 1.0;
+    private static final double errorTolerance_v = 0.01;
 
-    private final LinearOpMode opMode;
     private final Motor arm1;
     private final Motor arm2;
-    private final Servo rightClaw;
-    private final Servo leftClaw;
-    private final Servo elbow;
-    private Level level;
-    private final Servo wrist;
-    private boolean isClawOpen;
-    private boolean isElbowTurned;
 
+    private final Servo leftClaw;
+    private final Servo rightClaw;
+    private final Servo elbow;
+    private final Servo wrist;
+
+    private static volatile boolean isBusy;
+    private boolean isLeftClawOpen;
+    private boolean isRightClawOpen;
+    private boolean isElbowFlipped;
+
+    private final LinearOpMode opMode;
+
+    private Level level;
     public enum Level {
-        GROUND(0, 0),
+        GROUND(0, 0.0),
         BACKBOARD1(-1960,0.05),
         BACKBOARD2(-4200,0.125), //temp motor encoder values
         BACKBOARD3(-6000, 0.25);
 
-        public int target;
-        public double wristTarget;
+        public final int target;
+        public final double wristTarget;
 
         Level(int target, double wristTarget) {
             this.target = target;
@@ -52,7 +57,19 @@ public class InDepSubsystem extends SubsystemBase {
             else return GROUND;
         }
     }
-    public InDepSubsystem(Motor arm1, Motor arm2, Servo rightClaw, Servo leftClaw, Servo wrist, Servo elbow, LinearOpMode opMode, Telemetry telemetry) {
+    public enum EndEffector {
+        CLAW_OPEN(0.0),
+        CLAW_CLOSED(0.175),
+        ELBOW_REST(0.0),
+        ELBOW_FLIPPED(1.0);
+        public final double servoPosition;
+
+        EndEffector(double servoPosition) {
+            this.servoPosition = servoPosition;
+        }
+    }
+
+    public InDepSubsystem(Motor arm1, Motor arm2, Servo elbow, Servo wrist, Servo leftClaw, Servo rightClaw, LinearOpMode opMode) {
         // initialize objects
         this.arm1 = arm1;
         this.arm2 = arm2;
@@ -61,36 +78,167 @@ public class InDepSubsystem extends SubsystemBase {
         this.leftClaw = leftClaw;
 
         this.elbow = elbow;
-
-//        this.rightClaw = rightClaw;
-//        this.leftClaw = leftClaw;
         this.wrist = wrist;
+
         this.opMode = opMode;
 
-        // reset the arm and claw states
-        closeClaws();
-        setLevel(Level.GROUND);
+        // reset everything
+        setLevel(Level.GROUND); // arm, wrist
+        rest(); // elbow
+        close(); // claw
+
+        isBusy = false;
+
     }
-    public void stopAllMotors() {
-        arm1.stopMotor();
-        arm2.stopMotor();
-    }
-    public void setTPAllMotors(int target) {
-        arm1.setTargetPosition(target);
-        arm2.setTargetPosition(target);
-    }
-    public void setPowerAllMotors(double power) {
+
+    /**
+     * Sets the raw power of the arm.
+     */
+    public void rawPower(double power) {
         arm1.motor.setPower(power);
         arm2.motor.setPower(power);
     }
-    public void setSpeedAllMotors(double output) {
-        arm1.set(output);
-        arm2.set(output);
+
+    /**
+     * Use only for autonomous. Change the elevation of the arm by a certain angle in ticks.
+     * @param power      How fast the arm should raise (negative values = lower arm).
+     * @param ticks      The angle to displace the arm by in ticks.
+     */
+    public void raiseByEncoder(double power, double ticks) {
+        // check for clashing actions
+        if (InDepSubsystem.isBusy()) {
+            throw new RuntimeException("Tried to run two arm actions at once (arm is busy)");
+        }
+
+        // begin action
+        double startEncoder = arm1.motor.getCurrentPosition(); // arm1 is our reference for encoders
+        double setPoint = startEncoder + ticks;
+        double pidMultiplier;
+
+        PIDController pidController = new PIDController(Kp, Ki, Kd, setPoint);
+
+        while (
+                opMode.opModeIsActive() &&
+                Math.abs(setPoint-getArmPosition()) > errorTolerance_p &&
+                Math.abs(getArmVelocity()) > errorTolerance_v
+        ) {
+            pidMultiplier = pidController.update(getArmPosition());
+            rawPower(power * pidMultiplier);
+            isBusy = true;
+        }
+
+        // brake
+        arm1.stopMotor();
+        arm2.stopMotor();
+        arm1.motor.setPower(0);
+        arm2.motor.setPower(0);
+        isBusy = false;
     }
-    public void resetEncoderAllMotors()
-    {
-        arm1.resetEncoder();
-        arm2.resetEncoder();
+
+    /**
+     * Moves the arm to a target encoder value.
+     */
+    public void raiseToSetPoint(double power, double setPoint) {
+        new Thread(() -> raiseByEncoder(power, setPoint - getArmPosition())).start();
+    }
+
+    /**
+     * Sets the position of the arm to zero.
+     */
+    public void resetArm() {
+        raiseToSetPoint(SpeedCoefficients.getArmSpeed(), 0);
+    }
+
+    /**
+     * Moves the arm to a target level.
+     */
+    public void setLevel(Level level) {
+        wrist.setPosition(level.wristTarget);
+        raiseToSetPoint(SpeedCoefficients.getArmSpeed(), level.target);
+    }
+
+    /**
+     * Raises the arm to the next available level.
+     */
+    public void raiseArm() {
+        level = level.nextAbove();
+        setLevel(level);
+    }
+
+    /**
+     * Lowers the arm to the next available level.
+     */
+    public void lowerArm() {
+        level = level.nextBelow();
+        setLevel(level);
+    }
+
+    /**
+     * Opens both claws.
+     */
+    public void open() {
+        leftClaw.setPosition(EndEffector.CLAW_OPEN.servoPosition);
+        rightClaw.setPosition(EndEffector.CLAW_OPEN.servoPosition);
+        isLeftClawOpen = true;
+        isRightClawOpen = true;
+    }
+
+    /**
+     * Closes both claws.
+     */
+    public void close() {
+        leftClaw.setPosition(EndEffector.CLAW_CLOSED.servoPosition);
+        rightClaw.setPosition(EndEffector.CLAW_CLOSED.servoPosition);
+        isLeftClawOpen = false;
+        isRightClawOpen = false;
+    }
+
+    /**
+     * Opens the left claw.
+     */
+    public void openLeft() {
+        leftClaw.setPosition(EndEffector.CLAW_OPEN.servoPosition);
+        isLeftClawOpen = true;
+    }
+
+    /**
+     * Opens the right claw.
+     */
+    public void openRight() {
+        rightClaw.setPosition(EndEffector.CLAW_OPEN.servoPosition);
+        isRightClawOpen = true;
+    }
+
+    /**
+     * Closes the left claw.
+     */
+    public void closeLeft() {
+        leftClaw.setPosition(EndEffector.CLAW_CLOSED.servoPosition);
+        isLeftClawOpen = false;
+    }
+
+    /**
+     * Closes the right claw.
+     */
+    public void closeRight() {
+        rightClaw.setPosition(EndEffector.CLAW_CLOSED.servoPosition);
+        isRightClawOpen = false;
+    }
+
+    /**
+     * Turns the elbow servo to its flip state.
+     */
+    public void flip() {
+        elbow.setPosition(EndEffector.ELBOW_FLIPPED.servoPosition);
+        isElbowFlipped = true;
+    }
+
+    /**
+     * Turns the elbow servo to its non-flipped state.
+     */
+    public void rest() {
+        elbow.setPosition(EndEffector.ELBOW_REST.servoPosition);
+        isElbowFlipped = false;
     }
 
     /**
@@ -101,174 +249,74 @@ public class InDepSubsystem extends SubsystemBase {
     }
 
     /**
-     * @return true if the claw is open, otherwise false if it is closed.
+     * @return the power of the arm motor
      */
-    //public double getWristPosition(){return wrist.}
-    public boolean getIsOpen() {
-        return isClawOpen;
-    }
-
-    private int targetPosition = Level.GROUND.target;
-    private boolean movingToTarget = false;
-    public void setMoveAsyncToPosition(int position) {
-        targetPosition = position;
-        movingToTarget = true;
-    }
-
-    public void tickMoveAsyncToPosition(double power, boolean lowerBoundDisabled) {
-        int ERROR = 20;
-        int diff = arm1.motor.getCurrentPosition() - targetPosition;
-        if (movingToTarget && Math.abs(diff) <= ERROR) {
-//            rawPowerBase(power * (diff < 0 ? 1 : -1), lowerBoundDisabled);
-        }
-    }
-
-//    private void rawPowerBase(double power, boolean lowerBoundDisabled) {
-//        int armPos = arm.motor.getCurrentPosition();
-//
-//        // set bounds
-//        if (armPos>=0 && power>0 && !lowerBoundDisabled) { // more down is more positive
-//            arm.motor.setPower(0);
-//        } else {
-//            arm.motor.setPower(power);
-//        }
-//
-//        if (armPos <= Level.BACKBOARD2.target) {
-//            wrist.setPosition(Level.BACKBOARD2.wristTarget);
-//        } else if (armPos <= Level.BACKBOARD1.target) {
-//            wrist.setPosition(Level.BACKBOARD1.wristTarget);
-//        } else {
-//            wrist.setPosition(Level.GROUND.wristTarget);
-//        }
-//    }
-
-    /**
-     * sets the raw power of the arm.
-     */
-    public void rawPower(double power, boolean lowerBoundDisabled) {
-        movingToTarget = false;
-//        rawPowerBase(power, lowerBoundDisabled);
+    public double getArmVelocity() {
+        return arm1.motor.getPower();
     }
 
     /**
-     * gets the level immediately above or immediately below the current position
-     * @param getAbove whether to get the above level or below level
-     * @return the nearby level specified (by getAbove)
+     * @return the position of the elbow servo
      */
-    private Level getNearbyLevel(boolean getAbove) {
-        double armPos = arm1.getCurrentPosition();
-        if (armPos > Level.BACKBOARD2.target)
-            return getAbove ? Level.BACKBOARD2 : Level.BACKBOARD1;
-        else if (armPos > Level.BACKBOARD1.target)
-            return getAbove ? Level.BACKBOARD2 : Level.GROUND;
-        else
-            return getAbove ? Level.BACKBOARD1 : Level.GROUND;
+    public double getElbowPosition() {
+        return elbow.getPosition();
     }
 
     /**
-     * Raises the arm.
+     * @return the position of the wrist servo
      */
-//    public void raiseArm() {
-//        setLevel(getNearbyLevel(true));
-//    }
+    public double getWristPosition() {
+        return wrist.getPosition();
+    }
 
     /**
-     * Lowers the arm.
+     * @return the position of the left claw servo
      */
-//    public void lowerArm() {
-//        setLevel(getNearbyLevel(false));
-//    }
-
-    public void setLevel(Level level) {
-        setTPAllMotors(level.target);
-        wrist.setPosition(level.wristTarget);
-        setSpeedAllMotors(SpeedCoefficients.getArmSpeed());
+    public double getLeftClawPosition() {
+        return leftClaw.getPosition();
     }
 
-    public void raiseArm() {
-        setLevel(level.nextAbove());
+    /**
+     * @return the position of the right claw servo
+     */
+    public double getRightClawPosition() {
+        return rightClaw.getPosition();
     }
 
-    public void lowerArm() {
-        setLevel(level.nextBelow());
+    /**
+     * @return true if the left claw is open, otherwise false if it is closed.
+     */
+    public boolean getIsLeftClawOpen() {
+        return isLeftClawOpen;
     }
 
-    public void setOriginalPosOfElbow() {
-        elbow.setPosition(ELBOW_TURN_REGULARPOS);
-        isElbowTurned = false;
-    }
-    public void set180DegreePosOfElbow() {
-        elbow.setPosition(ELBOW_TURN_180);
-        isElbowTurned = true;
+    /**
+     * @return true if the right claw is open, otherwise false if it is closed.
+     */
+    public boolean getIsRightClawOpen() {
+        return isRightClawOpen;
     }
 
-    public boolean getElbowTurn() {return isElbowTurned;}
+    /**
+     * @return true if the elbow is flipped, otherwise false if it is rested.
+     */
+    public boolean getIsElbowFlipped() {
+        return isElbowFlipped;
+    }
 
+    /**
+     * @return whether or not the arm is in an action.
+     */
+    public static boolean isBusy() {
+        return isBusy;
+    }
 
+    /**
+     * Resets the encoder values of both arm motors.
+     */
     public void resetArmEncoder() {
-        resetEncoderAllMotors();
-    }
-
-    /**
-     * Opens the claw.
-     */
-    public void openClaws() {
-        leftClaw.setPosition(CLAW_OPEN_POS);
-        rightClaw.setPosition(CLAW_OPEN_POS);
-        isClawOpen = true;
-    }
-    public void openLeftClaw() {
-        leftClaw.setPosition(CLAW_OPEN_POS);
-    }
-    public void openRightClaw() {
-        rightClaw.setPosition(CLAW_OPEN_POS);
-    }
-
-    /**
-     * Closes the claw.
-     */
-    public void closeClaws() {
-        leftClaw.setPosition(CLAW_CLOSED_POS);
-        rightClaw.setPosition(CLAW_CLOSED_POS);
-        isClawOpen = false;
-    }
-    public void closeLeftClaw() {
-        leftClaw.setPosition(CLAW_CLOSED_POS);
-    }
-    public void closeRightClaw() {
-        rightClaw.setPosition(CLAW_CLOSED_POS);
-    }
-
-    /**
-     * Use only for autonomous. Change the elevation of the arm by a certain angle in ticks.
-     * @param power      How fast the arm should raise (negative values = lower arm).
-     * @param ticks      The angle to displace the arm by in ticks.
-     */
-    public void raiseByEncoder(double power, double ticks) {
-        double startEncoder = arm1.motor.getCurrentPosition();
-        // do we need PID here?
-        // if placing on the backboard during auto then we should atleast use kP and kI
-
-        while (opMode.opModeIsActive() && Math.abs(arm1.motor.getCurrentPosition() - startEncoder) < ticks) {
-            setPowerAllMotors(power);
-        }
-
-        stopAllMotors();
-
-        setPowerAllMotors(0);
-    }
-
-    public void resetArm() {
-        int target = 0;
-        setTPAllMotors(target);
-        setSpeedAllMotors(SpeedCoefficients.getArmSpeed());
-
-        // wait until reached target within errorTolerance
-        while (opMode.opModeIsActive() && !(Math.abs(target-arm1.getCurrentPosition()) < errorTolerance) );
-
-        // stop when reached
-        stopAllMotors();
-        setSpeedAllMotors(0);
+        arm1.resetEncoder();
+        arm2.resetEncoder();
     }
 }
 

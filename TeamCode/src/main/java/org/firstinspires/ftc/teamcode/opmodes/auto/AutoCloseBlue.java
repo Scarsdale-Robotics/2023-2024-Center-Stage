@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.HardwareRobot;
+import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
@@ -14,124 +15,165 @@ import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilde
 @Autonomous(name = "Auto Close Blue")
 public class AutoCloseBlue extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
-    private HardwareRobot robot;
     private InDepSubsystem inDep;
     private DriveSubsystem drive;
-    private CVSubsystem cv;
+    private CVSubsystem cvFront;
+    private CVSubsystem cvBack;
     @Override
     // The "Main" code will go in here
-    public void runOpMode() throws InterruptedException {
-        robot = new HardwareRobot(hardwareMap);
-        inDep = new InDepSubsystem(
-                robot.arm1,
-                robot.arm2,
-                robot.rightClaw,
-                robot.leftClaw,
-                robot.wrist,
-                robot.elbow,
-                this,
-                telemetry
-        );
-        drive = new DriveSubsystem(
-                robot.leftFront,
-                robot.rightFront,
-                robot.leftBack,
-                robot.rightBack,
-                robot.imu,
-                inDep,
-                this
-        );
-        cv = new CVSubsystem(robot.camera,
-                robot.cameraName,
-                drive,
-                telemetry,
-                false,
-                this);
-        inDep.closeClaws();
+    public void runOpMode() {
+        RobotSystem robot = new RobotSystem(hardwareMap, false, this, telemetry);
+        robot.getInDep().close();
+        drive = robot.getDrive();
         runtime.reset();
 
         waitForStart();
 
-        sleepFor(500);
-
         // Start actual Auto now | cv
-        int propLocation = cv.getPropLocation();
-
-        MovementSequence approachTape = new MovementSequenceBuilder().build(),
-                parkInBackdrop = new MovementSequenceBuilder().build();
-
         MovementSequence initCV = new MovementSequenceBuilder()
                 .left(4.16) // Strafe left
                 .forward(10.80) // Move forward
                 .build();
+        drive.followMovementSequence(initCV);
+        int propLocation = robot.getCVFront().getPropLocation();
+
+        MovementSequence placePurple = new MovementSequenceBuilder().build(),
+                approachWhite = new MovementSequenceBuilder().build(),
+                placeWhite = new MovementSequenceBuilder().build(),
+                placeYellow = new MovementSequenceBuilder().build(),
+                park = new MovementSequenceBuilder().build();
+
+        int WHITE_REPS = 2;
+        double WHITE_PX_HEIGHT = 22;
 
         if (propLocation == 0) {
             // left
-
-            // build the sequence of movements here
-            approachTape = new MovementSequenceBuilder()
-                    .forward(22.22) // Moving forward toward the pixel placing area
-                    .forward(0.03) // Brake
-                    .turnLeft(84.3) // Turn left 90 degrees
-                    .backward(3.09) // Moving forward (or backward) to the spike mark tape
-                    .forward(0.03) // Brake
-                    .right(4.0) // Strafe right to place pixel correctly
+            placeYellow = new MovementSequenceBuilder()
+                    .raiseArm(120) // raise arm to place pixel
+                    .forwardLeft(20, 46) // move to backdrop
+                    .turnRight(90) // face back to backdrop to place on backdrop
+                    .openLeftClaw() // drop yellow pixel
                     .build();
-
-            parkInBackdrop = new MovementSequenceBuilder()
-                    .raiseArm(57.14) // Raise claw
-                    .left(14.4) // Strafe left
-                    .forward(34.29) // Move forward
-                    .turnRight(180) // Turn right
-                    .backward(20.06) // Move backward
-                    .closeClaw() // Close claw
-                    .lowerArm(57.14) // Lower claw
+            placePurple = new MovementSequenceBuilder()
+                    .lowerArm(120) // lower arm
+                    .forwardLeft(7.65, 15.67) // move forward to purple pixel loc
+                    .openRightClaw() // drop purple pixel
+                    .raiseArm(WHITE_PX_HEIGHT) // raise arm to not hit purple pixel and to align with white pixel
+                    // lets run a test to see if we can try not lowering the arm now
+                    .backwardLeft(5, 15) // move to align with truss
                     .build();
-
+            approachWhite = new MovementSequenceBuilder()
+                    .forward(88) // move to white pixels
+                    .alignWithWhitePixel() // i wonder what this does
+//                    .forward(11) // move a bit more after align with white
+                    .closeRightClaw() // intake 2 white pixels
+                    .build();
+            placeWhite = new MovementSequenceBuilder()
+                    .backward(99) // move towards backdrop
+                    .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
+                    .backwardRight(11, 24) // move towards backdrop
+                    .openRightClaw() // open right claw to release 1 pixel
+                    .sleepFor(200) // allow 1st pixel to fall
+                    .closeRightClaw() // close right claw to prevent 2nd pixel release
+                    .right(3) // move to drop 2nd pixel
+                    .openRightClaw() // drop 2nd pixel
+                    .forwardLeft(20, 24) // align with truss
+                    .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
+                    .build();
+            park = new MovementSequenceBuilder()
+                    .turnLeft(90) // turn to post-auto (pre-teleop) ideal pos
+                    .left(35) // drive to park
+                    .build();
 
         } else if (propLocation == 1) {
-            approachTape = new MovementSequenceBuilder()
-                    .forward(25.77) // Moving forward toward the pixel placing area
-                    .forward(0.03) // Brake
-                    .backward(1.70) // Move backward to not hit pixel on turn
-                    .build();
 
-            parkInBackdrop = new MovementSequenceBuilder()
-                    .raiseArm(57.14) // Raise claw
-                    .turnLeft(80) // Turn left
-                    .left(14.4) // Strafe left
-                    .forward(34.29) // Move forward
-                    .turnRight(180) // Turn right
-                    .backward(16.98) // Move backward
-                    .closeClaw() // Close claw
-                    .lowerArm(57.14) // Lower claw
+            placeYellow = new MovementSequenceBuilder()
+                    .raiseArm(120) // raise arm to place pixel
+                    .forwardLeft(26, 52) // move to backdrop
+                    .turnRight(90) // face back to backdrop to place on backdrop
+                    .openLeftClaw() // drop yellow pixel
                     .build();
-
+            placePurple = new MovementSequenceBuilder()
+                    .lowerArm(120) // lower arm
+                    .forwardLeft(15.6789012345, 7.5643210987) // move forward to purple pixel loc
+                    .openRightClaw() // drop purple pixel
+                    .raiseArm(WHITE_PX_HEIGHT) // raise arm to not hit purple pixel and to align with white pixel
+                    // lets run a test to see if we can try not lowering the arm now
+                    .left(15) // move to align with truss
+                    .build();
+            approachWhite = new MovementSequenceBuilder()
+                    .forward(77) // move to white pixels
+                    .alignWithWhitePixel() // i wonder what this does
+//                    .forward(11) // move a bit more after align with white
+                    .closeRightClaw() // intake 2 white pixels
+                    .build();
+            placeWhite = new MovementSequenceBuilder()
+                    .backward(99) // move towards backdrop
+                    .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
+                    .backwardRight(11, 24) // move towards backdrop
+                    .openRightClaw() // open right claw to release 1 pixel
+                    .sleepFor(200) // allow 1st pixel to fall
+                    .closeRightClaw() // close right claw to prevent 2nd pixel release
+                    .right(3) // move to drop 2nd pixel
+                    .openRightClaw() // drop 2nd pixel
+                    .forwardLeft(31, 18) // align with truss
+                    .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
+                    .build();
+            park = new MovementSequenceBuilder()
+                    .turnLeft(90) // turn to post-auto (pre-teleop) ideal pos
+                    .left(46) // drive to park
+                    .build();
 
         } else if (propLocation == 2) {
-            approachTape = new MovementSequenceBuilder()
-                    .forward(24.69) // Moving forward toward the pixel placing area
-                    .forward(0.03) // Brake
-                    .turnRight(87.0) // Turn right
-                    .backward(0.31) // Brake
-                    .left(3.2) // Strafe left
+            placeYellow = new MovementSequenceBuilder()
+                    .raiseArm(120) // raise arm to place pixel
+                    .forwardLeft(32, 52) // move to backdrop
+                    .turnRight(90) // face back to backdrop to place on backdrop
+                    .openLeftClaw() // drop yellow pixel
                     .build();
-
-            parkInBackdrop = new MovementSequenceBuilder()
-                    .raiseArm(57.14) // Raise claw
-                    .backward(6.85) // Move backward
-                    .right(20.4) // Strafe right
-                    .backward(43.21) // Move backward
-                    .closeClaw() // Close claw
-                    .lowerArm(57.14) // Lower claw
+            placePurple = new MovementSequenceBuilder()
+                    .lowerArm(120) // lower arm
+                    .forwardRight(28.8888888888, 2) // move forward to purple pixel loc
+                    .openRightClaw() // drop purple pixel
+                    .raiseArm(WHITE_PX_HEIGHT) // raise arm to not hit purple pixel and to align with white pixel
+                    // lets run a test to see if we can try not lowering the arm now
+                    .left(15) // move to align with truss
+                    .build();
+            approachWhite = new MovementSequenceBuilder()
+                    .forward(66) // move to white pixels
+                    .alignWithWhitePixel() // i wonder what this does
+//                    .forward(11) // move a bit more after align with white
+                    .closeRightClaw() // intake 2 white pixels
+                    .build();
+            placeWhite = new MovementSequenceBuilder()
+                    .backward(99) // move towards backdrop
+                    .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
+                    .backwardRight(11, 12) // move towards backdrop
+                    .openRightClaw() // open right claw to release 1 pixel
+                    .sleepFor(200) // allow 1st pixel to fall
+                    .closeRightClaw() // close right claw to prevent 2nd pixel release
+                    .right(3) // move to drop 2nd pixel
+                    .openRightClaw() // drop 2nd pixel
+                    .forwardLeft(42, 24) // align with truss
+                    .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
+                    .build();
+            park = new MovementSequenceBuilder()
+                    .turnLeft(90) // turn to post-auto (pre-teleop) ideal pos
+                    .left(57) // drive to park
                     .build();
         }
 
         // perform the actual movements here in sequence
-        drive.followMovementSequence(approachTape);
-        drive.followMovementSequence(parkInBackdrop);
+        drive.followMovementSequence(placeYellow);
+        drive.followMovementSequence(placePurple);
+        for (int i=0;i<WHITE_REPS;i++)
+        {
+            drive.followMovementSequence(approachWhite);
+            drive.followMovementSequence(placeWhite);
+        }
+        drive.followMovementSequence(park);
 
-        stopRobot();
+        drive.stopController();
     }
 
     /**
@@ -141,9 +183,5 @@ public class AutoCloseBlue extends LinearOpMode {
     private void sleepFor(long ms) {
         runtime.reset();
         while (opModeIsActive() && (runtime.milliseconds() < ms));
-    }
-
-    public void stopRobot() {
-        drive.driveByEncoder(0, 0, 0, 0);
     }
 }

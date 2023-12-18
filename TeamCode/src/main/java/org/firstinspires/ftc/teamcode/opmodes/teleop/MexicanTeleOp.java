@@ -10,7 +10,7 @@
 //import org.checkerframework.checker.units.qual.Speed;
 //import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 //import org.firstinspires.ftc.teamcode.HardwareRobot;
-//import org.firstinspires.ftc.teamcode.SpeedCoefficients;
+//import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 //import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 //import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 //import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
