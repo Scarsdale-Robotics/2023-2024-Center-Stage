@@ -307,22 +307,22 @@ public class CVSubsystem extends SubsystemBase {
         int pixelOffset = getWhitePixelHorizontalOffset();
         double pixelDiam = getWhitePixelDiameterPx();
         while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDiam) < DIAM_THRESHOLD) {
-            drive.driveRobotCentric(SpeedCoefficients.getAutonomousDriveSpeed() * Math.min(HORIZ_THRESHOLD, Math.pow(pixelOffset, 2)) * 2 / HORIZ_THRESHOLD, SpeedCoefficients.getAutonomousDriveSpeed() * Math.min(DIAM_THRESHOLD, Math.sqrt(Math.abs(pixelDiam))) * 2 / DIAM_THRESHOLD, 0);
+            drive.driveRobotCentric(Math.max(DIAM_THRESHOLD, pixelDiam) / DIAM_THRESHOLD, Math.min(HORIZ_THRESHOLD, pixelOffset) / HORIZ_THRESHOLD, 0);
             pixelOffset = getWhitePixelHorizontalOffset();
             pixelDiam = getWhitePixelDiameterPx();
         }
     }
 
-    public void moveToAprilTag(int wantedAprilTag) { // Notice this does not work probably
+    public void moveToAprilTag(int tagID) {
         int width = getCameraWidth();
         double HORIZ_THRESHOLD = width / 11.1;
-        double DIAM_THRESHOLD = width / 4.0;
-        double aprilTagOffset = getAprilTagHorizontalOffset(wantedAprilTag);
-        double aprilTagDiam = getAprilTagDistance();
-        while (Math.abs(aprilTagOffset) > HORIZ_THRESHOLD || Math.abs(aprilTagDiam) < DIAM_THRESHOLD) {
-            drive.driveRobotCentric(SpeedCoefficients.getAutonomousStrafeSpeed() * Math.min(HORIZ_THRESHOLD, Math.pow(aprilTagOffset, 2)) * 2 / HORIZ_THRESHOLD, SpeedCoefficients.getAutonomousForwardSpeed() * Math.min(DIAM_THRESHOLD, Math.sqrt(Math.abs(aprilTagDiam))) * 2 / DIAM_THRESHOLD, 0);
-            aprilTagOffset = getWhitePixelHorizontalOffset();
-            aprilTagDiam = getWhitePixelDiameterPx();
+        double DIST_THRESHOLD = width / 4.0;
+        double pixelOffset = getAprilTagHorizontalOffset(tagID);
+        double pixelDist = getAprilTagDistance(tagID);
+        while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDist) > DIST_THRESHOLD) {
+            drive.driveRobotCentric(Math.max(HORIZ_THRESHOLD, pixelOffset) / HORIZ_THRESHOLD, Math.max(DIST_THRESHOLD, pixelDist) / DIST_THRESHOLD, 0);
+            pixelOffset = getWhitePixelHorizontalOffset();
+            pixelDist = getWhitePixelDiameterPx();
         }
     }
 
