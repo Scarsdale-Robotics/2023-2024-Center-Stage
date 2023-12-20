@@ -41,11 +41,7 @@ public class SpeedCoefficients {
         return moveMode.mode==MoveMode.MODE_FAST.mode ? FAST_ARM_SPEED : SLOW_ARM_SPEED;
     }
 
-    public static double getAutonomousForwardSpeed() {
-        return 0.3;
-    }
-
-    public static double getAutonomousStrafeSpeed() {
+    public static double getAutonomousDriveSpeed() {
         return 0.3;
     }
 
