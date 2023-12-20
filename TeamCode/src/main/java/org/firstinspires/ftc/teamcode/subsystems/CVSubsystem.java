@@ -307,7 +307,7 @@ public class CVSubsystem extends SubsystemBase {
         int pixelOffset = getWhitePixelHorizontalOffset();
         double pixelDiam = getWhitePixelDiameterPx();
         while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDiam) < DIAM_THRESHOLD) {
-            drive.driveRobotCentric(SpeedCoefficients.getAutonomousStrafeSpeed() * Math.min(HORIZ_THRESHOLD, Math.pow(pixelOffset, 2)) * 2 / HORIZ_THRESHOLD, SpeedCoefficients.getAutonomousForwardSpeed() * Math.min(DIAM_THRESHOLD, Math.sqrt(Math.abs(pixelDiam))) * 2 / DIAM_THRESHOLD, 0);
+            drive.driveRobotCentric(SpeedCoefficients.getAutonomousDriveSpeed() * Math.min(HORIZ_THRESHOLD, Math.pow(pixelOffset, 2)) * 2 / HORIZ_THRESHOLD, SpeedCoefficients.getAutonomousDriveSpeed() * Math.min(DIAM_THRESHOLD, Math.sqrt(Math.abs(pixelDiam))) * 2 / DIAM_THRESHOLD, 0);
             pixelOffset = getWhitePixelHorizontalOffset();
             pixelDiam = getWhitePixelDiameterPx();
         }
@@ -331,7 +331,7 @@ public class CVSubsystem extends SubsystemBase {
                 //assume that we don't need to optimize getAprilTagRotationalOffset(tagID) since it runs anyway
                 drive.driveFieldCentric(0, 0, rotOff * 0.1 * SpeedCoefficients.getTurnSpeed()); // times some scaling factor (temporarily at 1)
             }
-            drive.driveByEncoder(0, 0, 0, 0);
+            drive.driveByRectilinearEncoder(0, 0, 0);
 //            while (Math.abs(rotOff) > ERROR_ALIGNMENT && opMode.opModeIsActive()) {
 //                drive.driveByEncoder(0, 0, 0.2, (double) 1770 * rotOff / 180);
 //            }

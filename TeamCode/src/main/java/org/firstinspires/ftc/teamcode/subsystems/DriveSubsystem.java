@@ -24,17 +24,20 @@ public class DriveSubsystem extends SubsystemBase {
     private static final double Kd = 0;
     private static final double errorTolerance_p = 5.0;
     private static final double errorTolerance_v = 0.05;
+    private static final double errorTolerance_theta = 2.5;
 
     private static volatile boolean isBusy;
     private static volatile ExecutorService threadPool;
     private final MecanumDrive controller;
     private final IMU imu;
     private final LinearOpMode opMode;
+    private final Motor leftBack;
     private final Motor rightBack;
     private final InDepSubsystem inDep;
 
     public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, IMU imu, InDepSubsystem inDep, LinearOpMode opMode) {
         this.rightBack = rightBack;
+        this.leftBack = leftBack;
         controller = new MecanumDrive(
                 leftFront,
                 rightFront,
@@ -59,6 +62,20 @@ public class DriveSubsystem extends SubsystemBase {
         controller.driveRobotCentric(right, forward, turn);
     }
 
+
+    /**
+     * Drives the motors directly with the specified motor powers.
+     *
+     * @param frontLeftSpeed     the speed of the front left motor
+     * @param frontRightSpeed     the speed of the front right motor
+     * @param backLeftSpeed     the speed of the back left motor
+     * @param backRightSpeed     the speed of the back right motor
+     */
+    public void driveWithMotorPowers(double frontLeftSpeed, double frontRightSpeed,
+                                     double backLeftSpeed, double backRightSpeed) {
+        controller.driveWithMotorPowers(frontLeftSpeed, frontRightSpeed, backLeftSpeed, backRightSpeed);
+    }
+
     /**
      * Drives with directions based on driver pov.
      *
@@ -72,31 +89,115 @@ public class DriveSubsystem extends SubsystemBase {
 
     /**
      * Use only for autonomous. Move a certain distance in ticks. Drive is robot centric.
-     * @param rightSpeed      How fast the robot should strafe to the right (negative values = strafe left).
-     * @param forwardSpeed  How fast the robot should move forward (negative values = strafe backwards).
-     * @param turnSpeed      How fast the robot should turn (clockwise?).
-     * @param ticks          How far the robot should move.
+     *
+     * @param rightSpeed   How fast the robot should strafe to the right (negative values = strafe left).
+     * @param forwardSpeed How fast the robot should move forward (negative values = move backwards).
+     * @param ticks        How far the robot should move.
      */
-    public void driveByEncoder(double rightSpeed, double forwardSpeed, double turnSpeed, double ticks) {
+    public void driveByRectilinearEncoder(double rightSpeed, double forwardSpeed, double ticks) {
         // check for clashing actions
-        if (DriveSubsystem.isBusy()) {
-            throw new RuntimeException("Tried to run two drive actions at once (drivetrain is busy)");
+        if (DriveSubsystem.getIsBusy()) {
+            throw new RuntimeException("driveByRectilinearEncoder(): Tried to run two drive actions at once");
         }
 
         // begin action
-        double startEncoder = rightBack.getCurrentPosition();
+        double startEncoder = getRightWheelPosition();
         double setPoint = startEncoder + ticks;
-        double pidMultiplier;
+        double K;
 
-        PIDController pidController = new PIDController(Kp, Ki, Kd, setPoint);
+        PIDController PID = new PIDController(Kp, Ki, Kd, setPoint);
 
         while (
                 opMode.opModeIsActive() &&
-                Math.abs(setPoint-getWheelPosition()) > errorTolerance_p &&
-                Math.abs(getWheelVelocity()) > errorTolerance_v
+                Math.abs(setPoint-getRightWheelPosition()) > errorTolerance_p &&
+                Math.abs(getRightWheelVelocity()) > errorTolerance_v
         ) {
-            pidMultiplier = pidController.update(getWheelPosition());
-            driveRobotCentric(rightSpeed * pidMultiplier, forwardSpeed * pidMultiplier, turnSpeed * pidMultiplier);
+            K = PID.update(getRightWheelPosition());
+            driveRobotCentric(rightSpeed * K, forwardSpeed * K, 0);
+            isBusy = true;
+        }
+
+        // brake
+        controller.stop();
+        isBusy = false;
+    }
+
+    /**
+     * Use only for autonomous. Move a certain distance following a motion vector. Drive is robot centric.
+     * @param driveSpeed      Positive movement speed of the robot.
+     * @param leftTicks     How many ticks the back left and front right wheels should be displaced by.
+     * @param rightTicks      How many ticks the back right and front left wheels should be displaced by.
+     */
+    public void driveByAngularEncoder(double driveSpeed, double leftTicks, double rightTicks, double theta) {
+        // check for clashing actions
+        if (DriveSubsystem.getIsBusy()) {
+            throw new RuntimeException("driveByAngularEncoder(): Tried to run two drive actions at once");
+        }
+
+        // begin action
+        double L = leftTicks, R = rightTicks;
+
+        PIDController L_PID = new PIDController(Kp, Ki, Kd, L);
+        PIDController R_PID = new PIDController(Kp, Ki, Kd, R);
+
+        while ( // checking condition
+                opMode.opModeIsActive() &&
+                Math.abs(L-leftBack.getCurrentPosition()) > errorTolerance_p &&
+                Math.abs(R-rightBack.getCurrentPosition()) > errorTolerance_p &&
+                Math.abs(getLeftWheelVelocity()) > errorTolerance_v &&
+                Math.abs(getRightWheelVelocity()) > errorTolerance_v
+        ) {
+            // getting L and R
+            double L_p = leftBack.getCurrentPosition();
+            double R_p = rightBack.getCurrentPosition();
+
+            double L_K = L_PID.update(L_p);
+            double R_K = R_PID.update(R_p);
+
+            double L_v = driveSpeed * Math.sin(theta - Math.PI / 4) * L_K; // for bL and fR
+            double R_v = driveSpeed * Math.sin(theta + Math.PI / 4) * R_K; // for bR and fL
+
+            // setting the powers of the motors
+            driveWithMotorPowers(
+                    R_v, // fL
+                    L_v, // fR
+                    L_v, // bL
+                    R_v  // bR
+            );
+
+            isBusy = true;
+        }
+
+        // brake
+        controller.stop();
+        isBusy = false;
+    }
+
+    /**
+     * Use only for autonomous. Move a certain distance in ticks. Drive is robot centric.
+     * @param turnSpeed      Positive rotation speed of the robot.
+     * @param degrees          How many degrees the robot should turn
+     */
+    public void turnByIMU(double turnSpeed, double degrees) {
+        // check for clashing actions
+        if (DriveSubsystem.getIsBusy()) {
+            throw new RuntimeException("turnByIMU(): Tried to run two drive actions at once");
+        }
+
+        // begin action
+        double startAngle = getYaw();
+        double setPoint = normalizeAngle(startAngle + degrees);
+        double K;
+
+        PIDController PID = new PIDController(Kp, Ki, Kd, setPoint);
+
+        while (
+                opMode.opModeIsActive() &&
+                Math.abs(normalizeAngle(setPoint-getYaw())) > errorTolerance_theta &&
+                Math.abs(getRightWheelVelocity()) > errorTolerance_v
+        ) {
+            K = PID.updateError(normalizeAngle(setPoint-getYaw()));
+            driveRobotCentric(0, 0, turnSpeed * K);
             isBusy = true;
         }
 
@@ -142,21 +243,35 @@ public class DriveSubsystem extends SubsystemBase {
     /**
      * @return whether or not the drivetrain is in an action.
      */
-    public static boolean isBusy() {
+    public static boolean getIsBusy() {
         return isBusy;
     }
 
     /**
-     * @return the current position of the robot's wheels in ticks.
+     * @return the current position of the robot's back left wheels in ticks.
      */
-    public int getWheelPosition() {
+    public int getLeftWheelPosition() {
+        return leftBack.getCurrentPosition();
+    }
+
+    /**
+     * @return the current position of the robot's back right wheels in ticks.
+     */
+    public int getRightWheelPosition() {
         return rightBack.getCurrentPosition();
     }
 
     /**
-     * @return the current power of the robot's wheels.
+     * @return the current power of the robot's back left wheel.
      */
-    public double getWheelVelocity() {
+    public double getLeftWheelVelocity() {
+        return leftBack.getCorrectedVelocity();
+    }
+
+    /**
+     * @return the current power of the robot's back right wheel.
+     */
+    public double getRightWheelVelocity() {
         return rightBack.getCorrectedVelocity();
     }
 
@@ -173,5 +288,19 @@ public class DriveSubsystem extends SubsystemBase {
 
     private double getYaw() {
         return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+    }
+
+    /**
+     * Normalizes a given angle to [-180,180) degrees.
+     * @param degrees the given angle in degrees.
+     * @return the normalized angle in degrees.
+     */
+    private double normalizeAngle(double degrees) {
+        double angle = degrees;
+        while (angle <= -180)
+            angle += 360;
+        while (angle > 180)
+            angle -= 360;
+        return angle;
     }
 }

@@ -106,7 +106,7 @@ public class InDepSubsystem extends SubsystemBase {
      */
     public void raiseByEncoder(double power, double ticks) {
         // check for clashing actions
-        if (InDepSubsystem.isBusy()) {
+        if (InDepSubsystem.getIsBusy()) {
             throw new RuntimeException("Tried to run two arm actions at once (arm is busy)");
         }
 
@@ -307,7 +307,7 @@ public class InDepSubsystem extends SubsystemBase {
     /**
      * @return whether or not the arm is in an action.
      */
-    public static boolean isBusy() {
+    public static boolean getIsBusy() {
         return isBusy;
     }
 

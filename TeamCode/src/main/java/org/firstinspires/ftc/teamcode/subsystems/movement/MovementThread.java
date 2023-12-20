@@ -9,13 +9,12 @@ import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 
 public class MovementThread implements Runnable {
-    private static final double TICKS_PER_INCH_FORWARD = 32.4;
-    private static final double TICKS_PER_INCH_STRAFE = 62.5;
-    private static final double TICKS_PER_DEGREE_TURN = 10.0;
-    private static final double TICKS_PER_DEGREE_ARM = 35.0;
+    private static final double K_FORWARD = 32.4;
+    private static final double K_STRAFE = 62.5;
+    private static final double K_TURN = 10.0;
+    private static final double K_ARM = 35.0;
 
-    private static final double POWER_FORWARD = SpeedCoefficients.getAutonomousForwardSpeed();
-    private static final double POWER_STRAFE = SpeedCoefficients.getAutonomousStrafeSpeed();
+    private static final double POWER_DRIVE = SpeedCoefficients.getAutonomousDriveSpeed();
     private static final double POWER_TURN = SpeedCoefficients.getAutonomousTurnSpeed();
     private static final double POWER_ARM = SpeedCoefficients.getAutonomousArmSpeed();
 
@@ -46,44 +45,56 @@ public class MovementThread implements Runnable {
     public void run() {
         Movement.MovementType type = movement.MOVEMENT_TYPE;
 
-        // GENERIC DRIVE CASES
-        drive.driveByEncoder(
-                POWER_STRAFE * type.K_strafe,
-                POWER_FORWARD * type.K_forward,
-                POWER_TURN * type.K_turn,
-                Math.sqrt(
-                        // Pythagorean Theorem for diagonal movement
-                        Math.pow(movement.INCHES_STRAFE * TICKS_PER_INCH_STRAFE * Math.abs(type.K_strafe),2) +
-                        Math.pow(movement.INCHES_FORWARD * TICKS_PER_INCH_FORWARD * Math.abs(type.K_forward),2)
-                ) +
-                movement.DEGREES_TURN * TICKS_PER_DEGREE_TURN * Math.abs(type.K_turn)
-        );
+        // DRIVE CASES
+        if (type.isDriveType) {
+            double  a = movement.INCHES_FORWARD * type.SGN_forward,
+                    b = movement.INCHES_STRAFE * type.SGN_strafe,
+                    c = Math.hypot(a,b),
+                    theta = Math.atan2(b,a),
 
-        // ELEVATION CASES
-        inDep.raiseByEncoder(
-                POWER_ARM * type.K_elevation,
-                movement.DEGREES_ELEVATION * TICKS_PER_DEGREE_ARM * Math.abs(type.K_elevation)
-        );
+                    u = Math.hypot(K_STRAFE * Math.cos(theta), K_FORWARD * Math.sin(theta)),
+                    L = Math.abs(u*c*Math.cos(theta)-u*c*Math.sin(theta))/Math.sqrt(2),
+                    R = Math.abs(u*c*Math.cos(theta)+u*c*Math.sin(theta))/Math.sqrt(2);
+
+            drive.driveByAngularEncoder(POWER_DRIVE, L, R, theta);
+        }
+
+        // TURN CASES
+        if (type.isTurnType) {
+            drive.turnByIMU(POWER_TURN, movement.DEGREES_TURN);
+        }
+
+        // ARM CASES
+        if (type.isArmType) {
+            inDep.raiseByEncoder(
+                POWER_ARM * type.SGN_elevation,
+                movement.DEGREES_ELEVATION * K_ARM
+            );
+        }
 
         // DELAY CASE
         if (type == Movement.MovementType.DELAY)
             sleepFor(movement.WAIT);
 
         // CLAW CASES
-        if (type == Movement.MovementType.OPEN_LEFT_CLAW)
-            inDep.openLeft();
-        if (type == Movement.MovementType.OPEN_RIGHT_CLAW)
-            inDep.openRight();
-        if (type == Movement.MovementType.CLOSE_RIGHT_CLAW)
-            inDep.closeRight();
-        if (type == Movement.MovementType.CLOSE_LEFT_CLAW)
-            inDep.closeLeft();
+        if (type.isClawType) {
+            if (type == Movement.MovementType.OPEN_LEFT_CLAW)
+                inDep.openLeft();
+            if (type == Movement.MovementType.OPEN_RIGHT_CLAW)
+                inDep.openRight();
+            if (type == Movement.MovementType.CLOSE_RIGHT_CLAW)
+                inDep.closeRight();
+            if (type == Movement.MovementType.CLOSE_LEFT_CLAW)
+                inDep.closeLeft();
+        }
 
         // CV CASES
-        if (type == Movement.MovementType.WHITE_PXL_ALIGN)
-            cvFront.moveToWhitePixel();
-        if (type == Movement.MovementType.APRIL_TAG_ALIGN)
-            cvBack.moveToWhitePixel();
+        if (type.isCVType) {
+            if (type == Movement.MovementType.WHITE_PXL_ALIGN)
+                cvFront.moveToWhitePixel();
+            if (type == Movement.MovementType.APRIL_TAG_ALIGN)
+                cvBack.moveToWhitePixel();
+        }
     }
 
     /**
