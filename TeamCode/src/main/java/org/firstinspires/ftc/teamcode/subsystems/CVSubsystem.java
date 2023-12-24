@@ -316,7 +316,7 @@ public class CVSubsystem extends SubsystemBase {
     public void moveToAprilTag(int tagID) {
         int width = getCameraWidth();
         double HORIZ_THRESHOLD = width / 11.1;
-        double DIST_THRESHOLD = width / 4.0;
+        double DIST_THRESHOLD = 22;
         double pixelOffset = getAprilTagHorizontalOffset(tagID);
         double pixelDist = getAprilTagDistance(tagID);
         while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDist) > DIST_THRESHOLD) {

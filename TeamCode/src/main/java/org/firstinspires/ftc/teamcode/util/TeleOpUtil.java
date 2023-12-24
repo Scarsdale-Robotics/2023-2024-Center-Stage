@@ -23,8 +23,6 @@ public class TeleOpUtil {
     public boolean speedIsFast = true;
     private boolean clawToggle = false;
     private boolean speedToggle = false;
-    private boolean omniToggle = false;
-    public boolean omniMode = false;
     public boolean aprilTagAlignToggle = false;
     public boolean alignAprilTagRunning = false;
     public boolean macrosRunning = true;
@@ -97,40 +95,8 @@ public class TeleOpUtil {
         if (gamepad1.dpad_down)
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
 
-        //Toggle Omni Mode
-        if (gamepad1.square && !omniToggle) {
-            omniToggle = true;
-            omniMode = !omniMode;
-        }
-        if (!gamepad1.square) omniToggle = false;
-
-        // Drive Robot
-        if (!omniMode) {
-            moveInputX = 0;
-            moveInputY = 0;
-            if (Math.abs(gamepad1.left_stick_x) > 0.6) {
-                moveInputX = Math.signum(gamepad1.left_stick_x) * SpeedCoefficients.getStrafeSpeed();
-                moveInputY = 0;
-                // TODO: consider: might need a cancel button for below
-//                if (moveInputX == -1) {
-//                    SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
-//                }
-            } else if (Math.abs(gamepad1.left_stick_y) > 0.6) {
-                moveInputX = 0;
-                moveInputY = Math.signum(gamepad1.left_stick_y) * SpeedCoefficients.getForwardSpeed();
-            } else {
-                moveInputX = gamepad1.left_stick_x;
-                moveInputY = gamepad1.left_stick_y;
-            }
-            double turnInput = gamepad1.right_stick_x;
-            // DRIVE CONTROL
-            drive.driveRobotCentric(-moveInputX,moveInputY,-turnInput * SpeedCoefficients.getTurnSpeed()
-            );
-        } else {
-            drive.driveRobotCentric(-gamepad1.left_stick_x * SpeedCoefficients.getStrafeSpeed(),gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed(),-gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed()
-            );
-        }
-
+        // drive robot
+        drive.driveRobotCentric(-gamepad1.left_stick_x * SpeedCoefficients.getStrafeSpeed(),gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed(),-gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed());
     }
 
     /**
@@ -139,9 +105,11 @@ public class TeleOpUtil {
     private void runArmClawControl() {
         // CLAW TOGGLE CONTROL
         if (gamepad1.y && !clawToggle) {
-            if (inDep.getIsLeftClawOpen())
+            if (inDep.getIsLeftClawOpen()) {
                 inDep.close();
-            else {
+                // automagically set fast mode after intake
+                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
+            } else {
                 inDep.open();
                 // automagically set fast mode after release
                 SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
@@ -152,7 +120,7 @@ public class TeleOpUtil {
         if (!gamepad1.y) clawToggle = false;
 
         // FLEX ARM MOVEMENT MODE CONTROL
-//        inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed());
+        inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed());
 
         // RIGID ARM MOVEMENT MODE CONTROL
         runArmRigidControl();
