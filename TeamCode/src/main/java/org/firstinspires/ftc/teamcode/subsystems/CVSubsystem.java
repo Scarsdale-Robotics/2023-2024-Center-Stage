@@ -306,7 +306,7 @@ public class CVSubsystem extends SubsystemBase {
         double DIAM_THRESHOLD = width / 4.0;
         int pixelOffset = getWhitePixelHorizontalOffset();
         double pixelDiam = getWhitePixelDiameterPx();
-        while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDiam) < DIAM_THRESHOLD) {
+        while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDiam) < DIAM_THRESHOLD && opMode.opModeIsActive()) {
             drive.driveRobotCentric(Math.max(DIAM_THRESHOLD, pixelDiam) / DIAM_THRESHOLD, Math.min(HORIZ_THRESHOLD, pixelOffset) / HORIZ_THRESHOLD, 0);
             pixelOffset = getWhitePixelHorizontalOffset();
             pixelDiam = getWhitePixelDiameterPx();

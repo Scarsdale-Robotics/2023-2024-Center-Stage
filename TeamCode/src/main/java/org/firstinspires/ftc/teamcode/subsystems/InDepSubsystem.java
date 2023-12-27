@@ -95,6 +95,7 @@ public class InDepSubsystem extends SubsystemBase {
      * Sets the raw power of the arm.
      */
     public void rawPower(double power) {
+        // TODO: add ranges
         arm1.motor.setPower(power);
         arm2.motor.setPower(power);
     }

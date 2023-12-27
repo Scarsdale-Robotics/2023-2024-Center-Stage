@@ -11,6 +11,8 @@ import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
+import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
 
 public class TeleOpUtil {
     public DriveSubsystem drive;
@@ -32,7 +34,9 @@ public class TeleOpUtil {
     private double moveInputX;
     private double moveInputY;
     public int macroCapacity = 0;
-
+    private boolean towardsBackboard = false;
+    private final MovementSequence intoBackboardMode;
+    private final MovementSequence intoPickupMode;
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
         RobotSystem robot = new RobotSystem(hardwareMap, isRedTeam, opMode, telemetry);
         drive = robot.getDrive();
@@ -43,6 +47,24 @@ public class TeleOpUtil {
         this.gamepad2 = gamepad2;
         this.telemetry = telemetry;
         this.lastTurnStart = robot.getIMU().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+
+        if (isRedTeam)
+        {
+            intoBackboardMode = new MovementSequenceBuilder()
+                    .turnLeft(90)
+                    .build();
+            intoPickupMode = new MovementSequenceBuilder()
+                    .turnRight(90)
+                    .build();
+        } else {
+            intoBackboardMode = new MovementSequenceBuilder()
+                    .turnRight(90)
+                    .build();
+            intoPickupMode = new MovementSequenceBuilder()
+                    .turnLeft(90)
+                    .build();
+        }
+
     }
 
     private void runArmRigidControl() {
@@ -85,15 +107,25 @@ public class TeleOpUtil {
         }
     }
 
+    private void epicMacroControl() {
+        if (gamepad1.square) {
+            drive.followMovementSequence(towardsBackboard ? intoPickupMode : intoBackboardMode);
+            towardsBackboard = !towardsBackboard;
+        }
+    }
+
     /**
      * PRIMARY MOTION CONTROL METHOD
      */
     private void runMotionControl() {
         // TOGGLE MOVE SPEED MODE CONTROL
-        if (gamepad1.dpad_up)
+        if (gamepad1.dpad_up || gamepad1.circle)
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
-        if (gamepad1.dpad_down)
+        if (gamepad1.dpad_down || gamepad1.x)
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
+
+        // epic macros
+        epicMacroControl();
 
         // drive robot
         drive.driveRobotCentric(-gamepad1.left_stick_x * SpeedCoefficients.getStrafeSpeed(),gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed(),-gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed());
@@ -143,9 +175,9 @@ public class TeleOpUtil {
         telemetry.update();
         runMotionControl();
         runArmClawControl();
-        if (!gamepad2.x && !gamepad1.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsLeftClawOpen()) {
+        if (!gamepad2.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsLeftClawOpen()) {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
-        } else if (gamepad1.x || gamepad2.x) {
+        } else if (gamepad2.x) {
             gamepad1.rumble(500); // big bomboclat
             gamepad2.rumble(500);
         }
