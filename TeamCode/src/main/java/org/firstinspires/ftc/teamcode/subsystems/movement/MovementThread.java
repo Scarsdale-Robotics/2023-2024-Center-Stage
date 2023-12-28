@@ -9,10 +9,9 @@ import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 
 public class MovementThread implements Runnable {
-    private static final double K_FORWARD = 32.4;
-    private static final double K_STRAFE = 62.5;
-    private static final double K_TURN = 10.0;
-    private static final double K_ARM = 35.0;
+    private static double K_FORWARD = 32.4;
+    private static double K_STRAFE = 62.5;
+    private static double K_ARM = 35.0;
 
     private static final double POWER_DRIVE = SpeedCoefficients.getAutonomousDriveSpeed();
     private static final double POWER_TURN = SpeedCoefficients.getAutonomousTurnSpeed();

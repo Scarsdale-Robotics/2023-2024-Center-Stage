@@ -9,11 +9,11 @@ import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
 public class InDepSubsystem extends SubsystemBase {
-    private static final double Kp = 0.01;
-    private static final double Ki = 0;
-    private static final double Kd = 0;
-    private static final double errorTolerance_p = 1.0;
-    private static final double errorTolerance_v = 0.01;
+    private static double Kp = 0.01;
+    private static double Ki = 0;
+    private static double Kd = 0;
+    private static double errorTolerance_p = 1.0;
+    private static double errorTolerance_v = 0.01;
 
     private final Motor arm1;
     private final Motor arm2;

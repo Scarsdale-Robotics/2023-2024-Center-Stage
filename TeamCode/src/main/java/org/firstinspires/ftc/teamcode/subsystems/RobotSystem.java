@@ -32,7 +32,6 @@ public class RobotSystem {
                 hardwareRobot.leftBack,
                 hardwareRobot.rightBack,
                 hardwareRobot.imu,
-                inDep,
                 opMode
         );
         cvFront = new CVSubsystem(hardwareRobot.frontCam,

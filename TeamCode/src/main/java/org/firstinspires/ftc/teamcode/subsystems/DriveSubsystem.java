@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementThread;
 import org.firstinspires.ftc.teamcode.subsystems.movement.Movement;
@@ -19,12 +21,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class DriveSubsystem extends SubsystemBase {
-    private static final double Kp = 0.01;
-    private static final double Ki = 0;
-    private static final double Kd = 0;
-    private static final double errorTolerance_p = 5.0;
-    private static final double errorTolerance_v = 0.05;
-    private static final double errorTolerance_theta = 2.5;
+    private static double Kp = 0.01;
+    private static double Ki = 0;
+    private static double Kd = 0;
+    private static double errorTolerance_p = 5.0;
+    private static double errorTolerance_v = 0.05;
+    private static double errorTolerance_degrees = 2.5;
 
     private static volatile boolean isBusy;
     private static volatile ExecutorService threadPool;
@@ -33,9 +35,13 @@ public class DriveSubsystem extends SubsystemBase {
     private final LinearOpMode opMode;
     private final Motor leftBack;
     private final Motor rightBack;
-    private final InDepSubsystem inDep;
+    private MultipleTelemetry telemetry;
 
-    public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, IMU imu, InDepSubsystem inDep, LinearOpMode opMode) {
+    public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, IMU imu, LinearOpMode opMode) {
+        this(leftFront, rightFront, leftBack, rightBack, imu, opMode, null);
+    }
+
+    public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, IMU imu, LinearOpMode opMode, MultipleTelemetry telemetry) {
         this.rightBack = rightBack;
         this.leftBack = leftBack;
         controller = new MecanumDrive(
@@ -46,7 +52,7 @@ public class DriveSubsystem extends SubsystemBase {
         );
         this.imu = imu;
         this.opMode = opMode;
-        this.inDep = inDep;
+        this.telemetry = telemetry;
         isBusy = false;
         threadPool = Executors.newCachedThreadPool();
     }
@@ -123,10 +129,11 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Use only for autonomous. Move a certain distance following a motion vector. Drive is robot centric.
+     * Use only for autonomous. Move a certain distance following two motion vectors for diagonal motor pairs. Drive is robot centric.
      * @param driveSpeed      Positive movement speed of the robot.
      * @param leftTicks     How many ticks the back left and front right wheels should be displaced by.
      * @param rightTicks      How many ticks the back right and front left wheels should be displaced by.
+     * @param theta      The direction of movement in radians in [-π, π].
      */
     public void driveByAngularEncoder(double driveSpeed, double leftTicks, double rightTicks, double theta) {
         // check for clashing actions
@@ -150,6 +157,16 @@ public class DriveSubsystem extends SubsystemBase {
             // getting L and R
             double L_p = leftBack.getCurrentPosition();
             double R_p = rightBack.getCurrentPosition();
+
+            if (telemetry != null) {
+                telemetry.addData("L setpoint",L);
+                telemetry.addData("L position",L_p);
+                telemetry.addData("R setpoint",R);
+                telemetry.addData("R position",R_p);
+                telemetry.addData("L power",getLeftWheelVelocity());
+                telemetry.addData("R power",getRightWheelVelocity());
+                telemetry.update();
+            }
 
             double L_K = L_PID.update(L_p);
             double R_K = R_PID.update(R_p);
@@ -193,10 +210,18 @@ public class DriveSubsystem extends SubsystemBase {
 
         while (
                 opMode.opModeIsActive() &&
-                Math.abs(normalizeAngle(setPoint-getYaw())) > errorTolerance_theta &&
+                Math.abs(normalizeAngle(setPoint-getYaw())) > errorTolerance_degrees &&
                 Math.abs(getRightWheelVelocity()) > errorTolerance_v
         ) {
             K = PID.updateError(normalizeAngle(setPoint-getYaw()));
+
+            if (telemetry != null) {
+                telemetry.addData("Degrees setpoint",setPoint);
+                telemetry.addData("Degrees position",setPoint-normalizeAngle(setPoint-getYaw()));
+                telemetry.addData("K",K);
+                telemetry.update();
+            }
+
             driveRobotCentric(0, 0, turnSpeed * K);
             isBusy = true;
         }
