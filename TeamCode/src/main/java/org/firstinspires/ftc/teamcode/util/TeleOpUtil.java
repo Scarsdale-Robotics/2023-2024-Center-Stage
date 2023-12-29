@@ -131,12 +131,13 @@ public class TeleOpUtil {
         epicMacroControl();
 
         // drive robot
+        // TODO: test gradual slow
         double vsn = -gamepad1.left_stick_x * SpeedCoefficients.getStrafeSpeed();
         double vfn = gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed();
         double vtn = -gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed();
-        if (vsn == 0 && vs < 0.1) vs = 0; else vs = vsn * 0.5 + vs * 0.5;
-        if (vfn == 0 && vf < 0.1) vf = 0; else vf = vfn * 0.5 + vf * 0.5;
-        if (vtn == 0 && vt < 0.1) vt = 0; else vt = vtn * 0.5 + vt * 0.5;
+        vs = vs < 0.1 ? 0 : vsn * 0.5 + vs * 0.5;
+        vf = vf < 0.1 ? 0 : vfn * 0.5 + vf * 0.5;
+        vt = vt < 0.1 ? 0 : vtn * 0.5 + vt * 0.5;
         drive.driveFieldCentric(vs, vf, vt);
     }
 
