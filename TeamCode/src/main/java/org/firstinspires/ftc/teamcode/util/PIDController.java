@@ -45,9 +45,9 @@ public class PIDController {
      * @param pv The current measurement of the process variable.
      * @return the value produced by u(t).
      */
-    public double update(double encoderPosition) {
+    public double update(double pv) {
         // Calculate the error
-        double error = setPoint - encoderPosition;
+        double error = setPoint - pv;
 
         // Calculate derivative
         double derivative = (error - lastError) / timer.seconds(); // secant line slope
@@ -65,5 +65,11 @@ public class PIDController {
         timer.reset();
 
         return output; // Return multiplier
+    }
+
+    public void setPID(double Kp, double Ki, double Kd) {
+        this.Kp = Kp;
+        this.Ki = Ki;
+        this.Kd = Kd;
     }
 }
