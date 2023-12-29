@@ -134,9 +134,9 @@ public class TeleOpUtil {
         double vsn = -gamepad1.left_stick_x * SpeedCoefficients.getStrafeSpeed();
         double vfn = gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed();
         double vtn = -gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed();
-        vs = vsn == 0 ? 0.5 * vs : vsn;
-        vf = vfn == 0 ? 0.5 * vf : vfn;
-        vt = vtn == 0 ? 0.6 * vt : vtn;
+        if (vsn == 0 && vs < 0.1) vs = 0; else vs = vsn * 0.5 + vs * 0.5;
+        if (vfn == 0 && vf < 0.1) vf = 0; else vf = vfn * 0.5 + vf * 0.5;
+        if (vtn == 0 && vt < 0.1) vt = 0; else vt = vtn * 0.5 + vt * 0.5;
         drive.driveFieldCentric(vs, vf, vt);
     }
 
