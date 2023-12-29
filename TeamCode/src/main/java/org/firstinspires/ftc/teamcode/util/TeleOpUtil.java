@@ -37,6 +37,9 @@ public class TeleOpUtil {
     private boolean towardsBackboard = false;
     private final MovementSequence intoBackboardMode;
     private final MovementSequence intoPickupMode;
+    private double vs = 0.0;
+    private double vf = 0.0;
+    private double vt = 0.0;
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
         RobotSystem robot = new RobotSystem(hardwareMap, isRedTeam, opMode, telemetry);
         drive = robot.getDrive();
@@ -128,7 +131,13 @@ public class TeleOpUtil {
         epicMacroControl();
 
         // drive robot
-        drive.driveRobotCentric(-gamepad1.left_stick_x * SpeedCoefficients.getStrafeSpeed(),gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed(),-gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed());
+        double vsn = -gamepad1.left_stick_x * SpeedCoefficients.getStrafeSpeed();
+        double vfn = gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed();
+        double vtn = -gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed();
+        vs = vsn == 0 ? 0.5 * vs : vsn;
+        vf = vfn == 0 ? 0.5 * vf : vfn;
+        vt = vtn == 0 ? 0.6 * vt : vtn;
+        drive.driveFieldCentric(vs, vf, vt);
     }
 
     /**
