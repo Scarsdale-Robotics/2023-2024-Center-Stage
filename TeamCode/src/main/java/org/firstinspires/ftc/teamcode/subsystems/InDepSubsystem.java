@@ -30,10 +30,9 @@ public class InDepSubsystem extends SubsystemBase {
 
     public enum Level {
         GROUND(0, 0.25, 0.80),
-        HANG(5083, 0.4, 0.13),
-        BACKBOARD1(7777,0.35, 0.13),
-        BACKBOARD2(8888,0.3, 0.13), //temp motor encoder values
-        BACKBOARD3(9999, 0.25, 0.13);
+        BACKBOARD1(5083,0.17, 0.13),
+        BACKBOARD2(6666,0.14, 0.13), //temp motor encoder values
+        BACKBOARD3(7777, 0.11, 0.13);
 
         public final int target;
         public final double wristTarget;
@@ -47,16 +46,16 @@ public class InDepSubsystem extends SubsystemBase {
 
         public Level nextAbove() {
             if (this == GROUND) return BACKBOARD1;
-            else if (this == BACKBOARD1) return BACKBOARD2;
-            else if (this == BACKBOARD2) return BACKBOARD3;
-            else return HANG; // For MEDIUM and HIGH
+            if (this == BACKBOARD1) return BACKBOARD2;
+            if (this == BACKBOARD2) return BACKBOARD3;
+            return GROUND;
         }
 
         public Level nextBelow() {
-            if (this == HANG) return BACKBOARD3;
-            else if (this == BACKBOARD3) return BACKBOARD2;
-            else if (this == BACKBOARD2) return BACKBOARD1;
-            else return GROUND;
+            if (this == BACKBOARD3) return BACKBOARD2;
+            if (this == BACKBOARD2) return BACKBOARD1;
+            if (this == BACKBOARD1) return GROUND;
+            return BACKBOARD3;
         }
     }
     public enum EndEffector {
@@ -99,11 +98,8 @@ public class InDepSubsystem extends SubsystemBase {
 
     public Level getLevelBelow() {
         int armPos = getArmPosition();
-        if (armPos < Level.HANG.target) {
-            return Level.GROUND;
-        }
         if (armPos < Level.BACKBOARD1.target) {
-            return Level.HANG;
+            return Level.GROUND;
         }
         if (armPos < Level.BACKBOARD2.target) {
             return Level.BACKBOARD1;
