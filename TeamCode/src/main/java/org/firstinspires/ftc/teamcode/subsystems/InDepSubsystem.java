@@ -5,16 +5,11 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.util.InDepPIDCoefficients;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
 public class InDepSubsystem extends SubsystemBase {
-    private static final double Kp = 0.01;
-    private static final double Ki = 0;
-    private static final double Kd = 0;
-    private static final double errorTolerance_p = 1.0;
-    private static final double errorTolerance_v = 0.01;
-
     private final Motor arm1;
     private final Motor arm2;
 
@@ -58,10 +53,12 @@ public class InDepSubsystem extends SubsystemBase {
         }
     }
     public enum EndEffector {
-        CLAW_OPEN(0.0),
-        CLAW_CLOSED(0.175),
-        ELBOW_REST(0.0),
-        ELBOW_FLIPPED(1.0);
+        LEFT_CLAW_OPEN(0.0), // open = 0.0
+        LEFT_CLAW_CLOSED(0.3),
+        RIGHT_CLAW_OPEN(0.5), // open = 0.5
+        RIGHT_CLAW_CLOSED(0.65),
+        ELBOW_REST(0.58),
+        ELBOW_FLIPPED(0.25);
         public final double servoPosition;
 
         EndEffector(double servoPosition) {
@@ -83,9 +80,10 @@ public class InDepSubsystem extends SubsystemBase {
         this.opMode = opMode;
 
         // reset everything
-        setLevel(Level.GROUND); // arm, wrist
-        rest(); // elbow
-        close(); // claw
+
+//        setLevel(Level.GROUND); // arm, wrist
+//        rest(); // elbow
+//        close(); // claw
 
         isBusy = false;
 
@@ -95,6 +93,7 @@ public class InDepSubsystem extends SubsystemBase {
      * Sets the raw power of the arm.
      */
     public void rawPower(double power) {
+        // TODO: add ranges
         arm1.motor.setPower(power);
         arm2.motor.setPower(power);
     }
@@ -106,24 +105,36 @@ public class InDepSubsystem extends SubsystemBase {
      */
     public void raiseByEncoder(double power, double ticks) {
         // check for clashing actions
-        if (InDepSubsystem.isBusy()) {
+        if (InDepSubsystem.getIsBusy()) {
             throw new RuntimeException("Tried to run two arm actions at once (arm is busy)");
         }
-
         // begin action
         double startEncoder = arm1.motor.getCurrentPosition(); // arm1 is our reference for encoders
         double setPoint = startEncoder + ticks;
         double pidMultiplier;
-
-        PIDController pidController = new PIDController(Kp, Ki, Kd, setPoint);
-
+        PIDController pidController = new PIDController(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd(), setPoint);
         while (
                 opMode.opModeIsActive() &&
-                Math.abs(setPoint-getArmPosition()) > errorTolerance_p &&
-                Math.abs(getArmVelocity()) > errorTolerance_v
+                Math.abs(setPoint - getArmPosition()) > InDepPIDCoefficients.getErrorTolerance_p() &&
+                Math.abs(getArmVelocity()) > InDepPIDCoefficients.getErrorTolerance_v()
         ) {
             pidMultiplier = pidController.update(getArmPosition());
             rawPower(power * pidMultiplier);
+            if(getArmPosition() == Level.GROUND.target) {
+                wrist.setPosition(Level.GROUND.wristTarget);
+            }
+            else if (getArmPosition() >= Level.BACKBOARD1.target) {
+                wrist.setPosition(Level.BACKBOARD1.wristTarget);
+            }
+            else if (getArmPosition() >= Level.BACKBOARD2.target) {
+                wrist.setPosition(Level.BACKBOARD2.target);
+            }
+            else if (getArmPosition() >= Level.BACKBOARD3.target) {
+                wrist.setPosition(Level.BACKBOARD3.target);
+            }
+            else {
+                wrist.setPosition(1.0);
+            }
             isBusy = true;
         }
 
@@ -147,6 +158,13 @@ public class InDepSubsystem extends SubsystemBase {
      */
     public void resetArm() {
         raiseToSetPoint(SpeedCoefficients.getArmSpeed(), 0);
+    }
+
+    /**
+     * Sets the wrist servo to the passed position.
+     */
+    public void setWristPosition(double servoPosition) {
+        wrist.setPosition(servoPosition);
     }
 
     /**
@@ -174,11 +192,25 @@ public class InDepSubsystem extends SubsystemBase {
     }
 
     /**
+     * Sets the left claw servo to the passed position.
+     */
+    public void setLeftClawPosition(double servoPosition) {
+        leftClaw.setPosition(servoPosition);
+    }
+
+    /**
+     * Sets the right claw servo to the passed position.
+     */
+    public void setRightClawPosition(double servoPosition) {
+        rightClaw.setPosition(servoPosition);
+    }
+
+    /**
      * Opens both claws.
      */
     public void open() {
-        leftClaw.setPosition(EndEffector.CLAW_OPEN.servoPosition);
-        rightClaw.setPosition(EndEffector.CLAW_OPEN.servoPosition);
+        leftClaw.setPosition(EndEffector.LEFT_CLAW_OPEN.servoPosition);
+        rightClaw.setPosition(EndEffector.RIGHT_CLAW_OPEN.servoPosition);
         isLeftClawOpen = true;
         isRightClawOpen = true;
     }
@@ -187,8 +219,8 @@ public class InDepSubsystem extends SubsystemBase {
      * Closes both claws.
      */
     public void close() {
-        leftClaw.setPosition(EndEffector.CLAW_CLOSED.servoPosition);
-        rightClaw.setPosition(EndEffector.CLAW_CLOSED.servoPosition);
+        leftClaw.setPosition(EndEffector.LEFT_CLAW_CLOSED.servoPosition);
+        rightClaw.setPosition(EndEffector.RIGHT_CLAW_CLOSED.servoPosition);
         isLeftClawOpen = false;
         isRightClawOpen = false;
     }
@@ -197,7 +229,7 @@ public class InDepSubsystem extends SubsystemBase {
      * Opens the left claw.
      */
     public void openLeft() {
-        leftClaw.setPosition(EndEffector.CLAW_OPEN.servoPosition);
+        leftClaw.setPosition(EndEffector.LEFT_CLAW_OPEN.servoPosition);
         isLeftClawOpen = true;
     }
 
@@ -205,7 +237,7 @@ public class InDepSubsystem extends SubsystemBase {
      * Opens the right claw.
      */
     public void openRight() {
-        rightClaw.setPosition(EndEffector.CLAW_OPEN.servoPosition);
+        rightClaw.setPosition(EndEffector.RIGHT_CLAW_OPEN.servoPosition);
         isRightClawOpen = true;
     }
 
@@ -213,7 +245,7 @@ public class InDepSubsystem extends SubsystemBase {
      * Closes the left claw.
      */
     public void closeLeft() {
-        leftClaw.setPosition(EndEffector.CLAW_CLOSED.servoPosition);
+        leftClaw.setPosition(EndEffector.LEFT_CLAW_CLOSED.servoPosition);
         isLeftClawOpen = false;
     }
 
@@ -221,8 +253,15 @@ public class InDepSubsystem extends SubsystemBase {
      * Closes the right claw.
      */
     public void closeRight() {
-        rightClaw.setPosition(EndEffector.CLAW_CLOSED.servoPosition);
+        rightClaw.setPosition(EndEffector.RIGHT_CLAW_CLOSED.servoPosition);
         isRightClawOpen = false;
+    }
+
+    /**
+     * Sets the elbow servo to the passed position.
+     */
+    public void setElbowPosition(double servoPosition) {
+        elbow.setPosition(servoPosition);
     }
 
     /**
@@ -307,7 +346,7 @@ public class InDepSubsystem extends SubsystemBase {
     /**
      * @return whether or not the arm is in an action.
      */
-    public static boolean isBusy() {
+    public static boolean getIsBusy() {
         return isBusy;
     }
 

@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.function.DoubleFunction;
+
 public class PIDController {
     private double Kp;
     private double Ki;
@@ -31,12 +33,21 @@ public class PIDController {
 
     /**
      * Calculates the control value, u(t).
+     * @param error The current error of the process variable.
+     * @return the value produced by u(t).
+     */
+    public double updateError(double error) {
+        return update(setPoint-error);
+    }
+
+    /**
+     * Calculates the control value, u(t).
      * @param pv The current measurement of the process variable.
      * @return the value produced by u(t).
      */
-    public double update(double encoderPosition) {
+    public double update(double pv) {
         // Calculate the error
-        double error = setPoint - encoderPosition;
+        double error = setPoint - pv;
 
         // Calculate derivative
         double derivative = (error - lastError) / timer.seconds(); // secant line slope
@@ -46,11 +57,19 @@ public class PIDController {
         integralSum = integralSum < minIntegral ? minIntegral : Math.min(maxIntegral, integralSum);
 
         double output = (Kp * error) + (Ki * integralSum) + (Kd * derivative);
+        output = Math.min(1.0, output);
+        output = Math.max(-1.0, output);
 
         // Update stuff for derivative
         lastError = error;
         timer.reset();
 
         return output; // Return multiplier
+    }
+
+    public void setPID(double Kp, double Ki, double Kd) {
+        this.Kp = Kp;
+        this.Ki = Ki;
+        this.Kd = Kd;
     }
 }

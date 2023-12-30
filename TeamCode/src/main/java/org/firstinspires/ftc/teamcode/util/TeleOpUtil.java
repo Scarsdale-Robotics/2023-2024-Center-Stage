@@ -11,6 +11,8 @@ import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
+import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
 
 public class TeleOpUtil {
     public DriveSubsystem drive;
@@ -23,8 +25,6 @@ public class TeleOpUtil {
     public boolean speedIsFast = true;
     private boolean clawToggle = false;
     private boolean speedToggle = false;
-    private boolean omniToggle = false;
-    public boolean omniMode = false;
     public boolean aprilTagAlignToggle = false;
     public boolean alignAprilTagRunning = false;
     public boolean macrosRunning = true;
@@ -34,7 +34,9 @@ public class TeleOpUtil {
     private double moveInputX;
     private double moveInputY;
     public int macroCapacity = 0;
-
+    private boolean towardsBackboard = false;
+    private final MovementSequence intoBackboardMode;
+    private final MovementSequence intoPickupMode;
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
         RobotSystem robot = new RobotSystem(hardwareMap, isRedTeam, opMode, telemetry);
         drive = robot.getDrive();
@@ -45,6 +47,24 @@ public class TeleOpUtil {
         this.gamepad2 = gamepad2;
         this.telemetry = telemetry;
         this.lastTurnStart = robot.getIMU().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+
+        if (isRedTeam)
+        {
+            intoBackboardMode = new MovementSequenceBuilder()
+                    .turnLeft(90)
+                    .build();
+            intoPickupMode = new MovementSequenceBuilder()
+                    .turnRight(90)
+                    .build();
+        } else {
+            intoBackboardMode = new MovementSequenceBuilder()
+                    .turnRight(90)
+                    .build();
+            intoPickupMode = new MovementSequenceBuilder()
+                    .turnLeft(90)
+                    .build();
+        }
+
     }
 
     private void runArmRigidControl() {
@@ -87,50 +107,28 @@ public class TeleOpUtil {
         }
     }
 
+    private void epicMacroControl() {
+        if (gamepad1.square) {
+            drive.followMovementSequence(towardsBackboard ? intoPickupMode : intoBackboardMode);
+            towardsBackboard = !towardsBackboard;
+        }
+    }
+
     /**
      * PRIMARY MOTION CONTROL METHOD
      */
     private void runMotionControl() {
         // TOGGLE MOVE SPEED MODE CONTROL
-        if (gamepad1.dpad_up)
+        if (gamepad1.dpad_up || gamepad1.circle)
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
-        if (gamepad1.dpad_down)
+        if (gamepad1.dpad_down || gamepad1.x)
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
 
-        //Toggle Omni Mode
-        if (gamepad1.square && !omniToggle) {
-            omniToggle = true;
-            omniMode = !omniMode;
-        }
-        if (!gamepad1.square) omniToggle = false;
+        // epic macros
+        epicMacroControl();
 
-        // Drive Robot
-        if (!omniMode) {
-            moveInputX = 0;
-            moveInputY = 0;
-            if (Math.abs(gamepad1.left_stick_x) > 0.6) {
-                moveInputX = Math.signum(gamepad1.left_stick_x) * SpeedCoefficients.getStrafeSpeed();
-                moveInputY = 0;
-                // TODO: consider: might need a cancel button for below
-//                if (moveInputX == -1) {
-//                    SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
-//                }
-            } else if (Math.abs(gamepad1.left_stick_y) > 0.6) {
-                moveInputX = 0;
-                moveInputY = Math.signum(gamepad1.left_stick_y) * SpeedCoefficients.getForwardSpeed();
-            } else {
-                moveInputX = gamepad1.left_stick_x;
-                moveInputY = gamepad1.left_stick_y;
-            }
-            double turnInput = gamepad1.right_stick_x;
-            // DRIVE CONTROL
-            drive.driveRobotCentric(-moveInputX,moveInputY,-turnInput * SpeedCoefficients.getTurnSpeed()
-            );
-        } else {
-            drive.driveRobotCentric(-gamepad1.left_stick_x * SpeedCoefficients.getStrafeSpeed(),gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed(),-gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed()
-            );
-        }
-
+        // drive robot
+        drive.driveRobotCentric(-gamepad1.left_stick_x * SpeedCoefficients.getStrafeSpeed(),gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed(),-gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed());
     }
 
     /**
@@ -139,9 +137,11 @@ public class TeleOpUtil {
     private void runArmClawControl() {
         // CLAW TOGGLE CONTROL
         if (gamepad1.y && !clawToggle) {
-            if (inDep.getIsLeftClawOpen())
+            if (inDep.getIsLeftClawOpen()) {
                 inDep.close();
-            else {
+                // automagically set fast mode after intake
+                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
+            } else {
                 inDep.open();
                 // automagically set fast mode after release
                 SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
@@ -152,7 +152,7 @@ public class TeleOpUtil {
         if (!gamepad1.y) clawToggle = false;
 
         // FLEX ARM MOVEMENT MODE CONTROL
-//        inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed());
+        inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed());
 
         // RIGID ARM MOVEMENT MODE CONTROL
         runArmRigidControl();
@@ -175,9 +175,9 @@ public class TeleOpUtil {
         telemetry.update();
         runMotionControl();
         runArmClawControl();
-        if (!gamepad2.x && !gamepad1.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsLeftClawOpen()) {
+        if (!gamepad2.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsLeftClawOpen()) {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
-        } else if (gamepad1.x || gamepad2.x) {
+        } else if (gamepad2.x) {
             gamepad1.rumble(500); // big bomboclat
             gamepad2.rumble(500);
         }

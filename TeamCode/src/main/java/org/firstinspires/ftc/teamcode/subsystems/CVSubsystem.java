@@ -306,15 +306,24 @@ public class CVSubsystem extends SubsystemBase {
         double DIAM_THRESHOLD = width / 4.0;
         int pixelOffset = getWhitePixelHorizontalOffset();
         double pixelDiam = getWhitePixelDiameterPx();
-        while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDiam) < DIAM_THRESHOLD) {
-            drive.driveRobotCentric(SpeedCoefficients.getAutonomousStrafeSpeed() * Math.min(HORIZ_THRESHOLD, Math.pow(pixelOffset, 2)) * 2 / HORIZ_THRESHOLD, SpeedCoefficients.getAutonomousForwardSpeed() * Math.min(DIAM_THRESHOLD, Math.sqrt(Math.abs(pixelDiam))) * 2 / DIAM_THRESHOLD, 0);
+        while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDiam) < DIAM_THRESHOLD && opMode.opModeIsActive()) {
+            drive.driveRobotCentric(Math.max(DIAM_THRESHOLD, pixelDiam) / DIAM_THRESHOLD, Math.min(HORIZ_THRESHOLD, pixelOffset) / HORIZ_THRESHOLD, 0);
             pixelOffset = getWhitePixelHorizontalOffset();
             pixelDiam = getWhitePixelDiameterPx();
         }
     }
 
-    public void moveToAprilTag() {
-        // TODO
+    public void moveToAprilTag(int tagID) {
+        int width = getCameraWidth();
+        double HORIZ_THRESHOLD = width / 11.1;
+        double DIST_THRESHOLD = 22;
+        double pixelOffset = getAprilTagHorizontalOffset(tagID);
+        double pixelDist = getAprilTagDistance(tagID);
+        while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDist) > DIST_THRESHOLD) {
+            drive.driveRobotCentric(Math.max(HORIZ_THRESHOLD, pixelOffset) / HORIZ_THRESHOLD, Math.max(DIST_THRESHOLD, pixelDist) / DIST_THRESHOLD, 0);
+            pixelOffset = getWhitePixelHorizontalOffset();
+            pixelDist = getWhitePixelDiameterPx();
+        }
     }
 
     /**
@@ -331,7 +340,7 @@ public class CVSubsystem extends SubsystemBase {
                 //assume that we don't need to optimize getAprilTagRotationalOffset(tagID) since it runs anyway
                 drive.driveFieldCentric(0, 0, rotOff * 0.1 * SpeedCoefficients.getTurnSpeed()); // times some scaling factor (temporarily at 1)
             }
-            drive.driveByEncoder(0, 0, 0, 0);
+            drive.driveByRectilinearEncoder(0, 0, 0);
 //            while (Math.abs(rotOff) > ERROR_ALIGNMENT && opMode.opModeIsActive()) {
 //                drive.driveByEncoder(0, 0, 0.2, (double) 1770 * rotOff / 180);
 //            }
