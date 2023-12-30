@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.InDepPIDCoefficients;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.util.PIDController;
@@ -25,46 +26,53 @@ public class InDepSubsystem extends SubsystemBase {
 
     private final LinearOpMode opMode;
 
-    private Level level;
+    private Level level = Level.GROUND;
+
     public enum Level {
-        GROUND(0, 0.0),
-        BACKBOARD1(-1960,0.05),
-        BACKBOARD2(-4200,0.125), //temp motor encoder values
-        BACKBOARD3(-6000, 0.25);
+        GROUND(0, 0.25, 0.80),
+        HANG(5083, 0.4, 0.13),
+        BACKBOARD1(8000,0.35, 0.13),
+        BACKBOARD2(10000,0.3, 0.13), //temp motor encoder values
+        BACKBOARD3(12000, 0.25, 0.13);
 
         public final int target;
         public final double wristTarget;
+        public final double elbowTarget;
 
-        Level(int target, double wristTarget) {
+        Level(int target, double wristTarget, double elbowTarget) {
             this.target = target;
             this.wristTarget = wristTarget;
+            this.elbowTarget = elbowTarget;
         }
 
         public Level nextAbove() {
             if (this == GROUND) return BACKBOARD1;
             else if (this == BACKBOARD1) return BACKBOARD2;
-            else return BACKBOARD3; // For MEDIUM and HIGH
+            else if (this == BACKBOARD2) return BACKBOARD3;
+            else return HANG; // For MEDIUM and HIGH
         }
 
         public Level nextBelow() {
-            if (this == BACKBOARD3) return BACKBOARD2;
+            if (this == HANG) return BACKBOARD3;
+            else if (this == BACKBOARD3) return BACKBOARD2;
             else if (this == BACKBOARD2) return BACKBOARD1;
             else return GROUND;
         }
     }
     public enum EndEffector {
-        LEFT_CLAW_OPEN(0.0), // open = 0.0
-        LEFT_CLAW_CLOSED(0.3),
-        RIGHT_CLAW_OPEN(0.5), // open = 0.5
-        RIGHT_CLAW_CLOSED(0.65),
-        ELBOW_REST(0.58),
-        ELBOW_FLIPPED(0.25);
+        LEFT_CLAW_OPEN(0.6),
+        LEFT_CLAW_CLOSED(0.21),
+        RIGHT_CLAW_OPEN(0.25),
+        RIGHT_CLAW_CLOSED(0.60),
+        ELBOW_REST(0.80),
+        ELBOW_FLIPPED(0.13);
         public final double servoPosition;
 
         EndEffector(double servoPosition) {
             this.servoPosition = servoPosition;
         }
     }
+    public final int ELBOW_TURN_TICKS = 5038;
 
     public InDepSubsystem(Motor arm1, Motor arm2, Servo elbow, Servo wrist, Servo leftClaw, Servo rightClaw, LinearOpMode opMode) {
         // initialize objects
@@ -89,13 +97,45 @@ public class InDepSubsystem extends SubsystemBase {
 
     }
 
+    public Level getLevelBelow() {
+        int armPos = getArmPosition();
+        if (armPos < Level.HANG.target) {
+            return Level.GROUND;
+        }
+        if (armPos < Level.BACKBOARD1.target) {
+            return Level.HANG;
+        }
+        if (armPos < Level.BACKBOARD2.target) {
+            return Level.BACKBOARD1;
+        }
+        if (armPos < Level.BACKBOARD3.target) {
+            return Level.BACKBOARD2;
+        }
+        return Level.BACKBOARD3;
+    }
+
     /**
      * Sets the raw power of the arm.
      */
     public void rawPower(double power) {
         // TODO: add ranges
-        arm1.motor.setPower(power);
-        arm2.motor.setPower(power);
+        int armPos = getArmPosition();
+
+        // set bounds
+        if (armPos < 0 && power < 0 && !opMode.gamepad1.a) {
+            arm1.motor.setPower(0);
+            arm2.motor.setPower(0);
+        } else {
+            arm1.motor.setPower(power);
+            arm2.motor.setPower(power);
+        }
+        opMode.telemetry.addData("level: ", level);
+        opMode.telemetry.addData("nxt below: ", getLevelBelow());
+        if (!getLevelBelow().name().equals(level.name())) {
+            level = getLevelBelow();
+            elbow.setPosition(level.elbowTarget);
+            wrist.setPosition(level.wristTarget);
+        }
     }
 
     /**
