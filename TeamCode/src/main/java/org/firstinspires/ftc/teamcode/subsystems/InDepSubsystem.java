@@ -30,9 +30,9 @@ public class InDepSubsystem extends SubsystemBase {
 
     public enum Level {
         GROUND(0, 0.25, 0.80),
-        BACKBOARD1(5083,0.17, 0.13),
-        BACKBOARD2(6666,0.14, 0.13), //temp motor encoder values
-        BACKBOARD3(7777, 0.11, 0.13);
+        BACKBOARD1(5083,0.35, 0.13),
+        BACKBOARD2(6789,0.25, 0.13), //temp motor encoder values
+        BACKBOARD3(8111, 0.15, 0.13);
 
         public final int target;
         public final double wristTarget;

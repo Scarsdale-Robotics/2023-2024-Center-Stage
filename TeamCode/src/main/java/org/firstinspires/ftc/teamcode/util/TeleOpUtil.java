@@ -35,6 +35,9 @@ public class TeleOpUtil {
     private double moveInputX;
     private double moveInputY;
     boolean elbowToggle = false, elbowClosed = false;
+    private double vs = 0.0;
+    private double vf = 0.0;
+    private double vt = 0.0;
 
     public int macroCapacity = 0;
     private boolean towardsBackboard = false;
@@ -119,10 +122,10 @@ public class TeleOpUtil {
 //    }
 
     private void epicMacroControl() {
-//        if (gamepad1.square) {
-//            drive.followMovementSequence(towardsBackboard ? intoPickupMode : intoBackboardMode);
-//            towardsBackboard = !towardsBackboard;
-//        }
+        if (gamepad1.square) {
+            drive.followMovementSequence(towardsBackboard ? intoPickupMode : intoBackboardMode);
+            towardsBackboard = !towardsBackboard;
+        }
     }
 
     /**
@@ -139,7 +142,14 @@ public class TeleOpUtil {
         epicMacroControl();
 
         // drive robot
-        drive.driveRobotCentric(-gamepad1.left_stick_x * SpeedCoefficients.getStrafeSpeed(),gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed(),-gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed());
+        double vsn = -gamepad1.left_stick_x * SpeedCoefficients.getStrafeSpeed();
+        double vfn = gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed();
+        double vtn = -gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed();
+        double MOMENTUM_FACTOR = 0.1;  // higher = less momentum
+        if (vsn == 0) vs = Math.abs(vs) < 0.001 ? 0 : (vsn * MOMENTUM_FACTOR + vs * (1-MOMENTUM_FACTOR)); else vs = vsn;
+        if (vfn == 0) vf = Math.abs(vf) < 0.001 ? 0 : (vfn * MOMENTUM_FACTOR + vf * (1-MOMENTUM_FACTOR)); else vf = vfn;
+        if (vtn == 0) vt = Math.abs(vt) < 0.001 ? 0 : (vtn * MOMENTUM_FACTOR + vt * (1-MOMENTUM_FACTOR)); else vt = vtn + 0.001;
+        drive.driveFieldCentric(vs, vf, vt);
     }
 
     /**
