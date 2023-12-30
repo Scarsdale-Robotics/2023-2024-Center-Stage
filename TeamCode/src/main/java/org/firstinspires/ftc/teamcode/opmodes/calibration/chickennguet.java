@@ -21,9 +21,9 @@ public class chickennguet extends LinearOpMode {
     public static double rightPosOpen = 0.25;
     public static double leftPosClosed = 0.21;
     public static double rightPosClosed = 0.6;
-    public static double elbowPosRest = 0.17;
-    public static double elbowPosFlipped = 0.84;
-    public static double wristPos = 0.3;
+    public static double elbowPosRest = 0.80;
+    public static double elbowPosFlipped = 0.13;
+    public static double wristPos = 0.25;
 
     private double speed = 1;
     @Override
