@@ -58,6 +58,7 @@ public class TeleOpUtil {
         this.telemetry = telemetry;
         this.lastTurnStart = robot.getIMU().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
         this.inDep = robot.getInDep();
+        inDep.setWristPosition(wristPos);
         if (isRedTeam)
         {
             intoBackboardMode = new MovementSequenceBuilder()
@@ -175,20 +176,6 @@ public class TeleOpUtil {
 
         // FLEX ARM MOVEMENT MODE CONTROL
         inDep.rawPower((gamepad1.right_trigger - gamepad1.left_trigger) * SpeedCoefficients.getArmSpeed());
-
-        if (gamepad1.square && !elbowToggle) {
-            elbowClosed = !elbowClosed;
-            elbowToggle = true;
-        }
-        if (!gamepad1.square) elbowToggle = false;
-
-        if (elbowClosed) {
-            inDep.setElbowPosition(elbowPosFlipped);
-        } else {
-            inDep.setElbowPosition(elbowPosRest);
-        }
-
-        inDep.setWristPosition(wristPos);
 
         // RIGID ARM MOVEMENT MODE CONTROL
         runArmRigidControl();

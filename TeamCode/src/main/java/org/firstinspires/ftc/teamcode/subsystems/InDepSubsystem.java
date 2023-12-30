@@ -31,9 +31,9 @@ public class InDepSubsystem extends SubsystemBase {
     public enum Level {
         GROUND(0, 0.25, 0.80),
         HANG(5083, 0.4, 0.13),
-        BACKBOARD1(8000,0.35, 0.13),
-        BACKBOARD2(10000,0.3, 0.13), //temp motor encoder values
-        BACKBOARD3(12000, 0.25, 0.13);
+        BACKBOARD1(7777,0.35, 0.13),
+        BACKBOARD2(8888,0.3, 0.13), //temp motor encoder values
+        BACKBOARD3(9999, 0.25, 0.13);
 
         public final int target;
         public final double wristTarget;
@@ -131,11 +131,17 @@ public class InDepSubsystem extends SubsystemBase {
         }
         opMode.telemetry.addData("level: ", level);
         opMode.telemetry.addData("nxt below: ", getLevelBelow());
-        if (!getLevelBelow().name().equals(level.name())) {
+        opMode.telemetry.addData("level elbow target: ", level.elbowTarget);
+        opMode.telemetry.addData("level wrist target: ", level.wristTarget);
+        if (level != getLevelBelow())
+        {
             level = getLevelBelow();
             elbow.setPosition(level.elbowTarget);
             wrist.setPosition(level.wristTarget);
         }
+        opMode.telemetry.addData("chicken: ", "nugget");
+        opMode.telemetry.addData("elbowPos", elbow.getPosition());
+        opMode.telemetry.addData("wristPos", wrist.getPosition());
     }
 
     /**
