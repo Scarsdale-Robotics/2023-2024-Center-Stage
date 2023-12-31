@@ -1,5 +1,9 @@
-package org.firstinspires.ftc.teamcode.subsystems.cvpipelines.testing;
+package org.firstinspires.ftc.teamcode.subsystems.cvpipelines;
 
+import android.graphics.Canvas;
+
+import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
+import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -9,12 +13,11 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
-import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PixelGroupDetectionPipeline extends OpenCvPipeline {
+public class PixelGroupDetectionProcessor implements VisionProcessor {
     enum Color {
         WHITE(new Scalar(213, 20, 255), new Scalar(0, 0, 170), true),
         YELLOW(new Scalar(28, 195, 255), new Scalar(12, 82, 230), true),
@@ -43,7 +46,12 @@ public class PixelGroupDetectionPipeline extends OpenCvPipeline {
     private int impWidth, impHeight;
 
     @Override
-    public Mat processFrame(Mat input) {
+    public void init(int width, int height, CameraCalibration calibration) {
+        
+    }
+
+    @Override
+    public Object processFrame(Mat input, long captureTimeNanos) {
         impWidth = input.width();
         impHeight = input.height();
         Mat output = input.clone();
@@ -172,6 +180,11 @@ public class PixelGroupDetectionPipeline extends OpenCvPipeline {
         Point center = getPixelsCenter();
         Imgproc.circle(input, new Point(center.x + impWidth / 2.0, center.y + impHeight / 2.0), 1, new Scalar(0, 0, 255), 6);
         return input;
+    }
+
+    @Override
+    public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
+
     }
 
     public Pixel[] getPixels() {
