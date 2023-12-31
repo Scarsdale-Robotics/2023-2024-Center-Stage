@@ -50,10 +50,10 @@ public class PIDTurnTuner extends LinearOpMode {
         while (opModeIsActive()) {
             // right 1000√2 ticks
             drive.turnByIMU(SpeedCoefficients.getAutonomousTurnSpeed(), 180);
-            while (opModeIsActive() && !gamepad1.a);
+            while (opModeIsActive() && !gamepad1.triangle);
             // left 1000√2 ticks
             drive.turnByIMU(SpeedCoefficients.getAutonomousTurnSpeed(), -180);
-            while (opModeIsActive() && !gamepad1.a);
+            while (opModeIsActive() && !gamepad1.triangle);
         }
 
         drive.stopController();

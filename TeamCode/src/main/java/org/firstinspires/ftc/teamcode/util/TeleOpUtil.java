@@ -17,13 +17,14 @@ import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilde
 public class TeleOpUtil {
     public DriveSubsystem drive;
     public InDepSubsystem inDep;
-    public CVSubsystem cvFront;
-    public CVSubsystem cvBack;
+//    public CVSubsystem cvFront;
+//    public CVSubsystem cvBack;
     private final boolean isRedTeam;
     private final Gamepad gamepad1;
     private final Gamepad gamepad2;
     public boolean speedIsFast = true;
-    private boolean clawToggle = false;
+    private boolean clawLeftToggle = false;
+    private boolean clawRightToggle = false;
     private boolean speedToggle = false;
     public boolean aprilTagAlignToggle = false;
     public boolean alignAprilTagRunning = false;
@@ -33,24 +34,34 @@ public class TeleOpUtil {
     private double lastTurnStart;
     private double moveInputX;
     private double moveInputY;
+    boolean elbowToggle = false, elbowClosed = false;
+    private double vs = 0.0;
+    private double vf = 0.0;
+    private double vt = 0.0;
+
     public int macroCapacity = 0;
     private boolean towardsBackboard = false;
     private final MovementSequence intoBackboardMode;
     private final MovementSequence intoPickupMode;
-    private double vs = 0.0;
-    private double vf = 0.0;
-    private double vt = 0.0;
+    public static double leftPosOpen = 0.6;
+    public static double rightPosOpen = 0.25;
+    public static double leftPosClosed = 0.21;
+    public static double rightPosClosed = 0.6;
+    public static double elbowPosRest = 0.80;
+    public static double elbowPosFlipped = 0.13;
+    public static double wristPos = 0.25;
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
         RobotSystem robot = new RobotSystem(hardwareMap, isRedTeam, opMode, telemetry);
         drive = robot.getDrive();
-        cvFront = robot.getCVFront();
-        cvBack = robot.getCVBack();
+//        cvFront = robot.getCVFront();
+//        cvBack = robot.getCVBack();
         this.isRedTeam = isRedTeam;
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
         this.telemetry = telemetry;
         this.lastTurnStart = robot.getIMU().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-
+        this.inDep = robot.getInDep();
+        inDep.setWristPosition(wristPos);
         if (isRedTeam)
         {
             intoBackboardMode = new MovementSequenceBuilder()
@@ -89,26 +100,26 @@ public class TeleOpUtil {
 
     }
 
-    private void runAprilTagParallelAlignControl() {
-        // iterative version
-        if (((gamepad1.b && aprilTagAlignToggle == false) || alignAprilTagRunning == true) && macrosRunning) {
-            aprilTagAlignToggle = true;
-            alignAprilTagRunning = true;
-            //cv.alignParallelWithAprilTag(isRedTeam ? 5 : 2);
-            double rotOff = cvBack.getAprilTagRotationalOffset(isRedTeam ? 5 : 2);
-            if (Math.abs(rotOff) < cvBack.ERROR_ALIGNMENT) {
-                alignAprilTagRunning = false;
-            } else if (rotOff < 0 && rotOff != cvBack.NO_ROTATIONAL_OFFSET) {
-                drive.driveFieldCentric(0, 0, rotOff * 0.1 * SpeedCoefficients.getTurnSpeed());
-            } else if (rotOff > 0 && rotOff != cvBack.NO_ROTATIONAL_OFFSET) {
-                drive.driveFieldCentric(0, 0, rotOff * 0.1 * SpeedCoefficients.getTurnSpeed());
-            }
-        }
-        if ((!gamepad1.b && !alignAprilTagRunning) || !macrosRunning) {
-            aprilTagAlignToggle = false;
-            alignAprilTagRunning = false;
-        }
-    }
+//    private void runAprilTagParallelAlignControl() {
+//        // iterative version
+//        if (((gamepad1.b && aprilTagAlignToggle == false) || alignAprilTagRunning == true) && macrosRunning) {
+//            aprilTagAlignToggle = true;
+//            alignAprilTagRunning = true;
+//            //cv.alignParallelWithAprilTag(isRedTeam ? 5 : 2);
+//            double rotOff = cvBack.getAprilTagRotationalOffset(isRedTeam ? 5 : 2);
+//            if (Math.abs(rotOff) < cvBack.ERROR_ALIGNMENT) {
+//                alignAprilTagRunning = false;
+//            } else if (rotOff < 0 && rotOff != cvBack.NO_ROTATIONAL_OFFSET) {
+//                drive.driveFieldCentric(0, 0, rotOff * 0.1 * SpeedCoefficients.getTurnSpeed());
+//            } else if (rotOff > 0 && rotOff != cvBack.NO_ROTATIONAL_OFFSET) {
+//                drive.driveFieldCentric(0, 0, rotOff * 0.1 * SpeedCoefficients.getTurnSpeed());
+//            }
+//        }
+//        if ((!gamepad1.b && !alignAprilTagRunning) || !macrosRunning) {
+//            aprilTagAlignToggle = false;
+//            alignAprilTagRunning = false;
+//        }
+//    }
 
     private void epicMacroControl() {
         if (gamepad1.square) {
@@ -122,23 +133,23 @@ public class TeleOpUtil {
      */
     private void runMotionControl() {
         // TOGGLE MOVE SPEED MODE CONTROL
-        if (gamepad1.dpad_up || gamepad1.circle)
+        if (gamepad1.dpad_up)
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
-        if (gamepad1.dpad_down || gamepad1.x)
+        if (gamepad1.dpad_down)
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
 
         // epic macros
         epicMacroControl();
 
         // drive robot
-        // TODO: test gradual slow
         double vsn = -gamepad1.left_stick_x * SpeedCoefficients.getStrafeSpeed();
         double vfn = gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed();
         double vtn = -gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed();
-        vs = vs < 0.1 ? 0 : vsn * 0.5 + vs * 0.5;
-        vf = vf < 0.1 ? 0 : vfn * 0.5 + vf * 0.5;
-        vt = vt < 0.1 ? 0 : vtn * 0.5 + vt * 0.5;
-        drive.driveFieldCentric(vs, vf, vt);
+        double MOMENTUM_FACTOR = 0.1;  // higher = less momentum
+        if (vsn == 0) vs = Math.abs(vs) < 0.001 ? 0 : (vsn * MOMENTUM_FACTOR + vs * (1-MOMENTUM_FACTOR)); else vs = vsn;
+        if (vfn == 0) vf = Math.abs(vf) < 0.001 ? 0 : (vfn * MOMENTUM_FACTOR + vf * (1-MOMENTUM_FACTOR)); else vf = vfn;
+        if (vtn == 0) vt = Math.abs(vt) < 0.001 ? 0 : (vtn * MOMENTUM_FACTOR + vt * (1-MOMENTUM_FACTOR)); else vt = vtn + 0.001;
+        drive.driveRobotCentric(vs, vf, vt);
     }
 
     /**
@@ -146,23 +157,35 @@ public class TeleOpUtil {
      */
     private void runArmClawControl() {
         // CLAW TOGGLE CONTROL
-        if (gamepad1.y && !clawToggle) {
+        if ((gamepad1.dpad_left || gamepad1.y) && !clawLeftToggle) {
             if (inDep.getIsLeftClawOpen()) {
-                inDep.close();
+                inDep.closeLeft();
                 // automagically set fast mode after intake
-                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
+//                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
             } else {
-                inDep.open();
+                inDep.openLeft();
                 // automagically set fast mode after release
-                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+//                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
             }
-
-            clawToggle = true;
+            clawLeftToggle = true;
         }
-        if (!gamepad1.y) clawToggle = false;
+        if ((gamepad1.dpad_right || gamepad1.y) && !clawRightToggle) {
+            if (inDep.getIsRightClawOpen()) {
+                inDep.closeRight();
+                // automagically set fast mode after intake
+    //                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
+            } else {
+                inDep.openRight();
+                // automagically set fast mode after release
+    //                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+            }
+            clawRightToggle = true;
+        }
+        if (!gamepad1.dpad_left && !gamepad1.y) clawLeftToggle = false;
+        if (!gamepad1.dpad_right && !gamepad1.y) clawRightToggle = false;
 
         // FLEX ARM MOVEMENT MODE CONTROL
-        inDep.rawPower((gamepad1.left_trigger - gamepad1.right_trigger) * SpeedCoefficients.getArmSpeed());
+        inDep.rawPower((gamepad1.right_trigger - gamepad1.left_trigger) * SpeedCoefficients.getArmSpeed());
 
         // RIGID ARM MOVEMENT MODE CONTROL
         runArmRigidControl();
@@ -177,22 +200,23 @@ public class TeleOpUtil {
 
     public void tick() {
         double DISTANCE_BEFORE_BACKBOARD = 45;  // TEMP
-        double cvDist = cvBack.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
-        telemetry.addData("cvDist:", cvDist);
+//        double cvDist = cvBack.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
+//        telemetry.addData("cvDist:", cvDist);
         telemetry.addData("arm pos:", inDep.getArmPosition());
         telemetry.addData("claw open:", inDep.getIsLeftClawOpen());
         telemetry.addData("пуяза 你好何余安 ???", "θωθ");
         telemetry.update();
         runMotionControl();
         runArmClawControl();
-        if (!gamepad2.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsLeftClawOpen()) {
-            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
+//        if (!gamepad2.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsLeftClawOpen()) {
+        if (!gamepad2.x && !inDep.getIsLeftClawOpen()) {
+//            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
         } else if (gamepad2.x) {
-            gamepad1.rumble(500); // big bomboclat
+            gamepad1.rumble(500);
             gamepad2.rumble(500);
         }
 
-        runAprilTagParallelAlignControl();
+//        runAprilTagParallelAlignControl();
 //             teamPropLocationControl();
 //         runPixelAlignmentControl();
     }

@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryImpl;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
+import org.opencv.core.Mat;
 
 // FTC DASHBOARD
 // USAGE:
@@ -48,12 +49,20 @@ public class PIDForwardTuner extends LinearOpMode {
 
         // begin tuning sequence
         while (opModeIsActive()) {
+//            double theta = Math.PI / 2;
+//            drive.driveWithMotorPowers(
+//                    0.25 * Math.sin(theta + Math.PI / 4), // fL
+//                    0.25 * Math.sin(theta - Math.PI / 4), // fR
+//                    0.25 * Math.sin(theta - Math.PI / 4), // bL
+//                    0.25 * Math.sin(theta + Math.PI / 4)  // bR
+//                    );
+
             // forward 1000√2 ticks
-            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), 1000, 1000, Math.PI/2);
-            while (opModeIsActive() && !gamepad1.a);
+            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), 500, 500, Math.PI/2);
+            while (opModeIsActive() && !gamepad1.triangle);
             // backward 1000√2 ticks
-            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), 1000, 1000, -Math.PI/2);
-            while (opModeIsActive() && !gamepad1.a);
+            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), -500, -500, -Math.PI/2);
+            while (opModeIsActive() && !gamepad1.triangle);
         }
 
         drive.stopController();

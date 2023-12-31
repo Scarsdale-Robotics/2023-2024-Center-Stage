@@ -7,11 +7,11 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementThread;
 import org.firstinspires.ftc.teamcode.subsystems.movement.Movement;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
+import org.firstinspires.ftc.teamcode.util.DrivePIDCoefficients;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
 import java.util.ArrayDeque;
@@ -21,18 +21,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class DriveSubsystem extends SubsystemBase {
-    private static double Kp = 0.01;
-    private static double Ki = 0;
-    private static double Kd = 0;
-    private static double errorTolerance_p = 5.0;
-    private static double errorTolerance_v = 0.05;
-    private static double errorTolerance_degrees = 2.5;
 
     private static volatile boolean isBusy;
     private static volatile ExecutorService threadPool;
     private final MecanumDrive controller;
     private final IMU imu;
     private final LinearOpMode opMode;
+    private final Motor leftFront;
+    private final Motor rightFront;
     private final Motor leftBack;
     private final Motor rightBack;
     private MultipleTelemetry telemetry;
@@ -44,6 +40,8 @@ public class DriveSubsystem extends SubsystemBase {
     public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, IMU imu, LinearOpMode opMode, MultipleTelemetry telemetry) {
         this.rightBack = rightBack;
         this.leftBack = leftBack;
+        this.rightFront = rightFront;
+        this.leftFront = leftFront;
         controller = new MecanumDrive(
                 leftFront,
                 rightFront,
@@ -55,6 +53,16 @@ public class DriveSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
         isBusy = false;
         threadPool = Executors.newCachedThreadPool();
+
+        if (this.telemetry != null) {
+            this.telemetry.addData("L diff",0);
+            this.telemetry.addData("R diff",0);
+
+            this.telemetry.addData("Degrees setpoint",0);
+            this.telemetry.addData("Degrees position",0);
+
+            this.telemetry.update();
+        }
     }
 
     /**
@@ -77,8 +85,7 @@ public class DriveSubsystem extends SubsystemBase {
      * @param backLeftSpeed     the speed of the back left motor
      * @param backRightSpeed     the speed of the back right motor
      */
-    public void driveWithMotorPowers(double frontLeftSpeed, double frontRightSpeed,
-                                     double backLeftSpeed, double backRightSpeed) {
+    public void driveWithMotorPowers(double frontLeftSpeed, double frontRightSpeed, double backLeftSpeed, double backRightSpeed) {
         controller.driveWithMotorPowers(frontLeftSpeed, frontRightSpeed, backLeftSpeed, backRightSpeed);
     }
 
@@ -111,12 +118,12 @@ public class DriveSubsystem extends SubsystemBase {
         double setPoint = startEncoder + ticks;
         double K;
 
-        PIDController PID = new PIDController(Kp, Ki, Kd, setPoint);
+        PIDController PID = new PIDController(DrivePIDCoefficients.getKp(), DrivePIDCoefficients.getKi(), DrivePIDCoefficients.getKd(), setPoint);
 
         while (
                 opMode.opModeIsActive() &&
-                Math.abs(setPoint-getRightWheelPosition()) > errorTolerance_p &&
-                Math.abs(getRightWheelVelocity()) > errorTolerance_v
+                Math.abs(setPoint- getRightWheelPosition()) > DrivePIDCoefficients.getErrorTolerance_p() &&
+                Math.abs(getRightWheelVelocity()) > DrivePIDCoefficients.getErrorTolerance_v()
         ) {
             K = PID.update(getRightWheelPosition());
             driveRobotCentric(rightSpeed * K, forwardSpeed * K, 0);
@@ -142,37 +149,40 @@ public class DriveSubsystem extends SubsystemBase {
         }
 
         // begin action
+        double L_start = getLeftWheelPosition(), R_start = getRightWheelPosition();
+        double L_sp = leftBack.getCurrentPosition()+leftTicks, R_sp = -rightBack.getCurrentPosition()+rightTicks;
         double L = leftTicks, R = rightTicks;
 
-        PIDController L_PID = new PIDController(Kp, Ki, Kd, L);
-        PIDController R_PID = new PIDController(Kp, Ki, Kd, R);
+        PIDController L_PID = new PIDController(DrivePIDCoefficients.getKp(), DrivePIDCoefficients.getKi(), DrivePIDCoefficients.getKd(), L_sp);
+        PIDController R_PID = new PIDController(DrivePIDCoefficients.getKp(), DrivePIDCoefficients.getKi(), DrivePIDCoefficients.getKd(), R_sp);
 
         while ( // checking condition
-                opMode.opModeIsActive() &&
-                Math.abs(L-leftBack.getCurrentPosition()) > errorTolerance_p &&
-                Math.abs(R-rightBack.getCurrentPosition()) > errorTolerance_p &&
-                Math.abs(getLeftWheelVelocity()) > errorTolerance_v &&
-                Math.abs(getRightWheelVelocity()) > errorTolerance_v
+                opMode.opModeIsActive() && !(
+                        Math.abs(Math.abs(getLeftWheelPosition()-L_start) - Math.abs(L)) < DrivePIDCoefficients.getErrorTolerance_p() &&
+                        Math.abs(getLeftWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v() &&
+                        Math.abs(Math.abs(getRightWheelPosition()-R_start) - Math.abs(R)) < DrivePIDCoefficients.getErrorTolerance_p() &&
+                        Math.abs(getRightWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v())
         ) {
             // getting L and R
             double L_p = leftBack.getCurrentPosition();
-            double R_p = rightBack.getCurrentPosition();
+            double R_p = -rightBack.getCurrentPosition();
 
-            if (telemetry != null) {
-                telemetry.addData("L setpoint",L);
-                telemetry.addData("L position",L_p);
-                telemetry.addData("R setpoint",R);
-                telemetry.addData("R position",R_p);
-                telemetry.addData("L power",getLeftWheelVelocity());
-                telemetry.addData("R power",getRightWheelVelocity());
-                telemetry.update();
-            }
+            L_PID.setPID(DrivePIDCoefficients.getKp(), DrivePIDCoefficients.getKi(), DrivePIDCoefficients.getKd());
+            R_PID.setPID(DrivePIDCoefficients.getKp(), DrivePIDCoefficients.getKi(), DrivePIDCoefficients.getKd());
 
             double L_K = L_PID.update(L_p);
             double R_K = R_PID.update(R_p);
 
-            double L_v = driveSpeed * Math.sin(theta - Math.PI / 4) * L_K; // for bL and fR
-            double R_v = driveSpeed * Math.sin(theta + Math.PI / 4) * R_K; // for bR and fL
+            double L_v = driveSpeed * Math.abs(Math.sin(theta - Math.PI / 4)) * L_K; // for bL and fR
+            double R_v = driveSpeed * Math.abs(Math.sin(theta + Math.PI / 4)) * R_K; // for bR and fL
+
+            if (telemetry != null) {
+                telemetry.addData("L diff",Math.abs(Math.abs(getLeftWheelPosition()-L_start) - Math.abs(L)));
+                telemetry.addData("R diff",Math.abs(Math.abs(getRightWheelPosition()-R_start) - Math.abs(R)));
+                telemetry.addData("L setpoint",L_sp);
+                telemetry.addData("L position",L_p);
+                telemetry.update();
+            }
 
             // setting the powers of the motors
             driveWithMotorPowers(
@@ -206,12 +216,12 @@ public class DriveSubsystem extends SubsystemBase {
         double setPoint = normalizeAngle(startAngle + degrees);
         double K;
 
-        PIDController PID = new PIDController(Kp, Ki, Kd, setPoint);
+        PIDController PID = new PIDController(DrivePIDCoefficients.getKp(), DrivePIDCoefficients.getKi(), DrivePIDCoefficients.getKd(), setPoint);
 
         while (
                 opMode.opModeIsActive() &&
-                Math.abs(normalizeAngle(setPoint-getYaw())) > errorTolerance_degrees &&
-                Math.abs(getRightWheelVelocity()) > errorTolerance_v
+                Math.abs(normalizeAngle(setPoint-getYaw())) > DrivePIDCoefficients.getErrorTolerance_degrees() &&
+                Math.abs(getRightWheelVelocity()) > DrivePIDCoefficients.getErrorTolerance_v()
         ) {
             K = PID.updateError(normalizeAngle(setPoint-getYaw()));
 
@@ -273,14 +283,14 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * @return the current position of the robot's back left wheels in ticks.
+     * @return the current position of the robot's back left wheel in ticks.
      */
     public int getLeftWheelPosition() {
         return leftBack.getCurrentPosition();
     }
 
     /**
-     * @return the current position of the robot's back right wheels in ticks.
+     * @return the current position of the robot's back right wheel in ticks.
      */
     public int getRightWheelPosition() {
         return rightBack.getCurrentPosition();
