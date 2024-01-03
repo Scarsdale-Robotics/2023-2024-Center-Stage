@@ -35,7 +35,8 @@ public class AutoCloseBlue extends LinearOpMode {
                 .forward(10.80) // Move forward
                 .build();
         drive.followMovementSequence(initCV);
-        int propLocation = robot.getCVFront().getPropLocation();
+//        int propLocation = robot.getCVFront().getPropLocation();
+        int propLocation = 0;
 
         MovementSequence placePurple = new MovementSequenceBuilder().build(),
                 approachWhite = new MovementSequenceBuilder().build(),

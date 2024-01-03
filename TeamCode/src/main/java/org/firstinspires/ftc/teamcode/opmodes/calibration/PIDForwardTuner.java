@@ -11,6 +11,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryImpl;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
+import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
+import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 import org.opencv.core.Mat;
 
@@ -27,25 +31,24 @@ public class PIDForwardTuner extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
     private HardwareRobot hardwareRobot;
     private static DriveSubsystem drive;
+    private static InDepSubsystem inDep;
     private MultipleTelemetry telemetry = new MultipleTelemetry(new TelemetryImpl((OpMode) this), FtcDashboard.getInstance().getTelemetry());
 
 
     @Override
     // The "Main" code will go in here
     public void runOpMode() {
-        this.hardwareRobot = new HardwareRobot(hardwareMap);
-        drive = new DriveSubsystem(
-                hardwareRobot.leftFront,
-                hardwareRobot.rightFront,
-                hardwareRobot.leftBack,
-                hardwareRobot.rightBack,
-                hardwareRobot.imu,
-                this,
-                telemetry
-        );
+        RobotSystem robot = new RobotSystem(hardwareMap, false, this, telemetry);
+        inDep = robot.getInDep();
+        drive = robot.getDrive();
         runtime.reset();
+        inDep.close();
 
         waitForStart();
+
+        MovementSequence forward = new MovementSequenceBuilder()
+                .forward(60)
+                .build();
 
         // begin tuning sequence
         while (opModeIsActive()) {
@@ -58,10 +61,12 @@ public class PIDForwardTuner extends LinearOpMode {
 //                    );
 
             // forward 1000√2 ticks
-            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), 500, 500, Math.PI/2);
+//            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), 3000, 3000, Math.PI/2);
+            drive.followMovementSequence(forward);
             while (opModeIsActive() && !gamepad1.triangle);
             // backward 1000√2 ticks
-            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), -500, -500, -Math.PI/2);
+//            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), 3000, 3000, -Math.PI/2);
+            drive.followMovementSequence(forward);
             while (opModeIsActive() && !gamepad1.triangle);
         }
 

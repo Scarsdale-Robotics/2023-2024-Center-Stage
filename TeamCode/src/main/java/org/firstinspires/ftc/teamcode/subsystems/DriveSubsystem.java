@@ -32,6 +32,7 @@ public class DriveSubsystem extends SubsystemBase {
     private final Motor leftBack;
     private final Motor rightBack;
     private MultipleTelemetry telemetry;
+    public double theta;
 
     public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, IMU imu, LinearOpMode opMode) {
         this(leftFront, rightFront, leftBack, rightBack, imu, opMode, null);
@@ -51,6 +52,8 @@ public class DriveSubsystem extends SubsystemBase {
         this.imu = imu;
         this.opMode = opMode;
         this.telemetry = telemetry;
+        this.imu.resetYaw();
+        this.theta = getYaw();
         isBusy = false;
         threadPool = Executors.newCachedThreadPool();
 
@@ -118,7 +121,7 @@ public class DriveSubsystem extends SubsystemBase {
         double setPoint = startEncoder + ticks;
         double K;
 
-        PIDController PID = new PIDController(DrivePIDCoefficients.getKp(), DrivePIDCoefficients.getKi(), DrivePIDCoefficients.getKd(), setPoint);
+        PIDController PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), setPoint);
 
         while (
                 opMode.opModeIsActive() &&
@@ -150,47 +153,73 @@ public class DriveSubsystem extends SubsystemBase {
 
         // begin action
         double L_start = getLeftWheelPosition(), R_start = getRightWheelPosition();
-        double L_sp = leftBack.getCurrentPosition()+leftTicks, R_sp = -rightBack.getCurrentPosition()+rightTicks;
+        double L_sp = leftBack.getCurrentPosition() + leftTicks * Math.signum(Math.sin(theta - Math.PI / 4)),
+                R_sp = -rightBack.getCurrentPosition() + rightTicks * Math.signum(Math.sin(theta + Math.PI / 4));
         double L = leftTicks, R = rightTicks;
 
-        PIDController L_PID = new PIDController(DrivePIDCoefficients.getKp(), DrivePIDCoefficients.getKi(), DrivePIDCoefficients.getKd(), L_sp);
-        PIDController R_PID = new PIDController(DrivePIDCoefficients.getKp(), DrivePIDCoefficients.getKi(), DrivePIDCoefficients.getKd(), R_sp);
+        PIDController L_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), L_sp);
+        PIDController R_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), R_sp);
+
+        boolean L_atSetPoint = false, R_atSetPoint = false;
 
         while ( // checking condition
                 opMode.opModeIsActive() && !(
-                        Math.abs(Math.abs(getLeftWheelPosition()-L_start) - Math.abs(L)) < DrivePIDCoefficients.getErrorTolerance_p() &&
-                        Math.abs(getLeftWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v() &&
-                        Math.abs(Math.abs(getRightWheelPosition()-R_start) - Math.abs(R)) < DrivePIDCoefficients.getErrorTolerance_p() &&
-                        Math.abs(getRightWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v())
+                        L_atSetPoint &&
+                        R_atSetPoint)
         ) {
             // getting L and R
             double L_p = leftBack.getCurrentPosition();
             double R_p = -rightBack.getCurrentPosition();
 
-            L_PID.setPID(DrivePIDCoefficients.getKp(), DrivePIDCoefficients.getKi(), DrivePIDCoefficients.getKd());
-            R_PID.setPID(DrivePIDCoefficients.getKp(), DrivePIDCoefficients.getKi(), DrivePIDCoefficients.getKd());
+            L_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
+            R_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
 
             double L_K = L_PID.update(L_p);
             double R_K = R_PID.update(R_p);
+            double universal_K;
+            if (Math.abs(L_K) > Math.abs(R_K)) {
+                if (!L_atSetPoint) {
+                    universal_K = L_K;
+                } else {
+                    universal_K = R_K;
+                }
+            } else {
+                if (!R_atSetPoint) {
+                    universal_K = R_K;
+                } else {
+                    universal_K = L_K;
+                }
+            }
+            universal_K = Math.abs(universal_K);
 
-            double L_v = driveSpeed * Math.abs(Math.sin(theta - Math.PI / 4)) * L_K; // for bL and fR
-            double R_v = driveSpeed * Math.abs(Math.sin(theta + Math.PI / 4)) * R_K; // for bR and fL
+            double L_v = driveSpeed * Math.abs(Math.sin(theta - Math.PI / 4)) * universal_K * Math.signum(L_K); // for bL and fR
+            double R_v = driveSpeed * Math.abs(Math.sin(theta + Math.PI / 4)) * universal_K * Math.signum(R_K); // for bR and fL
 
             if (telemetry != null) {
                 telemetry.addData("L diff",Math.abs(Math.abs(getLeftWheelPosition()-L_start) - Math.abs(L)));
-                telemetry.addData("R diff",Math.abs(Math.abs(getRightWheelPosition()-R_start) - Math.abs(R)));
                 telemetry.addData("L setpoint",L_sp);
                 telemetry.addData("L position",L_p);
+                telemetry.addData("R diff",Math.abs(Math.abs(getRightWheelPosition()-R_start) - Math.abs(R)));
+                telemetry.addData("R setpoint",R_sp);
+                telemetry.addData("R position",R_p);
                 telemetry.update();
             }
 
+            double thetaDiff = 0.01 * (getYaw()-this.theta);
             // setting the powers of the motors
             driveWithMotorPowers(
-                    R_v, // fL
-                    L_v, // fR
-                    L_v, // bL
-                    R_v  // bR
+                    R_v + thetaDiff, // fL
+                    L_v - thetaDiff, // fR
+                    L_v + thetaDiff, // bL
+                    R_v - thetaDiff  // bR
             );
+
+            L_atSetPoint = L_atSetPoint ||
+                    (Math.abs(Math.abs(getLeftWheelPosition()-L_start) - Math.abs(L)) < DrivePIDCoefficients.getErrorTolerance_p() &&
+                    Math.abs(getLeftWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v());
+            R_atSetPoint = R_atSetPoint ||
+                    (Math.abs(Math.abs(getRightWheelPosition()-R_start) - Math.abs(R)) < DrivePIDCoefficients.getErrorTolerance_p() &&
+                    Math.abs(getRightWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v());
 
             isBusy = true;
         }
@@ -213,31 +242,43 @@ public class DriveSubsystem extends SubsystemBase {
 
         // begin action
         double startAngle = getYaw();
-        double setPoint = normalizeAngle(startAngle + degrees);
+        double setPoint = degrees;
+        double cumulativeAngle = 0, previousAngle = getYaw();
         double K;
 
-        PIDController PID = new PIDController(DrivePIDCoefficients.getKp(), DrivePIDCoefficients.getKi(), DrivePIDCoefficients.getKd(), setPoint);
+        PIDController PID = new PIDController(DrivePIDCoefficients.getTurnP(), DrivePIDCoefficients.getTurnI(), DrivePIDCoefficients.getTurnD(), setPoint);
 
         while (
-                opMode.opModeIsActive() &&
-                Math.abs(normalizeAngle(setPoint-getYaw())) > DrivePIDCoefficients.getErrorTolerance_degrees() &&
-                Math.abs(getRightWheelVelocity()) > DrivePIDCoefficients.getErrorTolerance_v()
+                opMode.opModeIsActive() && !(
+                Math.abs(degrees - (cumulativeAngle + normalizeAngle(previousAngle-getYaw()))) < DrivePIDCoefficients.getErrorTolerance_degrees() &&
+                Math.abs(getRightWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v())
         ) {
-            K = PID.updateError(normalizeAngle(setPoint-getYaw()));
+            PID.setPID(DrivePIDCoefficients.getTurnP(), DrivePIDCoefficients.getTurnI(), DrivePIDCoefficients.getTurnD());
+
+            double currentYaw = getYaw();
+
+            cumulativeAngle += normalizeAngle(previousAngle-currentYaw);
+            previousAngle = currentYaw;
+
+            K = PID.update(cumulativeAngle);
 
             if (telemetry != null) {
-                telemetry.addData("Degrees setpoint",setPoint);
-                telemetry.addData("Degrees position",setPoint-normalizeAngle(setPoint-getYaw()));
+                telemetry.addData("Degrees Disp setpoint",setPoint);
+                telemetry.addData("Degrees diff",setPoint-cumulativeAngle);
+                telemetry.addData("Degrees cumulative",cumulativeAngle);
                 telemetry.addData("K",K);
                 telemetry.update();
             }
 
             driveRobotCentric(0, 0, turnSpeed * K);
+
+
             isBusy = true;
         }
 
         // brake
         controller.stop();
+        theta = getYaw();
         isBusy = false;
     }
 

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -24,7 +25,8 @@ public class RobotSystem {
                 hardwareRobot.wrist,
                 hardwareRobot.leftClaw,
                 hardwareRobot.rightClaw,
-                opMode
+                opMode,
+                new MultipleTelemetry(telemetry)
         );
         drive = new DriveSubsystem(
                 hardwareRobot.leftFront,
@@ -32,7 +34,8 @@ public class RobotSystem {
                 hardwareRobot.leftBack,
                 hardwareRobot.rightBack,
                 hardwareRobot.imu,
-                opMode
+                opMode,
+                new MultipleTelemetry(telemetry)
         );
 //        cvFront = new CVSubsystem(hardwareRobot.frontCam,
 //                hardwareRobot.frontCamName,

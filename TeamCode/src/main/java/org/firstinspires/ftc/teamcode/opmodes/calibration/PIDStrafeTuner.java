@@ -11,6 +11,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryImpl;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
+import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
+import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 
@@ -24,42 +28,43 @@ import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 @Config
 @Autonomous(name = "Drivetrain Strafe PID Tuner")
 public class PIDStrafeTuner extends LinearOpMode {
-    private static double Kp = 0.01;
-    private static double Ki = 0;
-    private static double Kd = 0;
-    private static double errorTolerance_p = 5.0;
-    private static double errorTolerance_v = 0.05;
 
     final private ElapsedTime runtime = new ElapsedTime();
-    private HardwareRobot hardwareRobot;
     private static DriveSubsystem drive;
+    private static InDepSubsystem inDep;
+    public static double fwd = 20;
+    public static double str = 20;
     private MultipleTelemetry telemetry = new MultipleTelemetry(new TelemetryImpl((OpMode) this), FtcDashboard.getInstance().getTelemetry());
 
 
     @Override
     // The "Main" code will go in here
     public void runOpMode() {
-        this.hardwareRobot = new HardwareRobot(hardwareMap);
-        drive = new DriveSubsystem(
-                hardwareRobot.leftFront,
-                hardwareRobot.rightFront,
-                hardwareRobot.leftBack,
-                hardwareRobot.rightBack,
-                hardwareRobot.imu,
-                this,
-                telemetry
-        );
+        RobotSystem robot = new RobotSystem(hardwareMap, false, this, telemetry);
+        inDep = robot.getInDep();
+        drive = robot.getDrive();
         runtime.reset();
+        inDep.close();
 
         waitForStart();
+
+        MovementSequence forward = new MovementSequenceBuilder()
+                .right(82.25)
+                .build();
+        MovementSequence backward = new MovementSequenceBuilder()
+                .backwardRight(fwd,str)
+                .build();
 
         // begin tuning sequence
         while (opModeIsActive()) {
             // right 1000√2 ticks
-            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), -500, 500, 0);
+//            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), -2000, 2000, 0);
+            drive.followMovementSequence(backward);
             while (opModeIsActive() && !gamepad1.triangle);
+
             // left 1000√2 ticks
-            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), 500, -500, Math.PI);
+//            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), 2000, -2000, Math.PI);
+            drive.followMovementSequence(backward);
             while (opModeIsActive() && !gamepad1.triangle);
         }
 

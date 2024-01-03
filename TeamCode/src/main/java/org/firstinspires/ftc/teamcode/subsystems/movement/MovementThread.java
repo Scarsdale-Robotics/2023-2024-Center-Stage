@@ -9,9 +9,9 @@ import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 
 public class MovementThread implements Runnable {
-    private static double K_FORWARD = 32.4;
-    private static double K_STRAFE = 62.5;
-    private static double K_ARM = 35.0;
+    public static volatile double K_FORWARD = 64.04;
+    public static volatile double K_STRAFE = 72.948;
+    public static volatile double K_ARM = 35.0;
 
     private static final double POWER_DRIVE = SpeedCoefficients.getAutonomousDriveSpeed();
     private static final double POWER_TURN = SpeedCoefficients.getAutonomousTurnSpeed();
@@ -49,9 +49,9 @@ public class MovementThread implements Runnable {
             double  a = movement.INCHES_FORWARD * type.SGN_forward,
                     b = movement.INCHES_STRAFE * type.SGN_strafe,
                     c = Math.hypot(a,b),
-                    theta = Math.atan2(b,a),
+                    theta = Math.atan2(a,b),
 
-                    u = Math.hypot(K_STRAFE * Math.cos(theta), K_FORWARD * Math.sin(theta)),
+                    u = Math.hypot(MovementThread.K_STRAFE * Math.cos(theta), MovementThread.K_FORWARD * Math.sin(theta)),
                     L = Math.abs(u*c*Math.cos(theta)-u*c*Math.sin(theta))/Math.sqrt(2),
                     R = Math.abs(u*c*Math.cos(theta)+u*c*Math.sin(theta))/Math.sqrt(2);
 
@@ -60,14 +60,14 @@ public class MovementThread implements Runnable {
 
         // TURN CASES
         if (type.isTurnType) {
-            drive.turnByIMU(POWER_TURN, movement.DEGREES_TURN);
+            drive.turnByIMU(POWER_TURN, movement.DEGREES_TURN * type.SGN_turn);
         }
 
         // ARM CASES
         if (type.isArmType) {
             inDep.raiseByEncoder(
                 POWER_ARM * type.SGN_elevation,
-                movement.DEGREES_ELEVATION * K_ARM
+                movement.DEGREES_ELEVATION * MovementThread.K_ARM
             );
         }
 
@@ -85,6 +85,14 @@ public class MovementThread implements Runnable {
                 inDep.closeRight();
             if (type == Movement.MovementType.CLOSE_LEFT_CLAW)
                 inDep.closeLeft();
+        }
+
+        // ELBOW CASES
+        if (type == Movement.MovementType.REST_ELBOW) {
+            inDep.rest();
+        }
+        if (type == Movement.MovementType.FLIP_ELBOW) {
+            inDep.flip();
         }
 
         // CV CASES

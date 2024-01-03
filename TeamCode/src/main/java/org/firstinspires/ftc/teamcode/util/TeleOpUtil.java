@@ -6,9 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
-import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
@@ -151,7 +149,7 @@ public class TeleOpUtil {
         double vsn = -gamepad1.left_stick_x * SpeedCoefficients.getStrafeSpeed();
         double vfn = gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed();
         double vtn = -gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed();
-        double MOMENTUM_FACTOR = 0.5;  // higher = less momentum
+        double MOMENTUM_FACTOR = 0.1;  // higher = less momentum
         if (vsn == 0) vs = Math.abs(vs) < 0.001 ? 0 : (vsn * MOMENTUM_FACTOR + vs * (1-MOMENTUM_FACTOR)); else vs = vsn;
         if (vfn == 0) vf = Math.abs(vf) < 0.001 ? 0 : (vfn * MOMENTUM_FACTOR + vf * (1-MOMENTUM_FACTOR)); else vf = vfn;
         if (vtn == 0) vt = Math.abs(vt) < 0.001 ? 0 : (vtn * MOMENTUM_FACTOR + vt * (1-MOMENTUM_FACTOR)); else vt = vtn;  // could add a constant here to adjust for unintended turns
@@ -208,7 +206,7 @@ public class TeleOpUtil {
         double DISTANCE_BEFORE_BACKBOARD = 45;  // TEMP
 //        double cvDist = cvBack.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
 //        telemetry.addData("cvDist:", cvDist);
-        telemetry.addData("arm pos:", inDep.getArmPosition());
+        telemetry.addData("arm pos:", inDep.getLeftArmPosition());
         telemetry.addData("claw open:", inDep.getIsLeftClawOpen());
         telemetry.addData("пуяза 你好何余安 ???", "θωθ");
         telemetry.update();

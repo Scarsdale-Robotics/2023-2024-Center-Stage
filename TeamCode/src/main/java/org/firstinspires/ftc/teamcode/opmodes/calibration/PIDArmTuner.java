@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryImpl;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 
 // FTC DASHBOARD
@@ -21,12 +22,11 @@ import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 // TODO: Camera stream monitor
 
 @Config
-@Autonomous(name = "Drivetrain Turn PID Tuner")
-public class PIDTurnTuner extends LinearOpMode {
-    public static double turnDegrees = 180;
+@Autonomous(name = "Arm PID Tuner")
+public class PIDArmTuner extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
     private HardwareRobot hardwareRobot;
-    private static DriveSubsystem drive;
+    private static InDepSubsystem inDep;
     private MultipleTelemetry telemetry = new MultipleTelemetry(new TelemetryImpl((OpMode) this), FtcDashboard.getInstance().getTelemetry());
 
 
@@ -34,30 +34,39 @@ public class PIDTurnTuner extends LinearOpMode {
     // The "Main" code will go in here
     public void runOpMode() {
         this.hardwareRobot = new HardwareRobot(hardwareMap);
-        drive = new DriveSubsystem(
-                hardwareRobot.leftFront,
-                hardwareRobot.rightFront,
-                hardwareRobot.leftBack,
-                hardwareRobot.rightBack,
-                hardwareRobot.imu,
+        inDep = new InDepSubsystem(
+                hardwareRobot.arm1,
+                hardwareRobot.arm2,
+                hardwareRobot.elbow,
+                hardwareRobot.wrist,
+                hardwareRobot.leftClaw,
+                hardwareRobot.rightClaw,
                 this,
                 telemetry
         );
+        inDep.close();
         runtime.reset();
 
         waitForStart();
 
         // begin tuning sequence
         while (opModeIsActive()) {
-            // right 1000√2 ticks
-            drive.turnByIMU(SpeedCoefficients.getAutonomousTurnSpeed(), turnDegrees);
+//            double theta = Math.PI / 2;
+//            drive.driveWithMotorPowers(
+//                    0.25 * Math.sin(theta + Math.PI / 4), // fL
+//                    0.25 * Math.sin(theta - Math.PI / 4), // fR
+//                    0.25 * Math.sin(theta - Math.PI / 4), // bL
+//                    0.25 * Math.sin(theta + Math.PI / 4)  // bR
+//                    );
+
+            // forward 1000√2 ticks
+            inDep.raiseByEncoder(SpeedCoefficients.getArmSpeed(), 2000);
             while (opModeIsActive() && !gamepad1.triangle);
-            // left 1000√2 ticks
-            drive.turnByIMU(SpeedCoefficients.getAutonomousTurnSpeed(), -turnDegrees);
+            // backward 1000√2 ticks
+            inDep.raiseByEncoder(SpeedCoefficients.getArmSpeed(), -2000);
             while (opModeIsActive() && !gamepad1.triangle);
         }
 
-        drive.stopController();
     }
 
     /**

@@ -4,23 +4,38 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class DrivePIDCoefficients {
-    public static double Kp = 0.02;
-    public static double Ki = 0.15;
-    public static double Kd = 0.0006;
-    public static double errorTolerance_p = 7.5;
+    public static double drive_Kp = 0.0075;
+    public static double drive_Ki = 0.05;
+    public static double drive_Kd = 0.0001;
+    public static double turn_Kp = 0.1;
+    public static double turn_Ki = 0.1;
+    public static double turn_Kd = 0.001;
+    public static double errorTolerance_p = 15.5;
     public static double errorTolerance_v = 0.05;
-    public static double errorTolerance_degrees = 2.5;
+    public static double errorTolerance_degrees = 1.0;
 
-    public static double getKp() {
-        return Kp;
+    public static double getDriveP() {
+        return drive_Kp;
     }
 
-    public static double getKi() {
-        return Ki;
+    public static double getDriveI() {
+        return drive_Ki;
     }
 
-    public static double getKd() {
-        return Kd;
+    public static double getDriveD() {
+        return drive_Kd;
+    }
+
+    public static double getTurnP() {
+        return turn_Kp;
+    }
+
+    public static double getTurnI() {
+        return turn_Ki;
+    }
+
+    public static double getTurnD() {
+        return turn_Kd;
     }
 
     public static double getErrorTolerance_p() {

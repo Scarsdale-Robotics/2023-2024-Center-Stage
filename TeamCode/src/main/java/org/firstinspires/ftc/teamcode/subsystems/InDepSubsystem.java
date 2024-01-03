@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.InDepPIDCoefficients;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.util.PIDController;
@@ -25,14 +25,15 @@ public class InDepSubsystem extends SubsystemBase {
     private boolean isElbowFlipped;
 
     private final LinearOpMode opMode;
+    private MultipleTelemetry telemetry;
 
     private Level level = Level.GROUND;
 
     public enum Level {
-        GROUND(0, 0.25, 0.80),
-        BACKBOARD1(5083,0.35, 0.13),
-        BACKBOARD2(6789,0.25, 0.13), //temp motor encoder values
-        BACKBOARD3(8111, 0.15, 0.13);
+        GROUND(0, 0.25, 0.84),
+        BACKBOARD1(5083,0.35, 0.17),
+        BACKBOARD2(6789,0.4, 0.17), //temp motor encoder values
+        BACKBOARD3(8111, 0.4, 0.17);
 
         public final int target;
         public final double wristTarget;
@@ -74,6 +75,10 @@ public class InDepSubsystem extends SubsystemBase {
     public final int ELBOW_TURN_TICKS = 5038;
 
     public InDepSubsystem(Motor arm1, Motor arm2, Servo elbow, Servo wrist, Servo leftClaw, Servo rightClaw, LinearOpMode opMode) {
+        this(arm1,arm2,elbow,wrist,leftClaw,rightClaw,opMode,null);
+    }
+
+    public InDepSubsystem(Motor arm1, Motor arm2, Servo elbow, Servo wrist, Servo leftClaw, Servo rightClaw, LinearOpMode opMode, MultipleTelemetry telemetry) {
         // initialize objects
         this.arm1 = arm1;
         this.arm2 = arm2;
@@ -85,6 +90,7 @@ public class InDepSubsystem extends SubsystemBase {
         this.wrist = wrist;
 
         this.opMode = opMode;
+        this.telemetry = telemetry;
 
         // reset everything
 
@@ -97,7 +103,7 @@ public class InDepSubsystem extends SubsystemBase {
     }
 
     public Level getLevelBelow() {
-        int armPos = getArmPosition();
+        int armPos = getLeftArmPosition();
         if (armPos < Level.BACKBOARD1.target) {
             return Level.GROUND;
         }
@@ -115,7 +121,7 @@ public class InDepSubsystem extends SubsystemBase {
      */
     public void rawPower(double power) {
         // TODO: add ranges
-        int armPos = getArmPosition();
+        int armPos = getLeftArmPosition();
 
         // set bounds
         if (armPos < 0 && power < 0 && !opMode.gamepad1.a) {
@@ -151,32 +157,48 @@ public class InDepSubsystem extends SubsystemBase {
             throw new RuntimeException("Tried to run two arm actions at once (arm is busy)");
         }
         // begin action
-        double startEncoder = arm1.motor.getCurrentPosition(); // arm1 is our reference for encoders
-        double setPoint = startEncoder + ticks;
-        double pidMultiplier;
-        PIDController pidController = new PIDController(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd(), setPoint);
+        double L_startEncoder = arm1.motor.getCurrentPosition(), R_startEncoder = arm2.motor.getCurrentPosition();
+        double L_setPoint = L_startEncoder + ticks, R_setPoint = R_startEncoder + ticks;
+        PIDController L_PID = new PIDController(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd(), L_setPoint);
+        PIDController R_PID = new PIDController(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd(), R_setPoint);
+
         while (
-                opMode.opModeIsActive() &&
-                Math.abs(setPoint - getArmPosition()) > InDepPIDCoefficients.getErrorTolerance_p() &&
-                Math.abs(getArmVelocity()) > InDepPIDCoefficients.getErrorTolerance_v()
+                opMode.opModeIsActive() && !(
+                        Math.abs(L_setPoint - getLeftArmPosition()) < InDepPIDCoefficients.getErrorTolerance_p() &&
+                        Math.abs(getLeftArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v()) && !(
+                        Math.abs(R_setPoint - getRightArmPosition()) < InDepPIDCoefficients.getErrorTolerance_p() &&
+                        Math.abs(getRightArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v())
         ) {
-            pidMultiplier = pidController.update(getArmPosition());
-            rawPower(power * pidMultiplier);
-            if(getArmPosition() == Level.GROUND.target) {
-                wrist.setPosition(Level.GROUND.wristTarget);
+            L_PID.setPID(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd());
+            R_PID.setPID(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd());
+
+            double L_K = L_PID.update(getLeftArmPosition());
+            double R_K = R_PID.update(getRightArmPosition());
+
+            arm1.motor.setPower(power * L_K);
+            arm2.motor.setPower(power * R_K);
+
+//            setWristPosition(0.25);
+
+            if (telemetry != null) {
+                telemetry.addData("L Arm pos", getLeftArmPosition());
+                telemetry.addData("L Setpoint", L_setPoint);
+                telemetry.addData("R Arm pos", getRightArmPosition());
+                telemetry.addData("R Setpoint", R_setPoint);
+                telemetry.update();
             }
-            else if (getArmPosition() >= Level.BACKBOARD1.target) {
+            if (getLeftArmPosition() >= Level.BACKBOARD3.target) {
+                wrist.setPosition(Level.BACKBOARD3.wristTarget);
+            } else if (getLeftArmPosition() >= Level.BACKBOARD2.target) {
+                wrist.setPosition(Level.BACKBOARD2.wristTarget);
+            } else if (getLeftArmPosition() >= Level.BACKBOARD1.target) {
                 wrist.setPosition(Level.BACKBOARD1.wristTarget);
+            } else if(getLeftArmPosition() >= Level.GROUND.target) {
+                wrist.setPosition(Level.GROUND.wristTarget);
+            } else {
+                wrist.setPosition(0.25);
             }
-            else if (getArmPosition() >= Level.BACKBOARD2.target) {
-                wrist.setPosition(Level.BACKBOARD2.target);
-            }
-            else if (getArmPosition() >= Level.BACKBOARD3.target) {
-                wrist.setPosition(Level.BACKBOARD3.target);
-            }
-            else {
-                wrist.setPosition(1.0);
-            }
+
             isBusy = true;
         }
 
@@ -192,7 +214,7 @@ public class InDepSubsystem extends SubsystemBase {
      * Moves the arm to a target encoder value.
      */
     public void raiseToSetPoint(double power, double setPoint) {
-        new Thread(() -> raiseByEncoder(power, setPoint - getArmPosition())).start();
+        new Thread(() -> raiseByEncoder(power, setPoint - getLeftArmPosition())).start();
     }
 
     /**
@@ -323,17 +345,31 @@ public class InDepSubsystem extends SubsystemBase {
     }
 
     /**
-     * @return the position of the arm motor, in ticks.
+     * @return the position of the left arm motor, in ticks.
      */
-    public int getArmPosition() {
+    public int getLeftArmPosition() {
         return arm1.motor.getCurrentPosition();
     }
 
     /**
-     * @return the power of the arm motor
+     * @return the power of the left arm motor
      */
-    public double getArmVelocity() {
+    public double getLeftArmVelocity() {
         return arm1.motor.getPower();
+    }
+
+    /**
+     * @return the position of the right arm motor, in ticks.
+     */
+    public int getRightArmPosition() {
+        return arm2.motor.getCurrentPosition();
+    }
+
+    /**
+     * @return the power of the right arm motor
+     */
+    public double getRightArmVelocity() {
+        return arm2.motor.getPower();
     }
 
     /**
