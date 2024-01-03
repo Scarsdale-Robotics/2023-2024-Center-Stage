@@ -53,6 +53,7 @@ public class AutoCloseBlue extends LinearOpMode {
                     .forwardLeft(20, 46) // move to backdrop
                     .turnRight(90) // face back to backdrop to place on backdrop
                     .openLeftClaw() // drop yellow pixel
+                    .backward(5) // move backwards so yellow pixel falls out of claw
                     .build();
             placePurple = new MovementSequenceBuilder()
                     .lowerArm(120) // lower arm
@@ -92,6 +93,7 @@ public class AutoCloseBlue extends LinearOpMode {
                     .forwardLeft(26, 52) // move to backdrop
                     .turnRight(90) // face back to backdrop to place on backdrop
                     .openLeftClaw() // drop yellow pixel
+                    .backward(5) // move backwards so yellow pixel falls out of claw
                     .build();
             placePurple = new MovementSequenceBuilder()
                     .lowerArm(120) // lower arm
@@ -130,6 +132,7 @@ public class AutoCloseBlue extends LinearOpMode {
                     .forwardLeft(32, 52) // move to backdrop
                     .turnRight(90) // face back to backdrop to place on backdrop
                     .openLeftClaw() // drop yellow pixel
+                    .backward(5) // move backwards so yellow pixel falls out of claw
                     .build();
             placePurple = new MovementSequenceBuilder()
                     .lowerArm(120) // lower arm

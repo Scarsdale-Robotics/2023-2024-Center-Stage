@@ -56,6 +56,7 @@ public class AutoFarBlue extends LinearOpMode {
                     .backwardRight(11, 24) // move towards backdrop
                     .openLeftClaw() // release yellow
                     .openRightClaw() // release white
+                    .backward(5) // move backwards so yellow pixel falls out of claw
                     .forwardLeft(20, 33) // align with truss to head towards white stack
                     .build(); // build lol
             approachWhite = new MovementSequenceBuilder()
@@ -100,6 +101,7 @@ public class AutoFarBlue extends LinearOpMode {
                     .backwardRight(11, 18) // move towards backdrop
                     .openLeftClaw() // release yellow
                     .openRightClaw() // release white
+                    .backward(5) // move backwards so yellow pixel falls out of claw
                     .forwardLeft(20, 39) // align with truss to head towards white stack
                     .build(); // build lol
             approachWhite = new MovementSequenceBuilder()
@@ -144,6 +146,7 @@ public class AutoFarBlue extends LinearOpMode {
                     .backwardRight(11, 12) // move towards backdrop
                     .openLeftClaw() // release yellow
                     .openRightClaw() // release white
+                    .backward(5) // move backwards so yellow pixel falls out of claw
                     .forwardLeft(20, 45) // align with truss to head towards white stack
                     .lowerArm(120 - (WHITE_PX_HEIGHT * 4 / 5)) // lower arm to white pixel intake pos
                     .build(); // build lol
