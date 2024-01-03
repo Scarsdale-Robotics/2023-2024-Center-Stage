@@ -16,10 +16,10 @@ import java.util.List;
 
 public class PixelGroupDetectionPipeline extends OpenCvPipeline {
     enum Color {
-        WHITE(new Scalar(213, 20, 255), new Scalar(0, 0, 170), true),
-        YELLOW(new Scalar(28, 195, 255), new Scalar(12, 82, 77), true),
-        PURPLE(new Scalar(208, 90, 255), new Scalar(126, 22, 77), true),
-        GREEN(new Scalar(85, 160, 238), new Scalar(19, 40, 77), true);
+        WHITE(new Scalar(0, 0, 178.5), new Scalar(255, 26.9, 255), true),
+        YELLOW(new Scalar(18.4, 111.9, 168.6), new Scalar(36.8, 225.0, 255.0), true),
+        PURPLE(new Scalar(121.8, 0, 123.3), new Scalar(137.4, 109.1, 123.3), true),
+        GREEN(new Scalar(38.3, 66.6, 83.6), new Scalar(55.3, 174.3, 255.0), true);
         public final Scalar UPPER;
         public final Scalar LOWER;
         public final boolean display;
@@ -74,7 +74,7 @@ public class PixelGroupDetectionPipeline extends OpenCvPipeline {
                 Imgproc.approxPolyDP(c2f, approx, 0.05 * peri, true);
 
                 Point[] points = approx.toArray();
-                if (points.length == 6 && Imgproc.contourArea(cont) > input.width() / 10.0) {
+                if (points.length > 0 && Imgproc.contourArea(cont) > input.width() / 10.0) {
                     MatOfPoint simpleContour = new MatOfPoint(points);
 //                if (Imgproc.contourArea(cont) > input.width() / 10.0 && c.display) {
                     if (Imgproc.isContourConvex(simpleContour)) pixels.add(new Pixel(simpleContour, c));
