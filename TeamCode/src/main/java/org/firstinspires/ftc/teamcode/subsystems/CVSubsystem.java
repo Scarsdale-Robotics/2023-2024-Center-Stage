@@ -8,7 +8,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelGroupDetectionProcessor;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
+import org.opencv.core.Point;
 import org.openftc.easyopencv.OpenCvCamera;
 
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -49,6 +51,7 @@ public class CVSubsystem extends SubsystemBase {
     private PropDetectionPipeline propProcessor;
     private PixelDetectionPipeline pixelProcessor;
     private WhitePixelDetectionPipeline whitePixelProcessor;
+    private PixelGroupDetectionProcessor pixelGroupProcessor;
     private boolean isRedTeam;
     private LinearOpMode opMode;
     public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
@@ -115,7 +118,7 @@ public class CVSubsystem extends SubsystemBase {
         // Set and enable the processor.
         builder.addProcessor(aprilTag);
         builder.addProcessor(pixelProcessor);
-        builder.addProcessor(propProcessor);
+        builder.addProcessors(propProcessor, pixelGroupProcessor);
 //        builder.addProcessors(aprilTag, pixelProcessor, propProcessor);
 
         // Build the Vision Portal, using the above settings.
@@ -310,6 +313,20 @@ public class CVSubsystem extends SubsystemBase {
             drive.driveRobotCentric(Math.max(DIAM_THRESHOLD, pixelDiam) / DIAM_THRESHOLD, Math.min(HORIZ_THRESHOLD, pixelOffset) / HORIZ_THRESHOLD, 0);
             pixelOffset = getWhitePixelHorizontalOffset();
             pixelDiam = getWhitePixelDiameterPx();
+        }
+    }
+
+    public void moveToPixels() {
+        int width = getCameraWidth();
+        double HORIZ_THRESHOLD = width / 11.1;
+        double DIST_THRESHOLD = width / 4.0;
+        Point p = pixelGroupProcessor.getPixelsCenter();
+        double pixelOffset = p.x;
+        double pixelDist = p.y;
+        while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDist) < DIST_THRESHOLD && opMode.opModeIsActive()) {
+            drive.driveRobotCentric(Math.max(DIST_THRESHOLD, pixelDist) / DIST_THRESHOLD, Math.min(HORIZ_THRESHOLD, pixelOffset) / HORIZ_THRESHOLD, 0);
+            pixelOffset = getWhitePixelHorizontalOffset();
+            pixelDist = getWhitePixelDiameterPx();
         }
     }
 
