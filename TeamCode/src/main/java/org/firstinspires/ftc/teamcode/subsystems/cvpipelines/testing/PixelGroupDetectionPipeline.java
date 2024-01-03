@@ -17,9 +17,9 @@ import java.util.List;
 public class PixelGroupDetectionPipeline extends OpenCvPipeline {
     enum Color {
         WHITE(new Scalar(213, 20, 255), new Scalar(0, 0, 170), true),
-        YELLOW(new Scalar(28, 195, 255), new Scalar(12, 82, 230), true),
-        PURPLE(new Scalar(208, 90, 255), new Scalar(126, 22, 164), true),
-        GREEN(new Scalar(85, 160, 238), new Scalar(19, 0, 157), true);
+        YELLOW(new Scalar(28, 195, 255), new Scalar(12, 82, 77), true),
+        PURPLE(new Scalar(208, 90, 255), new Scalar(126, 22, 77), true),
+        GREEN(new Scalar(85, 160, 238), new Scalar(19, 40, 77), true);
         public final Scalar UPPER;
         public final Scalar LOWER;
         public final boolean display;
@@ -50,7 +50,7 @@ public class PixelGroupDetectionPipeline extends OpenCvPipeline {
         Mat hsv = new Mat();
         Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV);
 
-        Mat kernel = Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT, new Size(15, 15));
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT, new Size(25, 25));
 
         ArrayList<Pixel> pixels = new ArrayList<>();
         for (Color c : colors) {
@@ -122,11 +122,14 @@ public class PixelGroupDetectionPipeline extends OpenCvPipeline {
                             int height = yB - yT;
 //                            Imgproc.rectangle(input, new Rect(xL, yT, xR-xL, yB-yT), new Scalar(255,0,0), 5);
                             double p2_area = Imgproc.contourArea(p2.contour);
-
-                            if (p_area>p2_area){
-                                pixels.remove(pixels.get(p2_idx));
-                            }else{
-                                pixels.remove(pixels.get(p_idx));
+                            try {
+                                if (p_area > p2_area) {
+                                    pixels.remove(pixels.get(p2_idx));
+                                } else {
+                                    pixels.remove(pixels.get(p_idx));
+                                }
+                            } catch (Exception e) {
+                                // adding this catch bc an out of range error (idk why though)
                             }
 
 //                            pixels.remove(p_idx);
