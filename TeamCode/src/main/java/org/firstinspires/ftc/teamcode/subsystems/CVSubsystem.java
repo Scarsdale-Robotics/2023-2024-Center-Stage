@@ -304,8 +304,9 @@ public class CVSubsystem extends SubsystemBase {
     /**
      * returns the x,y,rotation position of the center of the robot based on apriltag positions in tiles. blue-backdrop corner is considered 0,0.
      * facing backdrop is zero rotation, right is more rotation
+     * offset params are positive towards the direction the camera is facing. the camera is assumed to be facing either "robot-forward" or "robot-backward"
      */
-    public double[] getPosition() {
+    public double[] getPosition(double cameraCenterOffsetX, double cameraCenterOffsetY) {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         if (currentDetections.size() == 0) return lastKnownPos;
         ArrayList<Double> xEst   = new ArrayList<>();
@@ -314,8 +315,8 @@ public class CVSubsystem extends SubsystemBase {
         for (AprilTagDetection detection : currentDetections) {
             double rotOff = (detection.ftcPose.x > 0 ? 1 : -1) * detection.ftcPose.yaw;
             // 24 inches per tile
-            double xOff   = (Math.cos(detection.ftcPose.bearing - detection.ftcPose.yaw) * detection.ftcPose.range) / 24;
-            double yOff   = (Math.sin(detection.ftcPose.bearing - detection.ftcPose.yaw) * detection.ftcPose.range) / 24;
+            double xOff   = (Math.cos(detection.ftcPose.bearing - detection.ftcPose.yaw) * detection.ftcPose.range) / 24 - cameraCenterOffsetX;
+            double yOff   = (Math.sin(detection.ftcPose.bearing - detection.ftcPose.yaw) * detection.ftcPose.range) / 24 - cameraCenterOffsetY;
             if (detection.id < 7) {
                 xEst.add(APRIL_TAG_LOCATIONS[detection.id][0] + yOff);
                 yEst.add(APRIL_TAG_LOCATIONS[detection.id][1] + xOff);
