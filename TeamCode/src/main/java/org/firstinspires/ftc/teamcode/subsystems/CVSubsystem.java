@@ -23,8 +23,11 @@ import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.WhitePixelDetection
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class CVSubsystem extends SubsystemBase {
@@ -54,6 +57,12 @@ public class CVSubsystem extends SubsystemBase {
     private PixelGroupDetectionProcessor pixelGroupProcessor;
     private boolean isRedTeam;
     private LinearOpMode opMode;
+    private static final double[][] APRIL_TAG_LOCATIONS = new double[][]{
+            {1.25, 0.5}, {1.5, 0.5}, {1.75, 0.5},
+            {4.25, 0.5}, {4.5, 0.5}, {4.75, 0.5},
+            {4.75, 6}  , {4.5, 6}  ,
+            {1.25, 6}  , {1.5, 6}
+    };
     public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
 //        tdp = new TapeDetectionPipeline();
 //        camera.setPipeline(tdp);
@@ -64,6 +73,7 @@ public class CVSubsystem extends SubsystemBase {
         this.isRedTeam = isRedTeam;
         this.opMode = opMode;
         runtime.reset();
+
         // create AprilTagProcessor and VisionPortal
         initAprilTag();
 
@@ -287,6 +297,43 @@ public class CVSubsystem extends SubsystemBase {
             }
         }
         return tagDistance;
+    }
+
+    private double[] lastKnownPos = POSITION_UNKNOWN;
+    public static final double[] POSITION_UNKNOWN = new double[]{-1, -1, -1};
+    /**
+     * returns the x,y,rotation position of the center of the robot based on apriltag positions in tiles. blue-backdrop corner is considered 0,0.
+     * facing backdrop is zero rotation, right is more rotation
+     */
+    public double[] getPosition() {
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        if (currentDetections.size() == 0) return lastKnownPos;
+        ArrayList<Double> xEst   = new ArrayList<>();
+        ArrayList<Double> yEst   = new ArrayList<>();
+        ArrayList<Double> rotEst = new ArrayList<>();
+        for (AprilTagDetection detection : currentDetections) {
+            double rotOff = (detection.ftcPose.x > 0 ? 1 : -1) * detection.ftcPose.yaw;
+            // 24 inches per tile
+            double xOff   = (Math.cos(detection.ftcPose.bearing - detection.ftcPose.yaw) * detection.ftcPose.range) / 24;
+            double yOff   = (Math.sin(detection.ftcPose.bearing - detection.ftcPose.yaw) * detection.ftcPose.range) / 24;
+            if (detection.id < 7) {
+                xEst.add(APRIL_TAG_LOCATIONS[detection.id][0] + yOff);
+                yEst.add(APRIL_TAG_LOCATIONS[detection.id][1] + xOff);
+                rotEst.add(rotOff);
+            } else {
+                xEst.add(APRIL_TAG_LOCATIONS[detection.id][0] - yOff);
+                yEst.add(APRIL_TAG_LOCATIONS[detection.id][1] - xOff);
+                rotEst.add(rotOff + 180);
+            }
+        }
+        Collections.sort(xEst);
+        Collections.sort(yEst);
+        Collections.sort(rotEst);
+        double xMed   = xEst.get(xEst.size() / 2);
+        double yMed   = yEst.get(xEst.size() / 2);
+        double rotMed = rotEst.get(xEst.size() / 2);
+        lastKnownPos = new double[]{xMed, yMed, rotMed};
+        return lastKnownPos;
     }
 
     public void moveToPixel() {
