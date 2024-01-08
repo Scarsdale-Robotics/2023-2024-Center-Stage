@@ -32,8 +32,8 @@ public class InDepSubsystem extends SubsystemBase {
     public enum Level {
         GROUND(0, 0.23, false),
         BACKBOARD_HIGH(5083,0.32, true),
-        BACKBOARD_MID(8250,0.275, true), // tuned values
-        BACKBOARD_LOW(8111, 0.17, true);
+        BACKBOARD_MID(7492,0.275, true), // tuned values
+        BACKBOARD_LOW(8250, 0.17, true);
 
         public final int target;
         public final double wristTarget;
