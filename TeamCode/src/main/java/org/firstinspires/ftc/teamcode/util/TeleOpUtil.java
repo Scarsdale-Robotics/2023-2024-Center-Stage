@@ -41,13 +41,6 @@ public class TeleOpUtil {
     private boolean towardsBackboard = false;
     private final MovementSequence intoBackboardMode;
     private final MovementSequence intoPickupMode;
-    public static double leftPosOpen = 0.6;
-    public static double rightPosOpen = 0.25;
-    public static double leftPosClosed = 0.21;
-    public static double rightPosClosed = 0.6;
-    public static double elbowPosRest = 0.80;
-    public static double elbowPosFlipped = 0.13;
-    public static double wristPos = 0.25;
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
         RobotSystem robot = new RobotSystem(hardwareMap, isRedTeam, opMode, telemetry);
         drive = robot.getDrive();
@@ -59,7 +52,6 @@ public class TeleOpUtil {
         this.telemetry = telemetry;
         this.lastTurnStart = robot.getIMU().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
         this.inDep = robot.getInDep();
-        inDep.setWristPosition(wristPos);
         if (isRedTeam)
         {
             intoBackboardMode = new MovementSequenceBuilder()
@@ -143,12 +135,12 @@ public class TeleOpUtil {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
 
         // epic macros
-        epicMacroControl();
+//        epicMacroControl();
 
         // drive robot
-        double vsn = -gamepad1.left_stick_x * SpeedCoefficients.getStrafeSpeed();
-        double vfn = gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed();
-        double vtn = -gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed();
+        double vsn = gamepad1.left_stick_x * SpeedCoefficients.getStrafeSpeed();
+        double vfn = -gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed();
+        double vtn = gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed();
         double MOMENTUM_FACTOR = 0.1;  // higher = less momentum
         if (vsn == 0) vs = Math.abs(vs) < 0.001 ? 0 : (vsn * MOMENTUM_FACTOR + vs * (1-MOMENTUM_FACTOR)); else vs = vsn;
         if (vfn == 0) vf = Math.abs(vf) < 0.001 ? 0 : (vfn * MOMENTUM_FACTOR + vf * (1-MOMENTUM_FACTOR)); else vf = vfn;
@@ -161,7 +153,7 @@ public class TeleOpUtil {
      */
     private void runArmClawControl() {
         // CLAW TOGGLE CONTROL
-        if ((gamepad1.dpad_left || gamepad1.y) && !clawLeftToggle) {
+        if ((gamepad1.square || gamepad1.y) && !clawLeftToggle) {
             if (inDep.getIsLeftClawOpen()) {
                 inDep.closeLeft();
                 // automagically set fast mode after intake
@@ -173,7 +165,7 @@ public class TeleOpUtil {
             }
             clawLeftToggle = true;
         }
-        if ((gamepad1.dpad_right || gamepad1.y) && !clawRightToggle) {
+        if ((gamepad1.circle || gamepad1.y) && !clawRightToggle) {
             if (inDep.getIsRightClawOpen()) {
                 inDep.closeRight();
                 // automagically set fast mode after intake
@@ -185,8 +177,8 @@ public class TeleOpUtil {
             }
             clawRightToggle = true;
         }
-        if (!gamepad1.dpad_left && !gamepad1.y) clawLeftToggle = false;
-        if (!gamepad1.dpad_right && !gamepad1.y) clawRightToggle = false;
+        if (!gamepad1.square && !gamepad1.y) clawLeftToggle = false;
+        if (!gamepad1.circle && !gamepad1.y) clawRightToggle = false;
 
         // FLEX ARM MOVEMENT MODE CONTROL
         inDep.rawPower((gamepad1.right_trigger - gamepad1.left_trigger) * SpeedCoefficients.getArmSpeed());

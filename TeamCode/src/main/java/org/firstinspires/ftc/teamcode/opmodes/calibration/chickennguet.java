@@ -52,6 +52,8 @@ public class chickennguet extends LinearOpMode {
         dbTelemetry.addData("RClaw Pos",inDep.getRightClawPosition());
         dbTelemetry.addData("Wrist Pos",inDep.getWristPosition());
         dbTelemetry.addData("Elbow Pos",inDep.getElbowPosition());
+        dbTelemetry.addData("LArm Pos", hardwareRobot.arm1.getCurrentPosition());
+        dbTelemetry.addData("RArm Pos", hardwareRobot.arm2.getCurrentPosition());
         dbTelemetry.update();
 
         waitForStart();
@@ -87,18 +89,21 @@ public class chickennguet extends LinearOpMode {
             }
 
             inDep.setWristPosition(wristPos);
-//            dbTelemetry.addData("LClaw Pos",inDep.getLeftClawPosition());
-//            dbTelemetry.addData("RClaw Pos",inDep.getRightClawPosition());
-//            dbTelemetry.addData("Wrist Pos",inDep.getWristPosition());
-//            dbTelemetry.addData("Elbow Pos",inDep.getElbowPosition());
-//            dbTelemetry.update();
+            dbTelemetry.addData("LClaw Pos",inDep.getLeftClawPosition());
+            dbTelemetry.addData("RClaw Pos",inDep.getRightClawPosition());
+            dbTelemetry.addData("Wrist Pos",inDep.getWristPosition());
+            dbTelemetry.addData("Elbow Pos",inDep.getElbowPosition());
+            dbTelemetry.addData("LArm Pos", hardwareRobot.arm1.getCurrentPosition());
+            dbTelemetry.addData("RArm Pos", hardwareRobot.arm2.getCurrentPosition());
+            dbTelemetry.update();
 
             if(gamepad1.left_bumper)speed = Math.max(speed - 0.0001, 0);
             else if (gamepad1.right_bumper)speed = Math.min(speed + 0.0001, 1.0);
             double diff = gamepad1.right_trigger - gamepad1.left_trigger;
             telemetry.addData("armpos", inDep.getLeftArmPosition());
             telemetry.addData("spd", speed*diff);
-            inDep.rawPower(speed*diff);
+            hardwareRobot.arm1.motor.setPower(speed*diff);
+            hardwareRobot.arm2.motor.setPower(speed*diff);
             telemetry.addData("armvelocity", inDep.getLeftArmVelocity());
             telemetry.addData("chicken", "nugget :>");
             telemetry.update();
