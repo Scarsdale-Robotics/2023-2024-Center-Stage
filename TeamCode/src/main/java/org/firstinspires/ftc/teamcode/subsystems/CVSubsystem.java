@@ -50,8 +50,6 @@ public class CVSubsystem extends SubsystemBase {
     private VisionPortal visionPortal;
     private final WebcamName cameraName;
     private PropDetectionPipeline propProcessor;
-    private PixelDetectionPipeline pixelProcessor;
-    private WhitePixelDetectionPipeline whitePixelProcessor;
     private PixelGroupDetectionProcessor pixelGroupProcessor;
     private boolean isRedTeam;
     private LinearOpMode opMode;
@@ -103,11 +101,9 @@ public class CVSubsystem extends SubsystemBase {
     private void initAprilTag() {
         // Create the AprilTag processor.
         propProcessor = new PropDetectionPipeline(isRedTeam);
-        pixelProcessor = new PixelDetectionPipeline();
         aprilTag = new AprilTagProcessor.Builder()
                 .setDrawTagOutline(true)
                 .build();
-        whitePixelProcessor = new WhitePixelDetectionPipeline();
         pixelGroupProcessor = new PixelGroupDetectionProcessor();
         // to modify, look for the specs in ConceptAprilTag.java:
         //.setDrawAxes(false)
@@ -126,8 +122,11 @@ public class CVSubsystem extends SubsystemBase {
 
         // Set and enable the processor.
         builder.addProcessor(aprilTag);
-        builder.addProcessor(pixelProcessor);
-        builder.addProcessors(propProcessor, pixelGroupProcessor);
+        builder.addProcessors(propProcessor);
+        builder.addProcessors(pixelGroupProcessor);
+
+
+        //builder.addProcessors(propProcessor, pixelGroupProcessor);
 //        builder.addProcessors(aprilTag, pixelProcessor, propProcessor);
 
         // Build the Vision Portal, using the above settings.
@@ -266,11 +265,11 @@ public class CVSubsystem extends SubsystemBase {
 
     public int getPixelHorizontalOffset() {
 //        visionPortal.resumeStreaming();
-        return pixelProcessor.getCenterOffset();
+        return 0;  // TODO
     }
 
     public int getWhitePixelHorizontalOffset() {
-        return whitePixelProcessor.getCenterOffset();
+        return 0;  // TODO
     }
 
     public double getWhitePixelDiameterPx() {
@@ -278,7 +277,7 @@ public class CVSubsystem extends SubsystemBase {
     }
 
     public int getCameraWidth() {
-        return whitePixelProcessor.getCameraWidth();
+        return pixelGroupProcessor.getCameraWidth();
     }
 
     public double getAprilTagHorizontalOffset(int tagID) {
