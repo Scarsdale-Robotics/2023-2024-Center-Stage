@@ -4,11 +4,11 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class InDepPIDCoefficients {
-    public static double Kp = 0.01;
-    public static double Ki = 0;
-    public static double Kd = 0;
-    public static double errorTolerance_p = 1.0;
-    public static double errorTolerance_v = 0.01;
+    public static double Kp = 0.015;
+    public static double Ki = 0.08;
+    public static double Kd = 0.0004;
+    public static double errorTolerance_p = 5.1;
+    public static double errorTolerance_v = 0.05;
 
     public static double getKp() {
         return Kp;

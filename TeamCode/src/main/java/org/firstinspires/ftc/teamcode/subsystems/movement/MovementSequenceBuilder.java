@@ -124,6 +124,22 @@ public class MovementSequenceBuilder {
     }
 
     /**
+     * Appends a rest elbow event to the MovementSequenceBuilder.
+     */
+    public MovementSequenceBuilder restElbow() {
+        movements.add(new Movement(Movement.MovementType.REST_ELBOW, 0, 0, 0, 0, 0));
+        return this;
+    }
+
+    /**
+     * Appends a flip elbow event to the MovementSequenceBuilder.
+     */
+    public MovementSequenceBuilder flipElbow() {
+        movements.add(new Movement(Movement.MovementType.FLIP_ELBOW, 0, 0, 0, 0, 0));
+        return this;
+    }
+
+    /**
      * Appends an open claw event for both claws to the MovementSequenceBuilder.
      */
     public MovementSequenceBuilder openBothClaws() {

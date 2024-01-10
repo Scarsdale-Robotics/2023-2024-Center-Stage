@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 @Config
 @Autonomous(name = "Drivetrain Turn PID Tuner")
 public class PIDTurnTuner extends LinearOpMode {
+    public static double turnDegrees = 180;
     final private ElapsedTime runtime = new ElapsedTime();
     private HardwareRobot hardwareRobot;
     private static DriveSubsystem drive;
@@ -49,10 +50,10 @@ public class PIDTurnTuner extends LinearOpMode {
         // begin tuning sequence
         while (opModeIsActive()) {
             // right 1000√2 ticks
-            drive.turnByIMU(SpeedCoefficients.getAutonomousTurnSpeed(), 180);
+            drive.turnByIMU(SpeedCoefficients.getAutonomousTurnSpeed(), turnDegrees);
             while (opModeIsActive() && !gamepad1.triangle);
             // left 1000√2 ticks
-            drive.turnByIMU(SpeedCoefficients.getAutonomousTurnSpeed(), -180);
+            drive.turnByIMU(SpeedCoefficients.getAutonomousTurnSpeed(), -turnDegrees);
             while (opModeIsActive() && !gamepad1.triangle);
         }
 

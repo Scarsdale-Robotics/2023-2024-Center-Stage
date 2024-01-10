@@ -21,7 +21,7 @@ public class AutoFunctionsTest extends LinearOpMode {
     // The "Main" code will go in here
     public void runOpMode() {
         RobotSystem robot = new RobotSystem(hardwareMap, false, this, telemetry);
-        robot.getInDep().close();
+        inDep = robot.getInDep();
         drive = robot.getDrive();
         runtime.reset();
         inDep.close();
@@ -30,10 +30,10 @@ public class AutoFunctionsTest extends LinearOpMode {
 
         // build a MovementSequence here
         MovementSequence testSequence = new MovementSequenceBuilder()
-                .forward(12)
-                .backward(12)
-                .left(12)
-                .right(12)
+                .forward(30)
+                .backward(30)
+                .left(30)
+                .right(30)
                 .openBothClaws()
                 .sleepFor(500)
                 .closeBothClaws()

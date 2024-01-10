@@ -17,6 +17,8 @@ public class Movement {
         OPEN_LEFT_CLAW(0.0,0.0,0.0,0.0, false, false, true, false, false),
         CLOSE_RIGHT_CLAW(0.0,0.0,0.0,0.0, false, false, true, false, false),
         OPEN_RIGHT_CLAW(0.0,0.0,0.0,0.0, false, false, true, false, false),
+        REST_ELBOW(0.0,0.0,0.0,0.0, false, false, false, false, false),
+        FLIP_ELBOW(0.0,0.0,0.0,0.0, false, false, false, false, false),
         LOWER_ARM(0.0,0.0,0.0,-1.0, false, false, false, true, false),
         RAISE_ARM(0.0,0.0,0.0,1.0, false, false, false, true, false),
         WHITE_PXL_ALIGN(1.0, 1.0, 1.0, 0.0, false, false, false, false, true),

@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes.calibration;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
@@ -133,8 +132,8 @@ public class Televerything extends LinearOpMode {
             telemetry.addData("elbow.getPosition: ", inDep.getElbowPosition());
             telemetry.addData("leftClaw.getPosition: ", inDep.getLeftClawPosition());
             telemetry.addData("rightClaw.getPosition: ", inDep.getRightClawPosition());
-            telemetry.addData("arm.getCurrentPosition:", inDep.getArmPosition());
-            telemetry.addData("arm.getPower: ", inDep.getArmVelocity());
+            telemetry.addData("arm.getCurrentPosition:", inDep.getLeftArmPosition());
+            telemetry.addData("arm.getPower: ", inDep.getLeftArmVelocity());
             telemetry.addData("cvDist:", cvDist);
             telemetry.addData("rotOff: ",cvBack.getAprilTagRotationalOffset(isRedTeam ? 5 : 2));
 

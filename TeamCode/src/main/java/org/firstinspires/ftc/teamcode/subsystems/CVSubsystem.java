@@ -8,7 +8,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelGroupDetectionProcessor;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
+import org.opencv.core.Point;
 import org.openftc.easyopencv.OpenCvCamera;
 
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -21,8 +23,11 @@ import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.WhitePixelDetection
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class CVSubsystem extends SubsystemBase {
@@ -49,8 +54,15 @@ public class CVSubsystem extends SubsystemBase {
     private PropDetectionPipeline propProcessor;
     private PixelDetectionPipeline pixelProcessor;
     private WhitePixelDetectionPipeline whitePixelProcessor;
+    private PixelGroupDetectionProcessor pixelGroupProcessor;
     private boolean isRedTeam;
     private LinearOpMode opMode;
+    private static final double[][] APRIL_TAG_LOCATIONS = new double[][]{
+            {1.25, 0.5}, {1.5, 0.5}, {1.75, 0.5},
+            {4.25, 0.5}, {4.5, 0.5}, {4.75, 0.5},
+            {4.75, 6}  , {4.5, 6}  ,
+            {1.25, 6}  , {1.5, 6}
+    };
     public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
 //        tdp = new TapeDetectionPipeline();
 //        camera.setPipeline(tdp);
@@ -61,6 +73,7 @@ public class CVSubsystem extends SubsystemBase {
         this.isRedTeam = isRedTeam;
         this.opMode = opMode;
         runtime.reset();
+
         // create AprilTagProcessor and VisionPortal
         initAprilTag();
 
@@ -115,7 +128,7 @@ public class CVSubsystem extends SubsystemBase {
         // Set and enable the processor.
         builder.addProcessor(aprilTag);
         builder.addProcessor(pixelProcessor);
-        builder.addProcessor(propProcessor);
+        builder.addProcessors(propProcessor, pixelGroupProcessor);
 //        builder.addProcessors(aprilTag, pixelProcessor, propProcessor);
 
         // Build the Vision Portal, using the above settings.
@@ -286,6 +299,44 @@ public class CVSubsystem extends SubsystemBase {
         return tagDistance;
     }
 
+    private double[] lastKnownPos = POSITION_UNKNOWN;
+    public static final double[] POSITION_UNKNOWN = new double[]{-1, -1, -1};
+    /**
+     * returns the x,y,rotation position of the center of the robot based on apriltag positions in tiles. blue-backdrop corner is considered 0,0.
+     * facing backdrop is zero rotation, right is more rotation
+     * offset params are positive towards the direction the camera is facing. the camera is assumed to be facing either "robot-forward" or "robot-backward"
+     */
+    public double[] getPosition(double cameraCenterOffsetX, double cameraCenterOffsetY) {
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        if (currentDetections.size() == 0) return lastKnownPos;
+        ArrayList<Double> xEst   = new ArrayList<>();
+        ArrayList<Double> yEst   = new ArrayList<>();
+        ArrayList<Double> rotEst = new ArrayList<>();
+        for (AprilTagDetection detection : currentDetections) {
+            double rotOff = (detection.ftcPose.x > 0 ? 1 : -1) * detection.ftcPose.yaw;
+            // 24 inches per tile
+            double xOff   = (Math.cos(detection.ftcPose.bearing - detection.ftcPose.yaw) * detection.ftcPose.range) / 24 - cameraCenterOffsetX;
+            double yOff   = (Math.sin(detection.ftcPose.bearing - detection.ftcPose.yaw) * detection.ftcPose.range) / 24 - cameraCenterOffsetY;
+            if (detection.id < 7) {
+                xEst.add(APRIL_TAG_LOCATIONS[detection.id][0] + yOff);
+                yEst.add(APRIL_TAG_LOCATIONS[detection.id][1] + xOff);
+                rotEst.add(rotOff);
+            } else {
+                xEst.add(APRIL_TAG_LOCATIONS[detection.id][0] - yOff);
+                yEst.add(APRIL_TAG_LOCATIONS[detection.id][1] - xOff);
+                rotEst.add(rotOff + 180);
+            }
+        }
+        Collections.sort(xEst);
+        Collections.sort(yEst);
+        Collections.sort(rotEst);
+        double xMed   = xEst.get(xEst.size() / 2);
+        double yMed   = yEst.get(xEst.size() / 2);
+        double rotMed = rotEst.get(xEst.size() / 2);
+        lastKnownPos = new double[]{xMed, yMed, rotMed};
+        return lastKnownPos;
+    }
+
     public void moveToPixel() {
         double ERROR_THRESHOLD = 50;
 
@@ -310,6 +361,20 @@ public class CVSubsystem extends SubsystemBase {
             drive.driveRobotCentric(Math.max(DIAM_THRESHOLD, pixelDiam) / DIAM_THRESHOLD, Math.min(HORIZ_THRESHOLD, pixelOffset) / HORIZ_THRESHOLD, 0);
             pixelOffset = getWhitePixelHorizontalOffset();
             pixelDiam = getWhitePixelDiameterPx();
+        }
+    }
+
+    public void moveToPixels() {
+        int width = getCameraWidth();
+        double HORIZ_THRESHOLD = width / 11.1;
+        double DIST_THRESHOLD = width / 4.0;
+        Point p = pixelGroupProcessor.getPixelsCenter();
+        double pixelOffset = p.x;
+        double pixelDist = p.y;
+        while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDist) < DIST_THRESHOLD && opMode.opModeIsActive()) {
+            drive.driveRobotCentric(Math.max(DIST_THRESHOLD, pixelDist) / DIST_THRESHOLD, Math.min(HORIZ_THRESHOLD, pixelOffset) / HORIZ_THRESHOLD, 0);
+            pixelOffset = getWhitePixelHorizontalOffset();
+            pixelDist = getWhitePixelDiameterPx();
         }
     }
 
