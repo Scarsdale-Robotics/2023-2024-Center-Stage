@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementThread;
 import org.firstinspires.ftc.teamcode.subsystems.movement.Movement;
@@ -31,14 +31,14 @@ public class DriveSubsystem extends SubsystemBase {
     private final Motor rightFront;
     private final Motor leftBack;
     private final Motor rightBack;
-    private MultipleTelemetry telemetry;
+    private Telemetry telemetry;
     public double theta;
 
     public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, IMU imu, LinearOpMode opMode) {
         this(leftFront, rightFront, leftBack, rightBack, imu, opMode, null);
     }
 
-    public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, IMU imu, LinearOpMode opMode, MultipleTelemetry telemetry) {
+    public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, IMU imu, LinearOpMode opMode, Telemetry telemetry) {
         this.rightBack = rightBack;
         this.leftBack = leftBack;
         this.rightFront = rightFront;

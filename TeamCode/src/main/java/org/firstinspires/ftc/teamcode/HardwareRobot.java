@@ -106,14 +106,12 @@ public class HardwareRobot {
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
-        frontCamName = null;
-        frontCam = null;
 
-        backCamName = null;
-        backCam = null;
+        backCamName = hardwareMap.get(WebcamName.class, "Webcam Back");
+        backCam = OpenCvCameraFactory.getInstance().createWebcam(backCamName);
 
-//        frontCamName = hardwareMap.get(WebcamName.class, "Webcam Front");
-//        frontCam = OpenCvCameraFactory.getInstance().createWebcam(frontCamName);
+        frontCamName = hardwareMap.get(WebcamName.class, "Webcam Front");
+        frontCam = OpenCvCameraFactory.getInstance().createWebcam(frontCamName);
 //
 //        backCamName = hardwareMap.get(WebcamName.class, "Webcam Back");
 //        backCam = OpenCvCameraFactory.getInstance().createWebcam(backCamName);

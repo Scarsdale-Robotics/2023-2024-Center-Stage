@@ -24,10 +24,8 @@ import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.WhitePixelDetection
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class CVSubsystem extends SubsystemBase {
@@ -364,6 +362,10 @@ public class CVSubsystem extends SubsystemBase {
         }
     }
 
+    public Point getPixelsCenter() {
+
+        return pixelGroupProcessor.getPixelsCenter();
+    }
     public void moveToPixels() {
         int width = getCameraWidth();
         double HORIZ_THRESHOLD = width / 11.1;
