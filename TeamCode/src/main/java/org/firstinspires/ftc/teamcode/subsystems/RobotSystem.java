@@ -37,18 +37,18 @@ public class RobotSystem {
                 opMode,
                 new MultipleTelemetry(telemetry)
         );
-//        cvFront = new CVSubsystem(hardwareRobot.frontCam,
-//                hardwareRobot.frontCamName,
-//                drive,
-//                telemetry,
-//                isRedTeam,
-//                opMode);
-//        cvBack = new CVSubsystem(hardwareRobot.backCam,
-//                hardwareRobot.backCamName,
-//                drive,
-//                telemetry,
-//                isRedTeam,
-//                opMode);
+        cvFront = new CVSubsystem(hardwareRobot.frontCam,
+                hardwareRobot.frontCamName,
+                drive,
+                telemetry,
+                isRedTeam,
+                opMode);
+        cvBack = new CVSubsystem(hardwareRobot.backCam,
+                hardwareRobot.backCamName,
+                drive,
+                telemetry,
+                isRedTeam,
+                opMode);
         MovementThread.initSubsystems(drive, inDep, cvFront, cvBack, opMode);
     }
 

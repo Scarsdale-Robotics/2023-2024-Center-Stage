@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 
 @Autonomous(name = "temp nathan")
 public class nathan extends LinearOpMode {
@@ -13,25 +14,16 @@ public class nathan extends LinearOpMode {
     @Override
     // The "Main" code will go in here
     public void runOpMode() {
-        HardwareRobot robot = new HardwareRobot(hardwareMap);
-        DriveSubsystem drive = new DriveSubsystem(
-                robot.leftFront,
-                robot.rightFront,
-                robot.leftBack,
-                robot.rightBack,
-                robot.imu,
-                this
-        );
-        CVSubsystem cv = new CVSubsystem(robot.frontCam, robot.frontCamName, drive, telemetry, false, this);
+        RobotSystem robot = new RobotSystem(hardwareMap, true, this, telemetry);
 
         waitForStart();
 
         telemetry.addData("team prop loc: ", "---");
         telemetry.update();
         while (opModeIsActive()) {
-            cv.moveToPixels();
-            telemetry.addData("sdjfl;asdf", cv.getPixelsCenter().x);
-            telemetry.addData("sdjfl;asdfy", cv.getPixelsCenter().y);
+            robot.getCVFront().moveToPixels();
+            telemetry.addData("sdjfl;asdf", robot.getCVFront().getPixelsCenter().x);
+            telemetry.addData("sdjfl;asdfy", robot.getCVFront().getPixelsCenter().y);
             telemetry.update();
         }
 

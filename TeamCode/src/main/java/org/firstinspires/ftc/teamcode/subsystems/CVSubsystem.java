@@ -107,7 +107,8 @@ public class CVSubsystem extends SubsystemBase {
         aprilTag = new AprilTagProcessor.Builder()
                 .setDrawTagOutline(true)
                 .build();
-
+        whitePixelProcessor = new WhitePixelDetectionPipeline();
+        pixelGroupProcessor = new PixelGroupDetectionProcessor();
         // to modify, look for the specs in ConceptAprilTag.java:
         //.setDrawAxes(false)
         //.setDrawCubeProjection(false)
