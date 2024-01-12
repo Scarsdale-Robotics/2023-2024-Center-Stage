@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
@@ -16,7 +17,7 @@ public class TeleOpUtil {
     public DriveSubsystem drive;
     public InDepSubsystem inDep;
 //    public CVSubsystem cvFront;
-//    public CVSubsystem cvBack;
+    public CVSubsystem cvBack;
     private final boolean isRedTeam;
     private final Gamepad gamepad1;
     private final Gamepad gamepad2;
@@ -45,7 +46,7 @@ public class TeleOpUtil {
         RobotSystem robot = new RobotSystem(hardwareMap, isRedTeam, opMode, telemetry);
         drive = robot.getDrive();
 //        cvFront = robot.getCVFront();
-//        cvBack = robot.getCVBack();
+        cvBack = robot.getCVBack();
         this.isRedTeam = isRedTeam;
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
@@ -196,17 +197,16 @@ public class TeleOpUtil {
 
     public void tick() {
         double DISTANCE_BEFORE_BACKBOARD = 45;  // TEMP
-//        double cvDist = cvBack.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
-//        telemetry.addData("cvDist:", cvDist);
+        double cvDist = cvBack.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
+        telemetry.addData("cvDist:", cvDist);
         telemetry.addData("arm pos:", inDep.getLeftArmPosition());
         telemetry.addData("claw open:", inDep.getIsLeftClawOpen());
         telemetry.addData("пуяза 你好何余安 ???", "θωθ");
         telemetry.update();
         runMotionControl();
         runArmClawControl();
-//        if (!gamepad2.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsLeftClawOpen()) {
-        if (!gamepad2.x && !inDep.getIsLeftClawOpen()) {
-//            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
+        if (!gamepad2.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsLeftClawOpen() && !inDep.getIsRightClawOpen()) {
+            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
         } else if (gamepad2.x) {
             gamepad1.rumble(500);
             gamepad2.rumble(500);

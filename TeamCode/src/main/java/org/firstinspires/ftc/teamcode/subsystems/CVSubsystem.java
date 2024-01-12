@@ -304,25 +304,26 @@ public class CVSubsystem extends SubsystemBase {
      * facing backdrop is zero rotation, right is more rotation
      * offset params are positive towards the direction the camera is facing. the camera is assumed to be facing either "robot-forward" or "robot-backward"
      */
-    public double[] getPosition(double cameraCenterOffsetX, double cameraCenterOffsetY) {
+    public double[] getPosition(double cameraCenterOffsetX, double cameraCenterOffsetY) { // of apriltags
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         if (currentDetections.size() == 0) return lastKnownPos;
-        ArrayList<Double> xEst   = new ArrayList<>();
+        ArrayList<Double> xEst   = new ArrayList<>(); //estimated x positions based on aprilTag
         ArrayList<Double> yEst   = new ArrayList<>();
         ArrayList<Double> rotEst = new ArrayList<>();
         for (AprilTagDetection detection : currentDetections) {
             double rotOff = (detection.ftcPose.x > 0 ? 1 : -1) * detection.ftcPose.yaw;
             // 24 inches per tile
-            double xOff   = (Math.cos(detection.ftcPose.bearing - detection.ftcPose.yaw) * detection.ftcPose.range) / 24 - cameraCenterOffsetX;
-            double yOff   = (Math.sin(detection.ftcPose.bearing - detection.ftcPose.yaw) * detection.ftcPose.range) / 24 - cameraCenterOffsetY;
+            double xOff   = (Math.sin(detection.ftcPose.bearing - detection.ftcPose.yaw) * detection.ftcPose.range) / 24 - cameraCenterOffsetX;
+            double yOff   = (Math.cos(detection.ftcPose.bearing - detection.ftcPose.yaw) * detection.ftcPose.range) / 24 - cameraCenterOffsetY;
+            // yes, x is sin and y is cos. Think physics Fg free body diagrams
             if (detection.id < 7) {
                 xEst.add(APRIL_TAG_LOCATIONS[detection.id][0] + yOff);
                 yEst.add(APRIL_TAG_LOCATIONS[detection.id][1] + xOff);
-                rotEst.add(rotOff);
+                rotEst.add((rotOff + 360) % 360);
             } else {
                 xEst.add(APRIL_TAG_LOCATIONS[detection.id][0] - yOff);
                 yEst.add(APRIL_TAG_LOCATIONS[detection.id][1] - xOff);
-                rotEst.add(rotOff + 180);
+                rotEst.add((rotOff + 540) % 360);
             }
         }
         Collections.sort(xEst);
@@ -332,6 +333,7 @@ public class CVSubsystem extends SubsystemBase {
         double yMed   = yEst.get(xEst.size() / 2);
         double rotMed = rotEst.get(xEst.size() / 2);
         lastKnownPos = new double[]{xMed, yMed, rotMed};
+        //xMed, yMed is in term of number of tiles
         return lastKnownPos;
     }
 
@@ -378,6 +380,11 @@ public class CVSubsystem extends SubsystemBase {
             pixelOffset = getWhitePixelHorizontalOffset();
             pixelDist = getWhitePixelDiameterPx();
         }
+    }
+
+    public void correctPositionAprilTag(int targetx, int targety) {
+        double[] currentPos = getPosition(99, 99);
+        drive.driveRobotCentric(currentPos[0], currentPos[1], currentPos[2]);
     }
 
     public void moveToAprilTag(int tagID) {

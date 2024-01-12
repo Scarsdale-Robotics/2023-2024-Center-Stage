@@ -276,20 +276,16 @@ public class InDepSubsystem extends SubsystemBase {
      * Opens both claws.
      */
     public void open() {
-        leftClaw.setPosition(EndEffector.LEFT_CLAW_OPEN.servoPosition);
-        rightClaw.setPosition(EndEffector.RIGHT_CLAW_OPEN.servoPosition);
-        isLeftClawOpen = true;
-        isRightClawOpen = true;
+        openLeft();
+        openRight();
     }
 
     /**
      * Closes both claws.
      */
     public void close() {
-        leftClaw.setPosition(EndEffector.LEFT_CLAW_CLOSED.servoPosition);
-        rightClaw.setPosition(EndEffector.RIGHT_CLAW_CLOSED.servoPosition);
-        isLeftClawOpen = false;
-        isRightClawOpen = false;
+        closeLeft();
+        closeRight();
     }
 
     /**
@@ -298,6 +294,7 @@ public class InDepSubsystem extends SubsystemBase {
     public void openLeft() {
         leftClaw.setPosition(EndEffector.LEFT_CLAW_OPEN.servoPosition);
         isLeftClawOpen = true;
+        SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
     }
 
     /**
@@ -306,6 +303,7 @@ public class InDepSubsystem extends SubsystemBase {
     public void openRight() {
         rightClaw.setPosition(EndEffector.RIGHT_CLAW_OPEN.servoPosition);
         isRightClawOpen = true;
+        SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
     }
 
     /**
