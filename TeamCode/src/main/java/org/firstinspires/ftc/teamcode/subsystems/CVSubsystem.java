@@ -118,7 +118,11 @@ public class CVSubsystem extends SubsystemBase {
         builder.setCamera(cameraName);
         builder.setAutoStopLiveView(false); // keep camera on when not processing
 
-        builder.setCameraResolution(new Size(640, 480)); // android.util
+        builder.setCameraResolution(new Size(176, 144)); // android.util
+//        builder.setCameraResolution(new Size(320, 240)); // android.util
+//        builder.setCameraResolution(new Size(640, 480)); // android.util
+//        builder.setCameraResolution(new Size(960, 540)); // android.util
+//        builder.setCameraResolution(new Size(1280, 720)); // android.util
 
         // Set and enable the processor.
         builder.addProcessor(aprilTag);
