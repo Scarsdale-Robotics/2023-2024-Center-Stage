@@ -313,8 +313,8 @@ public class CVSubsystem extends SubsystemBase {
         for (AprilTagDetection detection : currentDetections) {
             double rotOff = (detection.ftcPose.x > 0 ? 1 : -1) * detection.ftcPose.yaw;
             // 24 inches per tile
-            double xOff   = (Math.cos(detection.ftcPose.bearing - detection.ftcPose.yaw) * detection.ftcPose.range) / 24 - cameraCenterOffsetX;
-            double yOff   = (Math.sin(detection.ftcPose.bearing - detection.ftcPose.yaw) * detection.ftcPose.range) / 24 - cameraCenterOffsetY;
+            double xOff   = (Math.toDegrees(Math.sin(Math.toRadians(detection.ftcPose.bearing - detection.ftcPose.yaw))) * detection.ftcPose.range) / 24 - cameraCenterOffsetX;
+            double yOff   = (Math.toDegrees(Math.cos(Math.toRadians(detection.ftcPose.bearing - detection.ftcPose.yaw))) * detection.ftcPose.range) / 24 - cameraCenterOffsetY;
             if (detection.id < 7) {
                 xEst.add(APRIL_TAG_LOCATIONS[detection.id][0] + yOff);
                 yEst.add(APRIL_TAG_LOCATIONS[detection.id][1] + xOff);
@@ -333,6 +333,49 @@ public class CVSubsystem extends SubsystemBase {
         double rotMed = rotEst.get(xEst.size() / 2);
         lastKnownPos = new double[]{xMed, yMed, rotMed};
         return lastKnownPos;
+    }
+
+    public double AngleDifference( double angle1, double angle2 )
+    {
+        double diff = ( angle2 - angle1 + 180 ) % 360 - 180;
+        return diff;
+    }
+
+    public void goToPosition(double cameraCenterOffsetX, double cameraCenterOffsetY, double[] targetPos, boolean isRedTeam){
+        lastKnownPos = getPosition(cameraCenterOffsetX, cameraCenterOffsetY);
+        double xOffset = lastKnownPos[0]-targetPos[0];
+        double yOffset = lastKnownPos[1]-targetPos[1];
+        double angleOffset = AngleDifference(lastKnownPos[2],targetPos[2]);
+        double xyOffsetThreshold = 0.1;
+        double angleOffsetThreshold = 5;
+        int teamValue = isRedTeam ? -1 : 1;
+
+        while (true){
+            if (Math.abs(xOffset)<xyOffsetThreshold){
+                if (xOffset<0 ) { // need to move right
+                    drive.driveFieldCentric(0 ,1 * teamValue * SpeedCoefficients.getStrafeSpeed(),  0);
+                }else {
+                    drive.driveFieldCentric(0, -1 * teamValue * SpeedCoefficients.getStrafeSpeed(),  0);
+                }
+            }
+            if (Math.abs(yOffset)<xyOffsetThreshold){
+                if (yOffset<0) { // need to  down
+                    drive.driveRobotCentric( 1 *teamValue* SpeedCoefficients.getStrafeSpeed(), 0,0);
+                }else {
+                    drive.driveRobotCentric( -1 * teamValue* SpeedCoefficients.getStrafeSpeed(), 0,0);
+                }
+            }
+            if (Math.abs(angleOffset)<angleOffsetThreshold){
+                // need to turn left
+                if (angleOffset<0) {
+                    drive.driveRobotCentric( -1 * teamValue* SpeedCoefficients.getStrafeSpeed() * 0, 0,SpeedCoefficients.getTurnSpeed());
+                }else{
+                    drive.driveRobotCentric( -1 * teamValue* SpeedCoefficients.getStrafeSpeed() * 0, 0,SpeedCoefficients.getTurnSpeed() * -1);
+
+                }
+            }
+        }
+
     }
 
     public void moveToPixel() {
