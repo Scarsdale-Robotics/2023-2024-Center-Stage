@@ -295,7 +295,7 @@ public class DriveSubsystem extends SubsystemBase {
 
             // fetch all linked movements
             boolean linked = true;
-            while (!movements.isEmpty() && linked) {
+            while (!movements.isEmpty() && linked && opMode.opModeIsActive()) {
                 Movement movement = movements.removeFirst();
                 linked = movement.linkedToNext;
                 MovementThread thread = new MovementThread(movement);
@@ -305,7 +305,7 @@ public class DriveSubsystem extends SubsystemBase {
 
             // wait until all linked movements are completed
             boolean running = true;
-            while (opMode.opModeIsActive() && running) {
+            while (opMode.opModeIsActive() && running && opMode.opModeIsActive()) {
                 running = false;
                 for (Future<?> status : threadStatus)
                     running = !status.isDone() || running; // running is only false if all threads are inactive

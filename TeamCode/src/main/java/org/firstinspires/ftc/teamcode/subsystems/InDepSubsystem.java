@@ -31,9 +31,9 @@ public class InDepSubsystem extends SubsystemBase {
 
     public enum Level {
         GROUND(0, 0.23, false),
-        BACKBOARD_HIGH(5083,0.32, true),
-        BACKBOARD_MID(7492,0.275, true), // tuned values
-        BACKBOARD_LOW(8250, 0.17, true);
+        BACKBOARD_HIGH(5083,0.31, true),
+        BACKBOARD_MID(7492,0.265, true), // tuned values
+        BACKBOARD_LOW(8250, 0.165, true);
 
         public final int target;
         public final double wristTarget;
@@ -294,7 +294,9 @@ public class InDepSubsystem extends SubsystemBase {
     public void openLeft() {
         leftClaw.setPosition(EndEffector.LEFT_CLAW_OPEN.servoPosition);
         isLeftClawOpen = true;
-        SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+        if (isRightClawOpen) {
+            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+        }
     }
 
     /**
@@ -303,7 +305,9 @@ public class InDepSubsystem extends SubsystemBase {
     public void openRight() {
         rightClaw.setPosition(EndEffector.RIGHT_CLAW_OPEN.servoPosition);
         isRightClawOpen = true;
-        SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+        if (isLeftClawOpen) {
+            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+        }
     }
 
     /**

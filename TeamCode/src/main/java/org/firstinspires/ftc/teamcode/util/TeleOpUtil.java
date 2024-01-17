@@ -146,7 +146,7 @@ public class TeleOpUtil {
         if (vsn == 0) vs = Math.abs(vs) < 0.001 ? 0 : (vsn * MOMENTUM_FACTOR + vs * (1-MOMENTUM_FACTOR)); else vs = vsn;
         if (vfn == 0) vf = Math.abs(vf) < 0.001 ? 0 : (vfn * MOMENTUM_FACTOR + vf * (1-MOMENTUM_FACTOR)); else vf = vfn;
         if (vtn == 0) vt = Math.abs(vt) < 0.001 ? 0 : (vtn * MOMENTUM_FACTOR + vt * (1-MOMENTUM_FACTOR)); else vt = vtn;  // could add a constant here to adjust for unintended turns
-        drive.driveRobotCentric(vs, vf, vt);
+        drive.driveFieldCentric(vs, vf, vt);
     }
 
     /**
@@ -202,15 +202,18 @@ public class TeleOpUtil {
         telemetry.addData("arm pos:", inDep.getLeftArmPosition());
         telemetry.addData("claw open:", inDep.getIsLeftClawOpen());
         telemetry.addData("пуяза 你好何余安 ???", "θωθ");
+        telemetry.addData("LOC X", cvBack.getPosition(0, 0)[0]);
+        telemetry.addData("LOC Y", cvBack.getPosition(0, 0)[1]);
         telemetry.update();
         runMotionControl();
         runArmClawControl();
-        if (!gamepad2.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsLeftClawOpen() && !inDep.getIsRightClawOpen()) {
+        if (!gamepad2.x && cvDist < DISTANCE_BEFORE_BACKBOARD && (!inDep.getIsLeftClawOpen() || !inDep.getIsRightClawOpen())) {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
         } else if (gamepad2.x) {
             gamepad1.rumble(500);
             gamepad2.rumble(500);
         }
+
 
 //        runAprilTagParallelAlignControl();
 //             teamPropLocationControl();

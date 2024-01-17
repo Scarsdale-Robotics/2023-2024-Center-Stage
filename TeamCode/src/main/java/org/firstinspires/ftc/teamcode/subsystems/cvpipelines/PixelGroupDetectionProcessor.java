@@ -86,10 +86,10 @@ public class PixelGroupDetectionProcessor implements VisionProcessor {
 
     @Override
     public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
-        Paint p = new Paint();
-        p.setColor(Color.BLUE);
-        p.setStrokeWidth(4);
-        canvas.drawCircle((float) getPixelsCenter().x, (float) getPixelsCenter().y, 0, p);
-        canvas.drawCircle((float) getPixelsCenter().x, (float) getPixelsCenter().y, 6, p);
+//        Paint p = new Paint();
+//        p.setColor(Color.BLUE);
+//        p.setStrokeWidth(4);
+//        canvas.drawCircle((float) getPixelsCenter().x, (float) getPixelsCenter().y, 0, p);
+//        canvas.drawCircle((float) getPixelsCenter().x, (float) getPixelsCenter().y, 6, p);
     }
 }
