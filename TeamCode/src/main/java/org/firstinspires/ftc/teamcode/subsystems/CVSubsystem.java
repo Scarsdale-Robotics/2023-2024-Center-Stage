@@ -139,7 +139,12 @@ public class CVSubsystem extends SubsystemBase {
 
         // Disable or re-enable the aprilTag processor at any time.
         // visionPortal.setProcessorEnabled(aprilTag, true);
+        visionPortal.setProcessorEnabled(propProcessor, false);
 
+    }
+
+    public void disablePropProcessor() {
+        visionPortal.setProcessorEnabled(propProcessor, false);
     }
 
     public void close() {
@@ -361,6 +366,7 @@ public class CVSubsystem extends SubsystemBase {
     }
 
     public void moveToWhitePixel() {
+        // TODO: RECODE
         int width = getCameraWidth();
         double HORIZ_THRESHOLD = width / 11.1;
         double DIAM_THRESHOLD = width / 4.0;
@@ -374,21 +380,41 @@ public class CVSubsystem extends SubsystemBase {
     }
 
     public Point getPixelsCenter() {
-
-        return pixelGroupProcessor.getPixelsCenter();
+        visionPortal.setProcessorEnabled(propProcessor, true);
+        // do-while used bc idk if we will immediately get results, we'll have to
+        // wait a frame interval before pixels center returns actual results
+        // do-while also cancels bad results
+        // maybe make this do while (and future ones) async?
+        Point c;
+        do {
+            c = pixelGroupProcessor.getPixelsCenter();
+        }
+        while (opMode.opModeIsActive() && !c.equals(new Point(0, 0)));
+        visionPortal.setProcessorEnabled(propProcessor, false);
+        return c;
     }
+
+    // TODO: CONSIDER REMOVING IN FAVOR OF APRILTAG ALIGNMENT AND JUST HUMAN PLAYER PLACING PIXELS IN SAME SPOTS
     public void moveToPixels() {
+        visionPortal.setProcessorEnabled(propProcessor, true);
         int width = getCameraWidth();
         double HORIZ_THRESHOLD = width / 11.1;
         double DIST_THRESHOLD = width / 4.0;
-        Point p = pixelGroupProcessor.getPixelsCenter();
+        // same comments regarding do-while as in getPixelsCenter()
+        Point p;
+        do {
+            p = pixelGroupProcessor.getPixelsCenter();
+        }
+        while (opMode.opModeIsActive() && !p.equals(new Point(0, 0)));
         double pixelOffset = p.x;
         double pixelDist = p.y;
+        // TODO: NEED MUCH TUNING
         while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDist) < DIST_THRESHOLD && opMode.opModeIsActive()) {
             drive.driveRobotCentric(Math.max(DIST_THRESHOLD, pixelDist) / DIST_THRESHOLD, Math.min(HORIZ_THRESHOLD, pixelOffset) / HORIZ_THRESHOLD, 0);
-            pixelOffset = getWhitePixelHorizontalOffset();
-            pixelDist = getWhitePixelDiameterPx();
+            pixelOffset = pixelGroupProcessor.getPixelsCenter().x;
+            pixelDist = pixelGroupProcessor.getPixelsCenter().y;
         }
+        visionPortal.setProcessorEnabled(propProcessor, false);
     }
 
     public void correctPositionAprilTag(int targetx, int targety) {

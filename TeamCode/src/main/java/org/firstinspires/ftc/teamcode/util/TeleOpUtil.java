@@ -47,6 +47,8 @@ public class TeleOpUtil {
         drive = robot.getDrive();
         cvFront = robot.getCVFront();
         cvBack = robot.getCVBack();
+        cvFront.disablePropProcessor();
+        cvBack.disablePropProcessor();
         this.isRedTeam = isRedTeam;
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
