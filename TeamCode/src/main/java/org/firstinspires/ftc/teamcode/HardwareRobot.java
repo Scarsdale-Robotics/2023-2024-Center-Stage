@@ -112,9 +112,6 @@ public class HardwareRobot {
 
         frontCamName = hardwareMap.get(WebcamName.class, "Webcam Front");
         frontCam = OpenCvCameraFactory.getInstance().createWebcam(frontCamName);
-//
-//        backCamName = hardwareMap.get(WebcamName.class, "Webcam Back");
-//        backCam = OpenCvCameraFactory.getInstance().createWebcam(backCamName);
     }
 
     public double getYaw() {

@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilde
 public class TeleOpUtil {
     public DriveSubsystem drive;
     public InDepSubsystem inDep;
-//    public CVSubsystem cvFront;
+    public CVSubsystem cvFront;
     public CVSubsystem cvBack;
     private final boolean isRedTeam;
     private final Gamepad gamepad1;
@@ -45,7 +45,7 @@ public class TeleOpUtil {
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
         RobotSystem robot = new RobotSystem(hardwareMap, isRedTeam, opMode, telemetry);
         drive = robot.getDrive();
-//        cvFront = robot.getCVFront();
+        cvFront = robot.getCVFront();
         cvBack = robot.getCVBack();
         this.isRedTeam = isRedTeam;
         this.gamepad1 = gamepad1;
@@ -193,6 +193,11 @@ public class TeleOpUtil {
             gamepad1.rumble(500);
             gamepad2.rumble(500);
         }
+    }
+
+    public void end() {
+        cvBack.close();
+        cvFront.close();
     }
 
     public void tick() {

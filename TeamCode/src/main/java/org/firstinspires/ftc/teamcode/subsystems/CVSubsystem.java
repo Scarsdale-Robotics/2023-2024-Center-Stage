@@ -17,9 +17,6 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PropDetectionPipeline;
-import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelDetectionPipeline;
-
-import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.WhitePixelDetectionPipeline;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -125,9 +122,8 @@ public class CVSubsystem extends SubsystemBase {
 //        builder.setCameraResolution(new Size(1280, 720)); // android.util
 
         // Set and enable the processor.
-        builder.addProcessor(aprilTag);
-        builder.addProcessors(propProcessor);
-        builder.addProcessors(pixelGroupProcessor);
+        // TODO: DISABLE PROPPROCESSOR FOR TELEOP
+        builder.addProcessors(aprilTag, propProcessor, pixelGroupProcessor);
 
 
         //builder.addProcessors(propProcessor, pixelGroupProcessor);
@@ -139,6 +135,10 @@ public class CVSubsystem extends SubsystemBase {
         // Disable or re-enable the aprilTag processor at any time.
         // visionPortal.setProcessorEnabled(aprilTag, true);
 
+    }
+
+    public void close() {
+        visionPortal.close();
     }
 
     /**

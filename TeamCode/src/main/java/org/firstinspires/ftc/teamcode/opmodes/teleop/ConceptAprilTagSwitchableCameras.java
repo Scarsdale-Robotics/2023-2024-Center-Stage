@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -50,7 +50,6 @@ import java.util.List;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
 @TeleOp(name = "Concept: AprilTag Switchable Cameras", group = "Concept")
-@Disabled
 public class ConceptAprilTagSwitchableCameras extends LinearOpMode {
 
     /*
@@ -117,8 +116,8 @@ public class ConceptAprilTagSwitchableCameras extends LinearOpMode {
         // Create the AprilTag processor by using a builder.
         aprilTag = new AprilTagProcessor.Builder().build();
 
-        webcam1 = hardwareMap.get(WebcamName.class, "Webcam 1");
-        webcam2 = hardwareMap.get(WebcamName.class, "Webcam 2");
+        webcam1 = hardwareMap.get(WebcamName.class, "Webcam Back");
+        webcam2 = hardwareMap.get(WebcamName.class, "Webcam Front");
         CameraName switchableCamera = ClassFactory.getInstance()
             .getCameraManager().nameForSwitchableCamera(webcam1, webcam2);
 
@@ -178,8 +177,8 @@ public class ConceptAprilTagSwitchableCameras extends LinearOpMode {
      */
     private void doCameraSwitching() {
         if (visionPortal.getCameraState() == CameraState.STREAMING) {
-            // If the left bumper is pressed, use Webcam 1.
-            // If the right bumper is pressed, use Webcam 2.
+            // If the left bumper is pressed, use Webcam Back.
+            // If the right bumper is pressed, use Webcam Front.
             boolean newLeftBumper = gamepad1.left_bumper;
             boolean newRightBumper = gamepad1.right_bumper;
             if (newLeftBumper && !oldLeftBumper) {
