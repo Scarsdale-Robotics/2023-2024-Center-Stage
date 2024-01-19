@@ -56,6 +56,11 @@ public class CVSubsystem extends SubsystemBase {
             {4.75, 6}  , {4.5, 6}  ,
             {1.25, 6}  , {1.5, 6}
     };
+
+    public CVSubsystem(WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
+        this(null, cameraName,drive,telemetry,isRedTeam,opMode);
+    }
+
     public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
 //        tdp = new TapeDetectionPipeline();
 //        camera.setPipeline(tdp);
@@ -113,7 +118,7 @@ public class CVSubsystem extends SubsystemBase {
         VisionPortal.Builder builder = new VisionPortal.Builder();
 
         builder.setCamera(cameraName);
-        builder.setAutoStopLiveView(false); // keep camera on when not processing
+        // builder.setAutoStopLiveView(false); // keep camera on when not processing
 
         builder.setCameraResolution(new Size(176, 144)); // android.util
 //        builder.setCameraResolution(new Size(320, 240)); // android.util

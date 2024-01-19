@@ -37,13 +37,13 @@ public class RobotSystem {
                 opMode,
                 new MultipleTelemetry(telemetry)
         );
-        cvFront = new CVSubsystem(hardwareRobot.frontCam,
+        cvFront = new CVSubsystem(
                 hardwareRobot.frontCamName,
                 drive,
                 telemetry,
                 isRedTeam,
                 opMode);
-        cvBack = new CVSubsystem(hardwareRobot.backCam,
+        cvBack = new CVSubsystem(
                 hardwareRobot.backCamName,
                 drive,
                 telemetry,

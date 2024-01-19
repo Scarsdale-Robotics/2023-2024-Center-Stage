@@ -10,6 +10,7 @@ public class DriveTeleOpBlue extends LinearOpMode {
     @Override
     public void runOpMode() {
         TeleOpUtil teleOp = new TeleOpUtil(hardwareMap, telemetry, false, gamepad1, gamepad2, this);
+
         waitForStart();
 
         if (opModeIsActive()) {
@@ -24,7 +25,7 @@ public class DriveTeleOpBlue extends LinearOpMode {
     //            telemetry.update();
             }
         }
-        teleOp.cvBack.
-        teleOp.end();
+        teleOp.cvBack.close();
+        teleOp.cvFront.close();
     }
 }
