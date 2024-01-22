@@ -6,7 +6,9 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelGroupDetectionProcessor;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
@@ -44,8 +46,9 @@ public class CVSubsystem extends SubsystemBase {
     public final double ERROR_ALIGNMENT = 4;
 
     private AprilTagProcessor aprilTag;
-    private VisionPortal visionPortal;
-    private final WebcamName cameraName;
+    public VisionPortal visionPortal;
+    public final WebcamName cameraName1, cameraName2;
+    private CameraName switchableCamera;
     private PropDetectionPipeline propProcessor;
     private PixelGroupDetectionProcessor pixelGroupProcessor;
     private boolean isRedTeam;
@@ -57,17 +60,20 @@ public class CVSubsystem extends SubsystemBase {
             {1.25, 6}  , {1.5, 6}
     };
 
-    public CVSubsystem(WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
-        this(null, cameraName,drive,telemetry,isRedTeam,opMode);
+    public CVSubsystem(WebcamName cameraName1, WebcamName cameraName2, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
+        this(null, cameraName1, cameraName2,drive,telemetry,isRedTeam,opMode);
     }
 
-    public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
+    public CVSubsystem(OpenCvCamera camera, WebcamName cameraName1, WebcamName cameraName2, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
 //        tdp = new TapeDetectionPipeline();
 //        camera.setPipeline(tdp);
         this.camera = camera;
         this.drive = drive;
         this.telemetry = telemetry;
-        this.cameraName = cameraName;
+        this.cameraName1 = cameraName1;
+        this.cameraName2 = cameraName2;
+        switchableCamera = ClassFactory.getInstance()
+                .getCameraManager().nameForSwitchableCamera(this.cameraName1, this.cameraName2);
         this.isRedTeam = isRedTeam;
         this.opMode = opMode;
         runtime.reset();
@@ -107,43 +113,43 @@ public class CVSubsystem extends SubsystemBase {
                 .setDrawTagOutline(true)
                 .build();
         pixelGroupProcessor = new PixelGroupDetectionProcessor();
-        // to modify, look for the specs in ConceptAprilTag.java:
-        //.setDrawAxes(false)
-        //.setDrawCubeProjection(false)
-        //.setDrawTagOutline(true)
-        //.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
-        //.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
-        //.setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
         // Create the vision portal by using a builder.
         VisionPortal.Builder builder = new VisionPortal.Builder();
 
-        builder.setCamera(cameraName);
-        // builder.setAutoStopLiveView(false); // keep camera on when not processing
+        switchableCamera = ClassFactory.getInstance()
+                .getCameraManager().nameForSwitchableCamera(cameraName1, cameraName2);
 
-        builder.setCameraResolution(new Size(176, 144)); // android.util
-//        builder.setCameraResolution(new Size(320, 240)); // android.util
-//        builder.setCameraResolution(new Size(640, 480)); // android.util
-//        builder.setCameraResolution(new Size(960, 540)); // android.util
-//        builder.setCameraResolution(new Size(1280, 720)); // android.util
+        builder.setCamera(switchableCamera);
 
-        // Set and enable the processor.
+        builder.setCameraResolution(new Size(320, 240)); // android.util
+
         // TODO: DISABLE PROPPROCESSOR FOR TELEOP
         builder.addProcessors(aprilTag, propProcessor, pixelGroupProcessor);
-
-
-        //builder.addProcessors(propProcessor, pixelGroupProcessor);
-//        builder.addProcessors(aprilTag, pixelProcessor, propProcessor);
 
         // Build the Vision Portal, using the above settings.
         visionPortal = builder.build();
 
-        // Disable or re-enable the aprilTag processor at any time.
-        // visionPortal.setProcessorEnabled(aprilTag, true);
+//        ------------------------------------------------------------
+//
+//        aprilTag = new AprilTagProcessor.Builder().build();
+//
+//        CameraName switchableCamera = ClassFactory.getInstance()
+//                .getCameraManager().nameForSwitchableCamera(cameraName1, cameraName2);
+//
+//        // Create the vision portal by using a builder.
+//        visionPortal = new VisionPortal.Builder()
+//                .setCamera(switchableCamera)
+//                .addProcessor(aprilTag)
+//                .build();
 
     }
 
     public void close() {
         visionPortal.close();
+    }
+
+    public void switchCamera(WebcamName cameraName) {
+        visionPortal.setActiveCamera(cameraName);
     }
 
     /**
