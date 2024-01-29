@@ -60,12 +60,12 @@ public class InDepSubsystem extends SubsystemBase {
         }
     }
     public enum EndEffector {
-        LEFT_CLAW_OPEN(0.6),
-        LEFT_CLAW_CLOSED(0.21),
-        RIGHT_CLAW_OPEN(0.25),
-        RIGHT_CLAW_CLOSED(0.60),
-        ELBOW_REST(0.795),
-        ELBOW_FLIPPED(0.13);
+        LEFT_CLAW_OPEN(0.8),
+        LEFT_CLAW_CLOSED(0.55),
+        RIGHT_CLAW_OPEN(0.0),
+        RIGHT_CLAW_CLOSED(0.25),
+        ELBOW_REST(0.1),
+        ELBOW_FLIPPED(0.74);
         public final double servoPosition;
 
         EndEffector(double servoPosition) {

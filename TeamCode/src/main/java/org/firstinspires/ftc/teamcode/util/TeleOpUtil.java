@@ -141,11 +141,12 @@ public class TeleOpUtil {
         double vsn = gamepad1.left_stick_x * SpeedCoefficients.getStrafeSpeed();
         double vfn = -gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed();
         double vtn = gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed();
-        double MOMENTUM_FACTOR = 0.1;  // higher = less momentum
-        if (vsn == 0) vs = Math.abs(vs) < 0.001 ? 0 : (vsn * MOMENTUM_FACTOR + vs * (1-MOMENTUM_FACTOR)); else vs = vsn;
-        if (vfn == 0) vf = Math.abs(vf) < 0.001 ? 0 : (vfn * MOMENTUM_FACTOR + vf * (1-MOMENTUM_FACTOR)); else vf = vfn;
-        if (vtn == 0) vt = Math.abs(vt) < 0.001 ? 0 : (vtn * MOMENTUM_FACTOR + vt * (1-MOMENTUM_FACTOR)); else vt = vtn;  // could add a constant here to adjust for unintended turns
-        drive.driveFieldCentric(vs, vf, vt);
+//        double MOMENTUM_FACTOR = 0.1;  // higher = less momentum
+//        if (vsn == 0) vs = Math.abs(vs) < 0.001 ? 0 : (vsn * MOMENTUM_FACTOR + vs * (1-MOMENTUM_FACTOR)); else vs = vsn;
+//        if (vfn == 0) vf = Math.abs(vf) < 0.001 ? 0 : (vfn * MOMENTUM_FACTOR + vf * (1-MOMENTUM_FACTOR)); else vf = vfn;
+//        if (vtn == 0) vt = Math.abs(vt) < 0.001 ? 0 : (vtn * MOMENTUM_FACTOR + vt * (1-MOMENTUM_FACTOR)); else vt = vtn;  // could add a constant here to adjust for unintended turns
+//        drive.driveFieldCentric(vs, vf, vt);
+        drive.driveFieldCentric(vsn, vfn, vtn);
     }
 
     /**
