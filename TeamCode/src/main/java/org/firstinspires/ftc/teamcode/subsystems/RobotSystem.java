@@ -13,7 +13,7 @@ public class RobotSystem {
     private HardwareRobot hardwareRobot;
     private InDepSubsystem inDep;
     private DriveSubsystem drive;
-    private CVSubsystem cvFront;
+    private CVSubsystem cv;
     private CVSubsystem cvBack;
 
     public RobotSystem(HardwareMap hardwareMap, boolean isRedTeam, LinearOpMode opMode, Telemetry telemetry) {
@@ -37,19 +37,14 @@ public class RobotSystem {
                 opMode,
                 new MultipleTelemetry(telemetry)
         );
-//        cvFront = new CVSubsystem(hardwareRobot.frontCam,
-//                hardwareRobot.frontCamName,
-//                drive,
-//                telemetry,
-//                isRedTeam,
-//                opMode);
-//        cvBack = new CVSubsystem(hardwareRobot.backCam,
-//                hardwareRobot.backCamName,
-//                drive,
-//                telemetry,
-//                isRedTeam,
-//                opMode);
-        MovementThread.initSubsystems(drive, inDep, cvFront, cvBack, opMode);
+        cv = new CVSubsystem(
+                hardwareRobot.frontCamName,
+                hardwareRobot.backCamName,
+                drive,
+                telemetry,
+                isRedTeam,
+                opMode);
+        MovementThread.initSubsystems(drive, inDep, cv, cvBack, opMode);
     }
 
     public HardwareRobot getHardwareRobot() {
@@ -65,9 +60,9 @@ public class RobotSystem {
         return drive;
     }
     public CVSubsystem getCVFront() {
-        return cvFront;
+        return cv;
     }
     public CVSubsystem getCVBack() {
-        return cvFront;
+        return cv;
     }
 }

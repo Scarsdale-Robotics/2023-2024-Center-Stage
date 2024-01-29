@@ -21,5 +21,6 @@ public class DriveTeleOpRed extends LinearOpMode {
 //            telemetry.addData("Omni Mode:", teleOp.omniMode);
 //            telemetry.update();
         }
+        teleOp.end();
     }
 }

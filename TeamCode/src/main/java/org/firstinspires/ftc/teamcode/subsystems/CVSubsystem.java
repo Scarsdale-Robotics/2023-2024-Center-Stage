@@ -6,7 +6,9 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelGroupDetectionProcessor;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
@@ -17,9 +19,6 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PropDetectionPipeline;
-import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelDetectionPipeline;
-
-import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.WhitePixelDetectionPipeline;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,11 +46,10 @@ public class CVSubsystem extends SubsystemBase {
     public final double ERROR_ALIGNMENT = 4;
 
     private AprilTagProcessor aprilTag;
-    private VisionPortal visionPortal;
-    private final WebcamName cameraName;
+    public VisionPortal visionPortal;
+    public final WebcamName cameraName1, cameraName2;
+    private CameraName switchableCamera;
     private PropDetectionPipeline propProcessor;
-    private PixelDetectionPipeline pixelProcessor;
-    private WhitePixelDetectionPipeline whitePixelProcessor;
     private PixelGroupDetectionProcessor pixelGroupProcessor;
     private boolean isRedTeam;
     private LinearOpMode opMode;
@@ -61,13 +59,21 @@ public class CVSubsystem extends SubsystemBase {
             {4.75, 6}  , {4.5, 6}  ,
             {1.25, 6}  , {1.5, 6}
     };
-    public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
+
+    public CVSubsystem(WebcamName cameraName1, WebcamName cameraName2, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
+        this(null, cameraName1, cameraName2,drive,telemetry,isRedTeam,opMode);
+    }
+
+    public CVSubsystem(OpenCvCamera camera, WebcamName cameraName1, WebcamName cameraName2, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
 //        tdp = new TapeDetectionPipeline();
 //        camera.setPipeline(tdp);
         this.camera = camera;
         this.drive = drive;
         this.telemetry = telemetry;
-        this.cameraName = cameraName;
+        this.cameraName1 = cameraName1;
+        this.cameraName2 = cameraName2;
+        switchableCamera = ClassFactory.getInstance()
+                .getCameraManager().nameForSwitchableCamera(this.cameraName1, this.cameraName2);
         this.isRedTeam = isRedTeam;
         this.opMode = opMode;
         runtime.reset();
@@ -103,38 +109,47 @@ public class CVSubsystem extends SubsystemBase {
     private void initAprilTag() {
         // Create the AprilTag processor.
         propProcessor = new PropDetectionPipeline(isRedTeam);
-        pixelProcessor = new PixelDetectionPipeline();
         aprilTag = new AprilTagProcessor.Builder()
                 .setDrawTagOutline(true)
                 .build();
-
-        // to modify, look for the specs in ConceptAprilTag.java:
-        //.setDrawAxes(false)
-        //.setDrawCubeProjection(false)
-        //.setDrawTagOutline(true)
-        //.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
-        //.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
-        //.setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+        pixelGroupProcessor = new PixelGroupDetectionProcessor();
         // Create the vision portal by using a builder.
         VisionPortal.Builder builder = new VisionPortal.Builder();
 
-        builder.setCamera(cameraName);
-        builder.setAutoStopLiveView(false); // keep camera on when not processing
+        switchableCamera = ClassFactory.getInstance()
+                .getCameraManager().nameForSwitchableCamera(cameraName1, cameraName2);
 
-        builder.setCameraResolution(new Size(640, 480)); // android.util
+        builder.setCamera(switchableCamera);
 
-        // Set and enable the processor.
-        builder.addProcessor(aprilTag);
-        builder.addProcessor(pixelProcessor);
-        builder.addProcessors(propProcessor, pixelGroupProcessor);
-//        builder.addProcessors(aprilTag, pixelProcessor, propProcessor);
+        builder.setCameraResolution(new Size(320, 240)); // android.util
+
+        // TODO: DISABLE PROPPROCESSOR FOR TELEOP
+        builder.addProcessors(aprilTag, propProcessor, pixelGroupProcessor);
 
         // Build the Vision Portal, using the above settings.
         visionPortal = builder.build();
 
-        // Disable or re-enable the aprilTag processor at any time.
-        // visionPortal.setProcessorEnabled(aprilTag, true);
+//        ------------------------------------------------------------
+//
+//        aprilTag = new AprilTagProcessor.Builder().build();
+//
+//        CameraName switchableCamera = ClassFactory.getInstance()
+//                .getCameraManager().nameForSwitchableCamera(cameraName1, cameraName2);
+//
+//        // Create the vision portal by using a builder.
+//        visionPortal = new VisionPortal.Builder()
+//                .setCamera(switchableCamera)
+//                .addProcessor(aprilTag)
+//                .build();
 
+    }
+
+    public void close() {
+        visionPortal.close();
+    }
+
+    public void switchCamera(WebcamName cameraName) {
+        visionPortal.setActiveCamera(cameraName);
     }
 
     /**
@@ -265,11 +280,11 @@ public class CVSubsystem extends SubsystemBase {
 
     public int getPixelHorizontalOffset() {
 //        visionPortal.resumeStreaming();
-        return pixelProcessor.getCenterOffset();
+        return 0;  // TODO
     }
 
     public int getWhitePixelHorizontalOffset() {
-        return whitePixelProcessor.getCenterOffset();
+        return 0;  // TODO
     }
 
     public double getWhitePixelDiameterPx() {
@@ -277,7 +292,7 @@ public class CVSubsystem extends SubsystemBase {
     }
 
     public int getCameraWidth() {
-        return whitePixelProcessor.getCameraWidth();
+        return pixelGroupProcessor.getCameraWidth();
     }
 
     public double getAprilTagHorizontalOffset(int tagID) {
@@ -304,10 +319,10 @@ public class CVSubsystem extends SubsystemBase {
      * facing backdrop is zero rotation, right is more rotation
      * offset params are positive towards the direction the camera is facing. the camera is assumed to be facing either "robot-forward" or "robot-backward"
      */
-    public double[] getPosition(double cameraCenterOffsetX, double cameraCenterOffsetY) {
+    public double[] getPosition(double cameraCenterOffsetX, double cameraCenterOffsetY) { // of apriltags
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         if (currentDetections.size() == 0) return lastKnownPos;
-        ArrayList<Double> xEst   = new ArrayList<>();
+        ArrayList<Double> xEst   = new ArrayList<>(); //estimated x positions based on aprilTag
         ArrayList<Double> yEst   = new ArrayList<>();
         ArrayList<Double> rotEst = new ArrayList<>();
         for (AprilTagDetection detection : currentDetections) {
@@ -318,11 +333,11 @@ public class CVSubsystem extends SubsystemBase {
             if (detection.id < 7) {
                 xEst.add(APRIL_TAG_LOCATIONS[detection.id][0] + yOff);
                 yEst.add(APRIL_TAG_LOCATIONS[detection.id][1] + xOff);
-                rotEst.add(rotOff);
+                rotEst.add((rotOff + 360) % 360);
             } else {
                 xEst.add(APRIL_TAG_LOCATIONS[detection.id][0] - yOff);
                 yEst.add(APRIL_TAG_LOCATIONS[detection.id][1] - xOff);
-                rotEst.add(rotOff + 180);
+                rotEst.add((rotOff + 540) % 360);
             }
         }
         Collections.sort(xEst);
@@ -332,6 +347,7 @@ public class CVSubsystem extends SubsystemBase {
         double yMed   = yEst.get(xEst.size() / 2);
         double rotMed = rotEst.get(xEst.size() / 2);
         lastKnownPos = new double[]{xMed, yMed, rotMed};
+        //xMed, yMed is in term of number of tiles
         return lastKnownPos;
     }
 
@@ -421,6 +437,11 @@ public class CVSubsystem extends SubsystemBase {
             pixelOffset = getWhitePixelHorizontalOffset();
             pixelDist = getWhitePixelDiameterPx();
         }
+    }
+
+    public void correctPositionAprilTag(int targetx, int targety) {
+        double[] currentPos = getPosition(99, 99);
+        drive.driveRobotCentric(currentPos[0], currentPos[1], currentPos[2]);
     }
 
     public void moveToAprilTag(int tagID) {

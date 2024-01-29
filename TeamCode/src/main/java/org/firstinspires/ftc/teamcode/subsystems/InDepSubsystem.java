@@ -31,9 +31,9 @@ public class InDepSubsystem extends SubsystemBase {
 
     public enum Level {
         GROUND(0, 0.23, false),
-        BACKBOARD_HIGH(5083,0.32, true),
-        BACKBOARD_MID(7492,0.275, true), // tuned values
-        BACKBOARD_LOW(8250, 0.17, true);
+        BACKBOARD_HIGH(5083,0.31, true),
+        BACKBOARD_MID(7492,0.265, true), // tuned values
+        BACKBOARD_LOW(8250, 0.165, true);
 
         public final int target;
         public final double wristTarget;
@@ -131,22 +131,22 @@ public class InDepSubsystem extends SubsystemBase {
             arm1.motor.setPower(power);
             arm2.motor.setPower(power);
         }
-        opMode.telemetry.addData("level: ", level);
-        opMode.telemetry.addData("nxt below: ", getLevelBelow());
-        opMode.telemetry.addData("level elbow flipped?: ", level.elbowFlipped);
-        opMode.telemetry.addData("level wrist target: ", level.wristTarget);
-        if (level != getLevelBelow()) {
-            level = getLevelBelow();
-            if (level.elbowFlipped) {
-                flip();
-            } else {
-                rest();
-            }
-        }
-        wrist.setPosition(level.wristTarget);
-        opMode.telemetry.addData("chicken: ", "nugget");
-        opMode.telemetry.addData("elbowPos", elbow.getPosition());
-        opMode.telemetry.addData("wristPos", wrist.getPosition());
+//        opMode.telemetry.addData("level: ", level);
+//        opMode.telemetry.addData("nxt below: ", getLevelBelow());
+//        opMode.telemetry.addData("level elbow flipped?: ", level.elbowFlipped);
+//        opMode.telemetry.addData("level wrist target: ", level.wristTarget);
+//        if (level != getLevelBelow()) {
+//            level = getLevelBelow();
+//            if (level.elbowFlipped) {
+//                flip();
+//            } else {
+//                rest();
+//            }
+//        }
+//        wrist.setPosition(level.wristTarget);
+//        opMode.telemetry.addData("chicken: ", "nugget");
+//        opMode.telemetry.addData("elbowPos", elbow.getPosition());
+//        opMode.telemetry.addData("wristPos", wrist.getPosition());
     }
 
     /**
@@ -276,20 +276,16 @@ public class InDepSubsystem extends SubsystemBase {
      * Opens both claws.
      */
     public void open() {
-        leftClaw.setPosition(EndEffector.LEFT_CLAW_OPEN.servoPosition);
-        rightClaw.setPosition(EndEffector.RIGHT_CLAW_OPEN.servoPosition);
-        isLeftClawOpen = true;
-        isRightClawOpen = true;
+        openLeft();
+        openRight();
     }
 
     /**
      * Closes both claws.
      */
     public void close() {
-        leftClaw.setPosition(EndEffector.LEFT_CLAW_CLOSED.servoPosition);
-        rightClaw.setPosition(EndEffector.RIGHT_CLAW_CLOSED.servoPosition);
-        isLeftClawOpen = false;
-        isRightClawOpen = false;
+        closeLeft();
+        closeRight();
     }
 
     /**
@@ -298,6 +294,9 @@ public class InDepSubsystem extends SubsystemBase {
     public void openLeft() {
         leftClaw.setPosition(EndEffector.LEFT_CLAW_OPEN.servoPosition);
         isLeftClawOpen = true;
+        if (isRightClawOpen) {
+            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+        }
     }
 
     /**
@@ -306,6 +305,9 @@ public class InDepSubsystem extends SubsystemBase {
     public void openRight() {
         rightClaw.setPosition(EndEffector.RIGHT_CLAW_OPEN.servoPosition);
         isRightClawOpen = true;
+        if (isLeftClawOpen) {
+            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+        }
     }
 
     /**

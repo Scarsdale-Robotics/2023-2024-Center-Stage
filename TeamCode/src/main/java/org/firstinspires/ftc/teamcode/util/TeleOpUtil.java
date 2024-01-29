@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
@@ -15,8 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilde
 public class TeleOpUtil {
     public DriveSubsystem drive;
     public InDepSubsystem inDep;
-//    public CVSubsystem cvFront;
-//    public CVSubsystem cvBack;
+    public CVSubsystem cv;
     private final boolean isRedTeam;
     private final Gamepad gamepad1;
     private final Gamepad gamepad2;
@@ -44,8 +44,7 @@ public class TeleOpUtil {
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
         RobotSystem robot = new RobotSystem(hardwareMap, isRedTeam, opMode, telemetry);
         drive = robot.getDrive();
-//        cvFront = robot.getCVFront();
-//        cvBack = robot.getCVBack();
+        cv = robot.getCVFront();
         this.isRedTeam = isRedTeam;
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
@@ -142,11 +141,15 @@ public class TeleOpUtil {
         double vfn = -gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed();
         double vtn = gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed();
         double MOMENTUM_FACTOR = 0.1;  // higher = less momentum
-        if (vsn == 0) vs = Math.abs(vs) < 0.001 ? 0 : (vsn * MOMENTUM_FACTOR + vs * (1-MOMENTUM_FACTOR)); else vs = vsn;
-        if (vfn == 0) vf = Math.abs(vf) < 0.001 ? 0 : (vfn * MOMENTUM_FACTOR + vf * (1-MOMENTUM_FACTOR)); else vf = vfn;
-        if (vtn == 0) vt = Math.abs(vt) < 0.001 ? 0 : (vtn * MOMENTUM_FACTOR + vt * (1-MOMENTUM_FACTOR)); else vt = vtn;  // could add a constant here to adjust for unintended turns
-        drive.driveRobotCentric(vs, vf, vt);
+//        if (vsn == 0) vs = Math.abs(vs) < 0.001 ? 0 : (vsn * MOMENTUM_FACTOR + vs * (1-MOMENTUM_FACTOR)); else vs = vsn;
+//        if (vfn == 0) vf = Math.abs(vf) < 0.001 ? 0 : (vfn * MOMENTUM_FACTOR + vf * (1-MOMENTUM_FACTOR)); else vf = vfn;
+//        if (vtn == 0) vt = Math.abs(vt) < 0.001 ? 0 : (vtn * MOMENTUM_FACTOR + vt * (1-MOMENTUM_FACTOR)); else vt = vtn;  // could add a constant here to adjust for unintended turns
+
+
+//        drive.driveFieldCentric(vs, vf, vt);
+        drive.driveFieldCentric(vsn, vfn, vtn);
     }
+
 
     /**
      * PRIMARY ARM CLAW CONTROL METHOD
@@ -184,7 +187,8 @@ public class TeleOpUtil {
         inDep.rawPower((gamepad1.right_trigger - gamepad1.left_trigger) * SpeedCoefficients.getArmSpeed());
 
         // RIGID ARM MOVEMENT MODE CONTROL
-        runArmRigidControl();
+        // TODO: MIGHT CAUSE CRASH
+//        runArmRigidControl();
 
         // RESET ARM CONTROL
         if (gamepad2.a) {
@@ -194,6 +198,10 @@ public class TeleOpUtil {
         }
     }
 
+    public void end() {
+        cv.close();
+    }
+
     public void tick() {
         double DISTANCE_BEFORE_BACKBOARD = 45;  // TEMP
 //        double cvDist = cvBack.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
@@ -201,16 +209,18 @@ public class TeleOpUtil {
         telemetry.addData("arm pos:", inDep.getLeftArmPosition());
         telemetry.addData("claw open:", inDep.getIsLeftClawOpen());
         telemetry.addData("пуяза 你好何余安 ???", "θωθ");
+        telemetry.addData("LOC X", cv.getPosition(0, 0)[0]);
+        telemetry.addData("LOC Y", cv.getPosition(0, 0)[1]);
         telemetry.update();
         runMotionControl();
         runArmClawControl();
-//        if (!gamepad2.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !inDep.getIsLeftClawOpen()) {
-        if (!gamepad2.x && !inDep.getIsLeftClawOpen()) {
+//        if (!gamepad2.x && cvDist < DISTANCE_BEFORE_BACKBOARD && (!inDep.getIsLeftClawOpen() || !inDep.getIsRightClawOpen())) {
 //            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
-        } else if (gamepad2.x) {
-            gamepad1.rumble(500);
-            gamepad2.rumble(500);
-        }
+//        } else if (gamepad2.x) {
+//            gamepad1.rumble(500);
+//            gamepad2.rumble(500);
+//        }
+
 
 //        runAprilTagParallelAlignControl();
 //             teamPropLocationControl();

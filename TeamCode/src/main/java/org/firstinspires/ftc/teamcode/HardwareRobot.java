@@ -25,9 +25,9 @@ public class HardwareRobot {
     public final Servo wrist;
 
     public final IMU imu;
-    public final OpenCvCamera frontCam;
+//    public final OpenCvCamera frontCam;
     public final WebcamName frontCamName;
-    public final OpenCvCamera backCam;
+//    public final OpenCvCamera backCam;
     public final WebcamName backCamName;
     public HardwareRobot(HardwareMap hardwareMap) {
         leftFront = new Motor(hardwareMap, "leftFront", Motor.GoBILDA.RPM_312);
@@ -108,13 +108,10 @@ public class HardwareRobot {
 
 
         backCamName = hardwareMap.get(WebcamName.class, "Webcam Back");
-        backCam = OpenCvCameraFactory.getInstance().createWebcam(backCamName);
+//        backCam = OpenCvCameraFactory.getInstance().createWebcam(backCamName);
 
         frontCamName = hardwareMap.get(WebcamName.class, "Webcam Front");
-        frontCam = OpenCvCameraFactory.getInstance().createWebcam(frontCamName);
-//
-//        backCamName = hardwareMap.get(WebcamName.class, "Webcam Back");
-//        backCam = OpenCvCameraFactory.getInstance().createWebcam(backCamName);
+//        frontCam = OpenCvCameraFactory.getInstance().createWebcam(frontCamName);
     }
 
     public double getYaw() {
