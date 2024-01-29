@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilde
 public class TeleOpUtil {
     public DriveSubsystem drive;
     public InDepSubsystem inDep;
+    //    public CVSubsystem cvFront;
     public CVSubsystem cv;
     private final boolean isRedTeam;
     private final Gamepad gamepad1;
@@ -44,7 +45,7 @@ public class TeleOpUtil {
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
         RobotSystem robot = new RobotSystem(hardwareMap, isRedTeam, opMode, telemetry);
         drive = robot.getDrive();
-        cv = robot.getCVFront();
+        cv = robot.getCv();
         this.isRedTeam = isRedTeam;
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
@@ -141,15 +142,11 @@ public class TeleOpUtil {
         double vfn = -gamepad1.left_stick_y * SpeedCoefficients.getForwardSpeed();
         double vtn = gamepad1.right_stick_x * SpeedCoefficients.getTurnSpeed();
         double MOMENTUM_FACTOR = 0.1;  // higher = less momentum
-//        if (vsn == 0) vs = Math.abs(vs) < 0.001 ? 0 : (vsn * MOMENTUM_FACTOR + vs * (1-MOMENTUM_FACTOR)); else vs = vsn;
-//        if (vfn == 0) vf = Math.abs(vf) < 0.001 ? 0 : (vfn * MOMENTUM_FACTOR + vf * (1-MOMENTUM_FACTOR)); else vf = vfn;
-//        if (vtn == 0) vt = Math.abs(vt) < 0.001 ? 0 : (vtn * MOMENTUM_FACTOR + vt * (1-MOMENTUM_FACTOR)); else vt = vtn;  // could add a constant here to adjust for unintended turns
-
-
-//        drive.driveFieldCentric(vs, vf, vt);
-        drive.driveFieldCentric(vsn, vfn, vtn);
+        if (vsn == 0) vs = Math.abs(vs) < 0.001 ? 0 : (vsn * MOMENTUM_FACTOR + vs * (1-MOMENTUM_FACTOR)); else vs = vsn;
+        if (vfn == 0) vf = Math.abs(vf) < 0.001 ? 0 : (vfn * MOMENTUM_FACTOR + vf * (1-MOMENTUM_FACTOR)); else vf = vfn;
+        if (vtn == 0) vt = Math.abs(vt) < 0.001 ? 0 : (vtn * MOMENTUM_FACTOR + vt * (1-MOMENTUM_FACTOR)); else vt = vtn;  // could add a constant here to adjust for unintended turns
+        drive.driveFieldCentric(vs, vf, vt);
     }
-
 
     /**
      * PRIMARY ARM CLAW CONTROL METHOD
@@ -172,11 +169,11 @@ public class TeleOpUtil {
             if (inDep.getIsRightClawOpen()) {
                 inDep.closeRight();
                 // automagically set fast mode after intake
-    //                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
+                //                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
             } else {
                 inDep.openRight();
                 // automagically set fast mode after release
-    //                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+                //                SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
             }
             clawRightToggle = true;
         }
@@ -187,8 +184,7 @@ public class TeleOpUtil {
         inDep.rawPower((gamepad1.right_trigger - gamepad1.left_trigger) * SpeedCoefficients.getArmSpeed());
 
         // RIGID ARM MOVEMENT MODE CONTROL
-        // TODO: MIGHT CAUSE CRASH
-//        runArmRigidControl();
+        runArmRigidControl();
 
         // RESET ARM CONTROL
         if (gamepad2.a) {
@@ -198,14 +194,10 @@ public class TeleOpUtil {
         }
     }
 
-    public void end() {
-        cv.close();
-    }
-
     public void tick() {
         double DISTANCE_BEFORE_BACKBOARD = 45;  // TEMP
         double cvDist = cv.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
-//        telemetry.addData("cvDist:", cvDist);
+        telemetry.addData("cvDist:", cvDist);
         telemetry.addData("arm pos:", inDep.getLeftArmPosition());
         telemetry.addData("claw open:", inDep.getIsLeftClawOpen());
         telemetry.addData("пуяза 你好何余安 ???", "θωθ");

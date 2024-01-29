@@ -125,8 +125,8 @@ public class DriveSubsystem extends SubsystemBase {
 
         while (
                 opMode.opModeIsActive() &&
-                Math.abs(setPoint- getRightWheelPosition()) > DrivePIDCoefficients.getErrorTolerance_p() &&
-                Math.abs(getRightWheelVelocity()) > DrivePIDCoefficients.getErrorTolerance_v()
+                        Math.abs(setPoint- getRightWheelPosition()) > DrivePIDCoefficients.getErrorTolerance_p() &&
+                        Math.abs(getRightWheelVelocity()) > DrivePIDCoefficients.getErrorTolerance_v()
         ) {
             K = PID.update(getRightWheelPosition());
             driveRobotCentric(rightSpeed * K, forwardSpeed * K, 0);
@@ -165,7 +165,7 @@ public class DriveSubsystem extends SubsystemBase {
         while ( // checking condition
                 opMode.opModeIsActive() && !(
                         L_atSetPoint &&
-                        R_atSetPoint)
+                                R_atSetPoint)
         ) {
             // getting L and R
             double L_p = leftBack.getCurrentPosition();
@@ -216,10 +216,10 @@ public class DriveSubsystem extends SubsystemBase {
 
             L_atSetPoint = L_atSetPoint ||
                     (Math.abs(Math.abs(getLeftWheelPosition()-L_start) - Math.abs(L)) < DrivePIDCoefficients.getErrorTolerance_p() &&
-                    Math.abs(getLeftWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v());
+                            Math.abs(getLeftWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v());
             R_atSetPoint = R_atSetPoint ||
                     (Math.abs(Math.abs(getRightWheelPosition()-R_start) - Math.abs(R)) < DrivePIDCoefficients.getErrorTolerance_p() &&
-                    Math.abs(getRightWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v());
+                            Math.abs(getRightWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v());
 
             isBusy = true;
         }
@@ -250,8 +250,8 @@ public class DriveSubsystem extends SubsystemBase {
 
         while (
                 opMode.opModeIsActive() && !(
-                Math.abs(degrees - (cumulativeAngle + normalizeAngle(previousAngle-getYaw()))) < DrivePIDCoefficients.getErrorTolerance_degrees() &&
-                Math.abs(getRightWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v())
+                        Math.abs(degrees - (cumulativeAngle + normalizeAngle(previousAngle-getYaw()))) < DrivePIDCoefficients.getErrorTolerance_degrees() &&
+                                Math.abs(getRightWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v())
         ) {
             PID.setPID(DrivePIDCoefficients.getTurnP(), DrivePIDCoefficients.getTurnI(), DrivePIDCoefficients.getTurnD());
 

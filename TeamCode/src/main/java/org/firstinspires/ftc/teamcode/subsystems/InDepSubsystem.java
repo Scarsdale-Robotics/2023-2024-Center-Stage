@@ -131,22 +131,22 @@ public class InDepSubsystem extends SubsystemBase {
             arm1.motor.setPower(power);
             arm2.motor.setPower(power);
         }
-//        opMode.telemetry.addData("level: ", level);
-//        opMode.telemetry.addData("nxt below: ", getLevelBelow());
-//        opMode.telemetry.addData("level elbow flipped?: ", level.elbowFlipped);
-//        opMode.telemetry.addData("level wrist target: ", level.wristTarget);
-//        if (level != getLevelBelow()) {
-//            level = getLevelBelow();
-//            if (level.elbowFlipped) {
-//                flip();
-//            } else {
-//                rest();
-//            }
-//        }
-//        wrist.setPosition(level.wristTarget);
-//        opMode.telemetry.addData("chicken: ", "nugget");
-//        opMode.telemetry.addData("elbowPos", elbow.getPosition());
-//        opMode.telemetry.addData("wristPos", wrist.getPosition());
+        opMode.telemetry.addData("level: ", level);
+        opMode.telemetry.addData("nxt below: ", getLevelBelow());
+        opMode.telemetry.addData("level elbow flipped?: ", level.elbowFlipped);
+        opMode.telemetry.addData("level wrist target: ", level.wristTarget);
+        if (level != getLevelBelow()) {
+            level = getLevelBelow();
+            if (level.elbowFlipped) {
+                flip();
+            } else {
+                rest();
+            }
+        }
+        wrist.setPosition(level.wristTarget);
+        opMode.telemetry.addData("chicken: ", "nugget");
+        opMode.telemetry.addData("elbowPos", elbow.getPosition());
+        opMode.telemetry.addData("wristPos", wrist.getPosition());
     }
 
     /**
@@ -168,9 +168,9 @@ public class InDepSubsystem extends SubsystemBase {
         while (
                 opMode.opModeIsActive() && !(
                         Math.abs(L_setPoint - getLeftArmPosition()) < InDepPIDCoefficients.getErrorTolerance_p() &&
-                        Math.abs(getLeftArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v()) && !(
+                                Math.abs(getLeftArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v()) && !(
                         Math.abs(R_setPoint - getRightArmPosition()) < InDepPIDCoefficients.getErrorTolerance_p() &&
-                        Math.abs(getRightArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v())
+                                Math.abs(getRightArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v())
         ) {
             L_PID.setPID(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd());
             R_PID.setPID(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd());
@@ -441,5 +441,4 @@ public class InDepSubsystem extends SubsystemBase {
         arm2.resetEncoder();
     }
 }
-
 

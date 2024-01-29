@@ -21,9 +21,9 @@ public class nathan extends LinearOpMode {
         telemetry.addData("team prop loc: ", "---");
         telemetry.update();
         while (opModeIsActive()) {
-            robot.getCVFront().moveToPixels();
-            telemetry.addData("sdjfl;asdf", robot.getCVFront().getPixelsCenter().x);
-            telemetry.addData("sdjfl;asdfy", robot.getCVFront().getPixelsCenter().y);
+            robot.getCv().moveToPixels();
+            telemetry.addData("sdjfl;asdf", robot.getCv().getPixelsCenter().x);
+            telemetry.addData("sdjfl;asdfy", robot.getCv().getPixelsCenter().y);
             telemetry.update();
         }
 

@@ -59,10 +59,7 @@ public class RobotSystem {
     public DriveSubsystem getDrive() {
         return drive;
     }
-    public CVSubsystem getCVFront() {
-        return cv;
-    }
-    public CVSubsystem getCVBack() {
+    public CVSubsystem getCv() {
         return cv;
     }
 }
