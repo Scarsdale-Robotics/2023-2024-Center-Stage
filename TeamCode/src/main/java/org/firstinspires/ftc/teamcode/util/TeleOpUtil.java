@@ -204,7 +204,7 @@ public class TeleOpUtil {
 
     public void tick() {
         double DISTANCE_BEFORE_BACKBOARD = 45;  // TEMP
-//        double cvDist = cvBack.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
+        double cvDist = cv.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
 //        telemetry.addData("cvDist:", cvDist);
         telemetry.addData("arm pos:", inDep.getLeftArmPosition());
         telemetry.addData("claw open:", inDep.getIsLeftClawOpen());
@@ -214,12 +214,12 @@ public class TeleOpUtil {
         telemetry.update();
         runMotionControl();
         runArmClawControl();
-//        if (!gamepad2.x && cvDist < DISTANCE_BEFORE_BACKBOARD && (!inDep.getIsLeftClawOpen() || !inDep.getIsRightClawOpen())) {
-//            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
-//        } else if (gamepad2.x) {
-//            gamepad1.rumble(500);
-//            gamepad2.rumble(500);
-//        }
+        if (!gamepad2.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !(inDep.getIsLeftClawOpen() || inDep.getIsRightClawOpen())) {
+            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
+        } else if (gamepad2.x) {
+            gamepad1.rumble(500);
+            gamepad2.rumble(500);
+        }
 
 
 //        runAprilTagParallelAlignControl();
