@@ -95,7 +95,10 @@ public class chickennguet extends LinearOpMode {
             dbTelemetry.addData("Elbow Pos",inDep.getElbowPosition());
             dbTelemetry.addData("LArm Pos", hardwareRobot.arm1.getCurrentPosition());
             dbTelemetry.addData("RArm Pos", hardwareRobot.arm2.getCurrentPosition());
+            telemetry.addData("LArm Pos", hardwareRobot.arm1.getCurrentPosition());
+            telemetry.addData("RArm Pos", hardwareRobot.arm2.getCurrentPosition());
             dbTelemetry.update();
+            telemetry.update();
 
             if(gamepad1.left_bumper)speed = Math.max(speed - 0.0001, 0);
             else if (gamepad1.right_bumper)speed = Math.min(speed + 0.0001, 1.0);

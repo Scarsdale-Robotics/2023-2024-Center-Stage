@@ -362,7 +362,7 @@ public class DriveSubsystem extends SubsystemBase {
         imu.resetYaw();
     }
 
-    private double getYaw() {
+    public double getYaw() {
         return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
 

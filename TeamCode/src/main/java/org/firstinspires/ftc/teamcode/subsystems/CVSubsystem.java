@@ -328,15 +328,16 @@ public class CVSubsystem extends SubsystemBase {
         for (AprilTagDetection detection : currentDetections) {
             double rotOff = (detection.ftcPose.x > 0 ? 1 : -1) * detection.ftcPose.yaw;
             // 24 inches per tile
-            double xOff   = (Math.toDegrees(Math.sin(Math.toRadians(detection.ftcPose.bearing - detection.ftcPose.yaw))) * detection.ftcPose.range) / 24 - cameraCenterOffsetX;
-            double yOff   = (Math.toDegrees(Math.cos(Math.toRadians(detection.ftcPose.bearing - detection.ftcPose.yaw))) * detection.ftcPose.range) / 24 - cameraCenterOffsetY;
+            double radians = Math.toRadians(detection.ftcPose.bearing - detection.ftcPose.yaw);
+            double xOff   = (Math.sin(radians) * detection.ftcPose.range) / 24 - cameraCenterOffsetX;
+            double yOff   = (Math.cos(radians) * detection.ftcPose.range) / 24 - cameraCenterOffsetY;
             if (detection.id < 7) {
-                xEst.add(APRIL_TAG_LOCATIONS[detection.id][0] + yOff);
-                yEst.add(APRIL_TAG_LOCATIONS[detection.id][1] + xOff);
+                xEst.add(APRIL_TAG_LOCATIONS[detection.id-1][0] + yOff);
+                yEst.add(APRIL_TAG_LOCATIONS[detection.id-1][1] + xOff);
                 rotEst.add((rotOff + 360) % 360);
             } else {
-                xEst.add(APRIL_TAG_LOCATIONS[detection.id][0] - yOff);
-                yEst.add(APRIL_TAG_LOCATIONS[detection.id][1] - xOff);
+                xEst.add(APRIL_TAG_LOCATIONS[detection.id-1][0] - yOff);
+                yEst.add(APRIL_TAG_LOCATIONS[detection.id-1][1] - xOff);
                 rotEst.add((rotOff + 540) % 360);
             }
         }
