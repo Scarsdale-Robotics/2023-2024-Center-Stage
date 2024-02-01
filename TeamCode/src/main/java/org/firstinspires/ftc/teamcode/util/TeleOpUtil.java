@@ -208,22 +208,23 @@ public class TeleOpUtil {
 
     public void tick() {
         double DISTANCE_BEFORE_BACKBOARD = 45;  // TEMP
-//        double cvDist = cvBack.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
-//        telemetry.addData("cvDist:", cvDist);
+        double cvDist = cvBack.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
+        telemetry.addData("cvDist:", cvDist);
         telemetry.addData("arm pos:", inDep.getLeftArmPosition());
         telemetry.addData("claw open:", inDep.getIsLeftClawOpen());
         telemetry.addData("пуяза 你好何余安 ???", "θωθ");
-//        telemetry.addData("LOC X", cvBack.getPosition(0, 0)[0]);
-//        telemetry.addData("LOC Y", cvBack.getPosition(0, 0)[1]);
+        telemetry.addData("LOC X", cvBack.getPosition(0, 0)[0]);
+        telemetry.addData("LOC Y", cvBack.getPosition(0, 0)[1]);
         telemetry.update();
         runMotionControl();
         runArmClawControl();
-//        if (!gamepad2.x && cvDist < DISTANCE_BEFORE_BACKBOARD && (!inDep.getIsLeftClawOpen() || !inDep.getIsRightClawOpen())) {
-//            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
-//        } else if (gamepad2.x) {
-//            gamepad1.rumble(500);
-//            gamepad2.rumble(500);
-//        }
+        if (gamepad2.circle && gamepad2.dpad_left) drive.resetIMU();
+        if (!gamepad2.x && cvDist < DISTANCE_BEFORE_BACKBOARD && (!inDep.getIsLeftClawOpen() || !inDep.getIsRightClawOpen())) {
+            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
+        } else if (gamepad2.x) {
+            gamepad1.rumble(500);
+            gamepad2.rumble(500);
+        }
 
 
 //        runAprilTagParallelAlignControl();

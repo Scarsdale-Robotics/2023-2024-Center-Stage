@@ -61,7 +61,7 @@ public class Televerything extends LinearOpMode {
                 moveInputY = gamepad1.left_stick_y;
             }
             turnInput = gamepad1.right_stick_x;
-            drive.driveRobotCentric(-moveInputX,moveInputY,-turnInput * SpeedCoefficients.getTurnSpeed());
+            drive.driveFieldCentric(-moveInputX,moveInputY,-turnInput * SpeedCoefficients.getTurnSpeed());
 
 
 

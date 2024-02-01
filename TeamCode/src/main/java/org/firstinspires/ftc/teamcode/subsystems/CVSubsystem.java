@@ -367,16 +367,16 @@ public class CVSubsystem extends SubsystemBase {
 
     public void moveToWhitePixel() {
         // TODO: RECODE
-        int width = getCameraWidth();
-        double HORIZ_THRESHOLD = width / 11.1;
-        double DIAM_THRESHOLD = width / 4.0;
-        int pixelOffset = getWhitePixelHorizontalOffset();
-        double pixelDiam = getWhitePixelDiameterPx();
-        while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDiam) < DIAM_THRESHOLD && opMode.opModeIsActive()) {
-            drive.driveRobotCentric(Math.max(DIAM_THRESHOLD, pixelDiam) / DIAM_THRESHOLD, Math.min(HORIZ_THRESHOLD, pixelOffset) / HORIZ_THRESHOLD, 0);
-            pixelOffset = getWhitePixelHorizontalOffset();
-            pixelDiam = getWhitePixelDiameterPx();
-        }
+//        int width = getCameraWidth();
+//        double HORIZ_THRESHOLD = width / 11.1;
+//        double DIAM_THRESHOLD = width / 4.0;
+//        int pixelOffset = getWhitePixelHorizontalOffset();
+//        double pixelDiam = getWhitePixelDiameterPx();
+//        while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDiam) < DIAM_THRESHOLD && opMode.opModeIsActive()) {
+//            drive.driveRobotCentric(Math.max(DIAM_THRESHOLD, pixelDiam) / DIAM_THRESHOLD, Math.min(HORIZ_THRESHOLD, pixelOffset) / HORIZ_THRESHOLD, 0);
+//            pixelOffset = getWhitePixelHorizontalOffset();
+//            pixelDiam = getWhitePixelDiameterPx();
+//        }
     }
 
     public Point getPixelsCenter() {
@@ -396,25 +396,25 @@ public class CVSubsystem extends SubsystemBase {
 
     // TODO: CONSIDER REMOVING IN FAVOR OF APRILTAG ALIGNMENT AND JUST HUMAN PLAYER PLACING PIXELS IN SAME SPOTS
     public void moveToPixels() {
-        visionPortal.setProcessorEnabled(propProcessor, true);
-        int width = getCameraWidth();
-        double HORIZ_THRESHOLD = width / 11.1;
-        double DIST_THRESHOLD = width / 4.0;
-        // same comments regarding do-while as in getPixelsCenter()
-        Point p;
-        do {
-            p = pixelGroupProcessor.getPixelsCenter();
-        }
-        while (opMode.opModeIsActive() && !p.equals(new Point(0, 0)));
-        double pixelOffset = p.x;
-        double pixelDist = p.y;
-        // TODO: NEED MUCH TUNING
-        while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDist) < DIST_THRESHOLD && opMode.opModeIsActive()) {
-            drive.driveRobotCentric(Math.max(DIST_THRESHOLD, pixelDist) / DIST_THRESHOLD, Math.min(HORIZ_THRESHOLD, pixelOffset) / HORIZ_THRESHOLD, 0);
-            pixelOffset = pixelGroupProcessor.getPixelsCenter().x;
-            pixelDist = pixelGroupProcessor.getPixelsCenter().y;
-        }
-        visionPortal.setProcessorEnabled(propProcessor, false);
+//        visionPortal.setProcessorEnabled(propProcessor, true);
+//        int width = getCameraWidth();
+//        double HORIZ_THRESHOLD = width / 11.1;
+//        double DIST_THRESHOLD = width / 4.0;
+//        // same comments regarding do-while as in getPixelsCenter()
+//        Point p;
+//        do {
+//            p = pixelGroupProcessor.getPixelsCenter();
+//        }
+//        while (opMode.opModeIsActive() && !p.equals(new Point(0, 0)));
+//        double pixelOffset = p.x;
+//        double pixelDist = p.y;
+//        // TODO: NEED MUCH TUNING
+//        while (Math.abs(pixelOffset) > HORIZ_THRESHOLD || Math.abs(pixelDist) < DIST_THRESHOLD && opMode.opModeIsActive()) {
+//            drive.driveRobotCentric(Math.max(DIST_THRESHOLD, pixelDist) / DIST_THRESHOLD, Math.min(HORIZ_THRESHOLD, pixelOffset) / HORIZ_THRESHOLD, 0);
+//            pixelOffset = pixelGroupProcessor.getPixelsCenter().x;
+//            pixelDist = pixelGroupProcessor.getPixelsCenter().y;
+//        }
+//        visionPortal.setProcessorEnabled(propProcessor, false);
     }
 
     public void correctPositionAprilTag(int targetx, int targety) {
