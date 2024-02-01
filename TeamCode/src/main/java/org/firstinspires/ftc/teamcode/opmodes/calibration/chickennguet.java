@@ -95,7 +95,10 @@ public class chickennguet extends LinearOpMode {
             dbTelemetry.addData("Elbow Pos",inDep.getElbowPosition());
             dbTelemetry.addData("LArm Pos", hardwareRobot.arm1.getCurrentPosition());
             dbTelemetry.addData("RArm Pos", hardwareRobot.arm2.getCurrentPosition());
+            telemetry.addData("LArm Pos", hardwareRobot.arm1.getCurrentPosition());
+            telemetry.addData("RArm Pos", hardwareRobot.arm2.getCurrentPosition());
             dbTelemetry.update();
+            telemetry.update();
 
             if(gamepad1.left_bumper)speed = Math.max(speed - 0.0001, 0);
             else if (gamepad1.right_bumper)speed = Math.min(speed + 0.0001, 1.0);
@@ -109,22 +112,22 @@ public class chickennguet extends LinearOpMode {
             telemetry.update();
 
 
-            double x_stick = gamepad1.left_stick_x,
-                    y_stick = gamepad1.left_stick_y,
-                    x_turn = gamepad1.right_stick_x,
-                    K = SpeedCoefficients.getAutonomousDriveSpeed();
-
-            if (Math.abs(x_stick)>0.01 || Math.abs(y_stick)>0.01) {
-//                double theta = Math.atan2(y_stick,x_stick);
-//                double L = Math.sin(theta - Math.PI / 4),
-//                        R = Math.sin(theta + Math.PI / 4),
-//                        K = SpeedCoefficients.getAutonomousDriveSpeed();
-//                drive.driveWithMotorPowers(R * K, L * K, L * K, R * K);
-            } else {
-                x_stick = 0;
-                y_stick = 0;
-            }
-            drive.driveFieldCentric(-x_stick * K, y_stick * K, -x_turn * K);
+//            double x_stick = gamepad1.left_stick_x,
+//                    y_stick = gamepad1.left_stick_y,
+//                    x_turn = gamepad1.right_stick_x,
+//                    K = SpeedCoefficients.getAutonomousDriveSpeed();
+//
+//            if (Math.abs(x_stick)>0.01 || Math.abs(y_stick)>0.01) {
+////                double theta = Math.atan2(y_stick,x_stick);
+////                double L = Math.sin(theta - Math.PI / 4),
+////                        R = Math.sin(theta + Math.PI / 4),
+////                        K = SpeedCoefficients.getAutonomousDriveSpeed();
+////                drive.driveWithMotorPowers(R * K, L * K, L * K, R * K);
+//            } else {
+//                x_stick = 0;
+//                y_stick = 0;
+//            }
+//            drive.driveFieldCentric(-x_stick * K, y_stick * K, -x_turn * K);
 
         }
     }

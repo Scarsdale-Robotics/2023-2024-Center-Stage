@@ -13,7 +13,7 @@ public class RobotSystem {
     private HardwareRobot hardwareRobot;
     private InDepSubsystem inDep;
     private DriveSubsystem drive;
-    private CVSubsystem cvFront;
+    private CVSubsystem cv;
     private CVSubsystem cvBack;
 
     public RobotSystem(HardwareMap hardwareMap, boolean isRedTeam, LinearOpMode opMode, Telemetry telemetry) {
@@ -37,20 +37,15 @@ public class RobotSystem {
                 opMode,
                 new MultipleTelemetry(telemetry)
         );
-        cvFront = new CVSubsystem(
+        cv = new CVSubsystem(
                 hardwareRobot.frontCamName,
-                drive,
-                telemetry,
-                isRedTeam,
-                opMode);
-        cvBack = new CVSubsystem(
                 hardwareRobot.backCamName,
                 drive,
                 telemetry,
                 isRedTeam,
                 opMode);
         drive.resetIMU();
-        MovementThread.initSubsystems(drive, inDep, cvFront, cvBack, opMode);
+        MovementThread.initSubsystems(drive, inDep, cv, opMode);
     }
 
     public HardwareRobot getHardwareRobot() {
@@ -65,10 +60,7 @@ public class RobotSystem {
     public DriveSubsystem getDrive() {
         return drive;
     }
-    public CVSubsystem getCVFront() {
-        return cvFront;
-    }
-    public CVSubsystem getCVBack() {
-        return cvFront;
+    public CVSubsystem getCv() {
+        return cv;
     }
 }

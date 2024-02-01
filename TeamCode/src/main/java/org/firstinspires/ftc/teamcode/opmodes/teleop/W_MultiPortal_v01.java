@@ -99,7 +99,7 @@ public class W_MultiPortal_v01 extends LinearOpMode {
     myVisionPortalBuilder = new VisionPortal.Builder();
     if (USE_WEBCAM_1) {
       // Use a webcam.
-      myVisionPortalBuilder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
+      myVisionPortalBuilder.setCamera(hardwareMap.get(WebcamName.class, "Webcam Back"));
     } else {
       // Use the device's back camera.
       myVisionPortalBuilder.setCamera(BuiltinCameraDirection.BACK);
@@ -125,7 +125,7 @@ public class W_MultiPortal_v01 extends LinearOpMode {
   private void Make_second_VisionPortal() {
     if (USE_WEBCAM_2) {
       // Use a webcam.
-      myVisionPortalBuilder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 2"));
+      myVisionPortalBuilder.setCamera(hardwareMap.get(WebcamName.class, "Webcam Front"));
     } else {
       // Use the device's back camera.
       myVisionPortalBuilder.setCamera(BuiltinCameraDirection.BACK);

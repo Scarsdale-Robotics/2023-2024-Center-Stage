@@ -30,10 +30,10 @@ public class InDepSubsystem extends SubsystemBase {
     private Level level = Level.GROUND;
 
     public enum Level {
-        GROUND(0, 0.23, false),
-        BACKBOARD_HIGH(5083,0.31, true),
-        BACKBOARD_MID(7492,0.265, true), // tuned values
-        BACKBOARD_LOW(8250, 0.165, true);
+        GROUND(0, 0.31, false),
+        BACKBOARD_HIGH(1261,0.39, true),
+        BACKBOARD_MID(2150,0.34, true), // tuned values
+        BACKBOARD_LOW(2330, 0.27, true);
 
         public final int target;
         public final double wristTarget;
@@ -60,12 +60,12 @@ public class InDepSubsystem extends SubsystemBase {
         }
     }
     public enum EndEffector {
-        LEFT_CLAW_OPEN(0.6),
-        LEFT_CLAW_CLOSED(0.21),
-        RIGHT_CLAW_OPEN(0.25),
-        RIGHT_CLAW_CLOSED(0.60),
-        ELBOW_REST(0.795),
-        ELBOW_FLIPPED(0.13);
+        LEFT_CLAW_OPEN(0.8),
+        LEFT_CLAW_CLOSED(0.55),
+        RIGHT_CLAW_OPEN(0.0),
+        RIGHT_CLAW_CLOSED(0.25),
+        ELBOW_REST(0.1),
+        ELBOW_FLIPPED(0.74);
         public final double servoPosition;
 
         EndEffector(double servoPosition) {
@@ -168,9 +168,9 @@ public class InDepSubsystem extends SubsystemBase {
         while (
                 opMode.opModeIsActive() && !(
                         Math.abs(L_setPoint - getLeftArmPosition()) < InDepPIDCoefficients.getErrorTolerance_p() &&
-                        Math.abs(getLeftArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v()) && !(
+                                Math.abs(getLeftArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v()) && !(
                         Math.abs(R_setPoint - getRightArmPosition()) < InDepPIDCoefficients.getErrorTolerance_p() &&
-                        Math.abs(getRightArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v())
+                                Math.abs(getRightArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v())
         ) {
             L_PID.setPID(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd());
             R_PID.setPID(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd());
@@ -441,5 +441,4 @@ public class InDepSubsystem extends SubsystemBase {
         arm2.resetEncoder();
     }
 }
-
 

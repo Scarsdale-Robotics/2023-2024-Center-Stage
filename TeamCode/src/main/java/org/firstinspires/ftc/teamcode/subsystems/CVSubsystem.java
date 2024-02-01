@@ -6,7 +6,9 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelGroupDetectionProcessor;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
@@ -44,8 +46,9 @@ public class CVSubsystem extends SubsystemBase {
     public final double ERROR_ALIGNMENT = 4;
 
     private AprilTagProcessor aprilTag;
-    private VisionPortal visionPortal;
-    private final WebcamName cameraName;
+    public VisionPortal visionPortal;
+    public final WebcamName cameraName1, cameraName2;
+    private CameraName switchableCamera;
     private PropDetectionPipeline propProcessor;
     private PixelGroupDetectionProcessor pixelGroupProcessor;
     private boolean isRedTeam;
@@ -57,17 +60,20 @@ public class CVSubsystem extends SubsystemBase {
             {1.25, 6}  , {1.5, 6}
     };
 
-    public CVSubsystem(WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
-        this(null, cameraName,drive,telemetry,isRedTeam,opMode);
+    public CVSubsystem(WebcamName cameraName1, WebcamName cameraName2, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
+        this(null, cameraName1, cameraName2,drive,telemetry,isRedTeam,opMode);
     }
 
-    public CVSubsystem(OpenCvCamera camera, WebcamName cameraName, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
+    public CVSubsystem(OpenCvCamera camera, WebcamName cameraName1, WebcamName cameraName2, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
 //        tdp = new TapeDetectionPipeline();
 //        camera.setPipeline(tdp);
         this.camera = camera;
         this.drive = drive;
         this.telemetry = telemetry;
-        this.cameraName = cameraName;
+        this.cameraName1 = cameraName1;
+        this.cameraName2 = cameraName2;
+        switchableCamera = ClassFactory.getInstance()
+                .getCameraManager().nameForSwitchableCamera(this.cameraName1, this.cameraName2);
         this.isRedTeam = isRedTeam;
         this.opMode = opMode;
         runtime.reset();
@@ -107,32 +113,18 @@ public class CVSubsystem extends SubsystemBase {
                 .setDrawTagOutline(true)
                 .build();
         pixelGroupProcessor = new PixelGroupDetectionProcessor();
-        // to modify, look for the specs in ConceptAprilTag.java:
-        //.setDrawAxes(false)
-        //.setDrawCubeProjection(false)
-        //.setDrawTagOutline(true)
-        //.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
-        //.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
-        //.setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
         // Create the vision portal by using a builder.
         VisionPortal.Builder builder = new VisionPortal.Builder();
 
-        builder.setCamera(cameraName);
-        // builder.setAutoStopLiveView(false); // keep camera on when not processing
+        switchableCamera = ClassFactory.getInstance()
+                .getCameraManager().nameForSwitchableCamera(cameraName1, cameraName2);
 
-        builder.setCameraResolution(new Size(176, 144)); // android.util
-//        builder.setCameraResolution(new Size(320, 240)); // android.util
-//        builder.setCameraResolution(new Size(640, 480)); // android.util
-//        builder.setCameraResolution(new Size(960, 540)); // android.util
-//        builder.setCameraResolution(new Size(1280, 720)); // android.util
+        builder.setCamera(switchableCamera);
 
-        // Set and enable the processor.
+        builder.setCameraResolution(new Size(320, 240)); // android.util
+
         // TODO: DISABLE PROPPROCESSOR FOR TELEOP
         builder.addProcessors(aprilTag, propProcessor, pixelGroupProcessor);
-
-
-        //builder.addProcessors(propProcessor, pixelGroupProcessor);
-//        builder.addProcessors(aprilTag, pixelProcessor, propProcessor);
 
         // Build the Vision Portal, using the above settings.
         visionPortal = builder.build();
@@ -149,6 +141,10 @@ public class CVSubsystem extends SubsystemBase {
 
     public void close() {
         visionPortal.close();
+    }
+
+    public void switchCamera(WebcamName cameraName) {
+        visionPortal.setActiveCamera(cameraName);
     }
 
     /**
@@ -327,16 +323,16 @@ public class CVSubsystem extends SubsystemBase {
         for (AprilTagDetection detection : currentDetections) {
             double rotOff = (detection.ftcPose.x > 0 ? 1 : -1) * detection.ftcPose.yaw;
             // 24 inches per tile
-            double xOff   = (Math.sin(detection.ftcPose.bearing - detection.ftcPose.yaw) * detection.ftcPose.range) / 24 - cameraCenterOffsetX;
-            double yOff   = (Math.cos(detection.ftcPose.bearing - detection.ftcPose.yaw) * detection.ftcPose.range) / 24 - cameraCenterOffsetY;
-            // yes, x is sin and y is cos. Think physics Fg free body diagrams
+            double radians = Math.toRadians(detection.ftcPose.bearing - detection.ftcPose.yaw);
+            double xOff   = (Math.sin(radians) * detection.ftcPose.range) / 24 - cameraCenterOffsetX;
+            double yOff   = (Math.cos(radians) * detection.ftcPose.range) / 24 - cameraCenterOffsetY;
             if (detection.id < 7) {
-                xEst.add(APRIL_TAG_LOCATIONS[detection.id][0] + yOff);
-                yEst.add(APRIL_TAG_LOCATIONS[detection.id][1] + xOff);
+                xEst.add(APRIL_TAG_LOCATIONS[detection.id-1][0] + yOff);
+                yEst.add(APRIL_TAG_LOCATIONS[detection.id-1][1] + xOff);
                 rotEst.add((rotOff + 360) % 360);
             } else {
-                xEst.add(APRIL_TAG_LOCATIONS[detection.id][0] - yOff);
-                yEst.add(APRIL_TAG_LOCATIONS[detection.id][1] - xOff);
+                xEst.add(APRIL_TAG_LOCATIONS[detection.id-1][0] - yOff);
+                yEst.add(APRIL_TAG_LOCATIONS[detection.id-1][1] - xOff);
                 rotEst.add((rotOff + 540) % 360);
             }
         }
@@ -349,6 +345,49 @@ public class CVSubsystem extends SubsystemBase {
         lastKnownPos = new double[]{xMed, yMed, rotMed};
         //xMed, yMed is in term of number of tiles
         return lastKnownPos;
+    }
+
+    public double AngleDifference( double angle1, double angle2 )
+    {
+        double diff = ( angle2 - angle1 + 180 ) % 360 - 180;
+        return diff;
+    }
+
+    public void goToPosition(double cameraCenterOffsetX, double cameraCenterOffsetY, double[] targetPos, boolean isRedTeam){
+        lastKnownPos = getPosition(cameraCenterOffsetX, cameraCenterOffsetY);
+        double xOffset = lastKnownPos[0]-targetPos[0];
+        double yOffset = lastKnownPos[1]-targetPos[1];
+        double angleOffset = AngleDifference(lastKnownPos[2],targetPos[2]);
+        double xyOffsetThreshold = 0.1;
+        double angleOffsetThreshold = 5;
+        int teamValue = isRedTeam ? -1 : 1;
+
+        while (true){
+            if (Math.abs(xOffset)<xyOffsetThreshold){
+                if (xOffset<0 ) { // need to move right
+                    drive.driveFieldCentric(0 ,1 * teamValue * SpeedCoefficients.getStrafeSpeed(),  0);
+                }else {
+                    drive.driveFieldCentric(0, -1 * teamValue * SpeedCoefficients.getStrafeSpeed(),  0);
+                }
+            }
+            if (Math.abs(yOffset)<xyOffsetThreshold){
+                if (yOffset<0) { // need to  down
+                    drive.driveRobotCentric( 1 *teamValue* SpeedCoefficients.getStrafeSpeed(), 0,0);
+                }else {
+                    drive.driveRobotCentric( -1 * teamValue* SpeedCoefficients.getStrafeSpeed(), 0,0);
+                }
+            }
+            if (Math.abs(angleOffset)<angleOffsetThreshold){
+                // need to turn left
+                if (angleOffset<0) {
+                    drive.driveRobotCentric( -1 * teamValue* SpeedCoefficients.getStrafeSpeed() * 0, 0,SpeedCoefficients.getTurnSpeed());
+                }else{
+                    drive.driveRobotCentric( -1 * teamValue* SpeedCoefficients.getStrafeSpeed() * 0, 0,SpeedCoefficients.getTurnSpeed() * -1);
+
+                }
+            }
+        }
+
     }
 
     public void moveToPixel() {
