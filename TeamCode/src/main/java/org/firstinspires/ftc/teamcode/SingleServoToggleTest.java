@@ -16,7 +16,6 @@ public class SingleServoToggleTest extends LinearOpMode {
 
         waitForStart();
 
-
         // CONTROLS:
         // toggle servo        --> triangle
         // inc. bound pos slow --> right trigger
