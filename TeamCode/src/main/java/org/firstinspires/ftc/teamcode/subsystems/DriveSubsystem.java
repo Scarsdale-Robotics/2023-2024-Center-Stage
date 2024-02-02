@@ -52,7 +52,6 @@ public class DriveSubsystem extends SubsystemBase {
         this.imu = imu;
         this.opMode = opMode;
         this.telemetry = telemetry;
-        this.imu.resetYaw();
         this.theta = getYaw();
         isBusy = false;
         threadPool = Executors.newCachedThreadPool();
@@ -100,7 +99,8 @@ public class DriveSubsystem extends SubsystemBase {
      * @param turn      How much the robot should turn.
      */
     public void driveFieldCentric(double right, double forward, double turn) {
-        controller.driveFieldCentric(right, forward, turn, getYaw());
+        double yaw = getYaw();
+        controller.driveFieldCentric(right, forward, turn, yaw);
     }
 
     /**
@@ -358,7 +358,11 @@ public class DriveSubsystem extends SubsystemBase {
         controller.stop();
     }
 
-    public void resetIMU() {
+    public IMU getIMU() {
+        return imu;
+    }
+
+    private void resetIMU() {
         imu.resetYaw();
     }
 

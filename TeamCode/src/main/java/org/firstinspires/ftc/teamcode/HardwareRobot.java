@@ -105,6 +105,7 @@ public class HardwareRobot {
         RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
         imu.initialize(new IMU.Parameters(orientationOnRobot));
+        imu.resetYaw();
 
 
         backCamName = hardwareMap.get(WebcamName.class, "Webcam Back");

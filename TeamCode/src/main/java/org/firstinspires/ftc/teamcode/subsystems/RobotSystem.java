@@ -44,7 +44,6 @@ public class RobotSystem {
                 telemetry,
                 isRedTeam,
                 opMode);
-        drive.resetIMU();
         MovementThread.initSubsystems(drive, inDep, cv, opMode);
     }
 

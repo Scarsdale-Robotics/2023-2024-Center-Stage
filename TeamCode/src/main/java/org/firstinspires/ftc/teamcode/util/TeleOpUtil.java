@@ -73,11 +73,11 @@ public class TeleOpUtil {
     }
 
     private void runArmRigidControl() {
-        if (gamepad1.left_bumper) {
-            inDep.lowerArm();
-        } else if (gamepad1.right_bumper) {
-            inDep.raiseArm();
-        }
+//        if (gamepad1.left_bumper) {
+//            inDep.lowerArm();
+//        } else if (gamepad1.right_bumper) {
+//            inDep.raiseArm();
+//        }
     }
 
     private void macroFailSafe() {
@@ -147,8 +147,10 @@ public class TeleOpUtil {
 //        if (vfn == 0) vf = Math.abs(vf) < 0.001 ? 0 : (vfn * MOMENTUM_FACTOR + vf * (1-MOMENTUM_FACTOR)); else vf = vfn;
 //        if (vtn == 0) vt = Math.abs(vt) < 0.001 ? 0 : (vtn * MOMENTUM_FACTOR + vt * (1-MOMENTUM_FACTOR)); else vt = vtn;  // could add a constant here to adjust for unintended turns
 //        drive.driveFieldCentric(vs, vf, vt);
-        drive.driveFieldCentric(vsn, vfn, vtn);
-//        drive.driveRobotCentric(vsn, vfn, vtn);
+
+        //TODO: GET EXTERNAL IMU FOR FIELD CENTRIC
+//        drive.driveFieldCentric(vsn, vfn, vtn);
+        drive.driveRobotCentric(vsn, vfn, vtn);
     }
 
     /**
@@ -208,10 +210,17 @@ public class TeleOpUtil {
         telemetry.addData("LOC Y", cv.getPosition(0, 0)[1]);
         telemetry.addData("rot", cv.getPosition(0, 0)[2]);
         telemetry.addData("YAW", drive.getYaw());
+        telemetry.addData("IMU name",drive.getIMU().getDeviceName());
         telemetry.update();
         runMotionControl();
         runArmClawControl();
-        if (gamepad2.circle && gamepad2.dpad_left) drive.resetIMU();
+
+        //TODO: does this cause switch between "robot" centric and field centric
+        if (gamepad2.circle && gamepad2.dpad_left) {
+//            drive.resetIMU();
+            telemetry.addData("poop", Math.random());
+        }
+
         if (!gamepad2.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !(inDep.getIsLeftClawOpen() || inDep.getIsRightClawOpen())) {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
         } else if (gamepad2.x) {
