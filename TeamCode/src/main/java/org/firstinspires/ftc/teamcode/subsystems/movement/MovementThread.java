@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 public class MovementThread implements Runnable {
     public static volatile double K_FORWARD = 64.04;
     public static volatile double K_STRAFE = 72.948;
-    public static volatile double K_ARM = 35.0;
+    public static volatile double K_ARM = 11.111;
 
     private static final double POWER_DRIVE = SpeedCoefficients.getAutonomousDriveSpeed();
     private static final double POWER_TURN = SpeedCoefficients.getAutonomousTurnSpeed();
@@ -65,7 +65,7 @@ public class MovementThread implements Runnable {
         if (type.isArmType) {
             inDep.raiseByEncoder(
                 POWER_ARM * type.SGN_elevation,
-                movement.DEGREES_ELEVATION * MovementThread.K_ARM
+                movement.DEGREES_ELEVATION * MovementThread.K_ARM * type.SGN_elevation
             );
         }
 

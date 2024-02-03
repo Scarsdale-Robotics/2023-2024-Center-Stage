@@ -32,7 +32,7 @@ public class DriveSubsystem extends SubsystemBase {
     private final Motor leftBack;
     private final Motor rightBack;
     private Telemetry telemetry;
-    public double theta;
+    public static volatile double heading=0D;
 
     public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, IMU imu, LinearOpMode opMode) {
         this(leftFront, rightFront, leftBack, rightBack, imu, opMode, null);
@@ -52,7 +52,10 @@ public class DriveSubsystem extends SubsystemBase {
         this.imu = imu;
         this.opMode = opMode;
         this.telemetry = telemetry;
-        this.theta = getYaw();
+        while (getYaw() == 0D && heading == 0D && opMode.opModeIsActive()) { // wait until imu reads heading correctly
+            heading = getYaw();
+        }
+        heading = getYaw();
         isBusy = false;
         threadPool = Executors.newCachedThreadPool();
 
@@ -205,7 +208,7 @@ public class DriveSubsystem extends SubsystemBase {
                 telemetry.update();
             }
 
-            double thetaDiff = 0.01 * (getYaw()-this.theta);
+            double thetaDiff = 0.01 * (getYaw()-this.heading);
             // setting the powers of the motors
             driveWithMotorPowers(
                     R_v + thetaDiff, // fL
@@ -278,7 +281,10 @@ public class DriveSubsystem extends SubsystemBase {
 
         // brake
         controller.stop();
-        theta = getYaw();
+        while (getYaw() == 0D && heading == 0D && opMode.opModeIsActive()) { // wait until imu reads heading correctly
+            heading = getYaw();
+        }
+        heading = getYaw();
         isBusy = false;
     }
 

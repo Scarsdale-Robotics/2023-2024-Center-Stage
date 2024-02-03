@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementThread;
 
@@ -45,6 +46,10 @@ public class RobotSystem {
                 isRedTeam,
                 opMode);
         MovementThread.initSubsystems(drive, inDep, cv, opMode);
+        while (getIMU().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) == 0D && opMode.opModeIsActive()) {
+            getIMU().resetYaw();
+        }
+        getIMU().resetYaw();
     }
 
     public HardwareRobot getHardwareRobot() {

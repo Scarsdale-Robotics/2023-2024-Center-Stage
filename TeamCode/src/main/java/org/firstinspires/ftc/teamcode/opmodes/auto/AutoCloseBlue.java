@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -13,12 +14,24 @@ import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
 
 @Autonomous(name = "Auto Close Blue")
+@Config
 public class AutoCloseBlue extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
     private InDepSubsystem inDep;
     private DriveSubsystem drive;
     private CVSubsystem cvFront;
     private CVSubsystem cvBack;
+
+    public static double
+            _0Istep1 = 35,
+            _0Istep2 = 90,
+            _0Istep3a = 24,
+            _0Istep3b = 10,
+            _0IIstep1a = 9,
+            _0IIstep1b = 7,
+            _0IIIstep1 = 20,
+            _0IIIstep2 = 180;
+
     @Override
     // The "Main" code will go in here
     public void runOpMode() {
@@ -35,8 +48,8 @@ public class AutoCloseBlue extends LinearOpMode {
                 .forward(10.80) // Move forward
                 .build();
         drive.followMovementSequence(initCV);
-//        int propLocation = robot.getCVFront().getPropLocation();
-        int propLocation = 0;
+        int propLocation = robot.getCv().getPropLocation();
+//        int propLocation = 0;
 
         MovementSequence placePurple = new MovementSequenceBuilder().build(),
                 approachWhite = new MovementSequenceBuilder().build(),
@@ -50,38 +63,25 @@ public class AutoCloseBlue extends LinearOpMode {
         if (propLocation == 0) {
             // left
             placeYellow = new MovementSequenceBuilder()
-                    .raiseArm(60)
+                    .raiseArm(35)
                     .turnLeft(90, true)
-                    .left(20)
+                    .forwardRight(24,10)
                     .openLeftClaw()
+                    .sleepFor(150)
                     .build();
             placePurple = new MovementSequenceBuilder()
                     .closeBothClaws()
-                    .forwardLeft(20, 8)
+                    .forwardLeft(9, 7)
                     .openRightClaw() // drop purple pixel
+                    .sleepFor(500)
+                    .backward(5)
                     .build();
-//            approachWhite = new MovementSequenceBuilder()
-//                    .forward(88) // move to white pixels
-//                    .alignWithWhitePixel() // i wonder what this does
-////                    .forward(11) // move a bit more after align with white
-//                    .closeRightClaw() // intake 2 white pixels
-//                    .build();
-//            placeWhite = new MovementSequenceBuilder()
-//                    .backward(99) // move towards backdrop
-//                    .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
-//                    .backwardRight(11, 24) // move towards backdrop
-//                    .openRightClaw() // open right claw to release 1 pixel
-//                    .sleepFor(200) // allow 1st pixel to fall
-//                    .closeRightClaw() // close right claw to prevent 2nd pixel release
-//                    .right(3) // move to drop 2nd pixel
-//                    .openRightClaw() // drop 2nd pixel
-//                    .forwardLeft(20, 24) // align with truss
-//                    .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
-//                    .build();
             park = new MovementSequenceBuilder()
-                    .backwardLeft(5, 24)
-                    .lowerArm(60, true)
-                    .turnRight(90)
+                    .backward(5)
+                    .turnRight(180)
+                    .right(20)
+                    .backward(7)
+                    .lowerArm(35, true)
                     .build();
 
         } else if (propLocation == 1) {

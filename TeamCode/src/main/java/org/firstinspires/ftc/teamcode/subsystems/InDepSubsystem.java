@@ -160,34 +160,27 @@ public class InDepSubsystem extends SubsystemBase {
             throw new RuntimeException("Tried to run two arm actions at once (arm is busy)");
         }
         // begin action
-        double L_startEncoder = arm1.motor.getCurrentPosition(), R_startEncoder = arm2.motor.getCurrentPosition();
-        double L_setPoint = L_startEncoder + ticks, R_setPoint = R_startEncoder + ticks;
+        double L_startEncoder = arm1.motor.getCurrentPosition();
+        double L_setPoint = L_startEncoder + ticks;
         PIDController L_PID = new PIDController(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd(), L_setPoint);
-        PIDController R_PID = new PIDController(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd(), R_setPoint);
 
         while (
                 opMode.opModeIsActive() && !(
                         Math.abs(L_setPoint - getLeftArmPosition()) < InDepPIDCoefficients.getErrorTolerance_p() &&
-                                Math.abs(getLeftArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v()) && !(
-                        Math.abs(R_setPoint - getRightArmPosition()) < InDepPIDCoefficients.getErrorTolerance_p() &&
-                                Math.abs(getRightArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v())
+                                Math.abs(getLeftArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v())
         ) {
             L_PID.setPID(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd());
-            R_PID.setPID(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd());
 
             double L_K = L_PID.update(getLeftArmPosition());
-            double R_K = R_PID.update(getRightArmPosition());
 
             arm1.motor.setPower(power * L_K);
-            arm2.motor.setPower(power * R_K);
+            arm2.motor.setPower(power * L_K);
 
 //            setWristPosition(0.25);
 
             if (telemetry != null) {
                 telemetry.addData("L Arm pos", getLeftArmPosition());
                 telemetry.addData("L Setpoint", L_setPoint);
-                telemetry.addData("R Arm pos", getRightArmPosition());
-                telemetry.addData("R Setpoint", R_setPoint);
                 telemetry.update();
             }
             if (getLeftArmPosition() >= Level.BACKBOARD_LOW.target) {
