@@ -64,21 +64,7 @@ public class AutoFarBlue extends LinearOpMode {
                     .backwardLeft(2, 10) // move towards white stack (closest to center)
                     .build();
             placeYellow = new MovementSequenceBuilder()
-                    .backward(96) // move towards backdrop
-                    .sleepFor(500)
-                    .raiseArm(210 - WHITE_PX_HEIGHT) // raise arm to pixel placement pos
-                    .sleepFor(500)
-                    .backwardRight(3.5, 24) // move towards backdrop
-                    .flipElbow()
-                    .sleepFor(1500)
-                    .backward(3)
-                    .openLeftClaw() // release yellow
-                    .openRightClaw() // release white
-                    .sleepFor(250)
-                    .backward(3) // move backwards so yellow pixel falls out of claw
-                    .forwardLeft(10, 33) // align with truss to head towards white stack
-                    .restElbow()
-                    .lowerArm(200 - WHITE_PX_HEIGHT)
+//                    .
                     .build(); // build lol
             approachWhite = new MovementSequenceBuilder()
                     .forward(88) // move to white pixels
@@ -199,13 +185,13 @@ public class AutoFarBlue extends LinearOpMode {
 
         // perform the actual movements here in sequence
         drive.followMovementSequence(placePurple);
-        drive.followMovementSequence(approachFirstWhite);
+//        drive.followMovementSequence(approachFirstWhite);
         drive.followMovementSequence(placeYellow);
-        for (int i = 0;i<2;i++)
-        {
-            drive.followMovementSequence(approachWhite);
-            drive.followMovementSequence(placeWhite);
-        }
+//        for (int i = 0;i<2;i++)
+//        {
+//            drive.followMovementSequence(approachWhite);
+//            drive.followMovementSequence(placeWhite);
+//        }
         drive.followMovementSequence(park);
 
         drive.stopController();
