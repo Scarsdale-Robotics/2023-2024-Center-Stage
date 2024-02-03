@@ -47,6 +47,7 @@ public class TeleOpUtil {
         drive = robot.getDrive();
         cv = robot.getCv();
         cv.disablePropProcessor();
+        cv.switchCamera(cv.cameraName1);
         this.isRedTeam = isRedTeam;
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;

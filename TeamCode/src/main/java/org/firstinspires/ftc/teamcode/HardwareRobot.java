@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -11,6 +12,8 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
+
+import java.util.HashMap;
 
 public class HardwareRobot {
     public final Motor leftFront;
@@ -25,10 +28,11 @@ public class HardwareRobot {
     public final Servo wrist;
 
     public final IMU imu;
-//    public final OpenCvCamera frontCam;
+    public final OpenCvCamera frontCam;
     public final WebcamName frontCamName;
-//    public final OpenCvCamera backCam;
+    public final OpenCvCamera backCam;
     public final WebcamName backCamName;
+    public final HashMap<WebcamName, OpenCvCamera> nameToCamera = new HashMap<>();
     public HardwareRobot(HardwareMap hardwareMap) {
         leftFront = new Motor(hardwareMap, "leftFront", Motor.GoBILDA.RPM_312);
         rightFront = new Motor(hardwareMap, "rightFront", Motor.GoBILDA.RPM_312);
@@ -109,10 +113,15 @@ public class HardwareRobot {
 
 
         backCamName = hardwareMap.get(WebcamName.class, "Webcam Back");
-//        backCam = OpenCvCameraFactory.getInstance().createWebcam(backCamName);
+        backCam = OpenCvCameraFactory.getInstance().createWebcam(backCamName);
+        nameToCamera.put(backCamName, backCam);
 
         frontCamName = hardwareMap.get(WebcamName.class, "Webcam Front");
-//        frontCam = OpenCvCameraFactory.getInstance().createWebcam(frontCamName);
+        frontCam = OpenCvCameraFactory.getInstance().createWebcam(frontCamName);
+        FtcDashboard.getInstance().startCameraStream(frontCam, 0);
+        nameToCamera.put(frontCamName, frontCam);
+
+
     }
 
     public double getYaw() {

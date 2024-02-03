@@ -19,6 +19,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PropDetectionPipeline;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +32,7 @@ public class CVSubsystem extends SubsystemBase {
     private OpenCvCamera camera;
     private DriveSubsystem drive;
 
-    public final int SAMPLE_COUNT = 200;
+    public final int SAMPLE_COUNT = 5;
     public final long SAMPLE_WAIT_MILLISECONDS = 25;
     public final int LOCATION_LEFT   =  0;
     public final int LOCATION_CENTER =  1;
@@ -90,9 +91,8 @@ public class CVSubsystem extends SubsystemBase {
 //            @Override
 //            public void onOpened()
 //            {
-//                camera.setPipeline(pixelPipeline);
-////                camera.setPipeline(propPipeline);
 //                camera.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+//                initAprilTag();
 //            }
 //
 //            @Override
@@ -101,7 +101,6 @@ public class CVSubsystem extends SubsystemBase {
 //                /*
 //                 * This will be called if the camera could not be opened
 //                 */
-//                poo = "Nathan messed up !!!1!";
 //            }
 //        });
     }
@@ -121,7 +120,7 @@ public class CVSubsystem extends SubsystemBase {
 
         builder.setCamera(switchableCamera);
 
-        builder.setCameraResolution(new Size(320, 240)); // android.util
+        builder.setCameraResolution(new Size(640, 480)); // android.util
 
         // TODO: DISABLE PROPPROCESSOR FOR TELEOP
         builder.addProcessors(aprilTag, propProcessor, pixelGroupProcessor);
@@ -132,9 +131,8 @@ public class CVSubsystem extends SubsystemBase {
         // Disable or re-enable the aprilTag processor at any time.
         // visionPortal.setProcessorEnabled(aprilTag, true);
         visionPortal.setProcessorEnabled(propProcessor, false);
-//        while (opMode.opModeIsActive() && visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING);
-//        visionPortal.setActiveCamera(cameraName2);
-
+        while (opMode.opModeInInit() || visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING);
+        visionPortal.setActiveCamera(cameraName2);
     }
 
     public void disablePropProcessor() {
@@ -248,7 +246,6 @@ public class CVSubsystem extends SubsystemBase {
     public int getPropLocation() {
         int propLocation = -1;
         ArrayList<Integer> samples = new ArrayList<>();
-        sleepFor(1000);
         for (int i = 0; i < SAMPLE_COUNT; i++) {
             if (!opMode.opModeIsActive()) break;
             propLocation = propProcessor.getPosition();
