@@ -149,13 +149,19 @@ public class TeleOpUtil {
 //        if (vtn == 0) vt = Math.abs(vt) < 0.001 ? 0 : (vtn * MOMENTUM_FACTOR + vt * (1-MOMENTUM_FACTOR)); else vt = vtn;  // could add a constant here to adjust for unintended turns
 //        drive.driveFieldCentric(vs, vf, vt);
 
-        if (Math.abs(vsn) > 0.6) {
-            vsn = Math.signum(vsn);
-            vfn=0;
-        }
-        if (Math.abs(vfn) > 0.6) {
-            vfn = Math.signum(vfn);
-            vsn=0;
+//        if (Math.abs(vsn) > 0.6) {
+//            vsn = Math.signum(vsn);
+//            vfn=0;
+//        }
+//        if (Math.abs(vfn) > 0.6) {
+//            vfn = Math.signum(vfn);
+//            vsn=0;
+//        }
+
+        if (vfn < 0) {
+            cv.switchCamera(cv.cameraName1);
+        } else {
+            cv.switchCamera(cv.cameraName2);
         }
 
         //TODO: GET EXTERNAL IMU FOR FIELD CENTRIC
