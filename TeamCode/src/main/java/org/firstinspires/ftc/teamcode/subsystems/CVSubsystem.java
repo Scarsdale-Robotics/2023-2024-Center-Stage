@@ -31,7 +31,7 @@ public class CVSubsystem extends SubsystemBase {
     private OpenCvCamera camera;
     private DriveSubsystem drive;
 
-    public final int SAMPLE_COUNT = 5;
+    public final int SAMPLE_COUNT = 100;
     public final long SAMPLE_WAIT_MILLISECONDS = 25;
     public final int LOCATION_LEFT   =  0;
     public final int LOCATION_CENTER =  1;
@@ -73,7 +73,7 @@ public class CVSubsystem extends SubsystemBase {
         this.cameraName1 = cameraName1;
         this.cameraName2 = cameraName2;
         switchableCamera = ClassFactory.getInstance()
-                .getCameraManager().nameForSwitchableCamera(this.cameraName1, this.cameraName2);
+                .getCameraManager().nameForSwitchableCamera(this.cameraName2, this.cameraName1);
         this.isRedTeam = isRedTeam;
         this.opMode = opMode;
         runtime.reset();
@@ -115,7 +115,7 @@ public class CVSubsystem extends SubsystemBase {
         VisionPortal.Builder builder = new VisionPortal.Builder();
 
         switchableCamera = ClassFactory.getInstance()
-                .getCameraManager().nameForSwitchableCamera(cameraName1, cameraName2);
+                .getCameraManager().nameForSwitchableCamera(cameraName2, cameraName1);
 
         builder.setCamera(switchableCamera);
 
@@ -129,8 +129,8 @@ public class CVSubsystem extends SubsystemBase {
 
         // Disable or re-enable the aprilTag processor at any time.
         // visionPortal.setProcessorEnabled(aprilTag, true);
-        visionPortal.setProcessorEnabled(propProcessor, false);
-        while (opMode.opModeInInit() || visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING);
+        visionPortal.setProcessorEnabled(propProcessor, true);
+        while (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING);
         visionPortal.setActiveCamera(cameraName2);
     }
 
