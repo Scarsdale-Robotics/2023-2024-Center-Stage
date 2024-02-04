@@ -31,7 +31,7 @@ public class CVSubsystem extends SubsystemBase {
     private OpenCvCamera camera;
     private DriveSubsystem drive;
 
-    public final int SAMPLE_COUNT = 100;
+    public final int SAMPLE_COUNT = 15;
     public final long SAMPLE_WAIT_MILLISECONDS = 25;
     public final int LOCATION_LEFT   =  0;
     public final int LOCATION_CENTER =  1;
@@ -252,7 +252,6 @@ public class CVSubsystem extends SubsystemBase {
             sleepFor(SAMPLE_WAIT_MILLISECONDS);
         }
         // parsing early misreads
-        if (samples.size()>1) samples.remove(0);
         int[] locations = new int[3];
         for (int i : samples) locations[i]++;
         int max = 0;

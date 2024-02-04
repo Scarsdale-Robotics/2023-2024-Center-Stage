@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
@@ -23,15 +22,10 @@ public class AutoCloseBlue extends LinearOpMode {
     private CVSubsystem cvBack;
 
     public static double
-            _1step1 = 60,
-            _1step2 = 90,
-            _1step3a = 11,
-            _1step3b = 28,
-            _2step1 = 30,
-            _3step1a = 5,
-            _3step1b = 28,
-            _3step2 = 60,
-            _3step3 = 90;
+        _1step1=30,_1step2=90,_1step3=2.5,
+        _2step1a=30,_2step1b=5,_2step2=50,_2step3=160,
+        _3step1=10,_3step2a=0,_3step2b=28,_3step3=160,
+        _3step4=11,_3step5=40,_3step6=10;
 
     @Override
     // The "Main" code will go in here
@@ -69,7 +63,7 @@ public class AutoCloseBlue extends LinearOpMode {
                     .backward(5)
                     .build();
             placeYellow = new MovementSequenceBuilder()
-                    .raiseArm(35)
+                    .raiseArm(30)
                     .turnLeft(90, true)
                     .forwardRight(24,10)
                     .openLeftClaw()
@@ -80,7 +74,7 @@ public class AutoCloseBlue extends LinearOpMode {
                     .turnRight(180)
                     .right(20)
                     .backward(9)
-                    .lowerArm(25)
+                    .lowerArm(20)
                     .lowerArm(10)
                     .forward(2, true)
                     .build();
@@ -88,56 +82,54 @@ public class AutoCloseBlue extends LinearOpMode {
         } else if (propLocation == 1) {
             placePurple = new MovementSequenceBuilder()
                     .closeBothClaws()
-                    .forward(_2step1)
+                    .forward(26.5)
                     .openRightClaw()
+                    .sleepFor(500)
                     .build();
             placeYellow = new MovementSequenceBuilder()
-                    .raiseArm(_1step1)
-                    .turnLeft(_1step2, true)
-                    .forwardLeft(_1step3a, _1step3b)
+                    .backward(5)
+                    .raiseArm(30)
+                    .turnLeft(90)
+                    .forwardRight(33, 10.69420)
                     .openLeftClaw()
+                    .sleepFor(150)
                     .build();
             park = new MovementSequenceBuilder()
-                    .backwardLeft(_3step1a, _3step1b)
-                    .lowerArm(_3step2, true)
-                    .turnRight(_3step3)
+                    .backward(5)
+                    .backwardLeft(5, 26)
+                    .turnRight(180)
+                    .backward(16)
+                    .lowerArm(20)
+                    .lowerArm(10)
+                    .forward(2, true)
                     .build();
 
         } else if (propLocation == 2) {
             placePurple = new MovementSequenceBuilder()
                     .closeBothClaws()
-                    .forward(24)
-                    .turnRight(20, true)
+                    .forward(_1step1)
+                    .turnRight(_1step2)
+                    .forward(_1step3)
                     .openRightClaw()
+                    .sleepFor(500)
                     .build();
             placeYellow = new MovementSequenceBuilder()
-                    .backward(48)
-                    .turnRight(70, true)
-                    .raiseArm(222, true)
+                    .backwardLeft(_2step1a, _2step1b)
+                    .raiseArm(_2step2, true)
+                    .flipElbow()
+                    .raiseArm(_2step3)
                     .openLeftClaw()
-                    .build();
-            approachWhite = new MovementSequenceBuilder()
-                    .forward(66) // move to white pixels
-                    .alignWithWhitePixel() // i wonder what this does
-//                    .forward(11) // move a bit more after align with white
-                    .closeRightClaw() // intake 2 white pixels
-                    .build();
-            placeWhite = new MovementSequenceBuilder()
-                    .backward(99) // move towards backdrop
-                    .raiseArm(120 - WHITE_PX_HEIGHT) // raise arm to place pixels, considering the arm is slightly raised at this point (might be raised at level 1 or level 2 doesn't matter prob)
-                    .backwardRight(11, 12) // move towards backdrop
-                    .openRightClaw() // open right claw to release 1 pixel
-                    .sleepFor(200) // allow 1st pixel to fall
-                    .closeRightClaw() // close right claw to prevent 2nd pixel release
-                    .right(3) // move to drop 2nd pixel
-                    .openRightClaw() // drop 2nd pixel
-                    .forwardLeft(42, 24) // align with truss
-                    .lowerArm(120 - (WHITE_PX_HEIGHT * 3 / 5)) // arm is 120 before this point, now lower to 2nd white pxl pos
+                    .sleepFor(150)
                     .build();
             park = new MovementSequenceBuilder()
-                    .backwardLeft(5, 32)
-                    .lowerArm(60, true)
-                    .turnRight(90)
+                    .forward(_3step1)
+                    .right(_3step2b)
+                    .restElbow()
+                    .lowerArm(_3step3, true)
+                    .backward(_3step4)
+                    .lowerArm(_3step5)
+                    .lowerArm(_3step6)
+                    .forward(2, true)
                     .build();
         }
 
