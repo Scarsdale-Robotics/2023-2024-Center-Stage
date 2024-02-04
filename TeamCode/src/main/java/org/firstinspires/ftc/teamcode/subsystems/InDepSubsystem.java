@@ -117,11 +117,36 @@ public class InDepSubsystem extends SubsystemBase {
     }
 
     /**
+     * Calculates the power coefficient for the arm motors based on the arm position. (https://www.desmos.com/calculator/8qjoopxfda)
+     */
+    private double calculatePowerCoefficient(double armPos) {
+        double relMax = 500;
+
+        if (armPos <= relMax)
+            return Math.max(1/Math.E,
+                    1 /
+                            (Math.pow(
+                                    (armPos-relMax) /
+                                            (double)381,2) + 1)
+            );
+        else
+            return Math.max(1/Math.E,
+                    1 /
+                            (Math.pow(
+                                    (armPos-relMax) /
+                                            (double)1525,2) + 1)
+            );
+    }
+
+    /**
      * Sets the raw power of the arm.
      */
     public void rawPower(double power) {
         // TODO: add ranges
         int armPos = getLeftArmPosition();
+
+        // TODO: desmos graph stuff need to be adjusted
+        double K_power = calculatePowerCoefficient(armPos);
 
         // set bounds
         if (armPos < 0 && power < 0 && !opMode.gamepad1.a) {
@@ -133,8 +158,9 @@ public class InDepSubsystem extends SubsystemBase {
         }
         opMode.telemetry.addData("level: ", level);
         opMode.telemetry.addData("nxt below: ", getLevelBelow());
-        opMode.telemetry.addData("level elbow flipped?: ", level.elbowFlipped);
+        opMode.telemetry.addData("elbow pos: ", elbow.getPosition());
         opMode.telemetry.addData("level wrist target: ", level.wristTarget);
+
         if (level != getLevelBelow()) {
             level = getLevelBelow();
             if (level.elbowFlipped) {
@@ -143,7 +169,15 @@ public class InDepSubsystem extends SubsystemBase {
                 rest();
             }
         }
+
+        // TODO: desmos graph stuff need to be adjusted
+//        if (level != getLevelBelow()) {
+//            level = getLevelBelow();
+//        }
+//        setElbowPosition(calculateElbowPosition(armPos));
+
         wrist.setPosition(level.wristTarget);
+
         opMode.telemetry.addData("chicken: ", "nugget");
         opMode.telemetry.addData("elbowPos", elbow.getPosition());
         opMode.telemetry.addData("wristPos", wrist.getPosition());
@@ -317,6 +351,21 @@ public class InDepSubsystem extends SubsystemBase {
     public void closeRight() {
         rightClaw.setPosition(EndEffector.RIGHT_CLAW_CLOSED.servoPosition);
         isRightClawOpen = false;
+    }
+
+    /**
+     * Calculates the elbow's position based on the arm's position. (https://www.desmos.com/calculator/8qjoopxfda)
+     */
+    private double calculateElbowPosition(double armPos) {
+        double lowerBound = 500;
+        double m_elbow = (EndEffector.ELBOW_FLIPPED.servoPosition - EndEffector.ELBOW_REST.servoPosition) / ((double)Level.BACKBOARD_HIGH.target - lowerBound);
+
+        if (armPos <= lowerBound)
+            return EndEffector.ELBOW_REST.servoPosition;
+        else if (armPos <= (double)Level.BACKBOARD_HIGH.target)
+            return m_elbow*armPos - m_elbow*500 + EndEffector.ELBOW_REST.servoPosition;
+        else
+            return EndEffector.ELBOW_FLIPPED.servoPosition;
     }
 
     /**
