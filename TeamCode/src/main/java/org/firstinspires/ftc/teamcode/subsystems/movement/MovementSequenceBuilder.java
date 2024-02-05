@@ -13,13 +13,55 @@ public class MovementSequenceBuilder {
      */
     public MovementSequence build() {return new MovementSequence(movements);}
 
+    /**
+     * Sets true the linkedToNext boolean of the last Movement in this MovementSequenceBuilder.
+     */
+    public void linkLastMovement() {
+        movements.getLast().linkWithNext();
+    }
+
+    /**
+     * Appends a movement to this MovementSequenceBuilder.
+     * @param movement      The Movement to be appended.
+     */
+    public MovementSequenceBuilder appendMovement(Movement movement) {
+        movements.add(movement);
+        return this;
+    }
+
+    /**
+     * Appends the movements of a MovementSequence to the end of this MovementSequenceBuilder.
+     * @param movementSequence      The MovementSequence to be appended.
+     */
+    public MovementSequenceBuilder appendSequence(MovementSequence movementSequence) {
+        movements.addAll(movementSequence.movements);
+        return this;
+    }
+
+    /**
+     * Appends the movements of a MovementSequenceBuilder to the end of this MovementSequenceBuilder.
+     * @param movementSequenceBuilder      The MovementSequenceBuilder to be appended.
+     */
+    public MovementSequenceBuilder appendSequenceBuilder(MovementSequenceBuilder movementSequenceBuilder) {
+        movements.addAll(movementSequenceBuilder.movements);
+        return this;
+    }
+
+    /**
+     * Appends the movements interpreted from a string to the end of this MovementSequenceBuilder.
+     * @param s      The string whose movements are to be interpreted and appended.
+     */
+    public MovementSequenceBuilder appendFromString(String s) {
+        return this.appendSequenceBuilder(MovementStringInterpreter.interpretString(s));
+    }
+
     public MovementSequenceBuilder alignWithWhitePixel() {
         movements.add(new Movement(Movement.MovementType.WHITE_PXL_ALIGN, 0, 0, 0, 0, 0, 0));
         return this;
     }
 
     /**
-     * Appends a forward movement to the MovementSequenceBuilder.
+     * Appends a forward movement to this MovementSequenceBuilder.
      * @param inches      How far the robot should move in inches.
      */
     public MovementSequenceBuilder forward(double inches) {
@@ -28,7 +70,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a backward movement to the MovementSequenceBuilder.
+     * Appends a backward movement to this MovementSequenceBuilder.
      * @param inches      How far the robot should move in inches.
      */
     public MovementSequenceBuilder backward(double inches) {
@@ -37,7 +79,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a left strafe to the MovementSequenceBuilder.
+     * Appends a left strafe to this MovementSequenceBuilder.
      * @param inches      How far the robot should strafe in inches.
      */
     public MovementSequenceBuilder left(double inches) {
@@ -46,7 +88,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a right strafe to the MovementSequenceBuilder.
+     * Appends a right strafe to this MovementSequenceBuilder.
      * @param inches      How far the robot should strafe in inches.
      */
     public MovementSequenceBuilder right(double inches) {
@@ -55,7 +97,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a left turn to the MovementSequenceBuilder.
+     * Appends a left turn to this MovementSequenceBuilder.
      * @param degrees      How much the robot should turn in degrees.
      */
     public MovementSequenceBuilder turnLeft(double degrees) {
@@ -64,7 +106,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a left turn to the MovementSequenceBuilder.
+     * Appends a left turn to this MovementSequenceBuilder.
      * @param degrees      How much the robot should turn in degrees.
      */
     public MovementSequenceBuilder turnRight(double degrees) {
@@ -73,7 +115,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a forward-left movement to the MovementSequenceBuilder.
+     * Appends a forward-left movement to this MovementSequenceBuilder.
      * @param inchesForward      How much the robot should move forward in inches.
      * @param inchesLeft         How much the robot should strafe left in inches.
      */
@@ -83,7 +125,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a forward-right movement to the MovementSequenceBuilder.
+     * Appends a forward-right movement to this MovementSequenceBuilder.
      * @param inchesForward      How much the robot should move forward in inches.
      * @param inchesRight        How much the robot should strafe right in inches.
      */
@@ -93,7 +135,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a backward-left movement to the MovementSequenceBuilder.
+     * Appends a backward-left movement to this MovementSequenceBuilder.
      * @param inchesBackward     How much the robot should move backward in inches.
      * @param inchesLeft         How much the robot should strafe left in inches.
      */
@@ -103,7 +145,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a backward-right movement to the MovementSequenceBuilder.
+     * Appends a backward-right movement to this MovementSequenceBuilder.
      * @param inchesBackward     How much the robot should move backward in inches.
      * @param inchesRight        How much the robot should strafe right in inches.
      */
@@ -113,7 +155,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a timeout to the MovementSequenceBuilder.
+     * Appends a timeout to this MovementSequenceBuilder.
      * @param ms      The wait time in milliseconds.
      */
     public MovementSequenceBuilder sleepFor(long ms) {
@@ -122,7 +164,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a rest elbow event to the MovementSequenceBuilder.
+     * Appends a rest elbow event to this MovementSequenceBuilder.
      */
     public MovementSequenceBuilder restElbow() {
         movements.add(new Movement(Movement.MovementType.REST_ELBOW, 0, 0, 0, 0, 0, 0));
@@ -130,7 +172,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a flip elbow event to the MovementSequenceBuilder.
+     * Appends a flip elbow event to this MovementSequenceBuilder.
      */
     public MovementSequenceBuilder flipElbow() {
         movements.add(new Movement(Movement.MovementType.FLIP_ELBOW, 0, 0, 0, 0, 0, 0));
@@ -138,7 +180,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a set wrist event to the MovementSequenceBuilder.
+     * Appends a set wrist event to this MovementSequenceBuilder.
      */
     public MovementSequenceBuilder setWrist(double servoPosition) {
         movements.add(new Movement(Movement.MovementType.SET_WRIST, 0, 0, 0, 0, servoPosition, 0));
@@ -146,21 +188,21 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends an open claw event for both claws to the MovementSequenceBuilder.
+     * Appends an open claw event for both claws to this MovementSequenceBuilder.
      */
     public MovementSequenceBuilder openBothClaws() {
         return this.openLeftClaw().openRightClaw();
     }
 
     /**
-     * Appends a close claw event for both claws to the MovementSequenceBuilder.
+     * Appends a close claw event for both claws to this MovementSequenceBuilder.
      */
     public MovementSequenceBuilder closeBothClaws() {
         return this.closeLeftClaw().closeRightClaw();
     }
 
     /**
-     * Appends an open left claw event for both claws to the MovementSequenceBuilder.
+     * Appends an open left claw event for both claws to this MovementSequenceBuilder.
      */
     public MovementSequenceBuilder openLeftClaw() {
         movements.add(new Movement(Movement.MovementType.OPEN_LEFT_CLAW, 0, 0, 0, 0, 0, 0));
@@ -168,7 +210,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends an open right claw event for both claws to the MovementSequenceBuilder.
+     * Appends an open right claw event for both claws to this MovementSequenceBuilder.
      */
     public MovementSequenceBuilder openRightClaw() {
         movements.add(new Movement(Movement.MovementType.OPEN_RIGHT_CLAW, 0, 0, 0, 0, 0, 0));
@@ -176,7 +218,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a close left claw event for both claws to the MovementSequenceBuilder.
+     * Appends a close left claw event for both claws to this MovementSequenceBuilder.
      */
     public MovementSequenceBuilder closeLeftClaw() {
         movements.add(new Movement(Movement.MovementType.CLOSE_LEFT_CLAW, 0, 0, 0, 0, 0, 0));
@@ -184,7 +226,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a close right claw event for both claws to the MovementSequenceBuilder.
+     * Appends a close right claw event for both claws to this MovementSequenceBuilder.
      */
     public MovementSequenceBuilder closeRightClaw() {
         movements.add(new Movement(Movement.MovementType.CLOSE_RIGHT_CLAW, 0, 0, 0, 0, 0, 0));
@@ -192,7 +234,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a lower arm event to the MovementSequenceBuilder.
+     * Appends a lower arm event to this MovementSequenceBuilder.
      * @param degrees      The angle for the arm to be elevated in degrees.
      */
     public MovementSequenceBuilder lowerArm(double degrees) {
@@ -201,7 +243,7 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Appends a raise arm event to the MovementSequenceBuilder.
+     * Appends a raise arm event to this MovementSequenceBuilder.
      * @param degrees      The angle for the arm to be elevated in degrees.
      */
     public MovementSequenceBuilder raiseArm(double degrees) {
@@ -214,149 +256,149 @@ public class MovementSequenceBuilder {
     ////////////////////////////////////
 
     /**
-     * Appends a forward movement to the MovementSequenceBuilder.
+     * Appends a forward movement to this MovementSequenceBuilder.
      * @param inches      How far the robot should move in inches.
      * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
      */
     public MovementSequenceBuilder forward(double inches, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
-            movements.getLast().linkWithNext();
+            linkLastMovement();
         movements.add(new Movement(Movement.MovementType.FORWARD, inches, 0, 0, 0, 0, 0));
         return this;
     }
 
     /**
-     * Appends a backward movement to the MovementSequenceBuilder.
+     * Appends a backward movement to this MovementSequenceBuilder.
      * @param inches      How far the robot should move in inches.
      * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
      */
     public MovementSequenceBuilder backward(double inches, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
-            movements.getLast().linkWithNext();
+            linkLastMovement();
         movements.add(new Movement(Movement.MovementType.BACKWARD, inches, 0, 0, 0, 0, 0));
         return this;
     }
 
     /**
-     * Appends a left strafe to the MovementSequenceBuilder.
+     * Appends a left strafe to this MovementSequenceBuilder.
      * @param inches      How far the robot should strafe in inches.
      * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
      */
     public MovementSequenceBuilder left(double inches, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
-            movements.getLast().linkWithNext();
+            linkLastMovement();
         movements.add(new Movement(Movement.MovementType.STRAFE_LEFT, 0, inches, 0, 0, 0, 0));
         return this;
     }
 
     /**
-     * Appends a right strafe to the MovementSequenceBuilder.
+     * Appends a right strafe to this MovementSequenceBuilder.
      * @param inches      How far the robot should strafe in inches.
      * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
      */
     public MovementSequenceBuilder right(double inches, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
-            movements.getLast().linkWithNext();
+            linkLastMovement();
         movements.add(new Movement(Movement.MovementType.STRAFE_RIGHT, 0, inches, 0, 0, 0, 0));
         return this;
     }
 
     /**
-     * Appends a left turn to the MovementSequenceBuilder.
+     * Appends a left turn to this MovementSequenceBuilder.
      * @param degrees      How much the robot should turn in degrees.
      * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
      */
     public MovementSequenceBuilder turnLeft(double degrees, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
-            movements.getLast().linkWithNext();
+            linkLastMovement();
         movements.add(new Movement(Movement.MovementType.TURN_LEFT, 0, 0, degrees, 0, 0, 0));
         return this;
     }
 
     /**
-     * Appends a left turn to the MovementSequenceBuilder.
+     * Appends a left turn to this MovementSequenceBuilder.
      * @param degrees      How much the robot should turn in degrees.
      * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
      */
     public MovementSequenceBuilder turnRight(double degrees, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
-            movements.getLast().linkWithNext();
+            linkLastMovement();
         movements.add(new Movement(Movement.MovementType.TURN_RIGHT, 0, 0, degrees, 0, 0, 0));
         return this;
     }
 
     /**
-     * Appends a forward-left movement to the MovementSequenceBuilder.
+     * Appends a forward-left movement to this MovementSequenceBuilder.
      * @param inchesForward      How much the robot should move forward in inches.
      * @param inchesLeft         How much the robot should strafe left in inches.
      * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
      */
     public MovementSequenceBuilder forwardLeft(double inchesForward, double inchesLeft, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
-            movements.getLast().linkWithNext();
+            linkLastMovement();
         movements.add(new Movement(Movement.MovementType.FORWARD_LEFT, inchesForward, inchesLeft, 0, 0, 0, 0));
         return this;
     }
 
     /**
-     * Appends a forward-right movement to the MovementSequenceBuilder.
+     * Appends a forward-right movement to this MovementSequenceBuilder.
      * @param inchesForward      How much the robot should move forward in inches.
      * @param inchesRight        How much the robot should strafe right in inches.
      * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
      */
     public MovementSequenceBuilder forwardRight(double inchesForward, double inchesRight, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
-            movements.getLast().linkWithNext();
+            linkLastMovement();
         movements.add(new Movement(Movement.MovementType.FORWARD_RIGHT, inchesForward, inchesRight, 0, 0, 0, 0));
         return this;
     }
 
     /**
-     * Appends a backward-left movement to the MovementSequenceBuilder.
+     * Appends a backward-left movement to this MovementSequenceBuilder.
      * @param inchesBackward     How much the robot should move backward in inches.
      * @param inchesLeft         How much the robot should strafe left in inches.
      * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
      */
     public MovementSequenceBuilder backwardLeft(double inchesBackward, double inchesLeft, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
-            movements.getLast().linkWithNext();
+            linkLastMovement();
         movements.add(new Movement(Movement.MovementType.BACKWARD_LEFT, inchesBackward, inchesLeft, 0, 0, 0, 0));
         return this;
     }
 
     /**
-     * Appends a backward-right movement to the MovementSequenceBuilder.
+     * Appends a backward-right movement to this MovementSequenceBuilder.
      * @param inchesBackward     How much the robot should move backward in inches.
      * @param inchesRight        How much the robot should strafe right in inches.
      * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
      */
     public MovementSequenceBuilder backwardRight(double inchesBackward, double inchesRight, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
-            movements.getLast().linkWithNext();
+            linkLastMovement();
         movements.add(new Movement(Movement.MovementType.BACKWARD_RIGHT, inchesBackward, inchesRight, 0, 0, 0, 0));
         return this;
     }
 
     /**
-     * Appends a lower arm event to the MovementSequenceBuilder.
+     * Appends a lower arm event to this MovementSequenceBuilder.
      * @param degrees      The angle for the arm to be elevated in degrees.
      * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
      */
     public MovementSequenceBuilder lowerArm(double degrees, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
-            movements.getLast().linkWithNext();
+            linkLastMovement();
         movements.add(new Movement(Movement.MovementType.LOWER_ARM, 0, 0, 0, degrees, 0, 0));
         return this;
     }
 
     /**
-     * Appends a raise arm event to the MovementSequenceBuilder.
+     * Appends a raise arm event to this MovementSequenceBuilder.
      * @param degrees      The angle for the arm to be elevated in degrees.
      * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
      */
     public MovementSequenceBuilder raiseArm(double degrees, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
-            movements.getLast().linkWithNext();
+            linkLastMovement();
         movements.add(new Movement(Movement.MovementType.RAISE_ARM, 0, 0, 0, degrees, 0, 0));
         return this;
     }
