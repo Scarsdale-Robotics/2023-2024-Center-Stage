@@ -158,15 +158,19 @@ public class TeleOpUtil {
 //            vsn=0;
 //        }
 
-        if (vfn < 0) {
+        // TODO: test if there is delay only when switching forward/backward (if so prolly below code)
+        if (vfn < 0 && vf >= 0) {
             cv.switchCamera(cv.cameraName1);
-        } else {
+        } else if (vfn > 0 && vf <= 0) {
             cv.switchCamera(cv.cameraName2);
         }
+        vs=vsn;
+        vf=vfn;
+        vt=vtn;
 
         //TODO: GET EXTERNAL IMU FOR FIELD CENTRIC
 //        drive.driveFieldCentric(vsn, vfn, vtn);
-        drive.driveRobotCentric(vsn, vfn, vtn);
+        drive.driveRobotCentric(vs, vf, vt);
     }
 
     /**
