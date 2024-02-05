@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems.movement;
 
-import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
-
 import java.util.ArrayDeque;
 
 public class MovementSequenceBuilder {
@@ -16,7 +14,7 @@ public class MovementSequenceBuilder {
     public MovementSequence build() {return new MovementSequence(movements);}
 
     public MovementSequenceBuilder alignWithWhitePixel() {
-        movements.add(new Movement(Movement.MovementType.WHITE_PXL_ALIGN, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.WHITE_PXL_ALIGN, 0, 0, 0, 0, 0, 0));
         return this;
     }
 
@@ -25,7 +23,7 @@ public class MovementSequenceBuilder {
      * @param inches      How far the robot should move in inches.
      */
     public MovementSequenceBuilder forward(double inches) {
-        movements.add(new Movement(Movement.MovementType.FORWARD, inches, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.FORWARD, inches, 0, 0, 0, 0, 0));
         return this;
     }
 
@@ -34,7 +32,7 @@ public class MovementSequenceBuilder {
      * @param inches      How far the robot should move in inches.
      */
     public MovementSequenceBuilder backward(double inches) {
-        movements.add(new Movement(Movement.MovementType.BACKWARD, inches, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.BACKWARD, inches, 0, 0, 0, 0, 0));
         return this;
     }
 
@@ -43,7 +41,7 @@ public class MovementSequenceBuilder {
      * @param inches      How far the robot should strafe in inches.
      */
     public MovementSequenceBuilder left(double inches) {
-        movements.add(new Movement(Movement.MovementType.STRAFE_LEFT, 0, inches, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.STRAFE_LEFT, 0, inches, 0, 0, 0, 0));
         return this;
     }
 
@@ -52,7 +50,7 @@ public class MovementSequenceBuilder {
      * @param inches      How far the robot should strafe in inches.
      */
     public MovementSequenceBuilder right(double inches) {
-        movements.add(new Movement(Movement.MovementType.STRAFE_RIGHT, 0, inches, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.STRAFE_RIGHT, 0, inches, 0, 0, 0, 0));
         return this;
     }
 
@@ -61,7 +59,7 @@ public class MovementSequenceBuilder {
      * @param degrees      How much the robot should turn in degrees.
      */
     public MovementSequenceBuilder turnLeft(double degrees) {
-        movements.add(new Movement(Movement.MovementType.TURN_LEFT, 0, 0, degrees, 0, 0));
+        movements.add(new Movement(Movement.MovementType.TURN_LEFT, 0, 0, degrees, 0, 0, 0));
         return this;
     }
 
@@ -70,7 +68,7 @@ public class MovementSequenceBuilder {
      * @param degrees      How much the robot should turn in degrees.
      */
     public MovementSequenceBuilder turnRight(double degrees) {
-        movements.add(new Movement(Movement.MovementType.TURN_RIGHT, 0, 0, degrees, 0, 0));
+        movements.add(new Movement(Movement.MovementType.TURN_RIGHT, 0, 0, degrees, 0, 0, 0));
         return this;
     }
 
@@ -80,7 +78,7 @@ public class MovementSequenceBuilder {
      * @param inchesLeft         How much the robot should strafe left in inches.
      */
     public MovementSequenceBuilder forwardLeft(double inchesForward, double inchesLeft) {
-        movements.add(new Movement(Movement.MovementType.FORWARD_LEFT, inchesForward, inchesLeft, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.FORWARD_LEFT, inchesForward, inchesLeft, 0, 0, 0, 0));
         return this;
     }
 
@@ -90,7 +88,7 @@ public class MovementSequenceBuilder {
      * @param inchesRight        How much the robot should strafe right in inches.
      */
     public MovementSequenceBuilder forwardRight(double inchesForward, double inchesRight) {
-        movements.add(new Movement(Movement.MovementType.FORWARD_RIGHT, inchesForward, inchesRight, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.FORWARD_RIGHT, inchesForward, inchesRight, 0, 0, 0, 0));
         return this;
     }
 
@@ -100,7 +98,7 @@ public class MovementSequenceBuilder {
      * @param inchesLeft         How much the robot should strafe left in inches.
      */
     public MovementSequenceBuilder backwardLeft(double inchesBackward, double inchesLeft) {
-        movements.add(new Movement(Movement.MovementType.BACKWARD_LEFT, inchesBackward, inchesLeft, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.BACKWARD_LEFT, inchesBackward, inchesLeft, 0, 0, 0, 0));
         return this;
     }
 
@@ -110,7 +108,7 @@ public class MovementSequenceBuilder {
      * @param inchesRight        How much the robot should strafe right in inches.
      */
     public MovementSequenceBuilder backwardRight(double inchesBackward, double inchesRight) {
-        movements.add(new Movement(Movement.MovementType.BACKWARD_RIGHT, inchesBackward, inchesRight, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.BACKWARD_RIGHT, inchesBackward, inchesRight, 0, 0, 0, 0));
         return this;
     }
 
@@ -119,7 +117,7 @@ public class MovementSequenceBuilder {
      * @param ms      The wait time in milliseconds.
      */
     public MovementSequenceBuilder sleepFor(long ms) {
-        movements.add(new Movement(Movement.MovementType.DELAY, 0, 0, 0, 0, ms));
+        movements.add(new Movement(Movement.MovementType.DELAY, 0, 0, 0, 0, 0, ms));
         return this;
     }
 
@@ -127,7 +125,7 @@ public class MovementSequenceBuilder {
      * Appends a rest elbow event to the MovementSequenceBuilder.
      */
     public MovementSequenceBuilder restElbow() {
-        movements.add(new Movement(Movement.MovementType.REST_ELBOW, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.REST_ELBOW, 0, 0, 0, 0, 0, 0));
         return this;
     }
 
@@ -135,7 +133,15 @@ public class MovementSequenceBuilder {
      * Appends a flip elbow event to the MovementSequenceBuilder.
      */
     public MovementSequenceBuilder flipElbow() {
-        movements.add(new Movement(Movement.MovementType.FLIP_ELBOW, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.FLIP_ELBOW, 0, 0, 0, 0, 0, 0));
+        return this;
+    }
+
+    /**
+     * Appends a set wrist event to the MovementSequenceBuilder.
+     */
+    public MovementSequenceBuilder setWrist(double servoPosition) {
+        movements.add(new Movement(Movement.MovementType.SET_WRIST, 0, 0, 0, 0, servoPosition, 0));
         return this;
     }
 
@@ -157,7 +163,7 @@ public class MovementSequenceBuilder {
      * Appends an open left claw event for both claws to the MovementSequenceBuilder.
      */
     public MovementSequenceBuilder openLeftClaw() {
-        movements.add(new Movement(Movement.MovementType.OPEN_LEFT_CLAW, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.OPEN_LEFT_CLAW, 0, 0, 0, 0, 0, 0));
         return this;
     }
 
@@ -165,7 +171,7 @@ public class MovementSequenceBuilder {
      * Appends an open right claw event for both claws to the MovementSequenceBuilder.
      */
     public MovementSequenceBuilder openRightClaw() {
-        movements.add(new Movement(Movement.MovementType.OPEN_RIGHT_CLAW, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.OPEN_RIGHT_CLAW, 0, 0, 0, 0, 0, 0));
         return this;
     }
 
@@ -173,7 +179,7 @@ public class MovementSequenceBuilder {
      * Appends a close left claw event for both claws to the MovementSequenceBuilder.
      */
     public MovementSequenceBuilder closeLeftClaw() {
-        movements.add(new Movement(Movement.MovementType.CLOSE_LEFT_CLAW, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.CLOSE_LEFT_CLAW, 0, 0, 0, 0, 0, 0));
         return this;
     }
 
@@ -181,7 +187,7 @@ public class MovementSequenceBuilder {
      * Appends a close right claw event for both claws to the MovementSequenceBuilder.
      */
     public MovementSequenceBuilder closeRightClaw() {
-        movements.add(new Movement(Movement.MovementType.CLOSE_RIGHT_CLAW, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.CLOSE_RIGHT_CLAW, 0, 0, 0, 0, 0, 0));
         return this;
     }
 
@@ -190,7 +196,7 @@ public class MovementSequenceBuilder {
      * @param degrees      The angle for the arm to be elevated in degrees.
      */
     public MovementSequenceBuilder lowerArm(double degrees) {
-        movements.add(new Movement(Movement.MovementType.LOWER_ARM, 0, 0, 0, degrees, 0));
+        movements.add(new Movement(Movement.MovementType.LOWER_ARM, 0, 0, 0, degrees, 0, 0));
         return this;
     }
 
@@ -199,7 +205,7 @@ public class MovementSequenceBuilder {
      * @param degrees      The angle for the arm to be elevated in degrees.
      */
     public MovementSequenceBuilder raiseArm(double degrees) {
-        movements.add(new Movement(Movement.MovementType.RAISE_ARM, 0, 0, 0, degrees, 0));
+        movements.add(new Movement(Movement.MovementType.RAISE_ARM, 0, 0, 0, degrees, 0, 0));
         return this;
     }
 
@@ -215,7 +221,7 @@ public class MovementSequenceBuilder {
     public MovementSequenceBuilder forward(double inches, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
             movements.getLast().linkWithNext();
-        movements.add(new Movement(Movement.MovementType.FORWARD, inches, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.FORWARD, inches, 0, 0, 0, 0, 0));
         return this;
     }
 
@@ -227,7 +233,7 @@ public class MovementSequenceBuilder {
     public MovementSequenceBuilder backward(double inches, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
             movements.getLast().linkWithNext();
-        movements.add(new Movement(Movement.MovementType.BACKWARD, inches, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.BACKWARD, inches, 0, 0, 0, 0, 0));
         return this;
     }
 
@@ -239,7 +245,7 @@ public class MovementSequenceBuilder {
     public MovementSequenceBuilder left(double inches, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
             movements.getLast().linkWithNext();
-        movements.add(new Movement(Movement.MovementType.STRAFE_LEFT, 0, inches, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.STRAFE_LEFT, 0, inches, 0, 0, 0, 0));
         return this;
     }
 
@@ -251,7 +257,7 @@ public class MovementSequenceBuilder {
     public MovementSequenceBuilder right(double inches, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
             movements.getLast().linkWithNext();
-        movements.add(new Movement(Movement.MovementType.STRAFE_RIGHT, 0, inches, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.STRAFE_RIGHT, 0, inches, 0, 0, 0, 0));
         return this;
     }
 
@@ -263,7 +269,7 @@ public class MovementSequenceBuilder {
     public MovementSequenceBuilder turnLeft(double degrees, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
             movements.getLast().linkWithNext();
-        movements.add(new Movement(Movement.MovementType.TURN_LEFT, 0, 0, degrees, 0, 0));
+        movements.add(new Movement(Movement.MovementType.TURN_LEFT, 0, 0, degrees, 0, 0, 0));
         return this;
     }
 
@@ -275,7 +281,7 @@ public class MovementSequenceBuilder {
     public MovementSequenceBuilder turnRight(double degrees, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
             movements.getLast().linkWithNext();
-        movements.add(new Movement(Movement.MovementType.TURN_RIGHT, 0, 0, degrees, 0, 0));
+        movements.add(new Movement(Movement.MovementType.TURN_RIGHT, 0, 0, degrees, 0, 0, 0));
         return this;
     }
 
@@ -288,7 +294,7 @@ public class MovementSequenceBuilder {
     public MovementSequenceBuilder forwardLeft(double inchesForward, double inchesLeft, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
             movements.getLast().linkWithNext();
-        movements.add(new Movement(Movement.MovementType.FORWARD_LEFT, inchesForward, inchesLeft, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.FORWARD_LEFT, inchesForward, inchesLeft, 0, 0, 0, 0));
         return this;
     }
 
@@ -301,7 +307,7 @@ public class MovementSequenceBuilder {
     public MovementSequenceBuilder forwardRight(double inchesForward, double inchesRight, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
             movements.getLast().linkWithNext();
-        movements.add(new Movement(Movement.MovementType.FORWARD_RIGHT, inchesForward, inchesRight, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.FORWARD_RIGHT, inchesForward, inchesRight, 0, 0, 0, 0));
         return this;
     }
 
@@ -314,7 +320,7 @@ public class MovementSequenceBuilder {
     public MovementSequenceBuilder backwardLeft(double inchesBackward, double inchesLeft, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
             movements.getLast().linkWithNext();
-        movements.add(new Movement(Movement.MovementType.BACKWARD_LEFT, inchesBackward, inchesLeft, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.BACKWARD_LEFT, inchesBackward, inchesLeft, 0, 0, 0, 0));
         return this;
     }
 
@@ -327,7 +333,7 @@ public class MovementSequenceBuilder {
     public MovementSequenceBuilder backwardRight(double inchesBackward, double inchesRight, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
             movements.getLast().linkWithNext();
-        movements.add(new Movement(Movement.MovementType.BACKWARD_RIGHT, inchesBackward, inchesRight, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.BACKWARD_RIGHT, inchesBackward, inchesRight, 0, 0, 0, 0));
         return this;
     }
 
@@ -339,7 +345,7 @@ public class MovementSequenceBuilder {
     public MovementSequenceBuilder lowerArm(double degrees, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
             movements.getLast().linkWithNext();
-        movements.add(new Movement(Movement.MovementType.LOWER_ARM, 0, 0, 0, degrees, 0));
+        movements.add(new Movement(Movement.MovementType.LOWER_ARM, 0, 0, 0, degrees, 0, 0));
         return this;
     }
 
@@ -351,7 +357,7 @@ public class MovementSequenceBuilder {
     public MovementSequenceBuilder raiseArm(double degrees, boolean withPrevious) {
         if (!movements.isEmpty() && withPrevious)
             movements.getLast().linkWithNext();
-        movements.add(new Movement(Movement.MovementType.RAISE_ARM, 0, 0, 0, degrees, 0));
+        movements.add(new Movement(Movement.MovementType.RAISE_ARM, 0, 0, 0, degrees, 0, 0));
         return this;
     }
 

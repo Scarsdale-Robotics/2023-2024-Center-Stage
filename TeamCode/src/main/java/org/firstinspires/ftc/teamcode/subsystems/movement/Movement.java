@@ -19,6 +19,7 @@ public class Movement {
         OPEN_RIGHT_CLAW(0.0,0.0,0.0,0.0, false, false, true, false, false),
         REST_ELBOW(0.0,0.0,0.0,0.0, false, false, false, false, false),
         FLIP_ELBOW(0.0,0.0,0.0,0.0, false, false, false, false, false),
+        SET_WRIST(0.0,0.0,0.0,0.0, false, false, false, false, false),
         LOWER_ARM(0.0,0.0,0.0,-1.0, false, false, false, true, false),
         RAISE_ARM(0.0,0.0,0.0,1.0, false, false, false, true, false),
         WHITE_PXL_ALIGN(1.0, 1.0, 1.0, 0.0, false, false, false, false, true),
@@ -43,15 +44,17 @@ public class Movement {
     }
     public MovementType MOVEMENT_TYPE;
     public double INCHES_FORWARD, INCHES_STRAFE, DEGREES_TURN, DEGREES_ELEVATION;
+    public double SERVO_POSITION;
     public long WAIT;
     public boolean linkedToNext;
 
-    Movement(MovementType type, double forward, double strafe, double turn, double elevation, long wait) {
+    Movement(MovementType type, double forward, double strafe, double turn, double elevation, double servoPosition, long wait) {
         this.MOVEMENT_TYPE = type;
         this.INCHES_FORWARD = forward;
         this.INCHES_STRAFE = strafe;
         this.DEGREES_TURN = turn;
         this.DEGREES_ELEVATION = elevation;
+        this.SERVO_POSITION = servoPosition;
         this.WAIT = wait;
         linkedToNext = false;
     }

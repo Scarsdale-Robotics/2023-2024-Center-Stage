@@ -70,8 +70,9 @@ public class MovementThread implements Runnable {
         }
 
         // DELAY CASE
-        if (type == Movement.MovementType.DELAY)
+        if (type == Movement.MovementType.DELAY) {
             sleepFor(movement.WAIT);
+        }
 
         // CLAW CASES
         if (type.isClawType) {
@@ -91,6 +92,11 @@ public class MovementThread implements Runnable {
         }
         if (type == Movement.MovementType.FLIP_ELBOW) {
             inDep.flip();
+        }
+
+        // WRIST CASES
+        if (type == Movement.MovementType.SET_WRIST) {
+            inDep.setWristPosition(movement.SERVO_POSITION);
         }
 
         // CV CASES
