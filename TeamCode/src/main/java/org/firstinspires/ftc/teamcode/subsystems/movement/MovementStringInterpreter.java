@@ -24,7 +24,15 @@ public class MovementStringInterpreter {
 
 				// reading the MovementString parameters
 				int closeParenthesis = s.indexOf(")", i);
-				ArrayList<String> movementStringParamsList= new ArrayList<>(Arrays.asList((s.substring(i + 1, closeParenthesis)).split(",")));
+				int nests = 1;
+				String parametersString = "";
+				while (nests>0 && i < s.length()) {
+					i++;
+					nests += s.charAt(i)=='(' ? 1 : (s.charAt(i)==')' ? -1 : 0);
+					if (nests>0)
+						parametersString += s.charAt(i);
+				}
+				ArrayList<String> movementStringParamsList= new ArrayList<>(Arrays.asList(parametersString.split(",")));
 				movementStringParamsList.removeAll(Arrays.asList("", null));
 				String[] movementStringParams = movementStringParamsList.toArray(new String[movementStringParamsList.size()]);
 				i = closeParenthesis;
