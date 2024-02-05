@@ -1,4 +1,3 @@
-package org.firstinspires.ftc.teamcode.subsystems.movement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,7 +14,9 @@ public class MovementStringInterpreter {
 
 		ArrayList<MovementString> movementStrings = new ArrayList<>();
 
-		for (int i = 0; i < s.length(); i++) {
+		for (int i = 0; 0 <= i && i < s.length(); i++) {
+
+			// detect methods
 			if (s.charAt(i) == '.') {
 				// reading the MovementString name
 				int openParenthesis = s.indexOf("(", i);
@@ -26,8 +27,10 @@ public class MovementStringInterpreter {
 				int closeParenthesis = s.indexOf(")", i);
 				int nests = 1;
 				String parametersString = "";
-				while (nests>0 && i < s.length()) {
+				while (nests>0 && i<s.length()) {
 					i++;
+					if (i==s.length())
+						throw new RuntimeException("Missing )");
 					nests += s.charAt(i)=='(' ? 1 : (s.charAt(i)==')' ? -1 : 0);
 					if (nests>0)
 						parametersString += s.charAt(i);
@@ -35,12 +38,27 @@ public class MovementStringInterpreter {
 				ArrayList<String> movementStringParamsList= new ArrayList<>(Arrays.asList(parametersString.split(",")));
 				movementStringParamsList.removeAll(Arrays.asList("", null));
 				String[] movementStringParams = movementStringParamsList.toArray(new String[movementStringParamsList.size()]);
-				i = closeParenthesis;
 
 				// append MovementString to list
 				MovementString movementString = new MovementString(movementStringName, movementStringParams);
 				movementStrings.add(movementString);
 			}
+
+			// detect comments
+			int nextMovement = s.indexOf(".",i);
+			String comment;
+			if (nextMovement!=-1)
+				comment = s.substring(i+1, nextMovement);
+			else
+				comment = s.substring(i+1);
+			if (!comment.equals("")) {
+				if (comment.length()<2)
+					throw new RuntimeException("Failed to interpret movement \""+comment+"\".");
+				if (!comment.substring(0, 2).equals("//")) {
+					throw new RuntimeException("Failed to interpret movement \""+comment+"\".");
+				}
+			}
+			i = nextMovement-1;
 		}
 
 		MovementSequenceBuilder movementSequenceBuilder = new MovementSequenceBuilder();
