@@ -22,16 +22,10 @@ public class AutoFarBlue extends LinearOpMode {
     private CVSubsystem cvFront;
     private CVSubsystem cvBack;
 
-    public static double
-            _1step1 = 60,
-            _1step2 = 90,
-            _1step3a = 11,
-            _1step3b = 28,
-            _2step1 = 30,
-            _3step1a = 5,
-            _3step1b = 28,
-            _3step2 = 60,
-            _3step3 = 90;
+    public static String cv_seq = "";
+    public static String purple_seq = "";
+    public static String yellow_seq = "";
+    public static String park_seq = "";
 
     @Override
     // The "Main" code will go in here
@@ -44,8 +38,11 @@ public class AutoFarBlue extends LinearOpMode {
         waitForStart();
 
         // Start actual Auto now | cv
+//        MovementSequence initCV = new MovementSequenceBuilder()
+//                .forwardLeft(4, 8) // calibrate
+//                .build();
         MovementSequence initCV = new MovementSequenceBuilder()
-                .forwardLeft(4, 8) // calibrate
+                .appendFromString(cv_seq)
                 .build();
         drive.followMovementSequence(initCV);
         int propLocation = robot.getCv().getPropLocation();
@@ -236,6 +233,17 @@ public class AutoFarBlue extends LinearOpMode {
 //                    .forwardLeft(42, 24) // align with truss
 //                    .build();
         }
+
+        placePurple = new MovementSequenceBuilder()
+                .appendFromString(purple_seq)
+                .build();
+        placeYellow = new MovementSequenceBuilder()
+                .appendFromString(yellow_seq)
+                .build();
+        park = new MovementSequenceBuilder()
+                .appendFromString(park_seq)
+                .build();
+
 
         // perform the actual movements here in sequence
         drive.followMovementSequence(placePurple);
