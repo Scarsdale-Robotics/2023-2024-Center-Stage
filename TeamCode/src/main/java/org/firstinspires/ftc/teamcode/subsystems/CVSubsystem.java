@@ -359,7 +359,7 @@ public class CVSubsystem extends SubsystemBase {
         double angleOffsetThreshold = 5;
         int teamValue = isRedTeam ? -1 : 1;
 
-        while (true){
+        while (true){  // TODO: NOT WHILE TRUE
             if (Math.abs(xOffset)<xyOffsetThreshold){
                 if (xOffset<0 ) { // need to move right
                     drive.driveFieldCentric(0 ,1 * teamValue * SpeedCoefficients.getStrafeSpeed(),  0);

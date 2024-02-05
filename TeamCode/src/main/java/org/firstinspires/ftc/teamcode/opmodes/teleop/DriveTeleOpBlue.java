@@ -22,7 +22,7 @@ public class DriveTeleOpBlue extends LinearOpMode {
 
         if (opModeIsActive()) {
             while (opModeIsActive()) {
-                doCameraSwitching();
+//                doCameraSwitching();
                 teleOp.tick();
     //            telemetry.addData("Arm pos: ", teleOp.robot.arm.motor.getCurrentPosition());
     //            telemetry.addData("Wrist pos: ", teleOp.robot.wrist.getPosition());
