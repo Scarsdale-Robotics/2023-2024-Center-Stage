@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.EndgameSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
@@ -18,6 +19,7 @@ public class TeleOpUtil {
     public InDepSubsystem inDep;
     //    public CVSubsystem cvFront;
     public CVSubsystem cv;
+    public EndgameSubsystem endgame;
     private final boolean isRedTeam;
     private final Gamepad gamepad1;
     private final Gamepad gamepad2;
@@ -33,7 +35,7 @@ public class TeleOpUtil {
     private double lastTurnStart;
     private double moveInputX;
     private double moveInputY;
-    boolean elbowToggle = false, elbowClosed = false;
+    boolean elbowToggle = false, droneToggle = false, elbowClosed = false;
     private double vs = 0.0;
     private double vf = 0.0;
     private double vt = 0.0;
@@ -54,6 +56,7 @@ public class TeleOpUtil {
         this.telemetry = telemetry;
         this.lastTurnStart = robot.getIMU().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
         this.inDep = robot.getInDep();
+        this.endgame = robot.getEndgame();
         if (isRedTeam)
         {
             intoBackboardMode = new MovementSequenceBuilder()
@@ -159,11 +162,11 @@ public class TeleOpUtil {
 //        }
 
         // TODO: test if there is delay only when switching forward/backward (if so prolly below code)
-        if (vfn < 0 && vf >= 0) {
-            cv.switchCamera(cv.cameraName1);
-        } else if (vfn > 0 && vf <= 0) {
-            cv.switchCamera(cv.cameraName2);
-        }
+//        if (vfn < 0 && vf >= 0) {
+//            new Thread(() -> cv.switchCamera(cv.cameraName1));
+//        } else if (vfn > 0 && vf <= 0) {
+//            new Thread(() -> cv.switchCamera(cv.cameraName2));
+//        }
         vs=vsn;
         vf=vfn;
         vt=vtn;
@@ -172,6 +175,9 @@ public class TeleOpUtil {
 //        drive.driveFieldCentric(vsn, vfn, vtn);
         drive.driveRobotCentric(vs, vf, vt);
     }
+//HHHHHHHHHHIIIIIIIII
+    //poopypoop poop
+    /**/
 
     /**
      * PRIMARY ARM CLAW CONTROL METHOD
@@ -219,6 +225,21 @@ public class TeleOpUtil {
         }
     }
 
+
+    /**
+     * PRIMARY DRONE CONTROL METHOD
+     */
+    private void runEndgameControl() {
+        if ((gamepad2.triangle && gamepad2.square) && !droneToggle) {
+            endgame.releaseDrone();
+            droneToggle = true;
+        }
+        if (!gamepad2.triangle && !gamepad2.square) {
+            endgame.holdDrone();
+            droneToggle = false;
+        }
+    }
+
     public void tick() {
         double DISTANCE_BEFORE_BACKBOARD = 45;  // TEMP
         double cvDist = cv.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
@@ -234,6 +255,7 @@ public class TeleOpUtil {
         telemetry.update();
         runMotionControl();
         runArmClawControl();
+        runEndgameControl();
 
         //TODO: does this cause switch between "robot" centric and field centric
         if (gamepad2.circle && gamepad2.dpad_left) {

@@ -1,23 +1,31 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 
 public class EndgameSubsystem extends SubsystemBase {
 
-    private Servo drone;
+    private CRServo drone;
 
-    public EndgameSubsystem(Servo drone) {
+    public EndgameSubsystem(CRServo drone) {
         this.drone = drone;
-
-        drone.setPosition(0);
+        holdDrone();
     }
 
-    public void setPosition(double servoPos) {
-        drone.setPosition(servoPos);
+    public void setPower(double power) {
+        drone.setPower(power);
+    }
+
+    public double getPower() {
+        return drone.getPower();
+    }
+
+    public void holdDrone() {
+        drone.setPower(0);
     }
 
     public void releaseDrone() {
-        drone.setPosition(0);
+        drone.setPower(1);
     }
+
 }

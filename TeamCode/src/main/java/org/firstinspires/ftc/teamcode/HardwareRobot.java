@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -26,7 +27,7 @@ public class HardwareRobot {
     public final Servo leftClaw;
     public final Servo rightClaw;
     public final Servo wrist;
-    public final Servo drone;
+    public final CRServo drone;
     public final IMU imu;
     //    public final OpenCvCamera frontCam;
     public final WebcamName frontCamName;
@@ -99,13 +100,12 @@ public class HardwareRobot {
         rightClaw = hardwareMap.servo.get("rightClaw");
         wrist = hardwareMap.servo.get("wrist");
         elbow = hardwareMap.servo.get("elbow");
-        drone = hardwareMap.servo.get("drone");
+        drone = hardwareMap.crservo.get("drone");
 
         leftClaw.scaleRange(0, 1);
         rightClaw.scaleRange(0, 1);
         wrist.scaleRange(0, 1);
         elbow.scaleRange(0, 1);
-        drone.scaleRange(0, 1);
 
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;

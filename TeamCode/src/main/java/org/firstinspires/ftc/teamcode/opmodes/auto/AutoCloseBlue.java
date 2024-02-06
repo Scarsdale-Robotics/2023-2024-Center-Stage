@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
+import org.firstinspires.ftc.teamcode.subsystems.movement.MovementStringInterpreter;
 
 @Autonomous(name = "Auto Close Blue")
 @Config
@@ -20,6 +21,9 @@ public class AutoCloseBlue extends LinearOpMode {
     private DriveSubsystem drive;
     private CVSubsystem cvFront;
     private CVSubsystem cvBack;
+
+    public static String sequences = "";
+    public static boolean useString = false;
 
     @Override
     // The "Main" code will go in here
@@ -125,6 +129,13 @@ public class AutoCloseBlue extends LinearOpMode {
                     .lowerArm(10)
                     .forward(2, true)
                     .build();
+        }
+
+        if (useString) {
+            MovementSequence[] seqs = MovementStringInterpreter.toMovementSequenceArray(sequences);
+            placePurple = seqs[0];
+            placeYellow = seqs[1];
+            park = seqs[2];
         }
 
         // perform the actual movements here in sequence

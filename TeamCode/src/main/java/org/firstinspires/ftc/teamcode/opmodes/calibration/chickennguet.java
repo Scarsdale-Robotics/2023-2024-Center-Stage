@@ -10,7 +10,6 @@ import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.EndgameSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
-import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 
 @TeleOp(name = "chicken nguett")
 @Config
@@ -93,7 +92,7 @@ public class chickennguet extends LinearOpMode {
             }
 
             inDep.setWristPosition(wristPos);
-            endgame.setPosition(dronePos);
+            endgame.setPower(dronePos);
             dbTelemetry.addData("LClaw Pos",inDep.getLeftClawPosition());
             dbTelemetry.addData("RClaw Pos",inDep.getRightClawPosition());
             dbTelemetry.addData("Wrist Pos",inDep.getWristPosition());
@@ -102,6 +101,7 @@ public class chickennguet extends LinearOpMode {
             dbTelemetry.addData("RArm Pos", hardwareRobot.arm2.getCurrentPosition());
             telemetry.addData("LArm Pos", hardwareRobot.arm1.getCurrentPosition());
             telemetry.addData("RArm Pos", hardwareRobot.arm2.getCurrentPosition());
+            dbTelemetry.addData("Drone Pos", endgame.getPower());
             dbTelemetry.update();
             telemetry.update();
 

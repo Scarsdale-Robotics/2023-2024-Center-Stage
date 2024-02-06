@@ -93,7 +93,7 @@ public class SubsystemTester extends LinearOpMode {
 
         telemetry.clearAll();
         while (opModeIsActive() && !gamepad1.right_bumper) {
-            endgame.setPosition(gamepad1.left_stick_x/5+0.5);
+            endgame.setPower(gamepad1.left_stick_x/5+0.5);
             telemetry.addData("endgame servoPos:",gamepad1.left_stick_x/5+0.5);
             telemetry.update();
         } while (opModeIsActive() && gamepad1.right_bumper);
