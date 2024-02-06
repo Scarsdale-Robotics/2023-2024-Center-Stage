@@ -15,7 +15,7 @@ public class RobotSystem {
     private InDepSubsystem inDep;
     private DriveSubsystem drive;
     private CVSubsystem cv;
-    private CVSubsystem cvBack;
+    private EndgameSubsystem endgame;
 
     public RobotSystem(HardwareMap hardwareMap, boolean isRedTeam, LinearOpMode opMode, Telemetry telemetry) {
         this.hardwareRobot = new HardwareRobot(hardwareMap);
@@ -45,6 +45,7 @@ public class RobotSystem {
                 telemetry,
                 isRedTeam,
                 opMode);
+        endgame = new EndgameSubsystem(hardwareRobot.drone);
         MovementThread.initSubsystems(drive, inDep, cv, opMode);
         while (getIMU().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) == 0D && opMode.opModeIsActive()) {
             getIMU().resetYaw();
@@ -64,7 +65,10 @@ public class RobotSystem {
     public DriveSubsystem getDrive() {
         return drive;
     }
-    public CVSubsystem getCv() {
+    public CVSubsystem getCV() {
         return cv;
+    }
+    public EndgameSubsystem getEndgame() {
+        return endgame;
     }
 }

@@ -26,13 +26,14 @@ public class HardwareRobot {
     public final Servo leftClaw;
     public final Servo rightClaw;
     public final Servo wrist;
-
+    public final Servo drone;
     public final IMU imu;
-//    public final OpenCvCamera frontCam;
+    //    public final OpenCvCamera frontCam;
     public final WebcamName frontCamName;
-//    public final OpenCvCamera backCam;
+    //    public final OpenCvCamera backCam;
     public final WebcamName backCamName;
-//    public final HashMap<WebcamName, OpenCvCamera> nameToCamera = new HashMap<>();
+    //    public final HashMap<WebcamName, OpenCvCamera> nameToCamera = new HashMap<>();
+
     public HardwareRobot(HardwareMap hardwareMap) {
         leftFront = new Motor(hardwareMap, "leftFront", Motor.GoBILDA.RPM_312);
         rightFront = new Motor(hardwareMap, "rightFront", Motor.GoBILDA.RPM_312);
@@ -98,11 +99,13 @@ public class HardwareRobot {
         rightClaw = hardwareMap.servo.get("rightClaw");
         wrist = hardwareMap.servo.get("wrist");
         elbow = hardwareMap.servo.get("elbow");
+        drone = hardwareMap.servo.get("drone");
 
         leftClaw.scaleRange(0, 1);
         rightClaw.scaleRange(0, 1);
         wrist.scaleRange(0, 1);
         elbow.scaleRange(0, 1);
+        drone.scaleRange(0, 1);
 
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;

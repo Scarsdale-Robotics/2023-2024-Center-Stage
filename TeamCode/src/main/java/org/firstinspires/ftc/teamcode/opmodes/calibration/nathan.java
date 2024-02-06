@@ -3,9 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes.calibration;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.HardwareRobot;
-import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 
 @Autonomous(name = "temp nathan")
@@ -18,12 +15,12 @@ public class nathan extends LinearOpMode {
 
         waitForStart();
 
-        telemetry.addData("team prop loc: ", robot.getCv().getPropLocation());
+        telemetry.addData("team prop loc: ", robot.getCV().getPropLocation());
         telemetry.update();
         while (opModeIsActive()) {
-            robot.getCv().moveToPixels();
-            telemetry.addData("sdjfl;asdf", robot.getCv().getPixelsCenter().x);
-            telemetry.addData("sdjfl;asdfy", robot.getCv().getPixelsCenter().y);
+            robot.getCV().moveToPixels();
+            telemetry.addData("sdjfl;asdf", robot.getCV().getPixelsCenter().x);
+            telemetry.addData("sdjfl;asdfy", robot.getCV().getPixelsCenter().y);
             telemetry.update();
         }
 

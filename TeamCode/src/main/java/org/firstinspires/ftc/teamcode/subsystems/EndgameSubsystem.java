@@ -1,23 +1,23 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class EndgameSubsystem extends SubsystemBase {
 
-//    private final Motor lift1;
-//    private final Motor lift2;
-    public enum Level {
-        GROUND(0),
-        HANG(999999999);
-        int target;
-        Level(int target) {
-            this.target = target;
-        }
+    private Servo drone;
+
+    public EndgameSubsystem(Servo drone) {
+        this.drone = drone;
+
+        drone.setPosition(0);
     }
 
-//    public EndGameSubsystem(Motor lift1, Motor lift2) {
-//        //Initializes the subsystem
-//        this.lift1 = lift1;
-//        this.lift2 = lift2;
-//    }
+    public void setPosition(double servoPos) {
+        drone.setPosition(servoPos);
+    }
+
+    public void releaseDrone() {
+        drone.setPosition(0);
+    }
 }

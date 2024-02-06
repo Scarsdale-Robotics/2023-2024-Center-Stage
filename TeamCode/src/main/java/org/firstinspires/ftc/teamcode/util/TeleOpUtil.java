@@ -45,7 +45,7 @@ public class TeleOpUtil {
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
         RobotSystem robot = new RobotSystem(hardwareMap, isRedTeam, opMode, telemetry);
         drive = robot.getDrive();
-        cv = robot.getCv();
+        cv = robot.getCV();
         cv.disablePropProcessor();
         cv.switchCamera(cv.cameraName1);
         this.isRedTeam = isRedTeam;

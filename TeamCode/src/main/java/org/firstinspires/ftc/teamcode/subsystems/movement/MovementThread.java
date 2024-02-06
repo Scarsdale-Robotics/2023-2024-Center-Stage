@@ -64,7 +64,7 @@ public class MovementThread implements Runnable {
         // ARM CASES
         if (type.isArmType) {
             inDep.raiseByEncoder(
-                POWER_ARM * type.SGN_elevation,
+                POWER_ARM,
                 movement.DEGREES_ELEVATION * MovementThread.K_ARM * type.SGN_elevation
             );
         }

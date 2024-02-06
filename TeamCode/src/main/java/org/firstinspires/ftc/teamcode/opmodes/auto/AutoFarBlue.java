@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
@@ -45,7 +44,7 @@ public class AutoFarBlue extends LinearOpMode {
                 .appendFromString(cv_seq)
                 .build();
         drive.followMovementSequence(initCV);
-        int propLocation = robot.getCv().getPropLocation();
+        int propLocation = robot.getCV().getPropLocation();
 //        int propLocation = 0;
 
         MovementSequence placePurple = new MovementSequenceBuilder().build(),

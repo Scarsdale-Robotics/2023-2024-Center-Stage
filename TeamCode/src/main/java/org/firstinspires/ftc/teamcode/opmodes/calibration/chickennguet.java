@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.EndgameSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 
@@ -17,13 +18,15 @@ public class chickennguet extends LinearOpMode {
     private HardwareRobot hardwareRobot;
     private DriveSubsystem drive;
     private InDepSubsystem inDep;
+    private EndgameSubsystem endgame;
     public static double leftPosOpen = 0.6;
     public static double rightPosOpen = 0.25;
     public static double leftPosClosed = 0.21;
     public static double rightPosClosed = 0.6;
-    public static double elbowPosRest = 0.80;
-    public static double elbowPosFlipped = 0.13;
+    public static double elbowPosRest = 0.10;
+    public static double elbowPosFlipped = 0.74;
     public static double wristPos = 0.25;
+    public static double dronePos = 0.0;
 
     private double speed = 1;
     @Override
@@ -46,6 +49,7 @@ public class chickennguet extends LinearOpMode {
                 hardwareRobot.imu,
                 this
         );
+        endgame = new EndgameSubsystem(hardwareRobot.drone);
         FtcDashboard dashboard = FtcDashboard.getInstance();
         Telemetry dbTelemetry = dashboard.getTelemetry();
         dbTelemetry.addData("LClaw Pos",inDep.getLeftClawPosition());
@@ -89,6 +93,7 @@ public class chickennguet extends LinearOpMode {
             }
 
             inDep.setWristPosition(wristPos);
+            endgame.setPosition(dronePos);
             dbTelemetry.addData("LClaw Pos",inDep.getLeftClawPosition());
             dbTelemetry.addData("RClaw Pos",inDep.getRightClawPosition());
             dbTelemetry.addData("Wrist Pos",inDep.getWristPosition());
