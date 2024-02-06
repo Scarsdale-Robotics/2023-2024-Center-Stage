@@ -24,7 +24,7 @@ public class MovementSequenceBuilder {
      * Appends a movement to this MovementSequenceBuilder.
      * @param movement      The Movement to be appended.
      */
-    public MovementSequenceBuilder appendMovement(Movement movement) {
+    public MovementSequenceBuilder append(Movement movement) {
         movements.add(movement);
         return this;
     }
@@ -33,7 +33,7 @@ public class MovementSequenceBuilder {
      * Appends the movements of a MovementSequence to the end of this MovementSequenceBuilder.
      * @param movementSequence      The MovementSequence to be appended.
      */
-    public MovementSequenceBuilder appendSequence(MovementSequence movementSequence) {
+    public MovementSequenceBuilder append(MovementSequence movementSequence) {
         movements.addAll(movementSequence.movements);
         return this;
     }
@@ -42,7 +42,7 @@ public class MovementSequenceBuilder {
      * Appends the movements of a MovementSequenceBuilder to the end of this MovementSequenceBuilder.
      * @param movementSequenceBuilder      The MovementSequenceBuilder to be appended.
      */
-    public MovementSequenceBuilder appendSequenceBuilder(MovementSequenceBuilder movementSequenceBuilder) {
+    public MovementSequenceBuilder append(MovementSequenceBuilder movementSequenceBuilder) {
         movements.addAll(movementSequenceBuilder.movements);
         return this;
     }
@@ -51,8 +51,8 @@ public class MovementSequenceBuilder {
      * Appends the movements interpreted from a string to the end of this MovementSequenceBuilder.
      * @param s      The string whose movements are to be interpreted and appended.
      */
-    public MovementSequenceBuilder appendFromString(String s) {
-        return this.appendSequenceBuilder(MovementStringInterpreter.interpretString(s));
+    public MovementSequenceBuilder append(String s) {
+        return this.append(MovementStringInterpreter.toMovementSequenceBuilder(s));
     }
 
     public MovementSequenceBuilder alignWithWhitePixel() {

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems.movement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.regex.*;
 
 public class MovementStringInterpreter {
 
@@ -9,7 +10,7 @@ public class MovementStringInterpreter {
 	 * Converts a string into a MovementSequenceBuilder
 	 * @param s      The string to be converted.
 	 */
-	public static MovementSequenceBuilder interpretString(String s) {
+	public static MovementSequenceBuilder toMovementSequenceBuilder(String s) {
 		// removing whitespaces
 		s = s.replaceAll("\\s+","");
 
@@ -24,8 +25,6 @@ public class MovementStringInterpreter {
 				String movementStringName = s.substring(i+1, openParenthesis);
 				i = openParenthesis;
 
-				// reading the MovementString parameters
-				int closeParenthesis = s.indexOf(")", i);
 				int nests = 1;
 				String parametersString = "";
 				while (nests>0 && i<s.length()) {
@@ -39,6 +38,7 @@ public class MovementStringInterpreter {
 				ArrayList<String> movementStringParamsList= new ArrayList<>(Arrays.asList(parametersString.split(",")));
 				movementStringParamsList.removeAll(Arrays.asList("", null));
 				String[] movementStringParams = movementStringParamsList.toArray(new String[movementStringParamsList.size()]);
+				i++;
 
 				// append MovementString to list
 				MovementString movementString = new MovementString(movementStringName, movementStringParams);
@@ -49,16 +49,12 @@ public class MovementStringInterpreter {
 			int nextMovement = s.indexOf(".",i);
 			String comment;
 			if (nextMovement!=-1)
-				comment = s.substring(i+1, nextMovement);
+				comment = s.substring(i, nextMovement);
 			else
-				comment = s.substring(i+1);
-			if (!comment.equals("")) {
-				if (comment.length()<2)
-					throw new RuntimeException("Failed to interpret movement \""+comment+"\".");
-				if (!comment.substring(0, 2).equals("//")) {
-					throw new RuntimeException("Failed to interpret movement \""+comment+"\".");
-				}
-			}
+				comment = s.substring(i);
+			comment = comment.replaceAll("\\s+","");
+			if (!(comment.length()==0 || comment.startsWith("//")))
+				throw new RuntimeException("Failed to interpret movement: "+comment);
 			i = nextMovement-1;
 		}
 
@@ -82,15 +78,42 @@ public class MovementStringInterpreter {
 			if (movementStringParams.length > 0 &&
 					movementStringParams[movementStringParams.length-1].equals("true")) {
 				movementSequenceBuilder.linkLastMovement();
-				movementSequenceBuilder.appendMovement(movementString.toMovement());
+				movementSequenceBuilder.append(movementString.toMovement());
 				continue;
 			}
 
-			movementSequenceBuilder.appendMovement(movementString.toMovement());
+			movementSequenceBuilder.append(movementString.toMovement());
 
 		}
 
 		return movementSequenceBuilder;
+	}
+
+	/**
+	 * Converts a string containing MovementStrings bounded by curly brackets into a MovementSequence array.
+	 * @param s      The string to be converted.
+	 */
+	public static MovementSequence[] toMovementSequenceArray(String s) {
+		ArrayList<String> movementSequenceStrings = new ArrayList<>();
+
+		Matcher matcher = Pattern.compile("\\{((.|\\n|\\r)*?)\\}").matcher(s);
+		int prevEnd = 0;
+		while (matcher.find()) {
+			String comment = s.substring(prevEnd, matcher.start()).replaceAll("\\s+","");
+			if (!(comment.length()==0 || comment.startsWith("//")))
+				throw new RuntimeException("Unexpected token: "+comment);
+			movementSequenceStrings.add(matcher.group().replaceAll("\\{|\\}", ""));
+			prevEnd = matcher.end()+1;
+		}
+		String comment = s.substring(Math.min(prevEnd, s.length())).replaceAll("\\s+","");
+		if (!(comment.length()==0 || comment.startsWith("//")))
+			throw new RuntimeException("Unexpected token: "+comment);
+
+		MovementSequence[] movementSequences = new MovementSequence[movementSequenceStrings.size()];
+		for (int i = 0; i < movementSequenceStrings.size(); i++)
+			movementSequences[i] = toMovementSequenceBuilder(movementSequenceStrings.get(i)).build();
+
+		return movementSequences;
 	}
 
 
@@ -101,10 +124,6 @@ public class MovementStringInterpreter {
 		public MovementString(String name, String[] params) {
 			this.name = name;
 			this.params = params;
-		}
-
-		public void popLastParam() {
-			params = Arrays.copyOf(params, params.length-1);
 		}
 
 		public String toString() {
@@ -255,7 +274,7 @@ public class MovementStringInterpreter {
 	/////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////
 
-	public static Movement alignWithWhitePixel() {
+	private static Movement alignWithWhitePixel() {
 		return (new Movement(Movement.MovementType.WHITE_PXL_ALIGN, 0, 0, 0, 0, 0, 0));
 
 	}
@@ -264,7 +283,7 @@ public class MovementStringInterpreter {
 	 * Appends a forward movement to this MovementSequenceBuilder.
 	 * @param inches      How far the robot should move in inches.
 	 */
-	public static Movement forward(double inches) {
+	private static Movement forward(double inches) {
 		return (new Movement(Movement.MovementType.FORWARD, inches, 0, 0, 0, 0, 0));
 
 	}
@@ -273,7 +292,7 @@ public class MovementStringInterpreter {
 	 * Appends a backward movement to this MovementSequenceBuilder.
 	 * @param inches      How far the robot should move in inches.
 	 */
-	public static Movement backward(double inches) {
+	private static Movement backward(double inches) {
 		return (new Movement(Movement.MovementType.BACKWARD, inches, 0, 0, 0, 0, 0));
 
 	}
@@ -282,7 +301,7 @@ public class MovementStringInterpreter {
 	 * Appends a left strafe to this MovementSequenceBuilder.
 	 * @param inches      How far the robot should strafe in inches.
 	 */
-	public static Movement left(double inches) {
+	private static Movement left(double inches) {
 		return (new Movement(Movement.MovementType.STRAFE_LEFT, 0, inches, 0, 0, 0, 0));
 
 	}
@@ -291,7 +310,7 @@ public class MovementStringInterpreter {
 	 * Appends a right strafe to this MovementSequenceBuilder.
 	 * @param inches      How far the robot should strafe in inches.
 	 */
-	public static Movement right(double inches) {
+	private static Movement right(double inches) {
 		return (new Movement(Movement.MovementType.STRAFE_RIGHT, 0, inches, 0, 0, 0, 0));
 
 	}
@@ -300,7 +319,7 @@ public class MovementStringInterpreter {
 	 * Appends a left turn to this MovementSequenceBuilder.
 	 * @param degrees      How much the robot should turn in degrees.
 	 */
-	public static Movement turnLeft(double degrees) {
+	private static Movement turnLeft(double degrees) {
 		return (new Movement(Movement.MovementType.TURN_LEFT, 0, 0, degrees, 0, 0, 0));
 
 	}
@@ -309,7 +328,7 @@ public class MovementStringInterpreter {
 	 * Appends a left turn to this MovementSequenceBuilder.
 	 * @param degrees      How much the robot should turn in degrees.
 	 */
-	public static Movement turnRight(double degrees) {
+	private static Movement turnRight(double degrees) {
 		return (new Movement(Movement.MovementType.TURN_RIGHT, 0, 0, degrees, 0, 0, 0));
 
 	}
@@ -319,7 +338,7 @@ public class MovementStringInterpreter {
 	 * @param inchesForward      How much the robot should move forward in inches.
 	 * @param inchesLeft         How much the robot should strafe left in inches.
 	 */
-	public static Movement forwardLeft(double inchesForward, double inchesLeft) {
+	private static Movement forwardLeft(double inchesForward, double inchesLeft) {
 		return (new Movement(Movement.MovementType.FORWARD_LEFT, inchesForward, inchesLeft, 0, 0, 0, 0));
 
 	}
@@ -329,7 +348,7 @@ public class MovementStringInterpreter {
 	 * @param inchesForward      How much the robot should move forward in inches.
 	 * @param inchesRight        How much the robot should strafe right in inches.
 	 */
-	public static Movement forwardRight(double inchesForward, double inchesRight) {
+	private static Movement forwardRight(double inchesForward, double inchesRight) {
 		return (new Movement(Movement.MovementType.FORWARD_RIGHT, inchesForward, inchesRight, 0, 0, 0, 0));
 
 	}
@@ -339,7 +358,7 @@ public class MovementStringInterpreter {
 	 * @param inchesBackward     How much the robot should move backward in inches.
 	 * @param inchesLeft         How much the robot should strafe left in inches.
 	 */
-	public static Movement backwardLeft(double inchesBackward, double inchesLeft) {
+	private static Movement backwardLeft(double inchesBackward, double inchesLeft) {
 		return (new Movement(Movement.MovementType.BACKWARD_LEFT, inchesBackward, inchesLeft, 0, 0, 0, 0));
 
 	}
@@ -349,7 +368,7 @@ public class MovementStringInterpreter {
 	 * @param inchesBackward     How much the robot should move backward in inches.
 	 * @param inchesRight        How much the robot should strafe right in inches.
 	 */
-	public static Movement backwardRight(double inchesBackward, double inchesRight) {
+	private static Movement backwardRight(double inchesBackward, double inchesRight) {
 		return (new Movement(Movement.MovementType.BACKWARD_RIGHT, inchesBackward, inchesRight, 0, 0, 0, 0));
 
 	}
@@ -358,7 +377,7 @@ public class MovementStringInterpreter {
 	 * Appends a timeout to this MovementSequenceBuilder.
 	 * @param ms      The wait time in milliseconds.
 	 */
-	public static Movement sleepFor(long ms) {
+	private static Movement sleepFor(long ms) {
 		return (new Movement(Movement.MovementType.DELAY, 0, 0, 0, 0, 0, ms));
 
 	}
@@ -366,7 +385,7 @@ public class MovementStringInterpreter {
 	/**
 	 * Appends a rest elbow event to this MovementSequenceBuilder.
 	 */
-	public static Movement restElbow() {
+	private static Movement restElbow() {
 		return (new Movement(Movement.MovementType.REST_ELBOW, 0, 0, 0, 0, 0, 0));
 
 	}
@@ -374,7 +393,7 @@ public class MovementStringInterpreter {
 	/**
 	 * Appends a flip elbow event to this MovementSequenceBuilder.
 	 */
-	public static Movement flipElbow() {
+	private static Movement flipElbow() {
 		return (new Movement(Movement.MovementType.FLIP_ELBOW, 0, 0, 0, 0, 0, 0));
 
 	}
@@ -382,7 +401,7 @@ public class MovementStringInterpreter {
 	/**
 	 * Appends a set wrist event to this MovementSequenceBuilder.
 	 */
-	public static Movement setWrist(double servoPosition) {
+	private static Movement setWrist(double servoPosition) {
 		return (new Movement(Movement.MovementType.SET_WRIST, 0, 0, 0, 0, servoPosition, 0));
 
 	}
@@ -390,7 +409,7 @@ public class MovementStringInterpreter {
 	/**
 	 * Appends an open left claw event for both claws to this MovementSequenceBuilder.
 	 */
-	public static Movement openLeftClaw() {
+	private static Movement openLeftClaw() {
 		return (new Movement(Movement.MovementType.OPEN_LEFT_CLAW, 0, 0, 0, 0, 0, 0));
 
 	}
@@ -398,7 +417,7 @@ public class MovementStringInterpreter {
 	/**
 	 * Appends an open right claw event for both claws to this MovementSequenceBuilder.
 	 */
-	public static Movement openRightClaw() {
+	private static Movement openRightClaw() {
 		return (new Movement(Movement.MovementType.OPEN_RIGHT_CLAW, 0, 0, 0, 0, 0, 0));
 
 	}
@@ -406,7 +425,7 @@ public class MovementStringInterpreter {
 	/**
 	 * Appends a close left claw event for both claws to this MovementSequenceBuilder.
 	 */
-	public static Movement closeLeftClaw() {
+	private static Movement closeLeftClaw() {
 		return (new Movement(Movement.MovementType.CLOSE_LEFT_CLAW, 0, 0, 0, 0, 0, 0));
 
 	}
@@ -414,7 +433,7 @@ public class MovementStringInterpreter {
 	/**
 	 * Appends a close right claw event for both claws to this MovementSequenceBuilder.
 	 */
-	public static Movement closeRightClaw() {
+	private static Movement closeRightClaw() {
 		return (new Movement(Movement.MovementType.CLOSE_RIGHT_CLAW, 0, 0, 0, 0, 0, 0));
 
 	}
@@ -423,7 +442,7 @@ public class MovementStringInterpreter {
 	 * Appends a lower arm event to this MovementSequenceBuilder.
 	 * @param degrees      The angle for the arm to be elevated in degrees.
 	 */
-	public static Movement lowerArm(double degrees) {
+	private static Movement lowerArm(double degrees) {
 		return (new Movement(Movement.MovementType.LOWER_ARM, 0, 0, 0, degrees, 0, 0));
 
 	}
@@ -432,7 +451,7 @@ public class MovementStringInterpreter {
 	 * Appends a raise arm event to this MovementSequenceBuilder.
 	 * @param degrees      The angle for the arm to be elevated in degrees.
 	 */
-	public static Movement raiseArm(double degrees) {
+	private static Movement raiseArm(double degrees) {
 		return (new Movement(Movement.MovementType.RAISE_ARM, 0, 0, 0, degrees, 0, 0));
 
 	}
@@ -442,7 +461,7 @@ public class MovementStringInterpreter {
 	 * @param str  The string expression to be evaluated.
 	 * @return The answer to the expression.
 	 */
-	public static double eval(final String str) {
+	private static double eval(final String str) {
 		return new Object() {
 			int pos = -1, ch;
 

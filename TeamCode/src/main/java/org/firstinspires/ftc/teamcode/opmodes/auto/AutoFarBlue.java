@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
+import org.firstinspires.ftc.teamcode.subsystems.movement.MovementStringInterpreter;
 
 @Autonomous(name = "Auto Far Blue")
 @Config
@@ -21,10 +22,7 @@ public class AutoFarBlue extends LinearOpMode {
     private CVSubsystem cvFront;
     private CVSubsystem cvBack;
 
-    public static String cv_seq = "";
-    public static String purple_seq = "";
-    public static String yellow_seq = "";
-    public static String park_seq = "";
+    public static String sequences = "";
 
     @Override
     // The "Main" code will go in here
@@ -36,13 +34,14 @@ public class AutoFarBlue extends LinearOpMode {
 
         waitForStart();
 
+        MovementSequence[] seqs = MovementStringInterpreter.toMovementSequenceArray(sequences);
+
         // Start actual Auto now | cv
 //        MovementSequence initCV = new MovementSequenceBuilder()
 //                .forwardLeft(4, 8) // calibrate
 //                .build();
-        MovementSequence initCV = new MovementSequenceBuilder()
-                .appendFromString(cv_seq)
-                .build();
+        MovementSequence initCV = seqs[0];
+
         drive.followMovementSequence(initCV);
         int propLocation = robot.getCV().getPropLocation();
 //        int propLocation = 0;
@@ -233,15 +232,9 @@ public class AutoFarBlue extends LinearOpMode {
 //                    .build();
         }
 
-        placePurple = new MovementSequenceBuilder()
-                .appendFromString(purple_seq)
-                .build();
-        placeYellow = new MovementSequenceBuilder()
-                .appendFromString(yellow_seq)
-                .build();
-        park = new MovementSequenceBuilder()
-                .appendFromString(park_seq)
-                .build();
+        placePurple = seqs[1];
+        placeYellow = seqs[2];
+        park = seqs[3];
 
 
         // perform the actual movements here in sequence
