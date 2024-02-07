@@ -65,28 +65,33 @@ public class AutoFarBlue extends LinearOpMode {
             // left
             placePurple = new MovementSequenceBuilder()
                     .closeBothClaws()
-                    .right(8) //calibrate - should be equal to amount moved left by cv
-                    .forward(24) //calibrate
+                    .forwardRight(1, 5)
+                    .forward(21)
                     .turnLeft(90)
-                    .forward(5) //calibrate
+                    .forward(1)
                     .openRightClaw() // release purple pixel
-                    .sleepFor(500)
-                    .backward(5)
+                    .sleepFor(150)
+                    .backwardLeft(12, 24)
+                    .turnRight(180)
                     .build();
             placeYellow = new MovementSequenceBuilder()
-                    .left(24) //should be equal to initial forward
-                    .forward(92) //calibrate
-                    .raiseArm(35)
-                    .right(20) //calibrate
+                    .backward(38)
+                    .backward(20)
+                    .raiseArm(50, true)
+                    .flipElbow()
+                    .backwardLeft(29, 30)
+                    .raiseArm(170, true)
+                    .backward(7.5)
                     .openLeftClaw()
-                    .sleepFor(500)
+                    .sleepFor(150)
                     .build();
             park = new MovementSequenceBuilder()
-                    .backward(5)
-                    .turnRight(180)
-                    .right(20)
-                    .backward(9)
-                    .lowerArm(25)
+                    .forward(7)
+                    .left(32)
+                    .restElbow()
+                    .lowerArm(170, true)
+                    .backward(20)
+                    .lowerArm(40)
                     .lowerArm(10)
                     .forward(2, true)
                     .build();
@@ -129,26 +134,31 @@ public class AutoFarBlue extends LinearOpMode {
         } else if (propLocation == 1) {
             placePurple = new MovementSequenceBuilder()
                     .closeBothClaws()
-                    .right(8) //calibrate - should be equal to amount moved left by cv
-                    .forward(28) //calibrate
+                    .forwardRight(1, 5)
+                    .forward(21)
                     .openRightClaw() // release purple pixel
-                    .sleepFor(500)
+                    .sleepFor(150)
+                    .backward(25)
+                    .right(180)
                     .build();
             placeYellow = new MovementSequenceBuilder()
-                    .backward(28) //should be equal to initial forward
-                    .turnLeft(90)
-                    .forward(92) //calibrate
-                    .raiseArm(35)
-                    .right(24) //calibrate
+                    .backward(28)
+                    .backward(20)
+                    .raiseArm(50, true)
+                    .flipElbow()
+                    .backwardLeft(29, 23)
+                    .raiseArm(170, true)
+                    .backward(7.5)
                     .openLeftClaw()
-                    .sleepFor(500)
+                    .sleepFor(150)
                     .build();
             park = new MovementSequenceBuilder()
-                    .backward(5)
-                    .turnRight(180)
-                    .right(24)
-                    .backward(9)
-                    .lowerArm(25)
+                    .forward(7)
+                    .left(25)
+                    .restElbow()
+                    .lowerArm(170, true)
+                    .backward(20)
+                    .lowerArm(40)
                     .lowerArm(10)
                     .forward(2, true)
                     .build();
@@ -181,30 +191,31 @@ public class AutoFarBlue extends LinearOpMode {
         } else if (propLocation == 2) {
             placePurple = new MovementSequenceBuilder()
                     .closeBothClaws()
-                    .right(8) //calibrate - should be equal to amount moved left by cv
-                    .forward(26) //calibrate
-                    .turnRight(90)
-                    .backward(8) //calibrate
+                    .forwardRight(17, 13)
                     .openRightClaw() // release purple pixel
-                    .raiseArm(20, true)
+                    .sleepFor(150)
+                    .backward(8) //calibrate
+                    .turnRight(90)
+                    .backwardRight(20, 7)
                     .build();
             placeYellow = new MovementSequenceBuilder()
-                    .left(24) //should be equal to initial forward
-                    .forward(8)
-                    .turnLeft(180)
-                    .lowerArm(20)
-                    .forward(92) //calibrate
-                    .raiseArm(35)
-                    .right(28) //calibrate
+                    .backward(20)
+                    .backward(20)
+                    .raiseArm(50, true)
+                    .flipElbow()
+                    .backwardLeft(29, 30)
+                    .raiseArm(170, true)
+                    .backward(7.5)
                     .openLeftClaw()
-                    .sleepFor(500)
+                    .sleepFor(150)
                     .build();
             park = new MovementSequenceBuilder()
-                    .backward(5)
-                    .turnRight(180)
-                    .right(28)
-                    .backward(9)
-                    .lowerArm(25)
+                    .forward(7)
+                    .left(18)
+                    .restElbow()
+                    .lowerArm(170, true)
+                    .backward(20)
+                    .lowerArm(40)
                     .lowerArm(10)
                     .forward(2, true)
                     .build();
