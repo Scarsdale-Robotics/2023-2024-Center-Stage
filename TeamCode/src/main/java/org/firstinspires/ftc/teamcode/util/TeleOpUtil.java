@@ -35,7 +35,7 @@ public class TeleOpUtil {
     private double lastTurnStart;
     private double moveInputX;
     private double moveInputY;
-    boolean elbowToggle = false, droneToggle = false, elbowClosed = false;
+    boolean elbowToggle = false, droneToggle = false, elbowClosed = false, resetArmEncoderToggle = false;
     private double vs = 0.0;
     private double vf = 0.0;
     private double vt = 0.0;
@@ -57,6 +57,7 @@ public class TeleOpUtil {
         this.lastTurnStart = robot.getIMU().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
         this.inDep = robot.getInDep();
         this.endgame = robot.getEndgame();
+        inDep.open();
         if (isRedTeam)
         {
             intoBackboardMode = new MovementSequenceBuilder()
@@ -218,11 +219,14 @@ public class TeleOpUtil {
         runArmRigidControl();
 
         // RESET ARM CONTROL
-        if (gamepad2.a) {
+        if ((gamepad2.circle && gamepad2.a) && !resetArmEncoderToggle) {
             inDep.resetArmEncoder();
+
             gamepad1.rumble(500);
             gamepad2.rumble(500);
+            resetArmEncoderToggle = true;
         }
+        if (!gamepad2.circle && !gamepad2.a) resetArmEncoderToggle = false;
     }
 
 
@@ -245,6 +249,7 @@ public class TeleOpUtil {
         double cvDist = cv.getAprilTagDistance(isRedTeam ? new Integer[] {4, 5, 6} : new Integer[] {1, 2, 3});
         telemetry.addData("cvDist:", cvDist);
         telemetry.addData("arm pos:", inDep.getLeftArmPosition());
+        telemetry.addData("delta:", inDep.getDelta());
         telemetry.addData("claw open:", inDep.getIsLeftClawOpen());
         telemetry.addData("пуяза 你好何余安 ???", "θωθ");
         telemetry.addData("LOC X", cv.getPosition(0, 0)[0]);

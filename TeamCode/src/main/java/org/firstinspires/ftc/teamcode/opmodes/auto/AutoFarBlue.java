@@ -34,12 +34,13 @@ public class AutoFarBlue extends LinearOpMode {
         runtime.reset();
 
         waitForStart();
-
-        MovementSequence[] seqs = MovementStringInterpreter.toMovementSequenceArray(sequences);
+        MovementSequence[] seqs = null;
+        if (useString)
+            seqs = MovementStringInterpreter.toMovementSequenceArray(sequences);
 
         // Start actual Auto now | cv
         MovementSequence initCV = new MovementSequenceBuilder().build();
-        if (useString)
+        if (!useString)
             initCV = new MovementSequenceBuilder()
                 .forwardLeft(4, 8) // calibrate
                 .build();

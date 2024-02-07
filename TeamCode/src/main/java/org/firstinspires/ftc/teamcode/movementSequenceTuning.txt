@@ -1,0 +1,239 @@
+
+// BLUE AUTO FAR RIGHT
+(-37,64,-90)
+// cv_seq
+{
+                .forwardLeft(4, 12) // calibrate
+}
+// purple_seq
+{
+                    .closeBothClaws()
+                    .forwardRight(17, 17)
+                    .openRightClaw() // release purple pixel
+                    .sleepFor(150)
+                    .backward(19) //calibrate
+                    .turnRight(90)
+                    .backward(20)
+}
+// yellow_seq
+{
+					.backward(40)
+                    .raiseArm(50, true)
+                    .flipElbow()
+                    .backwardLeft(29, 34)
+                    .raiseArm(170, true)
+                    .backward(7.5)
+                    .openLeftClaw()
+                    .sleepFor(150)
+}
+// park_seq
+{
+                    .forward(7)
+                    .left(18)
+                    .restElbow()
+                    .lowerArm(170, true)
+                    .backward(20)
+                    .lowerArm(40)
+                    .lowerArm(10)
+                    .forward(2, true)
+}
+
+
+// BLUE AUTO FAR LEFT
+(-37,64,-90)
+// cv_seq
+{
+                .forwardLeft(4, 8) // calibrate
+}
+{
+                    .closeBothClaws()
+                    .forwardRight(1, 5)
+                    .forward(21)
+                    .turnLeft(90)
+                    .forward(1)
+                    .openRightClaw() // release purple pixel
+                    .sleepFor(150)
+                    .backwardLeft(12, 24)
+                    .turnRight(180)
+}
+{
+                    .backward(38)
+                    .backward(20)
+                    .raiseArm(50, true)
+                    .flipElbow()
+                    .backwardLeft(29, 30)
+                    .raiseArm(170, true)
+                    .backward(7.5)
+                    .openLeftClaw()
+                    .sleepFor(150)
+{
+}
+                    .forward(7)
+                    .left(32)
+                    .restElbow()
+                    .lowerArm(170, true)
+                    .backward(20)
+                    .lowerArm(40)
+                    .lowerArm(10)
+                    .forward(2, true)
+}
+
+
+
+
+
+// test stuff ----------------------
+{
+}
+
+{
+}
+
+{
+}
+
+{
+}
+
+
+
+// scratch stuff --------------
+		    (13,64,-90)
+                    .closeBothClaws()
+                    .forwardLeft(9+10.80, 7+4.16)
+                    .openRightClaw() // drop purple pixel
+                    .sleepFor(500)
+                    .backward(5)
+                    .raiseArm(30)
+                    .turnLeft(90, true)
+                    .forwardRight(24,10)
+                    .openLeftClaw()
+                    .sleepFor(150)
+                    .backward(5)
+                    .turnRight(180)
+                    .right(20)
+                    .backward(9)
+                    .lowerArm(20)
+                    .lowerArm(10)
+                    .forward(2, true)
+
+
+		    (13,64,-90)
+                    .closeBothClaws()
+                    .forward(26.5)
+                    .openRightClaw()
+                    .sleepFor(500)
+                    .backward(5)
+                    .raiseArm(30)
+                    .turnLeft(90)
+                    .forwardRight(33, 10.69420)
+                    .openLeftClaw()
+                    .sleepFor(300)
+                    .backward(5)
+                    .backwardLeft(5, 26)
+                    .turnRight(180)
+                    .backward(16)
+                    .lowerArm(20)
+                    .lowerArm(10)
+                    .forward(2, true)
+
+
+		    (13,64,-90)
+                    .closeBothClaws()
+                    .forward(30)
+                    .turnRight(90)
+                    .forward(2.5)
+                    .openRightClaw()
+                    .sleepFor(500)
+                    .backwardLeft(28, 7)
+                    .raiseArm(50, true)
+                    .flipElbow()
+                    .raiseArm(170)
+                    .openLeftClaw()
+                    .sleepFor(150)
+                    .forward(10)
+                    .right(28)
+                    .restElbow()
+                    .lowerArm(170, true)
+                    .backward(17)
+                    .lowerArm(40)
+                    .lowerArm(10)
+                    .forward(2, true)
+
+
+//-------
+
+
+
+                    (-37,64,-90).closeBothClaws()
+                    placePurple = new MovementSequenceBuilder()
+                    .closeBothClaws()
+                    .forwardRight(1, 5)
+                    .forward(21)
+                    .turnLeft(90)
+                    .forward(1)
+                    .openRightClaw() // release purple pixel
+                    .sleepFor(150)
+                    .backwardLeft(12, 24)
+                    .turnRight(180)
+                    .build();
+            placeYellow = new MovementSequenceBuilder()
+                    .backward(38)
+                    .backward(20)
+                    .raiseArm(50, true)
+                    .flipElbow()
+                    .backwardLeft(29, 30)
+                    .raiseArm(170, true)
+                    .backward(7.5)
+                    .openLeftClaw()
+                    .sleepFor(150)
+                    .build();
+            park = new MovementSequenceBuilder()
+                    .forward(7)
+                    .left(32)
+                    .restElbow()
+                    .lowerArm(170, true)
+                    .backward(20)
+                    .lowerArm(40)
+                    .lowerArm(10)
+                    .forward(2, true)
+                    .build();
+
+
+                    (-37,64,-90).closeBothClaws()
+                    placePurple = new MovementSequenceBuilder()
+                    .closeBothClaws()
+                    .forwardRight(1, 5)
+                    .forward(21)
+                    .openRightClaw() // release purple pixel
+                    .sleepFor(150)
+                    .backward(25)
+                    .right(180)
+                    .build();
+            placeYellow = new MovementSequenceBuilder()
+                    .backward(28)
+                    .backward(20)
+                    .raiseArm(50, true)
+                    .flipElbow()
+                    .backwardLeft(29, 23)
+                    .raiseArm(170, true)
+                    .backward(7.5)
+                    .openLeftClaw()
+                    .sleepFor(150)
+                    .build();
+            park = new MovementSequenceBuilder()
+                    .forward(7)
+                    .left(25)
+                    .restElbow()
+                    .lowerArm(170, true)
+                    .backward(20)
+                    .lowerArm(40)
+                    .lowerArm(10)
+                    .forward(2, true)
+                    .build();
+
+
+                    
+
+
+
