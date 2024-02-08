@@ -42,7 +42,7 @@ public class AutoFarBlue extends LinearOpMode {
         MovementSequence initCV = new MovementSequenceBuilder().build();
         if (!useString)
             initCV = new MovementSequenceBuilder()
-                .forwardLeft(4, 8) // calibrate
+                .forwardLeft(4, 12) // calibrate
                 .build();
         else
             initCV = seqs[0];
@@ -66,22 +66,21 @@ public class AutoFarBlue extends LinearOpMode {
             // left
             placePurple = new MovementSequenceBuilder()
                     .closeBothClaws()
-                    .forwardRight(1, 5)
-                    .forward(21)
+                    .forwardRight(1, 9)
+                    .forward(26)
                     .turnLeft(90)
                     .forward(1)
                     .openRightClaw() // release purple pixel
                     .sleepFor(150)
-                    .backwardLeft(12, 24)
+                    .backwardLeft(12, 30)
                     .turnRight(180)
                     .build();
             placeYellow = new MovementSequenceBuilder()
                     .backward(38)
                     .backward(20)
-                    .raiseArm(50, true)
                     .flipElbow()
-                    .backwardLeft(29, 30)
-                    .raiseArm(170, true)
+                    .backwardLeft(29, 25)
+                    .raiseArm(220, true)
                     .backward(7.5)
                     .openLeftClaw()
                     .sleepFor(150)
@@ -135,7 +134,7 @@ public class AutoFarBlue extends LinearOpMode {
         } else if (propLocation == 1) {
             placePurple = new MovementSequenceBuilder()
                     .closeBothClaws()
-                    .forwardRight(1, 5)
+                    .forwardRight(1, 9)
                     .forward(21)
                     .openRightClaw() // release purple pixel
                     .sleepFor(150)
@@ -192,7 +191,7 @@ public class AutoFarBlue extends LinearOpMode {
         } else if (propLocation == 2) {
             placePurple = new MovementSequenceBuilder()
                     .closeBothClaws()
-                    .forwardRight(17, 13)
+                    .forwardRight(17, 18)
                     .openRightClaw() // release purple pixel
                     .sleepFor(150)
                     .backward(8) //calibrate
