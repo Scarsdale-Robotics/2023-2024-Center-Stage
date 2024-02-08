@@ -184,7 +184,16 @@ public class TeleOpUtil {
      */
     private void runArmClawControl() {
         // CLAW TOGGLE CONTROL
-        if ((gamepad1.square || gamepad1.y) && !clawLeftToggle) {
+        if (gamepad1.y && !clawLeftToggle && !clawRightToggle) {
+            if (!inDep.getIsLeftClawOpen() || !inDep.getIsRightClawOpen()) {
+                inDep.open();
+            } else {
+                inDep.close();
+            }
+            clawLeftToggle = true;
+            clawRightToggle = true;
+        }
+        if (gamepad1.square && !clawLeftToggle) {
             if (inDep.getIsLeftClawOpen()) {
                 inDep.closeLeft();
                 // automagically set fast mode after intake
@@ -196,7 +205,7 @@ public class TeleOpUtil {
             }
             clawLeftToggle = true;
         }
-        if ((gamepad1.circle || gamepad1.y) && !clawRightToggle) {
+        if (gamepad1.circle && !clawRightToggle) {
             if (inDep.getIsRightClawOpen()) {
                 inDep.closeRight();
                 // automagically set fast mode after intake
