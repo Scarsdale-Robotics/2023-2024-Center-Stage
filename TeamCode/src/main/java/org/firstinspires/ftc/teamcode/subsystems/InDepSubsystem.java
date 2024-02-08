@@ -23,6 +23,7 @@ public class InDepSubsystem extends SubsystemBase {
     private boolean isLeftClawOpen;
     private boolean isRightClawOpen;
     private boolean isElbowFlipped;
+    private double delta;
 
     private final LinearOpMode opMode;
     private MultipleTelemetry telemetry;
@@ -91,6 +92,7 @@ public class InDepSubsystem extends SubsystemBase {
 
         this.opMode = opMode;
         this.telemetry = telemetry;
+        this.delta = 0;
 
 //         reset everything
 
@@ -104,13 +106,13 @@ public class InDepSubsystem extends SubsystemBase {
 
     public Level getLevelBelow() {
         int armPos = getLeftArmPosition();
-        if (armPos < Level.BACKBOARD_HIGH.target) {
+        if (armPos < Level.BACKBOARD_HIGH.target+delta) {
             return Level.GROUND;
         }
-        if (armPos < Level.BACKBOARD_MID.target) {
+        if (armPos < Level.BACKBOARD_MID.target+delta) {
             return Level.BACKBOARD_HIGH;
         }
-        if (armPos < Level.BACKBOARD_LOW.target) {
+        if (armPos < Level.BACKBOARD_LOW.target+delta) {
             return Level.BACKBOARD_MID;
         }
         return Level.BACKBOARD_LOW;
@@ -123,14 +125,14 @@ public class InDepSubsystem extends SubsystemBase {
         double relMax = 500;
 
         if (armPos <= relMax)
-            return Math.max(1/Math.E,
+            return Math.max(2.0/3.0,
                     1 /
                             (Math.pow(
                                     (armPos-relMax) /
                                             (double)381,2) + 1)
             );
         else
-            return Math.max(1/Math.E,
+            return Math.max(2.0/3.0,
                     1 /
                             (Math.pow(
                                     (armPos-relMax) /
@@ -146,35 +148,35 @@ public class InDepSubsystem extends SubsystemBase {
         int armPos = getLeftArmPosition();
 
         // TODO: desmos graph stuff need to be adjusted
-        double K_power = calculatePowerCoefficient(armPos);
+        double K_power = calculatePowerCoefficient(armPos-delta);
 
         // set bounds
-        if (armPos < 0 && power < 0 && !opMode.gamepad1.a) {
+        if (armPos < delta && power < 0 && !opMode.gamepad1.a) {
             arm1.motor.setPower(0);
             arm2.motor.setPower(0);
         } else {
-            arm1.motor.setPower(power);
-            arm2.motor.setPower(power);
+            arm1.motor.setPower(K_power*power);
+            arm2.motor.setPower(K_power*power);
         }
         opMode.telemetry.addData("level: ", level);
         opMode.telemetry.addData("nxt below: ", getLevelBelow());
         opMode.telemetry.addData("elbow pos: ", elbow.getPosition());
         opMode.telemetry.addData("level wrist target: ", level.wristTarget);
 
-        if (level != getLevelBelow()) {
-            level = getLevelBelow();
-            if (level.elbowFlipped) {
-                flip();
-            } else {
-                rest();
-            }
-        }
-
-        // TODO: desmos graph stuff need to be adjusted
 //        if (level != getLevelBelow()) {
 //            level = getLevelBelow();
+//            if (level.elbowFlipped) {
+//                flip();
+//            } else {
+//                rest();
+//            }
 //        }
-//        setElbowPosition(calculateElbowPosition(armPos));
+
+        // TODO: desmos graph stuff need to be adjusted
+        if (level != getLevelBelow()) {
+            level = getLevelBelow();
+        }
+        setElbowPosition(calculateElbowPosition(armPos-delta));
 
         wrist.setPosition(level.wristTarget);
 
@@ -217,13 +219,13 @@ public class InDepSubsystem extends SubsystemBase {
                 telemetry.addData("L Setpoint", L_setPoint);
                 telemetry.update();
             }
-            if (getLeftArmPosition() >= Level.BACKBOARD_LOW.target) {
+            if (getLeftArmPosition() >= Level.BACKBOARD_LOW.target+delta) {
                 wrist.setPosition(Level.BACKBOARD_LOW.wristTarget);
-            } else if (getLeftArmPosition() >= Level.BACKBOARD_MID.target) {
+            } else if (getLeftArmPosition() >= Level.BACKBOARD_MID.target+delta) {
                 wrist.setPosition(Level.BACKBOARD_MID.wristTarget);
-            } else if (getLeftArmPosition() >= Level.BACKBOARD_HIGH.target) {
+            } else if (getLeftArmPosition() >= Level.BACKBOARD_HIGH.target+delta) {
                 wrist.setPosition(Level.BACKBOARD_HIGH.wristTarget);
-            } else if(getLeftArmPosition() >= Level.GROUND.target) {
+            } else if(getLeftArmPosition() >= Level.GROUND.target+delta) {
                 wrist.setPosition(Level.GROUND.wristTarget);
             } else {
                 wrist.setPosition(0.25);
@@ -479,8 +481,11 @@ public class InDepSubsystem extends SubsystemBase {
      * Resets the encoder values of both arm motors.
      */
     public void resetArmEncoder() {
-        arm1.resetEncoder();
-        arm2.resetEncoder();
+        delta = getLeftArmPosition();
+    }
+
+    public double getDelta() {
+        return delta;
     }
 }
 
