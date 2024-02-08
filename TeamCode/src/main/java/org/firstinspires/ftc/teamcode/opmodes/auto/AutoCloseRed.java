@@ -13,9 +13,9 @@ import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementStringInterpreter;
 
-@Autonomous(name = "Auto Close Blue")
+@Autonomous(name = "Auto Close Red")
 @Config
-public class AutoCloseBlue extends LinearOpMode {
+public class AutoCloseRed extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
     private InDepSubsystem inDep;
     private DriveSubsystem drive;
@@ -56,16 +56,18 @@ public class AutoCloseBlue extends LinearOpMode {
         if (propLocation == 0) {
             placePurple = new MovementSequenceBuilder()
                     .closeBothClaws()
-                    .forwardRight(19.8,11.16)
+                    .forward(31)
+                    .turnLeft(90)
+                    .forward(7)
                     .openRightClaw() // drop purple pixel
                     .sleepFor(500)
                     .backward(5)
                     .build();
             placeYellow = new MovementSequenceBuilder()
                     .raiseArm(30)
-                    .turnRight(90, true)
-                    .forwardLeft(24,10)
-                    .openLeftClaw()
+                    .backwardLeft(41,10)
+                    .turnRight(180)
+                    .openLeftClaw() // drop yellow pixel
                     .sleepFor(150)
                     .build();
             park = new MovementSequenceBuilder()
