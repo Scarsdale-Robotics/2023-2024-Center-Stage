@@ -66,8 +66,10 @@ public class PropDetectionPipeline implements VisionProcessor {
             Mat mask2 = new Mat();
             Core.inRange(hsvmat, redLowerRange1, redUpperRange1, mask1);
             Core.inRange(hsvmat, redLowerRange2, redUpperRange2, mask2);
+            List<MatOfPoint> cl2 = new ArrayList<>();
             Imgproc.findContours(mask1, contourList, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-            Imgproc.findContours(mask2, contourList, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+            Imgproc.findContours(mask2, cl2, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+            contourList.addAll(cl2);
         }else {
             Mat mask = new Mat();
             Core.inRange(hsvmat, blueLowerRange, blueUpperRange, mask);

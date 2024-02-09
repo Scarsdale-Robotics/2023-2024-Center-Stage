@@ -39,15 +39,14 @@ public class AutoCloseRed extends LinearOpMode {
         MovementSequence initCV = new MovementSequenceBuilder()
                 .forward(3) // calibrate
                 .left(9.5)
-                .sleepFor(5000)
                 .build();
+        drive.followMovementSequence(initCV);
+        int propLocation = robot.getCV().getPropLocation();
 
-        int propLocation = 0;
-
-        if (!useString) {
-            drive.followMovementSequence(initCV);
-            propLocation = robot.getCV().getPropLocation();
-        }
+//        if (!useString) {
+//            drive.followMovementSequence(initCV);
+//            propLocation = robot.getCV().getPropLocation();
+//        }
 
         MovementSequence placePurple = new MovementSequenceBuilder().build(),
                 approachWhite = new MovementSequenceBuilder().build(),
