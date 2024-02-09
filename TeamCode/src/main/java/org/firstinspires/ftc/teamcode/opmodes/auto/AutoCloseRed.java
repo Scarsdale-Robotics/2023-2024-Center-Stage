@@ -28,7 +28,7 @@ public class AutoCloseRed extends LinearOpMode {
     @Override
     // The "Main" code will go in here
     public void runOpMode() {
-        RobotSystem robot = new RobotSystem(hardwareMap, false, this, telemetry);
+        RobotSystem robot = new RobotSystem(hardwareMap, true, this, telemetry);
         robot.getInDep().close();
         drive = robot.getDrive();
         runtime.reset();
@@ -37,12 +37,16 @@ public class AutoCloseRed extends LinearOpMode {
 
         // Start actual Auto now | cv
         MovementSequence initCV = new MovementSequenceBuilder()
-                //stuff
+                .forward(3) // calibrate
+                .left(9.5)
                 .build();
-        int propLocation = 0;
         drive.followMovementSequence(initCV);
-        if (!useString)
-            propLocation = robot.getCV().getPropLocation();
+        int propLocation = robot.getCV().getPropLocation();
+
+//        if (!useString) {
+//            drive.followMovementSequence(initCV);
+//            propLocation = robot.getCV().getPropLocation();
+//        }
 
         MovementSequence placePurple = new MovementSequenceBuilder().build(),
                 approachWhite = new MovementSequenceBuilder().build(),
@@ -56,33 +60,38 @@ public class AutoCloseRed extends LinearOpMode {
         if (propLocation == 0) {
             placePurple = new MovementSequenceBuilder()
                     .closeBothClaws()
-                    .forward(31)
+                    .right(9.5)
+                    .forward(27)
                     .turnLeft(90)
-                    .forward(7)
+                    .forward(4)
                     .openRightClaw() // drop purple pixel
                     .sleepFor(500)
                     .backward(5)
                     .build();
             placeYellow = new MovementSequenceBuilder()
-                    .raiseArm(30)
-                    .backwardLeft(41,10)
-                    .turnRight(180)
+                    .backwardRight(27,5)
+                    .raiseArm(100,true)
+                    .flipElbow()
+                    .raiseArm(120)
                     .openLeftClaw() // drop yellow pixel
-                    .sleepFor(150)
+                    .sleepFor(250)
                     .build();
             park = new MovementSequenceBuilder()
-                    .backward(5)
-                    .turnRight(180)
-                    .left(20)
-                    .backward(9)
-                    .lowerArm(20)
+                    .forward(5)
+                    .left(28)
+                    .lowerArm(170, true)
+                    .restElbow()
+                    .backward(18)
+                    .lowerArm(40)
                     .lowerArm(10)
-                    .forward(2)
+                    .forward(2, true)
                     .build();
 
         } else if (propLocation == 1) {
-            placePurple = new MovementSequenceBuilder().closeBothClaws()
-                    .forward(28)
+            placePurple = new MovementSequenceBuilder()
+                    .closeBothClaws()
+                    .right(4)
+                    .forward(23.5)
                     .openRightClaw() // drop purple pixel
                     .sleepFor(500)
                     .backward(4)
@@ -90,7 +99,7 @@ public class AutoCloseRed extends LinearOpMode {
             placeYellow = new MovementSequenceBuilder()
                     .raiseArm(30)
                     .turnRight(90, true)
-                    .forwardLeft(33,4)
+                    .forwardLeft(38.5,7)
                     .openLeftClaw()
                     .sleepFor(150)
                     .build();
@@ -99,23 +108,39 @@ public class AutoCloseRed extends LinearOpMode {
                     .turnLeft(180)
                     .lowerArm(20)
                     .left(24, true)
-                    .backward(18)
+                    .backward(10)
                     .lowerArm(10)
                     .forward(2)
                     .build();
 
         } else if (propLocation == 2) {
             placePurple = new MovementSequenceBuilder()
-
+                    .closeBothClaws()
+                    .right(10)
+                    .forwardRight(16.8,5.16)
+                    .openRightClaw() // drop purple pixel
+                    .sleepFor(500)
+                    .backward(5)
                     .build();
             placeYellow = new MovementSequenceBuilder()
-
+                    .raiseArm(30)
+                    .turnRight(90, true)
+                    .forwardLeft(29.5,7)
+                    .openLeftClaw()
+                    .sleepFor(150)
                     .build();
             park = new MovementSequenceBuilder()
-
+                    .backward(5)
+                    .turnRight(180)
+                    .left(17)
+                    .backward(9)
+                    .lowerArm(20)
+                    .lowerArm(10)
+                    .forward(2)
                     .build();
         }
 
+        // if string is being used, only run string
         if (useString) {
             MovementSequence seq = new MovementSequenceBuilder()
                     .append(sequence)
@@ -123,6 +148,7 @@ public class AutoCloseRed extends LinearOpMode {
             drive.followMovementSequence(seq);
         }
 
+        // follow regular if string is not being used
         if (!useString) {
             // perform the actual movements here in sequence
             drive.followMovementSequence(placePurple);
