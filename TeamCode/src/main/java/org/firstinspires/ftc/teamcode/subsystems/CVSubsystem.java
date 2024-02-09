@@ -26,6 +26,15 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 
 public class CVSubsystem extends SubsystemBase {
     private OpenCvCamera camera;
@@ -268,6 +277,54 @@ public class CVSubsystem extends SubsystemBase {
         telemetry.addData("locs2: ", locations[2]);
         telemetry.update();
         return propLocation;
+    }
+
+    // New function to identify color ranges in locations
+    public void identifyColorRangesInLocations() {
+        // Define color ranges with HSV values for different colors
+        HashMap<String, Scalar[]> colorRanges = new HashMap<>();
+        colorRanges.put("Red", new Scalar[]{new Scalar(0, 120, 70), new Scalar(10, 255, 255)}); // Example range for Red
+        colorRanges.put("Green", new Scalar[]{new Scalar(35, 100, 50), new Scalar(85, 255, 255)}); // Example range for Green
+        colorRanges.put("Blue", new Scalar[]{new Scalar(100, 150, 0), new Scalar(140, 255, 255)}); // Example range for Blue
+        // Add additional colors as needed
+
+        for (int i = 0; i < 5; i++) { // Iterate over 5 samples
+            Mat frame = new Mat(); // Placeholder for captured frame
+            Mat hsvFrame = new Mat();
+            // Capture frame from the camera
+            // camera.read(frame); // This line is pseudocode; actual implementation depends on camera API
+
+            // Convert frame to HSV color space
+            Imgproc.cvtColor(frame, hsvFrame, Imgproc.COLOR_BGR2HSV);
+
+            // Analyze for each location
+            analyzeLocations(hsvFrame, colorRanges);
+        }
+    }
+
+    private void analyzeLocations(Mat hsvFrame, HashMap<String, Scalar[]> colorRanges) {
+        // Define ROIs for left, center, right locations based on frame dimensions
+        int frameWidth = hsvFrame.width();
+        int frameHeight = hsvFrame.height();
+        Rect leftROI = new Rect(0, 0, frameWidth / 3, frameHeight);
+        Rect centerROI = new Rect(frameWidth / 3, 0, frameWidth / 3, frameHeight);
+        Rect rightROI = new Rect(2 * frameWidth / 3, 0, frameWidth / 3, frameHeight);
+
+        // Analyze each ROI for color ranges
+        analyzeForColor(hsvFrame.submat(leftROI), "Left", colorRanges);
+        analyzeForColor(hsvFrame.submat(centerROI), "Center", colorRanges);
+        analyzeForColor(hsvFrame.submat(rightROI), "Right", colorRanges);
+    }
+
+    private void analyzeForColor(Mat roi, String location, HashMap<String, Scalar[]> colorRanges) {
+        for (Map.Entry<String, Scalar[]> entry : colorRanges.entrySet()) {
+            Mat mask = new Mat(roi.size(), CvType.CV_8UC1);
+            Core.inRange(roi, entry.getValue()[0], entry.getValue()[1], mask);
+            // Check if color is present in the location
+            if (Core.countNonZero(mask) > 0) {
+                System.out.println(location + " contains " + entry.getKey());
+            }
+        }
     }
 
     public int getPixelHorizontalOffset() {
