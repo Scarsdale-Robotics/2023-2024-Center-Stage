@@ -38,7 +38,7 @@ public class PropDetectionPipeline implements VisionProcessor {
     public static Scalar redLowerRange1 = new Scalar(0,95,196);
 
     public static Scalar redUpperRange2 = new Scalar(63, 255, 199);  // Range needs fixing
-    public static Scalar redLowerRange2 = new Scalar(0, 112, 73);
+    public static Scalar redLowerRange2 = new Scalar(0, 69, 65);
 
     public AtomicBoolean hasStarted = new AtomicBoolean(false);
 

@@ -155,6 +155,7 @@ public class InDepSubsystem extends SubsystemBase {
             arm1.motor.setPower(0);
             arm2.motor.setPower(0);
         } else {
+            if (!)
             arm1.motor.setPower(K_power*power);
             arm2.motor.setPower(K_power*power);
         }

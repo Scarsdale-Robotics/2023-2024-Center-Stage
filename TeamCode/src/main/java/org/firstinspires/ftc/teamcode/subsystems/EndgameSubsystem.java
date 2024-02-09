@@ -5,10 +5,12 @@ import com.qualcomm.robotcore.hardware.CRServo;
 
 public class EndgameSubsystem extends SubsystemBase {
 
+    public static boolean droneReleased = false;
     private CRServo drone;
 
     public EndgameSubsystem(CRServo drone) {
         this.drone = drone;
+        droneReleased = false;
         holdDrone();
     }
 
@@ -26,6 +28,7 @@ public class EndgameSubsystem extends SubsystemBase {
 
     public void releaseDrone() {
         drone.setPower(1);
+        droneReleased = true;
     }
 
 }
