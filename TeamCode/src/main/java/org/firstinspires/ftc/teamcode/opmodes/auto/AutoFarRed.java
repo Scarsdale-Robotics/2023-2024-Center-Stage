@@ -99,7 +99,7 @@ public class AutoFarRed extends LinearOpMode {
             placeYellow = new MovementSequenceBuilder()
                     // arm needs 220
                     .backward(53)  // 15 -60
-                    .raiseArm(50, true)
+//                    .raiseArm(50, true) // bugged
                     .backwardRight(29, 23)  // 44 -37
                     .flipElbow()
                     .raiseArm(170, true)

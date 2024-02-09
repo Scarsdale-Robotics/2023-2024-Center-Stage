@@ -1,0 +1,37 @@
+MOVEMENT STRING:
+-> Open movementSequenceTuning.txt for examples
+Valid use:
+ - ONLY method names
+ - NO "new MovementSequenceBuilder()"
+ - NO ".build()"
+ - EXAMPLE (without the quotation marks):
+    """
+    .forward(10)
+    .turnRight(90)
+    """
+ - Comments MUST NOT CONTAIN A PERIOD
+
+
+SCRATCH/TURBOWARP PROJECT USE:
+-> Download the .sb3 project
+-> Online version https://scratch.mit.edu/projects/962289487/
+Valid use:
+ - Read instructions in online project for basic usage
+ - When drawing a string, the first pose will snap to one of the four the nearest pre-determined start poses
+ - When importing a string, you MUST include a START POSE (X, Y, HEADING) to signify where the path begins
+ - EXAMPLE (without the quotation marks):
+    """
+    (-40.75, 63.5, -90) // starts at (-40 point 75 inches, 64 point 5 inches, -90 degrees) aka facing downwards at the AutoFarBlue position
+    .forward(20)
+    .turnRight(90)
+    .openBothClaws()
+    """
+
+
+MOVEMENT STRING USAGE:
+
+1) Navigate to 192.168.43.1:8080/dash
+2) Open a configuration folder on the right side of the dashboard (e.g. "AutoCloseRed" etc)
+3) ENABLE "useString" and press "save"
+4) PASTE IN STRING in "sequences" and press enter so the asterisk (*) disappears
+5) Run the opmode and pray

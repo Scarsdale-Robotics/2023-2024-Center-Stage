@@ -1,82 +1,92 @@
-
-// BLUE AUTO FAR RIGHT
-(-37,64,-90)
-// cv_seq
-{
-                .forwardLeft(4, 12) // calibrate
-}
-// purple_seq
-{
-                    .closeBothClaws()
-                    .forwardRight(17, 17)
-                    .openRightClaw() // release purple pixel
-                    .sleepFor(150)
-                    .backward(19) //calibrate
-                    .turnRight(90)
-                    .backward(20)
-}
-// yellow_seq
-{
-					.backward(40)
-                    .raiseArm(50, true)
-                    .flipElbow()
-                    .backwardLeft(29, 34)
-                    .raiseArm(170, true)
-                    .backward(7.5)
-                    .openLeftClaw()
-                    .sleepFor(150)
-}
-// park_seq
-{
-                    .forward(7)
-                    .left(18)
-                    .restElbow()
-                    .lowerArm(170, true)
-                    .backward(20)
-                    .lowerArm(40)
-                    .lowerArm(10)
-                    .forward(2, true)
-}
-
-
-// BLUE AUTO FAR LEFT
-(-37,64,-90)
-// cv_seq
-{
-                .forwardLeft(4, 8) // calibrate
-}
-{
-                    .closeBothClaws()
-                    .forwardRight(1, 5)
-                    .forward(21)
+// RED AUTO CLOSE LEFT
+// (13,-64,90)
+					.forward(3) // calibrate
+					.left(9.5)
+					
+					.closeBothClaws()
+					.right(9.5)
+                    .forward(27)
                     .turnLeft(90)
-                    .forward(1)
-                    .openRightClaw() // release purple pixel
-                    .sleepFor(150)
-                    .backwardLeft(12, 24)
-                    .turnRight(180)
-}
-{
-                    .backward(38)
-                    .backward(20)
-                    .raiseArm(50, true)
+                    .forward(4)
+                    .openRightClaw() // drop purple pixel
+                    .sleepFor(500)
+                    .backward(5)
+
+					.backwardRight(27,5)
+                    .raiseArm(100,true)
                     .flipElbow()
-                    .backwardLeft(29, 30)
-                    .raiseArm(170, true)
-                    .backward(7.5)
-                    .openLeftClaw()
-                    .sleepFor(150)
-{
-}
-                    .forward(7)
-                    .left(32)
-                    .restElbow()
+                    .raiseArm(120)
+                    .openLeftClaw() // drop yellow pixel
+                    .sleepFor(250)
+
+                    .forward(5)
+                    .left(28)
                     .lowerArm(170, true)
-                    .backward(20)
+                    .restElbow()
+                    .backward(18)
                     .lowerArm(40)
                     .lowerArm(10)
                     .forward(2, true)
-}
+
+					
+			
+
+// RED AUTO CLOSE CENTER			
+// (13,-64,90)
+					.forward(3) // calibrate
+					.left(9.5)
+					
+                    .closeBothClaws()
+					.right(4)
+					.forward(23.5)
+                    .openRightClaw() // drop purple pixel
+                    .sleepFor(500)
+					.backward(4)
+			
+                    .raiseArm(30)		
+					.turnRight(90, true)
+					.forwardLeft(38.5,8)
+                    .openLeftClaw()
+                    .sleepFor(150)
+				
+					.backward(5)	
+					.turnLeft(180)
+                    .lowerArm(20)
+					.left(25, true)
+					.backward(10)
+                    .lowerArm(10)
+					.forward(2)
+					
+
+
+
+// RED AUTO CLOSE RIGHT
+// (13,-64,90)
+
+					.forward(3) // calibrate
+					.left(9.5)
+				
+                    .closeBothClaws()
+					.right(10)
+					.forwardRight(16.8,5.16)
+                    .openRightClaw() // drop purple pixel
+                    .sleepFor(500)
+					.backward(5)
+
+                    .raiseArm(30)
+					.turnRight(90, true)
+					.forwardLeft(29.5,7)
+                    .openLeftClaw()
+                    .sleepFor(150)
+
+					.backward(5)
+					.turnRight(180)
+					.left(17)
+					.backward(9)
+                    .lowerArm(20)
+                    .lowerArm(10)
+					.forward(2)
+
 
 
 
