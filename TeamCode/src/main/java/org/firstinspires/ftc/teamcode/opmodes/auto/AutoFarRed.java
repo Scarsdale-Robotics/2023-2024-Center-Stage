@@ -57,8 +57,8 @@ public class AutoFarRed extends LinearOpMode {
 
         if (propLocation == 0) {
             placePurple = new MovementSequenceBuilder()
-                    .closeBothClaws()  // -38 -62
-                    .forwardLeft(16, 10)  // -48 -46
+                    .closeBothClaws()  // -40.75 -63.5
+                    .forwardLeft(17.5, 7.25)  // -48 -46
                     .openRightClaw()
                     .sleepFor(150)
                     .backward(8)  // -48 -54
@@ -68,10 +68,10 @@ public class AutoFarRed extends LinearOpMode {
             placeYellow = new MovementSequenceBuilder()
                     // arm needs 220
                     .backward(53)  // 15 -60
-                    .raiseArm(50, true)
+                    .raiseArm(20, true)
                     .backwardRight(29, 30)  // 44 -30
                     .flipElbow()
-                    .raiseArm(170, true)
+                    .raiseArm(200, true)
                     .backward(5)  // 49 -30
                     .openLeftClaw()
                     .sleepFor(150)
@@ -89,8 +89,8 @@ public class AutoFarRed extends LinearOpMode {
 
         } else if (propLocation == 1) {
             placePurple = new MovementSequenceBuilder()
-                    .closeBothClaws()  // -38 -62
-                    .forward(27)  // -38 -35
+                    .closeBothClaws()  // -40.75 -63.5
+                    .forwardRight(28.5, 2.75)  // -38 -35
                     .openRightClaw()
                     .sleepFor(150)
                     .backward(25)  // -38 -60
@@ -100,9 +100,10 @@ public class AutoFarRed extends LinearOpMode {
                     // arm needs 220
                     .backward(53)  // 15 -60
 //                    .raiseArm(50, true) // bugged
+                    .raiseArm(20, true)
                     .backwardRight(29, 23)  // 44 -37
                     .flipElbow()
-                    .raiseArm(170, true)
+                    .raiseArm(200, true)
                     .backward(5)  // 49 -37
                     .openLeftClaw()
                     .sleepFor(150)
@@ -120,8 +121,8 @@ public class AutoFarRed extends LinearOpMode {
 
         } else if (propLocation == 2) {
             placePurple = new MovementSequenceBuilder()
-                    .closeBothClaws()  // -38 -62
-                    .forwardRight(27, 3)  // -35 -35
+                    .closeBothClaws()  // -40.75 -63.5
+                    .forwardRight(28.5, 5.75)  // -35 -35
                     .turnRight(90)
                     .openRightClaw()
                     .sleepFor(150)
@@ -132,10 +133,10 @@ public class AutoFarRed extends LinearOpMode {
             placeYellow = new MovementSequenceBuilder()
                     // arm needs 220
                     .backward(53)  // 15 -60
-                    .raiseArm(50, true)
+                    .raiseArm(20, true)
                     .backwardRight(29, 15)  // 44 -45
                     .flipElbow()
-                    .raiseArm(170, true)
+                    .raiseArm(200, true)
                     .backward(5)  // 49 -45
                     .openLeftClaw()
                     .sleepFor(150)
