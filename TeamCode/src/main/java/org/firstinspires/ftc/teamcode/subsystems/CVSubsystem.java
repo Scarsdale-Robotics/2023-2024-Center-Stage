@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PropDetectionPipeli
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -68,6 +69,21 @@ public class CVSubsystem extends SubsystemBase {
             {4.75, 6}  , {4.5, 6}  ,
             {1.25, 6}  , {1.5, 6}
     };
+
+    // Example fields to store analysis results
+    private String detectedColor = "";
+    private List<Scalar> leftTopHSV = new ArrayList<>();
+    private List<Scalar> centerTopHSV = new ArrayList<>();
+    private List<Scalar> rightTopHSV = new ArrayList<>();
+
+    // identifyColorRangesInLocations implementation
+    // Assume this method updates the above fields with the latest analysis results
+
+    // Public getters for oranjejuce to use
+    public String getDetectedColor() { return detectedColor; }
+    public List<Scalar> getLeftTopHSV() { return leftTopHSV; }
+    public List<Scalar> getCenterTopHSV() { return centerTopHSV; }
+    public List<Scalar> getRightTopHSV() { return rightTopHSV; }
 
     public CVSubsystem(WebcamName cameraName1, WebcamName cameraName2, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
         this(null, cameraName1, cameraName2,drive,telemetry,isRedTeam,opMode);
@@ -281,28 +297,19 @@ public class CVSubsystem extends SubsystemBase {
 
     // New function to identify color ranges in locations
     public void identifyColorRangesInLocations() {
-        // Define color ranges with HSV values for different colors
+        // Corrected and valid HSV color ranges
         HashMap<String, Scalar[]> colorRanges = new HashMap<>();
-        colorRanges.put("Red", new Scalar[]{new Scalar(0, 120, 70), new Scalar(10, 255, 255)}); // Example range for Red
-        colorRanges.put("Green", new Scalar[]{new Scalar(35, 100, 50), new Scalar(85, 255, 255)}); // Example range for Green
-        colorRanges.put("Blue", new Scalar[]{new Scalar(100, 150, 0), new Scalar(140, 255, 255)}); // Example range for Blue
-        // Add additional colors as needed
+        colorRanges.put("Red", new Scalar[]{new Scalar(0, 100, 100), new Scalar(10, 255, 255)}); // Lower range for Red
+        colorRanges.put("RedUpper", new Scalar[]{new Scalar(160, 100, 100), new Scalar(179, 255, 255)}); // Upper range for Red
+        colorRanges.put("Blue", new Scalar[]{new Scalar(100, 150, 150), new Scalar(140, 255, 255)}); // Range for Blue
 
-        for (int i = 0; i < 5; i++) { // Iterate over 5 samples
-            Mat frame = new Mat(); // Placeholder for captured frame
-            Mat hsvFrame = new Mat();
-            // Capture frame from the camera
-            // camera.read(frame); // This line is pseudocode; actual implementation depends on camera API
+        Mat frame = new Mat(); // Placeholder for captured frame
+        Mat hsvFrame = new Mat();
 
-            // Convert frame to HSV color space
-            Imgproc.cvtColor(frame, hsvFrame, Imgproc.COLOR_BGR2HSV);
+        // Assuming a continuous or periodic capture process, not a synchronous loop
+        // Convert frame to HSV color space once per frame capture
+        Imgproc.cvtColor(frame, hsvFrame, Imgproc.COLOR_BGR2HSV);
 
-            // Analyze for each location
-            analyzeLocations(hsvFrame, colorRanges);
-        }
-    }
-
-    private void analyzeLocations(Mat hsvFrame, HashMap<String, Scalar[]> colorRanges) {
         // Define ROIs for left, center, right locations based on frame dimensions
         int frameWidth = hsvFrame.width();
         int frameHeight = hsvFrame.height();
@@ -310,20 +317,52 @@ public class CVSubsystem extends SubsystemBase {
         Rect centerROI = new Rect(frameWidth / 3, 0, frameWidth / 3, frameHeight);
         Rect rightROI = new Rect(2 * frameWidth / 3, 0, frameWidth / 3, frameHeight);
 
-        // Analyze each ROI for color ranges
-        analyzeForColor(hsvFrame.submat(leftROI), "Left", colorRanges);
-        analyzeForColor(hsvFrame.submat(centerROI), "Center", colorRanges);
-        analyzeForColor(hsvFrame.submat(rightROI), "Right", colorRanges);
+        // Analyze each ROI for color ranges using the new method
+        analyzeColorPresenceAndHSVFrequency(hsvFrame.submat(leftROI), "Left", colorRanges);
+        analyzeColorPresenceAndHSVFrequency(hsvFrame.submat(centerROI), "Center", colorRanges);
+        analyzeColorPresenceAndHSVFrequency(hsvFrame.submat(rightROI), "Right", colorRanges);
     }
 
-    private void analyzeForColor(Mat roi, String location, HashMap<String, Scalar[]> colorRanges) {
+    private void analyzeColorPresenceAndHSVFrequency(Mat roi, String location, HashMap<String, Scalar[]> colorRanges) {
+        HashMap<Scalar, Integer> hsvFrequency = new HashMap<>();
+        boolean colorDetected = false;
+
         for (Map.Entry<String, Scalar[]> entry : colorRanges.entrySet()) {
-            Mat mask = new Mat(roi.size(), CvType.CV_8UC1);
+            Mat mask = new Mat();
             Core.inRange(roi, entry.getValue()[0], entry.getValue()[1], mask);
-            // Check if color is present in the location
+
             if (Core.countNonZero(mask) > 0) {
+                colorDetected = true;
                 System.out.println(location + " contains " + entry.getKey());
             }
+
+            // Assuming you have a method to convert mask to HSV and then count frequencies
+            // This part is pseudocode and needs actual implementation
+            for (int i = 0; i < mask.rows(); i++) {
+                for (int j = 0; j < mask.cols(); j++) {
+                    if (mask.get(i, j)[0] != 0) { // Check if the pixel is within the color range
+                        double[] hsvPixel = roi.get(i, j);
+                        Scalar hsv = new Scalar(hsvPixel);
+                        hsvFrequency.putIfAbsent(hsv, 0);
+                        hsvFrequency.put(hsv, hsvFrequency.get(hsv) + 1);
+                    }
+                }
+            }
+
+            mask.release();
+        }
+
+        if (colorDetected) {
+            // Sort by frequency and pick top 3
+            List<Map.Entry<Scalar, Integer>> list = new ArrayList<>(hsvFrequency.entrySet());
+            list.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+
+            System.out.println(location + " Top 3 HSV Values:");
+            list.stream().limit(3).forEach(entry -> {
+                System.out.println(entry.getKey() + " => " + entry.getValue());
+            });
+        } else {
+            System.out.println(location + " contains no detected colors from the given ranges.");
         }
     }
 
