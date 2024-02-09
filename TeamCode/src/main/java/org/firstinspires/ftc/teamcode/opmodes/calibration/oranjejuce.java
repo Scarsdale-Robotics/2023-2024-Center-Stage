@@ -16,6 +16,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 
+import java.util.HashMap;
+
 @TeleOp(name = "oranje juce")
 @Config
 public class oranjejuce extends LinearOpMode {
@@ -69,17 +71,40 @@ public class oranjejuce extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            // Telemetry data from CVSubsystem or other operations
             telemetry.addData("Status", "Running");
             telemetry.addData("Color Detection", "Press 'A' to detect colors");
 
-            if (gamepad1.a) {
-                cvSubsystem.identifyColorRangesInLocations();
+            while (opModeIsActive()) {
+                telemetry.addData("Status", "Running");
+                telemetry.addData("Color Detection", "Press 'A' to detect colors");
+
+                if (gamepad1.a) {
+                    // Trigger color range identification and HSV analysis in CVSubsystem
+                    cvSubsystem.identifyColorRangesInLocations();
+
+                    // Assuming cvSubsystem is structured to update internal state with analysis results
+                    // and provides getter methods to access these results.
+
+                    // Check and display detected color
+                    String detectedColor = cvSubsystem.getDetectedColor();
+                    if (!detectedColor.equals("")) {
+                        telemetry.addData("Detected Color", detectedColor);
+                    } else {
+                        telemetry.addData("Detected Color", "None");
+                    }
+
+                    // Display top 3 HSV values for each location
+                    // Assuming getters return a List<Scalar> for each location's top HSV values
+                    // or a similar structure that can be converted to a string representation
+                    telemetry.addData("Left Top 3 HSV", cvSubsystem.getLeftTopHSV().toString());
+                    telemetry.addData("Center Top 3 HSV", cvSubsystem.getCenterTopHSV().toString());
+                    telemetry.addData("Right Top 3 HSV", cvSubsystem.getRightTopHSV().toString());
+                }
+
+                telemetry.update();
             }
 
-            telemetry.update();
+            camera.stopStreaming();
         }
-
-        camera.stopStreaming();
     }
 }
