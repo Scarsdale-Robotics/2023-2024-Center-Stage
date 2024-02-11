@@ -44,8 +44,9 @@ public class TeleOpUtil {
     private boolean towardsBackboard = false;
     private final MovementSequence intoBackboardMode;
     private final MovementSequence intoPickupMode;
+    public RobotSystem robot;
     public TeleOpUtil(HardwareMap hardwareMap, Telemetry telemetry, boolean isRedTeam, Gamepad gamepad1, Gamepad gamepad2, LinearOpMode opMode) {
-        RobotSystem robot = new RobotSystem(hardwareMap, isRedTeam, opMode, telemetry);
+        robot = new RobotSystem(hardwareMap, isRedTeam, opMode, telemetry);
         drive = robot.getDrive();
         cv = robot.getCV();
         cv.disablePropProcessor();
@@ -277,9 +278,9 @@ public class TeleOpUtil {
             telemetry.addData("poop", Math.random());
         }
 
-        if (!gamepad2.x && cvDist < DISTANCE_BEFORE_BACKBOARD && !(inDep.getIsLeftClawOpen() || inDep.getIsRightClawOpen())) {
+        if (!gamepad2.dpad_left && cvDist < DISTANCE_BEFORE_BACKBOARD && !(inDep.getIsLeftClawOpen() || inDep.getIsRightClawOpen())) {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
-        } else if (gamepad2.x) {
+        } else if (gamepad2.dpad_left) {
             gamepad1.rumble(500);
             gamepad2.rumble(500);
         }

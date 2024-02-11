@@ -34,6 +34,8 @@ public class AutoCloseRed extends LinearOpMode {
         runtime.reset();
 
         waitForStart();
+        robot.getInDep().setLevel(InDepSubsystem.Level.GROUND); // arm, wrist
+        robot.getInDep().rest(); // elbow
 
         // Start actual Auto now | cv
         MovementSequence initCV = new MovementSequenceBuilder()

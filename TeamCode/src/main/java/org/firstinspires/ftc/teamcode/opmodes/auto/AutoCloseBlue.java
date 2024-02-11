@@ -35,9 +35,13 @@ public class AutoCloseBlue extends LinearOpMode {
 
         waitForStart();
 
+        robot.getInDep().setLevel(InDepSubsystem.Level.GROUND); // arm, wrist
+        robot.getInDep().rest(); // elbow
+
         // Start actual Auto now | cv
         MovementSequence initCV = new MovementSequenceBuilder()
                 //stuff
+                .sleepFor(1000)
                 .build();
         drive.followMovementSequence(initCV);
         int propLocation = robot.getCV().getPropLocation();
@@ -63,15 +67,15 @@ public class AutoCloseBlue extends LinearOpMode {
             placeYellow = new MovementSequenceBuilder()
                     .raiseArm(30)
                     .turnLeft(90, true)
-                    .forwardRight(24,10)
+                    .forwardRight(24,8)
                     .openLeftClaw()
                     .sleepFor(150)
                     .build();
             park = new MovementSequenceBuilder()
                     .backward(5)
-                    .turnRight(180)
-                    .right(20)
-                    .backward(9)
+//                    .turnRight(180)
+                    .left(16)
+                    .forward(7)
                     .lowerArm(20)
                     .lowerArm(10)
                     .forward(2, true)
@@ -88,15 +92,15 @@ public class AutoCloseBlue extends LinearOpMode {
                     .backward(5)
                     .raiseArm(30)
                     .turnLeft(90)
-                    .forwardRight(33, 10.69420)
+                    .forwardRight(33, 9.69420)
                     .openLeftClaw()
                     .sleepFor(300)
                     .build();
             park = new MovementSequenceBuilder()
                     .backward(5)
-                    .backwardLeft(5, 26)
-                    .turnRight(180)
-                    .backward(16)
+                    .backwardLeft(5, 23)
+//                    .turnRight(180)
+                    .forward(14)
                     .lowerArm(20)
                     .lowerArm(10)
                     .forward(2, true)

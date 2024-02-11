@@ -34,6 +34,8 @@ public class AutoFarBlue extends LinearOpMode {
         runtime.reset();
 
         waitForStart();
+        robot.getInDep().setLevel(InDepSubsystem.Level.GROUND); // arm, wrist
+        robot.getInDep().rest(); // elbow
         MovementSequence[] seqs = null;
         if (useString)
             seqs = MovementStringInterpreter.toMovementSequenceArray(sequences);

@@ -34,9 +34,12 @@ public class AutoFarRed extends LinearOpMode {
         runtime.reset();
 
         waitForStart();
+        robot.getInDep().setLevel(InDepSubsystem.Level.GROUND); // arm, wrist
+        robot.getInDep().rest(); // elbow
 
         // Start actual Auto now | cv
         MovementSequence initCV = new MovementSequenceBuilder()
+                .sleepFor(1000)
                 .build();
 
         int propLocation = 0;

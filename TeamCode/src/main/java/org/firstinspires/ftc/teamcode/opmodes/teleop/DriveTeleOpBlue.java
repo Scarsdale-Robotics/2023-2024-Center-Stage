@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.util.TeleOpUtil;
 import org.firstinspires.ftc.vision.VisionPortal;
 
@@ -18,6 +19,8 @@ public class DriveTeleOpBlue extends LinearOpMode {
         teleOp = new TeleOpUtil(hardwareMap, telemetry, false, gamepad1, gamepad2, this);
 
         waitForStart();
+        teleOp.robot.getInDep().setLevel(InDepSubsystem.Level.GROUND); // arm, wrist
+        teleOp.robot.getInDep().rest(); // elbow
         teleOp.cv.switchCamera(teleOp.cv.cameraName1);
 
         if (opModeIsActive()) {

@@ -96,8 +96,8 @@ public class InDepSubsystem extends SubsystemBase {
 
 //         reset everything
 
-        setLevel(Level.GROUND); // arm, wrist
-        rest(); // elbow
+//        setLevel(Level.GROUND); // arm, wrist
+//        rest(); // elbow
         close(); // claw
 
         isBusy = false;
