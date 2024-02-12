@@ -10,7 +10,11 @@ import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.internal.camera.delegating.CachingExposureControl;
+import org.firstinspires.ftc.robotcore.internal.camera.delegating.SwitchableExposureControl;
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelGroupDetectionProcessor;
+// docs: https://javadoc.io/doc/org.firstinspires.ftc/RobotCore/latest/org/firstinspires/ftc/robotcore/internal/camera/delegating/CachingExposureControl.html
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 import org.opencv.core.Point;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -29,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -36,6 +41,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+
 
 public class CVSubsystem extends SubsystemBase {
     private OpenCvCamera camera;
@@ -58,6 +64,7 @@ public class CVSubsystem extends SubsystemBase {
     private AprilTagProcessor aprilTag;
     public VisionPortal visionPortal;
     public final WebcamName cameraName1, cameraName2;
+    public final ExposureControl exposureControl;
     private CameraName switchableCamera;
     private PropDetectionPipeline propProcessor;
     private PixelGroupDetectionProcessor pixelGroupProcessor;
@@ -92,7 +99,9 @@ public class CVSubsystem extends SubsystemBase {
     public CVSubsystem(OpenCvCamera camera, WebcamName cameraName1, WebcamName cameraName2, DriveSubsystem drive, Telemetry telemetry, boolean isRedTeam, LinearOpMode opMode) {
 //        tdp = new TapeDetectionPipeline();
 //        camera.setPipeline(tdp);
+
         this.camera = camera;
+
         this.drive = drive;
         this.telemetry = telemetry;
         this.cameraName1 = cameraName1;
@@ -102,6 +111,7 @@ public class CVSubsystem extends SubsystemBase {
         this.isRedTeam = isRedTeam;
         this.opMode = opMode;
         runtime.reset();
+        exposureControl = new CachingExposureControl();
 
         // create AprilTagProcessor and VisionPortal
         initAprilTag();
@@ -130,6 +140,8 @@ public class CVSubsystem extends SubsystemBase {
     }
 
     private void initAprilTag() {
+        //camera exposure control
+        exposureControl.setExposure(exposureControl.getMinExposure(TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS);
         // Create the AprilTag processor.
         propProcessor = new PropDetectionPipeline(isRedTeam);
         aprilTag = new AprilTagProcessor.Builder()
