@@ -237,6 +237,8 @@ public class TeleOpUtil {
             resetArmEncoderToggle = true;
         }
         if (!gamepad2.circle && !gamepad2.a) resetArmEncoderToggle = false;
+        if (gamepad2.dpad_down) SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
+        else SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
     }
 
 
