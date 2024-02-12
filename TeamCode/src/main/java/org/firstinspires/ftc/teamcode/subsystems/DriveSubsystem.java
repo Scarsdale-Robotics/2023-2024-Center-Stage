@@ -311,10 +311,20 @@ public class DriveSubsystem extends SubsystemBase {
 
             // wait until all linked movements are completed
             boolean running = true;
-            while (opMode.opModeIsActive() && running && opMode.opModeIsActive()) {
+            while (running && opMode.opModeIsActive()) {
+                if (!opMode.opModeIsActive()) {
+                    threadPool.shutdownNow();
+                    break;
+                }
+
                 running = false;
                 for (Future<?> status : threadStatus)
                     running = !status.isDone() || running; // running is only false if all threads are inactive
+            }
+
+            if (!opMode.opModeIsActive()) {
+                threadPool.shutdownNow();
+                break;
             }
 
         }
