@@ -249,6 +249,8 @@ public class TeleOpUtil {
         if ((gamepad2.triangle && gamepad2.square) && !droneToggle) {
             endgame.releaseDrone();
             droneToggle = true;
+            gamepad1.rumble(500);
+            gamepad2.rumble(500);
         }
         if (!gamepad2.triangle && !gamepad2.square) {
             endgame.holdDrone();

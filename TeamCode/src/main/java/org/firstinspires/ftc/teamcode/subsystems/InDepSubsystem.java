@@ -155,7 +155,7 @@ public class InDepSubsystem extends SubsystemBase {
             arm1.motor.setPower(0);
             arm2.motor.setPower(0);
         } else {
-            if (EndgameSubsystem.droneReleased) {
+            if (EndgameSubsystem.droneReleased && opMode.gamepad2.left_trigger > 0.5 && opMode.gamepad2.right_trigger > 0.5) {
                 arm1.motor.setPower(power);
                 arm2.motor.setPower(power);
             } else {
