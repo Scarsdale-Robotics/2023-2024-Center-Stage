@@ -62,4 +62,57 @@ public class Movement {
     public void linkWithNext() {
         linkedToNext = true;
     }
+
+    public String toString() {
+        switch (MOVEMENT_TYPE) {
+            case FORWARD_RIGHT:
+                return "FORWARD_RIGHT";
+            case FORWARD_LEFT:
+                return "FORWARD_LEFT";
+            case BACKWARD_RIGHT:
+                return "BACKWARD_RIGHT";
+            case BACKWARD_LEFT:
+                return "BACKWARD_LEFT";
+            case FORWARD:
+                return "FORWARD";
+            case BACKWARD:
+                return "BACKWARD";
+            case STRAFE_LEFT:
+                return "STRAFE_LEFT";
+            case STRAFE_RIGHT:
+                return "STRAFE_RIGHT";
+            case TURN_LEFT:
+                return "TURN_LEFT";
+            case TURN_RIGHT:
+                return "TURN_RIGHT";
+            case DELAY:
+                return "DELAY";
+            case CLOSE_LEFT_CLAW:
+                return "CLOSE_LEFT_CLAW";
+            case OPEN_LEFT_CLAW:
+                return "OPEN_LEFT_CLAW";
+            case CLOSE_RIGHT_CLAW:
+                return "CLOSE_RIGHT_CLAW";
+            case OPEN_RIGHT_CLAW:
+                return "OPEN_RIGHT_CLAW";
+            case FLIP_ELBOW:
+                return "FLIP_ELBOW";
+            case REST_ELBOW:
+                return "REST_ELBOW";
+            case SET_WRIST:
+                return "SET_WRIST";
+            case LOWER_ARM:
+                return "LOWER_ARM";
+            case RAISE_ARM:
+                return "RAISE_ARM";
+            case WHITE_PXL_ALIGN:
+                return "WHITE_PXL_ALIGN";
+            case APRIL_TAG_ALIGN:
+                return "APRIL_TAG_ALIGN";
+            default:
+                return "null";
+        }
+
+    }
+
 }

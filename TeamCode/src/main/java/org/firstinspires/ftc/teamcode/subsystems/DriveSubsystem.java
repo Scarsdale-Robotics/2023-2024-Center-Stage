@@ -34,6 +34,9 @@ public class DriveSubsystem extends SubsystemBase {
     private Telemetry telemetry;
     public static volatile double heading=0D;
 
+    // for debugging
+    public static String currentMovement="";
+
     public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, IMU imu, LinearOpMode opMode) {
         this(leftFront, rightFront, leftBack, rightBack, imu, opMode, null);
     }
@@ -199,6 +202,7 @@ public class DriveSubsystem extends SubsystemBase {
             double R_v = driveSpeed * Math.abs(Math.sin(theta + Math.PI / 4)) * universal_K * Math.signum(R_K); // for bR and fL
 
             if (telemetry != null) {
+                telemetry.addData("CURRENT MOVEMENT:", currentMovement);
                 telemetry.addData("L diff",Math.abs(Math.abs(getLeftWheelPosition()-L_start) - Math.abs(L)));
                 telemetry.addData("L setpoint",L_sp);
                 telemetry.addData("L position",L_p);
@@ -266,6 +270,7 @@ public class DriveSubsystem extends SubsystemBase {
             K = PID.update(cumulativeAngle);
 
             if (telemetry != null) {
+                telemetry.addData("CURRENT MOVEMENT:", currentMovement);
                 telemetry.addData("Degrees Disp setpoint",setPoint);
                 telemetry.addData("Degrees diff",setPoint-cumulativeAngle);
                 telemetry.addData("Degrees cumulative",cumulativeAngle);
@@ -303,6 +308,9 @@ public class DriveSubsystem extends SubsystemBase {
             boolean linked = true;
             while (!movements.isEmpty() && linked && opMode.opModeIsActive()) {
                 Movement movement = movements.removeFirst();
+                currentMovement = "["+movement.toString()+"]";
+                telemetry.addData("CURRENT MOVEMENT:", currentMovement);
+                telemetry.update();
                 linked = movement.linkedToNext;
                 MovementThread thread = new MovementThread(movement);
                 Future<?> status = threadPool.submit(thread);

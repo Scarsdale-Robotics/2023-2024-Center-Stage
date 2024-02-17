@@ -6,7 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 public class DrivePIDCoefficients {
     public static double drive_Kp = 0.0075;
     public static double drive_Ki = 0.05;
-    public static double drive_Kd = 0.0001;
+    public static double drive_Kd = 0.0;
     public static double turn_Kp = 0.1;
     public static double turn_Ki = 0.1;
     public static double turn_Kd = 0.001;

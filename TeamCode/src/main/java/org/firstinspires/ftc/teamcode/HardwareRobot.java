@@ -6,8 +6,10 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -23,10 +25,10 @@ public class HardwareRobot {
     public final Motor rightBack;
     public final Motor arm1;
     public final Motor arm2;
-    public final Servo elbow;
+    public final ServoImplEx elbow;
     public final Servo leftClaw;
     public final Servo rightClaw;
-    public final Servo wrist;
+    public final ServoImplEx wrist;
     public final CRServo drone;
     public final IMU imu;
     //    public final OpenCvCamera frontCam;
@@ -98,14 +100,17 @@ public class HardwareRobot {
 
         leftClaw = hardwareMap.servo.get("leftClaw");
         rightClaw = hardwareMap.servo.get("rightClaw");
-        wrist = hardwareMap.servo.get("wrist");
-        elbow = hardwareMap.servo.get("elbow");
+        wrist = hardwareMap.get(ServoImplEx.class, "wrist");
+        elbow = hardwareMap.get(ServoImplEx.class, "elbow");
         drone = hardwareMap.crservo.get("drone");
 
         leftClaw.scaleRange(0, 1);
         rightClaw.scaleRange(0, 1);
         wrist.scaleRange(0, 1);
         elbow.scaleRange(0, 1);
+
+        wrist.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        elbow.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
