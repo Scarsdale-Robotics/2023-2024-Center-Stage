@@ -16,7 +16,7 @@ public class DrivePIDCoefficients {
     public static double turn_Ki = 0.1;
     public static double turn_Kd = 0.001;
     public static double errorTolerance_p = 30.5;
-    public static double errorTolerance_v = 30;
+    public static double errorTolerance_v = 50;
     public static double errorTolerance_degrees = 1.0;
 
     public static double getDriveP() {

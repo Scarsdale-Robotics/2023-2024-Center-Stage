@@ -187,6 +187,12 @@ public class DriveSubsystem extends SubsystemBase {
             throw new RuntimeException("driveByAngularEncoder(): Tried to run two drive actions at once");
         }
 
+        // prepare velocity PID controllers
+        leftBackController.resetIntegral();
+        rightBackController.resetIntegral();
+        leftFrontController.resetIntegral();
+        rightFrontController.resetIntegral();
+
         // begin action
         double LB_start = getLBPosition(), RB_start = getRBPosition(), LF_start = getLFPosition(), RF_start = getRFPosition();
         double LD = leftTicks * Math.signum(Math.sin(theta - Math.PI / 4)), RD = rightTicks * Math.signum(Math.sin(theta + Math.PI / 4));

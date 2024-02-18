@@ -81,11 +81,11 @@ public class PIDController {
     }
 
     public void setSetPoint(double setPoint) {
-        if (setPoint != this.setPoint) {
-            this.integralSum = 0;
-            this.setPoint = setPoint;
-        }
+        this.setPoint = setPoint;
+    }
 
+    public void resetIntegral() {
+        this.integralSum = 0;
     }
 
     public double getSetPoint() {
