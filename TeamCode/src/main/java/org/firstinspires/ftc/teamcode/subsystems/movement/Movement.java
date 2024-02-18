@@ -47,6 +47,7 @@ public class Movement {
     public double SERVO_POSITION;
     public long WAIT;
     public boolean linkedToNext;
+    public boolean ignoreVelocity;
 
     Movement(MovementType type, double forward, double strafe, double turn, double elevation, double servoPosition, long wait) {
         this.MOVEMENT_TYPE = type;
@@ -57,10 +58,15 @@ public class Movement {
         this.SERVO_POSITION = servoPosition;
         this.WAIT = wait;
         linkedToNext = false;
+        ignoreVelocity = false;
     }
 
     public void linkWithNext() {
         linkedToNext = true;
+    }
+
+    public void ignoreDriveVelocity() {
+        ignoreVelocity = true;
     }
 
     public String toString() {

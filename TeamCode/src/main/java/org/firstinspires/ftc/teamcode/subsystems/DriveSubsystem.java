@@ -152,6 +152,18 @@ public class DriveSubsystem extends SubsystemBase {
      * @param theta      The direction of movement in radians in [-π, π].
      */
     public void driveByAngularEncoder(double driveSpeed, double leftTicks, double rightTicks, double theta) {
+        driveByAngularEncoder(driveSpeed, leftTicks, rightTicks, theta, false);
+    }
+
+    /**
+     * Use only for autonomous. Move a certain distance following two motion vectors for diagonal motor pairs. Drive is robot centric.
+     * @param driveSpeed      Positive movement speed of the robot.
+     * @param leftTicks     How many ticks the back left and front right wheels should be displaced by.
+     * @param rightTicks      How many ticks the back right and front left wheels should be displaced by.
+     * @param theta      The direction of movement in radians in [-π, π].
+     * @param ignoreVelocity    If the wheels should ignore fully stopping after reaching the setpoints.
+     */
+    public void driveByAngularEncoder(double driveSpeed, double leftTicks, double rightTicks, double theta, boolean ignoreVelocity) {
         // check for clashing actions
         if (DriveSubsystem.getIsBusy()) {
             throw new RuntimeException("driveByAngularEncoder(): Tried to run two drive actions at once");
@@ -222,11 +234,11 @@ public class DriveSubsystem extends SubsystemBase {
             );
 
             L_atSetPoint = L_atSetPoint ||
-                    (Math.abs(Math.abs(getLeftWheelPosition()-L_start) - Math.abs(L)) < DrivePIDCoefficients.getErrorTolerance_p() &&
-                            Math.abs(getLeftWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v());
+                    (Math.abs(Math.abs(getLeftWheelPosition()-L_start) - Math.abs(L)) < DrivePIDCoefficients.getErrorTolerance_p() && // position
+                            ( ignoreVelocity || (Math.abs(getLeftWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v())) ); // velocity
             R_atSetPoint = R_atSetPoint ||
-                    (Math.abs(Math.abs(getRightWheelPosition()-R_start) - Math.abs(R)) < DrivePIDCoefficients.getErrorTolerance_p() &&
-                            Math.abs(getRightWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v());
+                    (Math.abs(Math.abs(getRightWheelPosition()-R_start) - Math.abs(R)) < DrivePIDCoefficients.getErrorTolerance_p() && // position
+                            ( ignoreVelocity || (Math.abs(getRightWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v())) ); // velocity
 
             isBusy = true;
         }
