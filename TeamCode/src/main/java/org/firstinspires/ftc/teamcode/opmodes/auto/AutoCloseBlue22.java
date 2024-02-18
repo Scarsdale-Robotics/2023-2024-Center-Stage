@@ -12,15 +12,25 @@ import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
 
-@Autonomous(name = "Auto Close Blue 2+4")
+@Autonomous(name = "Auto Close Blue 2+2")
 @Config
-public class AutoCloseBlue24 extends LinearOpMode {
+public class AutoCloseBlue22 extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
     private InDepSubsystem inDep;
     private DriveSubsystem drive;
     private CVSubsystem cvFront;
     private CVSubsystem cvBack;
-    public static double WHITE_TRAVEL = 81;
+    public static double _1a = 21;
+    public static double _1b = 12.5;
+    public static double _2 = 31;
+    public static double WHITE_OFFSET_X = 6;
+    public static double _3 = 27;
+    public static double _99 = 13.5;
+    public static double _22a = 10;
+    public static double _22b = 8;
+    public static double _4 = 5;
+    public static double _5 = 190;
+    public static double WHITE_TRAVEL = 80.25;
     public static String sequence = "";
     public static boolean useString = false;
 
@@ -55,63 +65,44 @@ public class AutoCloseBlue24 extends LinearOpMode {
 
         if (propLocation == 0) {
             main = new MovementSequenceBuilder()
-                    .forwardLeft(21, 11)
+                    .forwardLeft(_1a, _1b)
                     .openRightClaw()
-                    .sleepFor(150)
-                    .backward(10)
-                    .left(7)
+                    .backwardLeft(_22a, _22b)
                     .turnRight(90)
                     .raiseArm(10, true)
                     .flipElbow()
                     .left(10)
                     .raiseArm(200, true)
-                    .backward(12)
+                    .backward(_99)
                     .openLeftClaw()
-                    .sleepFor(333)
+                    .sleepFor(500)
                     .forward(5)
                     .restElbow()
-                    .left(31)
-                    .lowerArm(200, true)
-                    .forwardLeft(WHITE_TRAVEL, 5)
+                    .left(_2)
+                    .lowerArm(170, true)
+                    .forwardLeft(WHITE_TRAVEL, WHITE_OFFSET_X)
+                    .lowerArm(40, true)
                     .forward(10)
-                    .lowerArm(10, true)
+//                    .lowerArm(10, true)
                     .closeBothClaws()
                     .sleepFor(500)
                     .backward(10)
                     .raiseArm(10, true)
-                    .backwardRight(WHITE_TRAVEL, 5)
+                    .backwardRight(WHITE_TRAVEL+5, WHITE_OFFSET_X, false, true)
                     .flipElbow()
-                    .right(22)
-                    .raiseArm(190, true)
+                    .right(_3)
+                    .raiseArm(_5, true)
                     .sleepFor(250)
-                    .backward(8)
+                    .backward(_4)
                     .openBothClaws()
                     .sleepFor(1000)
-//                    .forward(5)
-//                    .left(19)
-//                    .restElbow()
-//                    .lowerArm(210, true)
-//                    .forward(WHITE_TRAVEL)
-//                    .forward(5)
-////                    .lowerArm(10, true)
-//                    .closeBothClaws()
-//                    .sleepFor(500)
-//                    .backward(10)
-//                    .raiseArm(10, true)
-//                    .backward(WHITE_TRAVEL-10+5)
-//                    .right(19)
-//                    .raiseArm(200, true)
-//                    .flipElbow()
-//                    .sleepFor(250)
-//                    .backward(7)
-//                    .openBothClaws()
-//                    .sleepFor(150)
-                    .forward(5)
+                    .forward(2, false, true)
                     .restElbow()
-                    .left(20)
-                    .lowerArm(190, true)
+                    .left(20, false, true)
+                    .lowerArm(_5, true)
                     .backward(15)
-                    .forward(5)
+                    .forward(2, false, true)
+                    .forward(8)
                     .lowerArm(10, true)
                     .build();
         } else if (propLocation == 1) {
