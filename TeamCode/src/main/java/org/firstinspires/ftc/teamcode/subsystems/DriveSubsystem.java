@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -31,8 +32,17 @@ public class DriveSubsystem extends SubsystemBase {
     private final Motor rightFront;
     private final Motor leftBack;
     private final Motor rightBack;
+    private static double leftBackPower = 0;
+    private static double rightBackPower = 0;
+    private static double leftFrontPower = 0;
+    private static double rightFrontPower = 0;
+    private static PIDController leftFrontController = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
+    private static PIDController rightFrontController = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
+    private static PIDController leftBackController = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
+    private static PIDController rightBackController = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
     private Telemetry telemetry;
     public static volatile double heading=0D;
+    private final ElapsedTime runtime;
 
     // for debugging
     public static String currentMovement="";
@@ -71,6 +81,10 @@ public class DriveSubsystem extends SubsystemBase {
 
             this.telemetry.update();
         }
+
+        runtime = new ElapsedTime();
+        runtime.reset();
+        
     }
 
     /**
@@ -88,13 +102,17 @@ public class DriveSubsystem extends SubsystemBase {
     /**
      * Drives the motors directly with the specified motor powers.
      *
-     * @param frontLeftSpeed     the speed of the front left motor
-     * @param frontRightSpeed     the speed of the front right motor
-     * @param backLeftSpeed     the speed of the back left motor
-     * @param backRightSpeed     the speed of the back right motor
+     * @param leftFrontPower     the power of the leftFront motor
+     * @param rightFrontPower     the power of the rightFront motor
+     * @param leftBackPower     the power of the leftBack motor
+     * @param rightBackPower     the power of the rightBack motor
      */
-    public void driveWithMotorPowers(double frontLeftSpeed, double frontRightSpeed, double backLeftSpeed, double backRightSpeed) {
-        controller.driveWithMotorPowers(frontLeftSpeed, frontRightSpeed, backLeftSpeed, backRightSpeed);
+    public void driveWithMotorPowers(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower) {
+        controller.driveWithMotorPowers(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
+        this.leftFrontPower = leftFrontPower;
+        this.rightFrontPower = rightFrontPower;
+        this.leftBackPower = leftBackPower;
+        this.rightBackPower = rightBackPower;
     }
 
     /**
@@ -123,7 +141,7 @@ public class DriveSubsystem extends SubsystemBase {
         }
 
         // begin action
-        double startEncoder = getRightWheelPosition();
+        double startEncoder = getRBPosition();
         double setPoint = startEncoder + ticks;
         double K;
 
@@ -131,10 +149,10 @@ public class DriveSubsystem extends SubsystemBase {
 
         while (
                 opMode.opModeIsActive() &&
-                        Math.abs(setPoint- getRightWheelPosition()) > DrivePIDCoefficients.getErrorTolerance_p() &&
-                        Math.abs(getRightWheelVelocity()) > DrivePIDCoefficients.getErrorTolerance_v()
+                        Math.abs(setPoint- getRBPosition()) > DrivePIDCoefficients.getErrorTolerance_p() &&
+                        Math.abs(getRBVelocity()) > DrivePIDCoefficients.getErrorTolerance_v()
         ) {
-            K = PID.update(getRightWheelPosition());
+            K = PID.update(getRBPosition());
             driveRobotCentric(rightSpeed * K, forwardSpeed * K, 0);
             isBusy = true;
         }
@@ -170,75 +188,90 @@ public class DriveSubsystem extends SubsystemBase {
         }
 
         // begin action
-        double L_start = getLeftWheelPosition(), R_start = getRightWheelPosition();
-        double L_sp = leftBack.getCurrentPosition() + leftTicks * Math.signum(Math.sin(theta - Math.PI / 4)),
-                R_sp = -rightBack.getCurrentPosition() + rightTicks * Math.signum(Math.sin(theta + Math.PI / 4));
+        double LB_start = getLBPosition(), RB_start = getRBPosition(), LF_start = getLFPosition(), RF_start = getRFPosition();
+        double LD = leftTicks * Math.signum(Math.sin(theta - Math.PI / 4)), RD = rightTicks * Math.signum(Math.sin(theta + Math.PI / 4));
+        double LB_sp = LB_start + LD,
+                RB_sp = -RB_start + RD,
+                LF_sp = -RB_start + RD,
+                RF_sp = LB_start + LD;
         double L = leftTicks, R = rightTicks;
 
-        PIDController L_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), L_sp);
-        PIDController R_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), R_sp);
+        PIDController LB_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), LB_sp);
+        PIDController RB_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), RB_sp);
+        PIDController LF_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), LF_sp);
+        PIDController RF_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), RF_sp);
 
-        boolean L_atSetPoint = false, R_atSetPoint = false;
+        boolean LB_atSetPoint = false, RB_atSetPoint = false, LF_atSetPoint = false, RF_atSetPoint = false;
 
         while ( // checking condition
                 opMode.opModeIsActive() && !(
-                        L_atSetPoint &&
-                                R_atSetPoint)
+                        LB_atSetPoint &&
+                        RB_atSetPoint &&
+                        LF_atSetPoint &&
+                        RF_atSetPoint)
         ) {
-            // getting L and R
-            double L_p = leftBack.getCurrentPosition();
-            double R_p = -rightBack.getCurrentPosition();
+            // getting current positions
+            double LB_p = getLBPosition();
+            double RB_p = -getRBPosition();
+            double LF_p = -getLFPosition();
+            double RF_p = getRFPosition();
 
-            L_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
-            R_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
+            LB_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
+            RB_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
+            LF_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
+            RF_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
 
-            double L_K = L_PID.update(L_p);
-            double R_K = R_PID.update(R_p);
-            double universal_K;
-            if (Math.abs(L_K) > Math.abs(R_K)) {
-                if (!L_atSetPoint) {
-                    universal_K = L_K;
-                } else {
-                    universal_K = R_K;
-                }
-            } else {
-                if (!R_atSetPoint) {
-                    universal_K = R_K;
-                } else {
-                    universal_K = L_K;
-                }
-            }
-            universal_K = Math.abs(universal_K);
+            double LB_K = LB_PID.update(LB_p);
+            double RB_K = RB_PID.update(RB_p);
+            double LF_K = LF_PID.update(LF_p);
+            double RF_K = RF_PID.update(RF_p);
 
-            double L_v = driveSpeed * Math.abs(Math.sin(theta - Math.PI / 4)) * universal_K * Math.signum(L_K); // for bL and fR
-            double R_v = driveSpeed * Math.abs(Math.sin(theta + Math.PI / 4)) * universal_K * Math.signum(R_K); // for bR and fL
+            double LDir = Math.abs(Math.sin(theta - Math.PI / 4)), RDir = Math.abs(Math.sin(theta + Math.PI / 4));
+            double LB_v = driveSpeed * LDir * LB_K; // for bL
+            double RB_v = driveSpeed * RDir * RB_K; // for bR
+            double LF_v = driveSpeed * RDir * LF_K; // for fL
+            double RF_v = driveSpeed * LDir * RF_K; // for fR
 
             if (telemetry != null) {
                 telemetry.addData("CURRENT MOVEMENT:", currentMovement);
-                telemetry.addData("L diff",Math.abs(Math.abs(getLeftWheelPosition()-L_start) - Math.abs(L)));
-                telemetry.addData("L setpoint",L_sp);
-                telemetry.addData("L position",L_p);
-                telemetry.addData("R diff",Math.abs(Math.abs(getRightWheelPosition()-R_start) - Math.abs(R)));
-                telemetry.addData("R setpoint",R_sp);
-                telemetry.addData("R position",R_p);
+                telemetry.addData("LB setpoint",LB_sp);
+                telemetry.addData("LB position",LB_p);
+                telemetry.addData("LF setpoint",LF_sp);
+                telemetry.addData("LF position",LF_p);
+                telemetry.addData("RB setpoint",RB_sp);
+                telemetry.addData("RB position",RB_p);
+                telemetry.addData("RF setpoint",RF_sp);
+                telemetry.addData("RF position",RF_p);
                 telemetry.update();
             }
 
-            double thetaDiff = 0.01 * (getYaw()-this.heading);
+            double thetaDiff = 0.01 * normalizeAngle(getYaw()-this.heading); // originally factored into to each motor
+
             // setting the powers of the motors
+//            double maxVelocity = DrivePIDCoefficients.MAX_VELOCITY;
+//            driveWithMotorVelocities(
+//                    maxVelocity * LF_v, // fL
+//                    maxVelocity * RF_v, // fR
+//                    maxVelocity * LB_v, // bL
+//                    maxVelocity * RB_v  // bR
+//            );
+
             driveWithMotorPowers(
-                    R_v + thetaDiff, // fL
-                    L_v - thetaDiff, // fR
-                    L_v + thetaDiff, // bL
-                    R_v - thetaDiff  // bR
+                    LF_v, // fL
+                    RF_v, // fR
+                    LB_v, // bL
+                    RB_v  // bR
             );
 
-            L_atSetPoint = L_atSetPoint ||
-                    (Math.abs(Math.abs(getLeftWheelPosition()-L_start) - Math.abs(L)) < DrivePIDCoefficients.getErrorTolerance_p() && // position
-                            ( ignoreVelocity || (Math.abs(getLeftWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v())) ); // velocity
-            R_atSetPoint = R_atSetPoint ||
-                    (Math.abs(Math.abs(getRightWheelPosition()-R_start) - Math.abs(R)) < DrivePIDCoefficients.getErrorTolerance_p() && // position
-                            ( ignoreVelocity || (Math.abs(getRightWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v())) ); // velocity
+            double positionErrorTolerance = DrivePIDCoefficients.getErrorTolerance_p();
+            LB_atSetPoint = LB_atSetPoint ||
+                    (Math.abs(Math.abs(getLBPosition()-LB_start) - Math.abs(L)) < positionErrorTolerance); // position
+            RB_atSetPoint = RB_atSetPoint ||
+                    (Math.abs(Math.abs(getRBPosition()-RB_start) - Math.abs(R)) < positionErrorTolerance); // position
+            LF_atSetPoint = LF_atSetPoint ||
+                    (Math.abs(Math.abs(getLFPosition()-LF_start) - Math.abs(L)) < positionErrorTolerance); // position
+            RF_atSetPoint = RF_atSetPoint ||
+                    (Math.abs(Math.abs(getRFPosition()-RF_start) - Math.abs(R)) < positionErrorTolerance); // position
 
             isBusy = true;
         }
@@ -270,7 +303,7 @@ public class DriveSubsystem extends SubsystemBase {
         while (
                 opMode.opModeIsActive() && !(
                         Math.abs(degrees - (cumulativeAngle + normalizeAngle(previousAngle-getYaw()))) < DrivePIDCoefficients.getErrorTolerance_degrees() &&
-                                Math.abs(getRightWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v())
+                                Math.abs(getRBVelocity()) < DrivePIDCoefficients.getErrorTolerance_v())
         ) {
             PID.setPID(DrivePIDCoefficients.getTurnP(), DrivePIDCoefficients.getTurnI(), DrivePIDCoefficients.getTurnD());
 
@@ -362,29 +395,57 @@ public class DriveSubsystem extends SubsystemBase {
     /**
      * @return the current position of the robot's back left wheel in ticks.
      */
-    public int getLeftWheelPosition() {
+    public int getLBPosition() {
         return leftBack.getCurrentPosition();
     }
 
     /**
      * @return the current position of the robot's back right wheel in ticks.
      */
-    public int getRightWheelPosition() {
+    public int getRBPosition() {
         return rightBack.getCurrentPosition();
+    }
+
+    /**
+     * @return the current position of the robot's front left wheel in ticks.
+     */
+    public int getLFPosition() {
+        return leftFront.getCurrentPosition();
+    }
+
+    /**
+     * @return the current position of the robot's front right wheel in ticks.
+     */
+    public int getRFPosition() {
+        return rightFront.getCurrentPosition();
     }
 
     /**
      * @return the current power of the robot's back left wheel.
      */
-    public double getLeftWheelVelocity() {
+    public double getLBVelocity() {
         return leftBack.getCorrectedVelocity();
     }
 
     /**
      * @return the current power of the robot's back right wheel.
      */
-    public double getRightWheelVelocity() {
+    public double getRBVelocity() {
         return rightBack.getCorrectedVelocity();
+    }
+
+    /**
+     * @return the current power of the robot's front left wheel.
+     */
+    public double getLFVelocity() {
+        return leftFront.getCorrectedVelocity();
+    }
+
+    /**
+     * @return the current power of the robot's front right wheel.
+     */
+    public double getRFVelocity() {
+        return rightFront.getCorrectedVelocity();
     }
 
     /**
@@ -419,4 +480,104 @@ public class DriveSubsystem extends SubsystemBase {
             angle -= 360;
         return angle;
     }
+
+    /**
+     * Drives the motors using PID control with the specified motor velocities.
+     *
+     * @param leftFrontVelocity     the velocity of the leftFront motor in encoder ticks/second.
+     * @param rightFrontVelocity    the velocity of the rightFront motor in encoder ticks/second.
+     * @param leftBackVelocity     the velocity of the leftBack motor in encoder ticks/second.
+     * @param rightBackVelocity     the velocity of the rightBack motor in encoder ticks/second.
+     */
+    public void driveWithMotorVelocities(double leftFrontVelocity, double rightFrontVelocity, double leftBackVelocity, double rightBackVelocity) {
+
+        leftFrontVelocity = clipWheelVelocity(leftFrontVelocity);
+        rightFrontVelocity = clipWheelVelocity(rightFrontVelocity);
+        leftBackVelocity = clipWheelVelocity(leftBackVelocity);
+        rightBackVelocity = clipWheelVelocity(rightBackVelocity);
+
+        leftFrontController.setErrorTolerance(DrivePIDCoefficients.getErrorTolerance_v());
+        rightFrontController.setErrorTolerance(DrivePIDCoefficients.getErrorTolerance_v());
+        leftBackController.setErrorTolerance(DrivePIDCoefficients.getErrorTolerance_v());
+        rightBackController.setErrorTolerance(DrivePIDCoefficients.getErrorTolerance_v());
+
+        leftFrontController.setPID(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
+        rightFrontController.setPID(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
+        leftBackController.setPID(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
+        rightBackController.setPID(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
+
+        leftFrontController.setSetPoint(leftFrontVelocity);
+        rightFrontController.setSetPoint(rightFrontVelocity);
+        leftBackController.setSetPoint(leftBackVelocity);
+        rightBackController.setSetPoint(rightBackVelocity);
+
+        while (!leftFrontController.atSetPoint(getLFVelocity()) ||
+                !rightFrontController.atSetPoint(getRFVelocity()) ||
+                !leftBackController.atSetPoint(getLBVelocity()) ||
+                !rightBackController.atSetPoint(getRBVelocity())) {
+
+            double velocityToPower = 0.02;
+            double LF_D = leftFrontController.update(getLFVelocity()) * velocityToPower;
+            double RF_D = rightFrontController.update(-getRFVelocity()) * velocityToPower;
+            double LB_D = leftBackController.update(getLBVelocity()) * velocityToPower;
+            double RB_D = rightBackController.update(-getRBVelocity()) * velocityToPower;
+
+            leftFrontPower += LF_D;
+            rightFrontPower += RF_D;
+            leftBackPower += LB_D;
+            rightBackPower += RB_D;
+
+            telemetry.addData("leftFront SP", leftFrontController.getSetPoint());
+            telemetry.addData("rightFront SP", rightFrontController.getSetPoint());
+            telemetry.addData("leftBack SP", leftBackController.getSetPoint());
+            telemetry.addData("rightBack SP", rightBackController.getSetPoint());
+
+            telemetry.addData("leftFront Vel", getLFVelocity());
+            telemetry.addData("rightFront Vel", getRFVelocity());
+            telemetry.addData("leftBack Vel", getLBVelocity());
+            telemetry.addData("rightBack Vel", getRBVelocity());
+
+            telemetry.addData("leftFront Diff", leftFrontController.getSetPoint()-getLFVelocity());
+            telemetry.addData("rightFront Diff", rightFrontController.getSetPoint()-getRFVelocity());
+            telemetry.addData("leftBack Diff", leftBackController.getSetPoint()-getLBVelocity());
+            telemetry.addData("rightBack Diff", rightBackController.getSetPoint()-getRBVelocity());
+
+            telemetry.update();
+
+            driveWithMotorPowers(
+                    leftFrontPower,
+                    rightFrontPower,
+                    leftBackPower,
+                    rightBackPower
+            );
+
+        }
+
+        telemetry.addData("at vel leftFront Vel", getLFVelocity());
+        telemetry.addData("at vel rightFront Vel", getRFVelocity());
+        telemetry.addData("at vel leftBack Vel", getLBVelocity());
+        telemetry.addData("at vel rightBack Vel", getRBVelocity());
+        telemetry.update();
+        
+        sleepFor(2000);
+
+    }
+
+    /**
+     * Smart sleep with opMode running check.
+     * @param ms Timeout in milliseconds.
+     */
+    private void sleepFor(long ms) {
+        runtime.reset();
+        while (opMode.opModeIsActive() && (runtime.milliseconds() < ms));
+    }
+
+    private double clipWheelVelocity(double velocity) {
+        if (velocity > DrivePIDCoefficients.MAX_VELOCITY)
+            return DrivePIDCoefficients.MAX_VELOCITY;
+        else if (velocity < -DrivePIDCoefficients.MAX_VELOCITY)
+            return -DrivePIDCoefficients.MAX_VELOCITY;
+        else return velocity;
+    }
+
 }

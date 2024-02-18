@@ -57,7 +57,7 @@ public class SubsystemTester extends LinearOpMode {
         while (opModeIsActive() && !gamepad1.right_bumper) {
             drive.driveWithMotorPowers(0,0,gamepad1.left_stick_x,0);
             telemetry.addData("leftBack:",gamepad1.left_stick_x);
-            telemetry.addData("leftBack Pos:",drive.getLeftWheelPosition());
+            telemetry.addData("leftBack Pos:",drive.getLBPosition());
             telemetry.update();
         } while (opModeIsActive() && gamepad1.right_bumper);
 
@@ -65,7 +65,7 @@ public class SubsystemTester extends LinearOpMode {
         while (opModeIsActive() && !gamepad1.right_bumper) {
             drive.driveWithMotorPowers(0,0,0,gamepad1.left_stick_x);
             telemetry.addData("rightBack:",gamepad1.left_stick_x);
-            telemetry.addData("rightBack Pos:",drive.getRightWheelPosition());
+            telemetry.addData("rightBack Pos:",drive.getRBPosition());
             telemetry.update();
         } while (opModeIsActive() && gamepad1.right_bumper);
 

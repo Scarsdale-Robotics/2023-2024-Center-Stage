@@ -13,7 +13,12 @@ public class PIDController {
     private double setPoint;
     private double integralSum;
     private double lastError;
+    private double errorTolerance;
     private ElapsedTime timer;
+
+    public PIDController(double Kp, double Ki, double Kd) {
+        this(Kp, Ki, Kd, 0);
+    }
 
     public PIDController(double Kp, double Ki, double Kd, double setPoint) {
         this.Kp = Kp;
@@ -27,6 +32,8 @@ public class PIDController {
 
         this.integralSum = 0;
         this.lastError = 0;
+
+        this.errorTolerance = 0;
 
         this.timer = new ElapsedTime();
     }
@@ -72,4 +79,25 @@ public class PIDController {
         this.Ki = Ki;
         this.Kd = Kd;
     }
+
+    public void setSetPoint(double setPoint) {
+        if (setPoint != this.setPoint) {
+            this.integralSum = 0;
+            this.setPoint = setPoint;
+        }
+
+    }
+
+    public double getSetPoint() {
+        return this.setPoint;
+    }
+
+    public boolean atSetPoint(double pv) {
+        return Math.abs(pv-setPoint) < errorTolerance;
+    }
+
+    public void setErrorTolerance(double errorTolerance) {
+        this.errorTolerance = errorTolerance;
+    }
+
 }

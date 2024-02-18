@@ -66,8 +66,8 @@ public class InDepSubsystem extends SubsystemBase {
         LEFT_CLAW_CLOSED(0.55),
         RIGHT_CLAW_OPEN(0.0),
         RIGHT_CLAW_CLOSED(0.25),
-        ELBOW_REST(0.0),
-        ELBOW_FLIPPED(0.99);
+        ELBOW_REST(0.99),
+        ELBOW_FLIPPED(0.0);
         public final double servoPosition;
 
         EndEffector(double servoPosition) {

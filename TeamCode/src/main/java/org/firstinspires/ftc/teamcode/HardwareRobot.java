@@ -48,10 +48,10 @@ public class HardwareRobot {
         leftBack.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightBack.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        leftFront.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightFront.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftBack.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightBack.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftFront.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFront.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBack.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBack.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         leftFront.setRunMode(Motor.RunMode.VelocityControl);
         rightFront.setRunMode(Motor.RunMode.VelocityControl);
@@ -102,6 +102,7 @@ public class HardwareRobot {
         rightClaw = hardwareMap.servo.get("rightClaw");
         wrist = hardwareMap.get(ServoImplEx.class, "wrist");
         elbow = hardwareMap.get(ServoImplEx.class, "elbow");
+        elbow.resetDeviceConfigurationForOpMode();
         drone = hardwareMap.crservo.get("drone");
 
         leftClaw.scaleRange(0, 1);

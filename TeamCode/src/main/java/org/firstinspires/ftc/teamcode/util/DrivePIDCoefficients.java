@@ -4,14 +4,19 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class DrivePIDCoefficients {
+
+    public static double MAX_VELOCITY = 2300;
     public static double drive_Kp = 0.0075;
     public static double drive_Ki = 0.05;
     public static double drive_Kd = 0.0;
+    public static double velocity_Kp = 1.0;
+    public static double velocity_Ki = 0.0;
+    public static double velocity_Kd = 0.0;
     public static double turn_Kp = 0.1;
     public static double turn_Ki = 0.1;
     public static double turn_Kd = 0.001;
     public static double errorTolerance_p = 30.5;
-    public static double errorTolerance_v = 0.05;
+    public static double errorTolerance_v = 30;
     public static double errorTolerance_degrees = 1.0;
 
     public static double getDriveP() {
@@ -24,6 +29,18 @@ public class DrivePIDCoefficients {
 
     public static double getDriveD() {
         return drive_Kd;
+    }
+
+    public static double getVelocityP() {
+        return velocity_Kp;
+    }
+
+    public static double getVelocityI() {
+        return velocity_Ki;
+    }
+
+    public static double getVelocityD() {
+        return velocity_Kd;
     }
 
     public static double getTurnP() {
