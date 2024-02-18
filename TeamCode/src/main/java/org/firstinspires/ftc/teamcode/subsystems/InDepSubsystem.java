@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.util.InDepPIDCoefficients;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
@@ -16,8 +17,8 @@ public class InDepSubsystem extends SubsystemBase {
 
     private final Servo leftClaw;
     private final Servo rightClaw;
-    private final Servo elbow;
-    private final Servo wrist;
+    private final ServoImplEx elbow;
+    private final ServoImplEx wrist;
 
     private static volatile boolean isBusy;
     private boolean isLeftClawOpen;
@@ -65,8 +66,8 @@ public class InDepSubsystem extends SubsystemBase {
         LEFT_CLAW_CLOSED(0.55),
         RIGHT_CLAW_OPEN(0.0),
         RIGHT_CLAW_CLOSED(0.25),
-        ELBOW_REST(0.1),
-        ELBOW_FLIPPED(0.74);
+        ELBOW_REST(0.0),
+        ELBOW_FLIPPED(0.99);
         public final double servoPosition;
 
         EndEffector(double servoPosition) {
@@ -75,11 +76,11 @@ public class InDepSubsystem extends SubsystemBase {
     }
     public final int ELBOW_TURN_TICKS = 5038;
 
-    public InDepSubsystem(Motor arm1, Motor arm2, Servo elbow, Servo wrist, Servo leftClaw, Servo rightClaw, LinearOpMode opMode) {
+    public InDepSubsystem(Motor arm1, Motor arm2, ServoImplEx elbow, ServoImplEx wrist, Servo leftClaw, Servo rightClaw, LinearOpMode opMode) {
         this(arm1,arm2,elbow,wrist,leftClaw,rightClaw,opMode,null);
     }
 
-    public InDepSubsystem(Motor arm1, Motor arm2, Servo elbow, Servo wrist, Servo leftClaw, Servo rightClaw, LinearOpMode opMode, MultipleTelemetry telemetry) {
+    public InDepSubsystem(Motor arm1, Motor arm2, ServoImplEx elbow, ServoImplEx wrist, Servo leftClaw, Servo rightClaw, LinearOpMode opMode, MultipleTelemetry telemetry) {
         // initialize objects
         this.arm1 = arm1;
         this.arm2 = arm2;
@@ -155,7 +156,7 @@ public class InDepSubsystem extends SubsystemBase {
             arm1.motor.setPower(0);
             arm2.motor.setPower(0);
         } else {
-            if (EndgameSubsystem.droneReleased) {
+            if (EndgameSubsystem.droneReleased && opMode.gamepad2.left_trigger > 0.5 && opMode.gamepad2.right_trigger > 0.5) {
                 arm1.motor.setPower(power);
                 arm2.motor.setPower(power);
             } else {
@@ -220,6 +221,7 @@ public class InDepSubsystem extends SubsystemBase {
 //            setWristPosition(0.25);
 
             if (telemetry != null) {
+                telemetry.addData("CURRENT MOVEMENT:", DriveSubsystem.currentMovement);
                 telemetry.addData("L Arm pos", getLeftArmPosition());
                 telemetry.addData("L Setpoint", L_setPoint);
                 telemetry.update();
@@ -364,7 +366,7 @@ public class InDepSubsystem extends SubsystemBase {
      * Calculates the elbow's position based on the arm's position. (https://www.desmos.com/calculator/8qjoopxfda)
      */
     private double calculateElbowPosition(double armPos) {
-        double lowerBound = 500;
+        double lowerBound = Level.BACKBOARD_HIGH.target-50;
         double m_elbow = (EndEffector.ELBOW_FLIPPED.servoPosition - EndEffector.ELBOW_REST.servoPosition) / ((double)Level.BACKBOARD_HIGH.target - lowerBound);
 
         if (armPos <= lowerBound)

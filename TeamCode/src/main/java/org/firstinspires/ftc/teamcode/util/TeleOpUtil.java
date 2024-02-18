@@ -237,6 +237,8 @@ public class TeleOpUtil {
             resetArmEncoderToggle = true;
         }
         if (!gamepad2.circle && !gamepad2.a) resetArmEncoderToggle = false;
+        if (gamepad2.dpad_up) SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+        else SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
     }
 
 
@@ -247,6 +249,8 @@ public class TeleOpUtil {
         if ((gamepad2.triangle && gamepad2.square) && !droneToggle) {
             endgame.releaseDrone();
             droneToggle = true;
+            gamepad1.rumble(500);
+            gamepad2.rumble(500);
         }
         if (!gamepad2.triangle && !gamepad2.square) {
             endgame.holdDrone();

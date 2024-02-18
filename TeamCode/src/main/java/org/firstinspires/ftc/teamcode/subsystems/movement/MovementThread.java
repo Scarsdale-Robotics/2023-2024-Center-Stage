@@ -24,11 +24,11 @@ public class MovementThread implements Runnable {
     private static volatile CVSubsystem cv;
     private static volatile LinearOpMode opMode;
 
+
     public MovementThread(Movement movement) {
         this.movement = movement;
         runtime = new ElapsedTime();
         runtime.reset();
-
     }
 
     public static void initSubsystems(DriveSubsystem drive, InDepSubsystem inDep, CVSubsystem cv, LinearOpMode opMode) {
@@ -53,7 +53,7 @@ public class MovementThread implements Runnable {
                     L = Math.abs(u*c*Math.cos(theta)-u*c*Math.sin(theta))/Math.sqrt(2),
                     R = Math.abs(u*c*Math.cos(theta)+u*c*Math.sin(theta))/Math.sqrt(2);
 
-            drive.driveByAngularEncoder(POWER_DRIVE, L, R, theta);
+            drive.driveByAngularEncoder(POWER_DRIVE, L, R, theta, movement.ignoreVelocity);
         }
 
         // TURN CASES

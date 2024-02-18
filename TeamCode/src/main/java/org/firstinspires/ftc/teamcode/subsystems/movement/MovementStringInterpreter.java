@@ -2,17 +2,19 @@ package org.firstinspires.ftc.teamcode.subsystems.movement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MovementStringInterpreter {
 
 	/**
 	 * Converts a string into a MovementSequenceBuilder
-	 * @param s      The string to be converted.
+	 *
+	 * @param s The string to be converted.
 	 */
 	public static MovementSequenceBuilder toMovementSequenceBuilder(String s) {
 		// removing whitespaces
-		s = s.replaceAll("\\s+","");
+		s = s.replaceAll("\\s+", "");
 
 		ArrayList<MovementString> movementStrings = new ArrayList<>();
 
@@ -22,22 +24,24 @@ public class MovementStringInterpreter {
 			if (s.charAt(i) == '.') {
 				// reading the MovementString name
 				int openParenthesis = s.indexOf("(", i);
-				String movementStringName = s.substring(i+1, openParenthesis);
+				String movementStringName = s.substring(i + 1, openParenthesis);
 				i = openParenthesis;
 
 				int nests = 1;
 				String parametersString = "";
-				while (nests>0 && i<s.length()) {
+				while (nests > 0 && i < s.length()) {
 					i++;
-					if (i==s.length())
+					if (i == s.length())
 						throw new RuntimeException("Missing )");
-					nests += s.charAt(i)=='(' ? 1 : (s.charAt(i)==')' ? -1 : 0);
-					if (nests>0)
+					nests += s.charAt(i) == '(' ? 1 : (s.charAt(i) == ')' ? -1 : 0);
+					if (nests > 0)
 						parametersString += s.charAt(i);
 				}
-				ArrayList<String> movementStringParamsList= new ArrayList<>(Arrays.asList(parametersString.split(",")));
+				ArrayList<String> movementStringParamsList = new ArrayList<>(
+						Arrays.asList(parametersString.split(",")));
 				movementStringParamsList.removeAll(Arrays.asList("", null));
-				String[] movementStringParams = movementStringParamsList.toArray(new String[movementStringParamsList.size()]);
+				String[] movementStringParams = movementStringParamsList
+						.toArray(new String[movementStringParamsList.size()]);
 				i++;
 
 				// append MovementString to list
@@ -46,16 +50,16 @@ public class MovementStringInterpreter {
 			}
 
 			// detect comments
-			int nextMovement = s.indexOf(".",i);
+			int nextMovement = s.indexOf(".", i);
 			String comment;
-			if (nextMovement!=-1)
+			if (nextMovement != -1)
 				comment = s.substring(i, nextMovement);
 			else
 				comment = s.substring(i);
-			comment = comment.replaceAll("\\s+","");
-			if (!(comment.length()==0 || comment.startsWith("//")))
-				throw new RuntimeException("Failed to interpret movement: "+comment);
-			i = nextMovement-1;
+			comment = comment.replaceAll("\\s+", "");
+			if (!(comment.length() == 0 || comment.startsWith("//")))
+				throw new RuntimeException("Failed to interpret movement: " + comment);
+			i = nextMovement - 1;
 		}
 
 		MovementSequenceBuilder movementSequenceBuilder = new MovementSequenceBuilder();
@@ -65,24 +69,34 @@ public class MovementStringInterpreter {
 			String[] movementStringParams = movementString.params;
 
 			if (movementStringName.equals("openBothClaws")) {
-				if (movementStringParams.length!=0) movementString.throwInterpretError();
+				if (movementStringParams.length != 0)
+					movementString.throwInterpretError();
 				movementSequenceBuilder.openBothClaws();
 				continue;
 			}
 			if (movementStringName.equals("closeBothClaws")) {
-				if (movementStringParams.length!=0) movementString.throwInterpretError();
+				if (movementStringParams.length != 0)
+					movementString.throwInterpretError();
 				movementSequenceBuilder.closeBothClaws();
 				continue;
 			}
 
-			if (movementStringParams.length > 0 &&
-					movementStringParams[movementStringParams.length-1].equals("true")) {
-				movementSequenceBuilder.linkLastMovement();
-				movementSequenceBuilder.append(movementString.toMovement());
+			// check for modifier parameters
+			Movement convertedMovement = movementString.toMovement();
+			if (movementString.extraParams.length > 0) {
+				if (movementString.extraParams[0].equals("true")) // linked modifier
+					movementSequenceBuilder.linkLastMovement();
+
+				movementSequenceBuilder.append(convertedMovement);
+
+				if (movementString.extraParams.length > 1 && movementString.extraParams[1].equals("true")) // ignore
+					// velocity
+					// modifier
+					movementSequenceBuilder.ignoreLastMovementVelocity();
 				continue;
 			}
 
-			movementSequenceBuilder.append(movementString.toMovement());
+			movementSequenceBuilder.append(convertedMovement);
 
 		}
 
@@ -90,8 +104,10 @@ public class MovementStringInterpreter {
 	}
 
 	/**
-	 * Converts a string containing MovementStrings bounded by curly brackets into a MovementSequence array.
-	 * @param s      The string to be converted.
+	 * Converts a string containing MovementStrings bounded by curly brackets into a
+	 * MovementSequence array.
+	 *
+	 * @param s The string to be converted.
 	 */
 	public static MovementSequence[] toMovementSequenceArray(String s) {
 		ArrayList<String> movementSequenceStrings = new ArrayList<>();
@@ -99,15 +115,15 @@ public class MovementStringInterpreter {
 		Matcher matcher = Pattern.compile("\\{((.|\\n|\\r)*?)\\}").matcher(s);
 		int prevEnd = 0;
 		while (matcher.find()) {
-			String comment = s.substring(prevEnd, matcher.start()).replaceAll("\\s+","");
-			if (!(comment.length()==0 || comment.startsWith("//")))
-				throw new RuntimeException("Unexpected token: "+comment);
+			String comment = s.substring(prevEnd, matcher.start()).replaceAll("\\s+", "");
+			if (!(comment.length() == 0 || comment.startsWith("//")))
+				throw new RuntimeException("Unexpected token: " + comment);
 			movementSequenceStrings.add(matcher.group().replaceAll("\\{|\\}", ""));
-			prevEnd = matcher.end()+1;
+			prevEnd = matcher.end() + 1;
 		}
-		String comment = s.substring(Math.min(prevEnd, s.length())).replaceAll("\\s+","");
-		if (!(comment.length()==0 || comment.startsWith("//")))
-			throw new RuntimeException("Unexpected token: "+comment);
+		String comment = s.substring(Math.min(prevEnd, s.length())).replaceAll("\\s+", "");
+		if (!(comment.length() == 0 || comment.startsWith("//")))
+			throw new RuntimeException("Unexpected token: " + comment);
 
 		MovementSequence[] movementSequences = new MovementSequence[movementSequenceStrings.size()];
 		for (int i = 0; i < movementSequenceStrings.size(); i++)
@@ -116,26 +132,28 @@ public class MovementStringInterpreter {
 		return movementSequences;
 	}
 
-
 	private static class MovementString {
 		String name;
 		String[] params;
+		String[] extraParams;
 
 		public MovementString(String name, String[] params) {
 			this.name = name;
 			this.params = params;
+			extraParams = new String[0];
 		}
 
 		public String toString() {
-			String s = name+"(";
+			String s = name + "(";
 			for (int i = 0; i < params.length; i++)
-				s += params[i] + (i!=params.length-1 ? "," : "");
+				s += params[i] + (i != params.length - 1 ? "," : "");
 			s += ")";
 			return s;
 		}
 
 		/**
 		 * Converts a MovementString to a Movement.
+		 *
 		 * @return The converted Movement.
 		 */
 		public Movement toMovement() {
@@ -145,112 +163,153 @@ public class MovementStringInterpreter {
 			switch (name) {
 
 				case "alignWithWhitePixel":
-					if (params.length!=0) throwInterpretError();
+					if (!isIn(params.length, 0))
+						throwInterpretError();
 					movement = alignWithWhitePixel();
 					break;
 
 				case "forward":
-					if (params.length!=1 && params.length!=2) throwInterpretError();
+					if (!isIn(params.length, 1, 2, 3))
+						throwInterpretError();
 					movement = forward(eval(params[0]));
+					if (params.length > 1)
+						extraParams = Arrays.copyOfRange(params, 1, params.length);
 					break;
 
 				case "backward":
-					if (params.length!=1 && params.length!=2) throwInterpretError();
+					if (!isIn(params.length, 1, 2, 3))
+						throwInterpretError();
 					movement = backward(eval(params[0]));
+					if (params.length > 1)
+						extraParams = Arrays.copyOfRange(params, 1, params.length);
 					break;
 
 				case "left":
-					if (params.length!=1 && params.length!=2) throwInterpretError();
+					if (!isIn(params.length, 1, 2, 3))
+						throwInterpretError();
 					movement = left(eval(params[0]));
+					if (params.length > 1)
+						extraParams = Arrays.copyOfRange(params, 1, params.length);
 					break;
 
 				case "right":
-					if (params.length!=1 && params.length!=2) throwInterpretError();
+					if (!isIn(params.length, 1, 2, 3))
+						throwInterpretError();
 					movement = right(eval(params[0]));
+					if (params.length > 1)
+						extraParams = Arrays.copyOfRange(params, 1, params.length);
 					break;
 
 				case "turnLeft":
-					if (params.length!=1 && params.length!=2) throwInterpretError();
+					if (!isIn(params.length, 1, 2))
+						throwInterpretError();
 					movement = turnLeft(eval(params[0]));
+					if (params.length > 1)
+						extraParams = Arrays.copyOfRange(params, 1, params.length);
 					break;
 
 				case "turnRight":
-					if (params.length!=1 && params.length!=2) throwInterpretError();
+					if (!isIn(params.length, 1, 2))
+						throwInterpretError();
 					movement = turnRight(eval(params[0]));
+					if (params.length > 1)
+						extraParams = Arrays.copyOfRange(params, 1, params.length);
 					break;
 
 				case "forwardLeft":
-					if (params.length!=2 && params.length!=3) throwInterpretError();
-					movement = forwardLeft(eval(params[0]),
-							eval(params[1]));
+					if (!isIn(params.length, 2, 3, 4))
+						throwInterpretError();
+					movement = forwardLeft(eval(params[0]), eval(params[1]));
+					if (params.length > 2)
+						extraParams = Arrays.copyOfRange(params, 2, params.length);
 					break;
 
 				case "forwardRight":
-					if (params.length!=2 && params.length!=3) throwInterpretError();
-					movement = forwardRight(eval(params[0]),
-							eval(params[1]));
+					if (!isIn(params.length, 2, 3, 4))
+						throwInterpretError();
+					movement = forwardRight(eval(params[0]), eval(params[1]));
+					if (params.length > 2)
+						extraParams = Arrays.copyOfRange(params, 2, params.length);
 					break;
 
 				case "backwardLeft":
-					if (params.length!=2 && params.length!=3) throwInterpretError();
-					movement = backwardLeft(eval(params[0]),
-							eval(params[1]));
+					if (!isIn(params.length, 2, 3, 4))
+						throwInterpretError();
+					movement = backwardLeft(eval(params[0]), eval(params[1]));
+					if (params.length > 2)
+						extraParams = Arrays.copyOfRange(params, 2, params.length);
 					break;
 
 				case "backwardRight":
-					if (params.length!=2 && params.length!=3) throwInterpretError();
-					movement = backwardRight(eval(params[0]),
-							eval(params[1]));
+					if (!isIn(params.length, 2, 3, 4))
+						throwInterpretError();
+					movement = backwardRight(eval(params[0]), eval(params[1]));
+					if (params.length > 2)
+						extraParams = Arrays.copyOfRange(params, 2, params.length);
 					break;
 
 				case "sleepFor":
-					if (params.length!=1) throwInterpretError();
-					movement = sleepFor((long)eval(params[0]));
+					if (!isIn(params.length, 1))
+						throwInterpretError();
+					movement = sleepFor((long) eval(params[0]));
 					break;
 
 				case "restElbow":
-					if (params.length!=0) throwInterpretError();
+					if (!isIn(params.length, 0))
+						throwInterpretError();
 					movement = restElbow();
 					break;
 
 				case "flipElbow":
-					if (params.length!=0) throwInterpretError();
+					if (!isIn(params.length, 0))
+						throwInterpretError();
 					movement = flipElbow();
 					break;
 
 				case "setWrist":
-					if (params.length!=1) throwInterpretError();
+					if (!isIn(params.length, 1))
+						throwInterpretError();
 					movement = setWrist(eval(params[0]));
 					break;
 
 				case "openLeftClaw":
-					if (params.length!=0) throwInterpretError();
+					if (!isIn(params.length, 0))
+						throwInterpretError();
 					movement = openLeftClaw();
 					break;
 
 				case "openRightClaw":
-					if (params.length!=0) throwInterpretError();
+					if (!isIn(params.length, 0))
+						throwInterpretError();
 					movement = openRightClaw();
 					break;
 
 				case "closeLeftClaw":
-					if (params.length!=0) throwInterpretError();
+					if (!isIn(params.length, 0))
+						throwInterpretError();
 					movement = closeLeftClaw();
 					break;
 
 				case "closeRightClaw":
-					if (params.length!=0) throwInterpretError();
+					if (!isIn(params.length, 0))
+						throwInterpretError();
 					movement = closeRightClaw();
 					break;
 
 				case "lowerArm":
-					if (params.length!=1 && params.length!=2) throwInterpretError();
+					if (!isIn(params.length, 1, 2))
+						throwInterpretError();
 					movement = lowerArm(eval(params[0]));
+					if (params.length > 1)
+						extraParams = Arrays.copyOfRange(params, 1, params.length);
 					break;
 
 				case "raiseArm":
-					if (params.length!=1 && params.length!=2) throwInterpretError();
+					if (!isIn(params.length, 1, 2))
+						throwInterpretError();
 					movement = raiseArm(eval(params[0]));
+					if (params.length > 1)
+						extraParams = Arrays.copyOfRange(params, 1, params.length);
 					break;
 
 				default:
@@ -263,7 +322,7 @@ public class MovementStringInterpreter {
 		}
 
 		private void throwInterpretError() {
-			throw new IllegalArgumentException("Failed to interpret the movement "+this);
+			throw new IllegalArgumentException("Failed to interpret the movement " + this);
 		}
 
 	}
@@ -281,7 +340,8 @@ public class MovementStringInterpreter {
 
 	/**
 	 * Appends a forward movement to this MovementSequenceBuilder.
-	 * @param inches      How far the robot should move in inches.
+	 *
+	 * @param inches How far the robot should move in inches.
 	 */
 	private static Movement forward(double inches) {
 		return (new Movement(Movement.MovementType.FORWARD, inches, 0, 0, 0, 0, 0));
@@ -290,7 +350,8 @@ public class MovementStringInterpreter {
 
 	/**
 	 * Appends a backward movement to this MovementSequenceBuilder.
-	 * @param inches      How far the robot should move in inches.
+	 *
+	 * @param inches How far the robot should move in inches.
 	 */
 	private static Movement backward(double inches) {
 		return (new Movement(Movement.MovementType.BACKWARD, inches, 0, 0, 0, 0, 0));
@@ -299,7 +360,8 @@ public class MovementStringInterpreter {
 
 	/**
 	 * Appends a left strafe to this MovementSequenceBuilder.
-	 * @param inches      How far the robot should strafe in inches.
+	 *
+	 * @param inches How far the robot should strafe in inches.
 	 */
 	private static Movement left(double inches) {
 		return (new Movement(Movement.MovementType.STRAFE_LEFT, 0, inches, 0, 0, 0, 0));
@@ -308,7 +370,8 @@ public class MovementStringInterpreter {
 
 	/**
 	 * Appends a right strafe to this MovementSequenceBuilder.
-	 * @param inches      How far the robot should strafe in inches.
+	 *
+	 * @param inches How far the robot should strafe in inches.
 	 */
 	private static Movement right(double inches) {
 		return (new Movement(Movement.MovementType.STRAFE_RIGHT, 0, inches, 0, 0, 0, 0));
@@ -317,7 +380,8 @@ public class MovementStringInterpreter {
 
 	/**
 	 * Appends a left turn to this MovementSequenceBuilder.
-	 * @param degrees      How much the robot should turn in degrees.
+	 *
+	 * @param degrees How much the robot should turn in degrees.
 	 */
 	private static Movement turnLeft(double degrees) {
 		return (new Movement(Movement.MovementType.TURN_LEFT, 0, 0, degrees, 0, 0, 0));
@@ -326,7 +390,8 @@ public class MovementStringInterpreter {
 
 	/**
 	 * Appends a left turn to this MovementSequenceBuilder.
-	 * @param degrees      How much the robot should turn in degrees.
+	 *
+	 * @param degrees How much the robot should turn in degrees.
 	 */
 	private static Movement turnRight(double degrees) {
 		return (new Movement(Movement.MovementType.TURN_RIGHT, 0, 0, degrees, 0, 0, 0));
@@ -335,8 +400,9 @@ public class MovementStringInterpreter {
 
 	/**
 	 * Appends a forward-left movement to this MovementSequenceBuilder.
-	 * @param inchesForward      How much the robot should move forward in inches.
-	 * @param inchesLeft         How much the robot should strafe left in inches.
+	 *
+	 * @param inchesForward How much the robot should move forward in inches.
+	 * @param inchesLeft    How much the robot should strafe left in inches.
 	 */
 	private static Movement forwardLeft(double inchesForward, double inchesLeft) {
 		return (new Movement(Movement.MovementType.FORWARD_LEFT, inchesForward, inchesLeft, 0, 0, 0, 0));
@@ -345,8 +411,9 @@ public class MovementStringInterpreter {
 
 	/**
 	 * Appends a forward-right movement to this MovementSequenceBuilder.
-	 * @param inchesForward      How much the robot should move forward in inches.
-	 * @param inchesRight        How much the robot should strafe right in inches.
+	 *
+	 * @param inchesForward How much the robot should move forward in inches.
+	 * @param inchesRight   How much the robot should strafe right in inches.
 	 */
 	private static Movement forwardRight(double inchesForward, double inchesRight) {
 		return (new Movement(Movement.MovementType.FORWARD_RIGHT, inchesForward, inchesRight, 0, 0, 0, 0));
@@ -355,8 +422,9 @@ public class MovementStringInterpreter {
 
 	/**
 	 * Appends a backward-left movement to this MovementSequenceBuilder.
-	 * @param inchesBackward     How much the robot should move backward in inches.
-	 * @param inchesLeft         How much the robot should strafe left in inches.
+	 *
+	 * @param inchesBackward How much the robot should move backward in inches.
+	 * @param inchesLeft     How much the robot should strafe left in inches.
 	 */
 	private static Movement backwardLeft(double inchesBackward, double inchesLeft) {
 		return (new Movement(Movement.MovementType.BACKWARD_LEFT, inchesBackward, inchesLeft, 0, 0, 0, 0));
@@ -365,8 +433,9 @@ public class MovementStringInterpreter {
 
 	/**
 	 * Appends a backward-right movement to this MovementSequenceBuilder.
-	 * @param inchesBackward     How much the robot should move backward in inches.
-	 * @param inchesRight        How much the robot should strafe right in inches.
+	 *
+	 * @param inchesBackward How much the robot should move backward in inches.
+	 * @param inchesRight    How much the robot should strafe right in inches.
 	 */
 	private static Movement backwardRight(double inchesBackward, double inchesRight) {
 		return (new Movement(Movement.MovementType.BACKWARD_RIGHT, inchesBackward, inchesRight, 0, 0, 0, 0));
@@ -375,7 +444,8 @@ public class MovementStringInterpreter {
 
 	/**
 	 * Appends a timeout to this MovementSequenceBuilder.
-	 * @param ms      The wait time in milliseconds.
+	 *
+	 * @param ms The wait time in milliseconds.
 	 */
 	private static Movement sleepFor(long ms) {
 		return (new Movement(Movement.MovementType.DELAY, 0, 0, 0, 0, 0, ms));
@@ -407,7 +477,8 @@ public class MovementStringInterpreter {
 	}
 
 	/**
-	 * Appends an open left claw event for both claws to this MovementSequenceBuilder.
+	 * Appends an open left claw event for both claws to this
+	 * MovementSequenceBuilder.
 	 */
 	private static Movement openLeftClaw() {
 		return (new Movement(Movement.MovementType.OPEN_LEFT_CLAW, 0, 0, 0, 0, 0, 0));
@@ -415,7 +486,8 @@ public class MovementStringInterpreter {
 	}
 
 	/**
-	 * Appends an open right claw event for both claws to this MovementSequenceBuilder.
+	 * Appends an open right claw event for both claws to this
+	 * MovementSequenceBuilder.
 	 */
 	private static Movement openRightClaw() {
 		return (new Movement(Movement.MovementType.OPEN_RIGHT_CLAW, 0, 0, 0, 0, 0, 0));
@@ -423,7 +495,8 @@ public class MovementStringInterpreter {
 	}
 
 	/**
-	 * Appends a close left claw event for both claws to this MovementSequenceBuilder.
+	 * Appends a close left claw event for both claws to this
+	 * MovementSequenceBuilder.
 	 */
 	private static Movement closeLeftClaw() {
 		return (new Movement(Movement.MovementType.CLOSE_LEFT_CLAW, 0, 0, 0, 0, 0, 0));
@@ -431,7 +504,8 @@ public class MovementStringInterpreter {
 	}
 
 	/**
-	 * Appends a close right claw event for both claws to this MovementSequenceBuilder.
+	 * Appends a close right claw event for both claws to this
+	 * MovementSequenceBuilder.
 	 */
 	private static Movement closeRightClaw() {
 		return (new Movement(Movement.MovementType.CLOSE_RIGHT_CLAW, 0, 0, 0, 0, 0, 0));
@@ -440,7 +514,8 @@ public class MovementStringInterpreter {
 
 	/**
 	 * Appends a lower arm event to this MovementSequenceBuilder.
-	 * @param degrees      The angle for the arm to be elevated in degrees.
+	 *
+	 * @param degrees The angle for the arm to be elevated in degrees.
 	 */
 	private static Movement lowerArm(double degrees) {
 		return (new Movement(Movement.MovementType.LOWER_ARM, 0, 0, 0, degrees, 0, 0));
@@ -449,7 +524,8 @@ public class MovementStringInterpreter {
 
 	/**
 	 * Appends a raise arm event to this MovementSequenceBuilder.
-	 * @param degrees      The angle for the arm to be elevated in degrees.
+	 *
+	 * @param degrees The angle for the arm to be elevated in degrees.
 	 */
 	private static Movement raiseArm(double degrees) {
 		return (new Movement(Movement.MovementType.RAISE_ARM, 0, 0, 0, degrees, 0, 0));
@@ -457,8 +533,20 @@ public class MovementStringInterpreter {
 	}
 
 	/**
-	 * See: https://stackoverflow.com/questions/3422673/how-to-evaluate-a-math-expression-given-in-string-form
-	 * @param str  The string expression to be evaluated.
+	 * Checks if an integer is in a set of integer values.
+	 *
+	 * @param key    The integer to be matched.
+	 * @param values The values to be matched with the key.
+	 */
+	private static boolean isIn(int key, int... values) {
+		return Arrays.stream(values).anyMatch(i -> i == key);
+	}
+
+	/**
+	 * See:
+	 * https://stackoverflow.com/questions/3422673/how-to-evaluate-a-math-expression-given-in-string-form
+	 *
+	 * @param str The string expression to be evaluated.
 	 * @return The answer to the expression.
 	 */
 	private static double eval(final String str) {
@@ -470,7 +558,8 @@ public class MovementStringInterpreter {
 			}
 
 			boolean eat(int charToEat) {
-				while (ch == ' ') nextChar();
+				while (ch == ' ')
+					nextChar();
 				if (ch == charToEat) {
 					nextChar();
 					return true;
@@ -481,7 +570,8 @@ public class MovementStringInterpreter {
 			double parse() {
 				nextChar();
 				double x = parseExpression();
-				if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char)ch);
+				if (pos < str.length())
+					throw new RuntimeException("Unexpected: " + (char) ch);
 				return x;
 			}
 
@@ -489,58 +579,76 @@ public class MovementStringInterpreter {
 			// expression = term | expression `+` term | expression `-` term
 			// term = factor | term `*` factor | term `/` factor
 			// factor = `+` factor | `-` factor | `(` expression `)` | number
-			//        | functionName `(` expression `)` | functionName factor
-			//        | factor `^` factor
+			// | functionName `(` expression `)` | functionName factor
+			// | factor `^` factor
 
 			double parseExpression() {
 				double x = parseTerm();
 				for (;;) {
-					if      (eat('+')) x += parseTerm(); // addition
-					else if (eat('-')) x -= parseTerm(); // subtraction
-					else return x;
+					if (eat('+'))
+						x += parseTerm(); // addition
+					else if (eat('-'))
+						x -= parseTerm(); // subtraction
+					else
+						return x;
 				}
 			}
 
 			double parseTerm() {
 				double x = parseFactor();
 				for (;;) {
-					if      (eat('*')) x *= parseFactor(); // multiplication
-					else if (eat('/')) x /= parseFactor(); // division
-					else return x;
+					if (eat('*'))
+						x *= parseFactor(); // multiplication
+					else if (eat('/'))
+						x /= parseFactor(); // division
+					else
+						return x;
 				}
 			}
 
 			double parseFactor() {
-				if (eat('+')) return +parseFactor(); // unary plus
-				if (eat('-')) return -parseFactor(); // unary minus
+				if (eat('+'))
+					return +parseFactor(); // unary plus
+				if (eat('-'))
+					return -parseFactor(); // unary minus
 
 				double x;
 				int startPos = this.pos;
 				if (eat('(')) { // parentheses
 					x = parseExpression();
-					if (!eat(')')) throw new RuntimeException("Missing ')'");
+					if (!eat(')'))
+						throw new RuntimeException("Missing ')'");
 				} else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
-					while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();
+					while ((ch >= '0' && ch <= '9') || ch == '.')
+						nextChar();
 					x = Double.parseDouble(str.substring(startPos, this.pos));
 				} else if (ch >= 'a' && ch <= 'z') { // functions
-					while (ch >= 'a' && ch <= 'z') nextChar();
+					while (ch >= 'a' && ch <= 'z')
+						nextChar();
 					String func = str.substring(startPos, this.pos);
 					if (eat('(')) {
 						x = parseExpression();
-						if (!eat(')')) throw new RuntimeException("Missing ')' after argument to " + func);
+						if (!eat(')'))
+							throw new RuntimeException("Missing ')' after argument to " + func);
 					} else {
 						x = parseFactor();
 					}
-					if (func.equals("sqrt")) x = Math.sqrt(x);
-					else if (func.equals("sin")) x = Math.sin(Math.toRadians(x));
-					else if (func.equals("cos")) x = Math.cos(Math.toRadians(x));
-					else if (func.equals("tan")) x = Math.tan(Math.toRadians(x));
-					else throw new RuntimeException("Failed to interpret movement: " + func);
+					if (func.equals("sqrt"))
+						x = Math.sqrt(x);
+					else if (func.equals("sin"))
+						x = Math.sin(Math.toRadians(x));
+					else if (func.equals("cos"))
+						x = Math.cos(Math.toRadians(x));
+					else if (func.equals("tan"))
+						x = Math.tan(Math.toRadians(x));
+					else
+						throw new RuntimeException("Failed to interpret movement: " + func);
 				} else {
-					throw new RuntimeException("Unexpected: " + (char)ch);
+					throw new RuntimeException("Unexpected: " + (char) ch);
 				}
 
-				if (eat('^')) x = Math.pow(x, parseFactor()); // exponentiation
+				if (eat('^'))
+					x = Math.pow(x, parseFactor()); // exponentiation
 
 				return x;
 			}

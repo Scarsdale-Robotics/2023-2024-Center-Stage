@@ -21,6 +21,13 @@ public class MovementSequenceBuilder {
     }
 
     /**
+     * Sets true the ignoreVelocity boolean of the last Movement in this MovementSequenceBuilder.
+     */
+    public void ignoreLastMovementVelocity() {
+        movements.getLast().ignoreDriveVelocity();
+    }
+
+    /**
      * Appends a movement to this MovementSequenceBuilder.
      * @param movement      The Movement to be appended.
      */
@@ -400,6 +407,150 @@ public class MovementSequenceBuilder {
         if (!movements.isEmpty() && withPrevious)
             linkLastMovement();
         movements.add(new Movement(Movement.MovementType.RAISE_ARM, 0, 0, 0, degrees, 0, 0));
+        return this;
+    }
+
+    //////////////////////////////////////////////
+    // METHOD OVERLOADING FOR IGNORING VELOCITY //
+    //////////////////////////////////////////////
+
+    /**
+     * Appends a forward movement to this MovementSequenceBuilder.
+     * @param inches      How far the robot should move in inches.
+     * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
+     * @param ignoreVelocity    If the robot should ignore fully stopping after the drive movement has been completed.
+     */
+    public MovementSequenceBuilder forward(double inches, boolean withPrevious, boolean ignoreVelocity) {
+        if (!movements.isEmpty() && withPrevious)
+            linkLastMovement();
+        movements.add(new Movement(Movement.MovementType.FORWARD, inches, 0, 0, 0, 0, 0));
+
+        if (ignoreVelocity)
+            ignoreLastMovementVelocity();
+
+        return this;
+    }
+
+    /**
+     * Appends a backward movement to this MovementSequenceBuilder.
+     * @param inches      How far the robot should move in inches.
+     * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
+     * @param ignoreVelocity    If the robot should ignore fully stopping after the drive movement has been completed.
+     */
+    public MovementSequenceBuilder backward(double inches, boolean withPrevious, boolean ignoreVelocity) {
+        if (!movements.isEmpty() && withPrevious)
+            linkLastMovement();
+        movements.add(new Movement(Movement.MovementType.BACKWARD, inches, 0, 0, 0, 0, 0));
+
+        if (ignoreVelocity)
+            ignoreLastMovementVelocity();
+
+        return this;
+    }
+
+    /**
+     * Appends a left strafe to this MovementSequenceBuilder.
+     * @param inches      How far the robot should strafe in inches.
+     * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
+     * @param ignoreVelocity    If the robot should ignore fully stopping after the drive movement has been completed.
+     */
+    public MovementSequenceBuilder left(double inches, boolean withPrevious, boolean ignoreVelocity) {
+        if (!movements.isEmpty() && withPrevious)
+            linkLastMovement();
+        movements.add(new Movement(Movement.MovementType.STRAFE_LEFT, 0, inches, 0, 0, 0, 0));
+
+        if (ignoreVelocity)
+            ignoreLastMovementVelocity();
+
+        return this;
+    }
+
+    /**
+     * Appends a right strafe to this MovementSequenceBuilder.
+     * @param inches      How far the robot should strafe in inches.
+     * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
+     * @param ignoreVelocity    If the robot should ignore fully stopping after the drive movement has been completed.
+     */
+    public MovementSequenceBuilder right(double inches, boolean withPrevious, boolean ignoreVelocity) {
+        if (!movements.isEmpty() && withPrevious)
+            linkLastMovement();
+        movements.add(new Movement(Movement.MovementType.STRAFE_RIGHT, 0, inches, 0, 0, 0, 0));
+
+        if (ignoreVelocity)
+            ignoreLastMovementVelocity();
+
+        return this;
+    }
+
+    /**
+     * Appends a forward-left movement to this MovementSequenceBuilder.
+     * @param inchesForward      How much the robot should move forward in inches.
+     * @param inchesLeft         How much the robot should strafe left in inches.
+     * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
+     * @param ignoreVelocity    If the robot should ignore fully stopping after the drive movement has been completed.
+     */
+    public MovementSequenceBuilder forwardLeft(double inchesForward, double inchesLeft, boolean withPrevious, boolean ignoreVelocity) {
+        if (!movements.isEmpty() && withPrevious)
+            linkLastMovement();
+        movements.add(new Movement(Movement.MovementType.FORWARD_LEFT, inchesForward, inchesLeft, 0, 0, 0, 0));
+
+        if (ignoreVelocity)
+            ignoreLastMovementVelocity();
+
+        return this;
+    }
+
+    /**
+     * Appends a forward-right movement to this MovementSequenceBuilder.
+     * @param inchesForward      How much the robot should move forward in inches.
+     * @param inchesRight        How much the robot should strafe right in inches.
+     * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
+     * @param ignoreVelocity    If the robot should ignore fully stopping after the drive movement has been completed.
+     */
+    public MovementSequenceBuilder forwardRight(double inchesForward, double inchesRight, boolean withPrevious, boolean ignoreVelocity) {
+        if (!movements.isEmpty() && withPrevious)
+            linkLastMovement();
+        movements.add(new Movement(Movement.MovementType.FORWARD_RIGHT, inchesForward, inchesRight, 0, 0, 0, 0));
+
+        if (ignoreVelocity)
+            ignoreLastMovementVelocity();
+
+        return this;
+    }
+
+    /**
+     * Appends a backward-left movement to this MovementSequenceBuilder.
+     * @param inchesBackward     How much the robot should move backward in inches.
+     * @param inchesLeft         How much the robot should strafe left in inches.
+     * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
+     * @param ignoreVelocity    If the robot should ignore fully stopping after the drive movement has been completed.
+     */
+    public MovementSequenceBuilder backwardLeft(double inchesBackward, double inchesLeft, boolean withPrevious, boolean ignoreVelocity) {
+        if (!movements.isEmpty() && withPrevious)
+            linkLastMovement();
+        movements.add(new Movement(Movement.MovementType.BACKWARD_LEFT, inchesBackward, inchesLeft, 0, 0, 0, 0));
+
+        if (ignoreVelocity)
+            ignoreLastMovementVelocity();
+
+        return this;
+    }
+
+    /**
+     * Appends a backward-right movement to this MovementSequenceBuilder.
+     * @param inchesBackward     How much the robot should move backward in inches.
+     * @param inchesRight        How much the robot should strafe right in inches.
+     * @param withPrevious      If this movement should be executed at the same time as the previous movement is executed.
+     * @param ignoreVelocity    If the robot should ignore fully stopping after the drive movement has been completed.
+     */
+    public MovementSequenceBuilder backwardRight(double inchesBackward, double inchesRight, boolean withPrevious, boolean ignoreVelocity) {
+        if (!movements.isEmpty() && withPrevious)
+            linkLastMovement();
+        movements.add(new Movement(Movement.MovementType.BACKWARD_RIGHT, inchesBackward, inchesRight, 0, 0, 0, 0));
+
+        if (ignoreVelocity)
+            ignoreLastMovementVelocity();
+
         return this;
     }
 

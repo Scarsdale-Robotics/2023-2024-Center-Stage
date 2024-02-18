@@ -34,6 +34,9 @@ public class DriveSubsystem extends SubsystemBase {
     private Telemetry telemetry;
     public static volatile double heading=0D;
 
+    // for debugging
+    public static String currentMovement="";
+
     public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, IMU imu, LinearOpMode opMode) {
         this(leftFront, rightFront, leftBack, rightBack, imu, opMode, null);
     }
@@ -149,6 +152,18 @@ public class DriveSubsystem extends SubsystemBase {
      * @param theta      The direction of movement in radians in [-π, π].
      */
     public void driveByAngularEncoder(double driveSpeed, double leftTicks, double rightTicks, double theta) {
+        driveByAngularEncoder(driveSpeed, leftTicks, rightTicks, theta, false);
+    }
+
+    /**
+     * Use only for autonomous. Move a certain distance following two motion vectors for diagonal motor pairs. Drive is robot centric.
+     * @param driveSpeed      Positive movement speed of the robot.
+     * @param leftTicks     How many ticks the back left and front right wheels should be displaced by.
+     * @param rightTicks      How many ticks the back right and front left wheels should be displaced by.
+     * @param theta      The direction of movement in radians in [-π, π].
+     * @param ignoreVelocity    If the wheels should ignore fully stopping after reaching the setpoints.
+     */
+    public void driveByAngularEncoder(double driveSpeed, double leftTicks, double rightTicks, double theta, boolean ignoreVelocity) {
         // check for clashing actions
         if (DriveSubsystem.getIsBusy()) {
             throw new RuntimeException("driveByAngularEncoder(): Tried to run two drive actions at once");
@@ -199,6 +214,7 @@ public class DriveSubsystem extends SubsystemBase {
             double R_v = driveSpeed * Math.abs(Math.sin(theta + Math.PI / 4)) * universal_K * Math.signum(R_K); // for bR and fL
 
             if (telemetry != null) {
+                telemetry.addData("CURRENT MOVEMENT:", currentMovement);
                 telemetry.addData("L diff",Math.abs(Math.abs(getLeftWheelPosition()-L_start) - Math.abs(L)));
                 telemetry.addData("L setpoint",L_sp);
                 telemetry.addData("L position",L_p);
@@ -218,11 +234,11 @@ public class DriveSubsystem extends SubsystemBase {
             );
 
             L_atSetPoint = L_atSetPoint ||
-                    (Math.abs(Math.abs(getLeftWheelPosition()-L_start) - Math.abs(L)) < DrivePIDCoefficients.getErrorTolerance_p() &&
-                            Math.abs(getLeftWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v());
+                    (Math.abs(Math.abs(getLeftWheelPosition()-L_start) - Math.abs(L)) < DrivePIDCoefficients.getErrorTolerance_p() && // position
+                            ( ignoreVelocity || (Math.abs(getLeftWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v())) ); // velocity
             R_atSetPoint = R_atSetPoint ||
-                    (Math.abs(Math.abs(getRightWheelPosition()-R_start) - Math.abs(R)) < DrivePIDCoefficients.getErrorTolerance_p() &&
-                            Math.abs(getRightWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v());
+                    (Math.abs(Math.abs(getRightWheelPosition()-R_start) - Math.abs(R)) < DrivePIDCoefficients.getErrorTolerance_p() && // position
+                            ( ignoreVelocity || (Math.abs(getRightWheelVelocity()) < DrivePIDCoefficients.getErrorTolerance_v())) ); // velocity
 
             isBusy = true;
         }
@@ -266,6 +282,7 @@ public class DriveSubsystem extends SubsystemBase {
             K = PID.update(cumulativeAngle);
 
             if (telemetry != null) {
+                telemetry.addData("CURRENT MOVEMENT:", currentMovement);
                 telemetry.addData("Degrees Disp setpoint",setPoint);
                 telemetry.addData("Degrees diff",setPoint-cumulativeAngle);
                 telemetry.addData("Degrees cumulative",cumulativeAngle);
@@ -303,6 +320,9 @@ public class DriveSubsystem extends SubsystemBase {
             boolean linked = true;
             while (!movements.isEmpty() && linked && opMode.opModeIsActive()) {
                 Movement movement = movements.removeFirst();
+                currentMovement = "["+movement.toString()+"]";
+                telemetry.addData("CURRENT MOVEMENT:", currentMovement);
+                telemetry.update();
                 linked = movement.linkedToNext;
                 MovementThread thread = new MovementThread(movement);
                 Future<?> status = threadPool.submit(thread);

@@ -476,7 +476,7 @@ public class CVSubsystem extends SubsystemBase {
                 }
             }
             if (Math.abs(yOffset)<xyOffsetThreshold){
-                if (yOffset<0) { // need to  down
+                if (yOffset<0) { // need to down
                     drive.driveRobotCentric( 1 *teamValue* SpeedCoefficients.getStrafeSpeed(), 0,0);
                 }else {
                     drive.driveRobotCentric( -1 * teamValue* SpeedCoefficients.getStrafeSpeed(), 0,0);

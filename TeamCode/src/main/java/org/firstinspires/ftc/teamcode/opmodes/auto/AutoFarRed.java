@@ -49,110 +49,153 @@ public class AutoFarRed extends LinearOpMode {
             propLocation = robot.getCV().getPropLocation();
         }
 
-        MovementSequence placePurple = new MovementSequenceBuilder().build(),
-                approachWhite = new MovementSequenceBuilder().build(),
-                placeWhite = new MovementSequenceBuilder().build(),
-                placeYellow = new MovementSequenceBuilder().build(),
-                park = new MovementSequenceBuilder().build();
+        MovementSequence main = new MovementSequenceBuilder().build();
 
         int WHITE_REPS = 2;
         double WHITE_PX_HEIGHT = 22;
 
         if (propLocation == 0) {
-            placePurple = new MovementSequenceBuilder()
-                    .closeBothClaws()  // -40.75 -63.5
-                    .forwardLeft(17.5, 7.25)  // -48 -46
+            main = new MovementSequenceBuilder()
+                    .forwardRight(37.5, 2.75)
+                    .turnLeft(90)
                     .openRightClaw()
                     .sleepFor(150)
-                    .backward(8)  // -48 -54
-                    .backwardRight(6, 10)  // -38 -60
-                    .turnLeft(90)
-                    .build();
-            placeYellow = new MovementSequenceBuilder()
-                    // arm needs 220
-                    .backward(53)  // 15 -60
-                    .raiseArm(20, true)
-                    .backwardRight(29, 30)  // 44 -30
+                    .backward(4)
+                    .backwardLeft(1, 10)
+                    .forwardLeft(28, 1)
+                    .raiseArm(10, true)
+                    .closeRightClaw()
+                    .sleepFor(150)
+                    .backwardLeft(32, 23)
+                    .backward(41)
+                    .raiseArm(10, true)
+                    .backwardRight(33, 30)
                     .flipElbow()
                     .raiseArm(200, true)
-                    .backward(5)  // 49 -30
-                    .openLeftClaw()
+                    .backward(3)
+                    .openBothClaws()
                     .sleepFor(150)
-                    .build();
-            park = new MovementSequenceBuilder()
-                    .forward(8)  // 41 -30
-                    .right(18)  // 41 -12
+                    .forward(3)
+                    .forwardLeft(33, 30)
                     .restElbow()
-                    .lowerArm(170, true)
-                    .backward(20)  // 61 -12
-                    .lowerArm(40)
-                    .lowerArm(10)
-                    .forward(2, true)  // 59 -12
+                    .closeLeftClaw()
+                    .lowerArm(210, true)
+                    .forward(41)
+                    .forwardRight(32, 23)
+                    .lowerArm(10, true)
+                    .closeRightClaw()
+                    .sleepFor(500)
+                    .backwardLeft(32, 23)
+                    .backward(41)
+                    .raiseArm(10, true)
+                    .backwardRight(33, 18)
+                    .flipElbow()
+                    .raiseArm(220, true)
+                    .backward(3)
+                    .openRightClaw()
+                    .sleepFor(150)
+                    .forward(7)
+                    .right(29)
+                    .restElbow()
+                    .lowerArm(220, true)
+                    .openLeftClaw()
                     .build();
-
         } else if (propLocation == 1) {
-            placePurple = new MovementSequenceBuilder()
-                    .closeBothClaws()  // -40.75 -63.5
-                    .forwardRight(28.5, 2.75)  // -38 -35
+            main = new MovementSequenceBuilder()
+                    .forwardRight(29.5, 1.75)
                     .openRightClaw()
                     .sleepFor(150)
-                    .backward(25)  // -38 -60
+                    .backward(4)
                     .turnLeft(90)
-                    .build();
-            placeYellow = new MovementSequenceBuilder()
-                    // arm needs 220
-                    .backward(53)  // 15 -60
-//                    .raiseArm(50, true) // bugged
-                    .raiseArm(20, true)
-                    .backwardRight(29, 23)  // 44 -37
+                    .forward(21)
+                    .raiseArm(10, true)
+                    .closeRightClaw()
+                    .sleepFor(150)
+                    .backwardLeft(30, 22)
+                    .backward(49)
+                    .raiseArm(10, true)
+                    .backwardRight(29, 23)
                     .flipElbow()
                     .raiseArm(200, true)
-                    .backward(5)  // 49 -37
+                    .backward(3)
                     .openLeftClaw()
                     .sleepFor(150)
-                    .build();
-            park = new MovementSequenceBuilder()
-                    .forward(8)  // 41 -37
-                    .right(25)  // 41 -12
+                    .openRightClaw()
+                    .sleepFor(150)
+                    .forward(3)
+                    .forwardLeft(29, 23)
                     .restElbow()
-                    .lowerArm(170, true)
-                    .backward(20)  // 61 -12
-                    .lowerArm(40)
-                    .lowerArm(10)
-                    .forward(2, true)  // 59 -12
+                    .closeLeftClaw()
+                    .lowerArm(210, true)
+                    .forward(49)
+                    .forwardRight(30, 22)
+                    .lowerArm(10, true)
+                    .closeRightClaw()
+                    .sleepFor(500)
+                    .backwardLeft(30, 22)
+                    .raiseArm(10, true)
+                    .backward(49)
+                    .raiseArm(10, true)
+                    .backwardRight(30, 30)
+                    .flipElbow()
+                    .raiseArm(200, true)
+                    .backward(2)
+                    .openRightClaw()
+                    .sleepFor(150)
+                    .forward(2)
+                    .right(18)
+                    .closeRightClaw()
+                    .restElbow()
+                    .lowerArm(220, true)
                     .build();
-
         } else if (propLocation == 2) {
-            placePurple = new MovementSequenceBuilder()
-                    .closeBothClaws()  // -40.75 -63.5
-                    .forwardRight(28.5, 5.75)  // -35 -35
+            main = new MovementSequenceBuilder()
+                    .forwardRight(28.5, 6.75)
                     .turnRight(90)
                     .openRightClaw()
                     .sleepFor(150)
-                    .backward(8)  // -43 -35
-                    .forwardRight(5, 25)  // -38 -60
+                    .backwardRight(13, 1)
                     .turnLeft(180)
-                    .build();
-            placeYellow = new MovementSequenceBuilder()
-                    // arm needs 220
-                    .backward(53)  // 15 -60
-                    .raiseArm(20, true)
-                    .backwardRight(29, 15)  // 44 -45
+                    .raiseArm(10, true)
+                    .forwardLeft(13, 1)
+                    .closeRightClaw()
+                    .sleepFor(500)
+                    .backwardLeft(28, 23)
+                    .backward(47)
+                    .raiseArm(10, true)
+                    .backwardRight(29, 17)
                     .flipElbow()
                     .raiseArm(200, true)
-                    .backward(5)  // 49 -45
+                    .backward(4)
                     .openLeftClaw()
                     .sleepFor(150)
-                    .build();
-            park = new MovementSequenceBuilder()
-                    .forward(8)  // 41 -45
-                    .right(33)  // 41 -12
+                    .openRightClaw()
+                    .sleepFor(150)
+                    .forward(4)
+                    .forwardLeft(27, 16)
                     .restElbow()
-                    .lowerArm(170, true)
-                    .backward(20)  // 61 -12
-                    .lowerArm(40)
-                    .lowerArm(10)
-                    .forward(2, true)  // 59 -12
+                    .closeLeftClaw()
+                    .lowerArm(210, true)
+                    .forward(49)
+                    .forwardRight(28, 22)
+                    .lowerArm(10, true)
+                    .closeRightClaw()
+                    .sleepFor(500)
+                    .backwardLeft(29, 22)
+                    .raiseArm(10, true)
+                    .backward(47)
+                    .raiseArm(10, true)
+                    .backwardRight(28, 29)
+                    .flipElbow()
+                    .raiseArm(200, true)
+                    .backward(4)
+                    .openRightClaw()
+                    .sleepFor(150)
+                    .forward(4)
+                    .right(16)
+                    .restElbow()
+                    .closeRightClaw()
+                    .lowerArm(220, true)
                     .build();
         }
 
@@ -167,14 +210,7 @@ public class AutoFarRed extends LinearOpMode {
         // follow regular if string is not being used
         if (!useString) {
             // perform the actual movements here in sequence
-            drive.followMovementSequence(placePurple);
-            drive.followMovementSequence(placeYellow);
-            //        for (int i=0;i<WHITE_REPS;i++)
-            //        {
-            //            drive.followMovementSequence(approachWhite);
-            //            drive.followMovementSequence(placeWhite);
-            //        }
-            drive.followMovementSequence(park);
+            drive.followMovementSequence(main);
         }
 
         drive.stopController();
