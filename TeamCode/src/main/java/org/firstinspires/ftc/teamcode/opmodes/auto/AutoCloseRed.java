@@ -44,6 +44,7 @@ public class AutoCloseRed extends LinearOpMode {
                 .build();
         drive.followMovementSequence(initCV);
         int propLocation = robot.getCV().getPropLocation();
+        robot.getCV().disablePropProcessor();
 
 //        if (!useString) {
 //            drive.followMovementSequence(initCV);

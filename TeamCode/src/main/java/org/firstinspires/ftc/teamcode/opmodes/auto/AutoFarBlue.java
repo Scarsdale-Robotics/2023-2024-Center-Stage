@@ -51,6 +51,7 @@ public class AutoFarBlue extends LinearOpMode {
 
         drive.followMovementSequence(initCV);
         int propLocation = robot.getCV().getPropLocation();
+        robot.getCV().disablePropProcessor();
 //        int propLocation = 0;
 
         MovementSequence placePurple = new MovementSequenceBuilder().build(),

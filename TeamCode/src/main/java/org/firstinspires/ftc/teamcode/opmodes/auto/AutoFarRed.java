@@ -48,6 +48,7 @@ public class AutoFarRed extends LinearOpMode {
             drive.followMovementSequence(initCV);
             propLocation = robot.getCV().getPropLocation();
         }
+        robot.getCV().disablePropProcessor();
 
         MovementSequence main = new MovementSequenceBuilder().build();
 

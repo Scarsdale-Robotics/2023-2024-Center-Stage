@@ -8,16 +8,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.function.Continuation;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.internal.camera.CameraImpl;
-import org.firstinspires.ftc.robotcore.internal.camera.CameraManagerImpl;
-import org.firstinspires.ftc.robotcore.internal.camera.delegating.CachingExposureControl;
-import org.firstinspires.ftc.robotcore.internal.camera.delegating.RefCountedSwitchableCameraImpl;
 import org.firstinspires.ftc.robotcore.internal.camera.delegating.SwitchableCameraName;
-import org.firstinspires.ftc.robotcore.internal.camera.delegating.SwitchableExposureControl;
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelGroupDetectionProcessor;
 // docs: https://javadoc.io/doc/org.firstinspires.ftc/RobotCore/latest/org/firstinspires/ftc/robotcore/internal/camera/delegating/CachingExposureControl.html
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
@@ -30,7 +22,6 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PropDetectionPipeline;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,13 +34,10 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.opencv.core.Core;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvSwitchableWebcam;
 
 
 public class CVSubsystem extends SubsystemBase {
@@ -166,10 +154,11 @@ public class CVSubsystem extends SubsystemBase {
 
         builder.setCamera(switchableCamera);
 
-        builder.setCameraResolution(new Size(320, 240)); // android.util
+        builder.setCameraResolution(new Size(800, 600)); // android.util
 
         // TODO: DISABLE PROPPROCESSOR FOR TELEOP
         builder.addProcessors(aprilTag, propProcessor);
+        builder.setAutoStopLiveView(false);
 
         // Build the Vision Portal, using the above settings.
         visionPortal = builder.build();
@@ -178,9 +167,9 @@ public class CVSubsystem extends SubsystemBase {
         // visionPortal.setProcessorEnabled(aprilTag, true);
         visionPortal.setProcessorEnabled(propProcessor, true);
         while (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING);
-        SwitchableExposureControl exposureControl = visionPortal.getCameraControl(SwitchableExposureControl.class);
+        ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
+        exposureControl.setMode(ExposureControl.Mode.Manual);
         exposureControl.setExposure(exposureControl.getMinExposure(TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS);
-//        telemetry.addData("exposure min", exposureControl.getMinExposure(TimeUnit.NANOSECONDS));
         switchCamera(cameraName2);
     }
 
@@ -442,8 +431,8 @@ public class CVSubsystem extends SubsystemBase {
             double rotOff = (detection.ftcPose.x > 0 ? 1 : -1) * detection.ftcPose.yaw;
             // 24 inches per tile
             double radians = Math.toRadians(detection.ftcPose.bearing - detection.ftcPose.yaw);
-            double xOff   = (Math.sin(radians) * detection.ftcPose.range) / 24 - cameraCenterOffsetX;
-            double yOff   = (Math.cos(radians) * detection.ftcPose.range) / 24 - cameraCenterOffsetY;
+            double xOff   = (Math.cos(radians) * detection.ftcPose.range) / 24 - cameraCenterOffsetX;
+            double yOff   = (Math.sin(radians) * detection.ftcPose.range) / 24 - cameraCenterOffsetY;
             if (detection.id < 7) {
                 xEst.add(APRIL_TAG_LOCATIONS[detection.id-1][0] + yOff);
                 yEst.add(APRIL_TAG_LOCATIONS[detection.id-1][1] + xOff);
@@ -465,47 +454,42 @@ public class CVSubsystem extends SubsystemBase {
         return lastKnownPos;
     }
 
-    public double AngleDifference( double angle1, double angle2 )
+    public double angleDifference(double angle1, double angle2)
     {
-        double diff = ( angle2 - angle1 + 180 ) % 360 - 180;
-        return diff;
+        double d=angle2-angle1;
+        if (d > 180) d-=360;
+        return d;
     }
 
-    public void goToPosition(double cameraCenterOffsetX, double cameraCenterOffsetY, double[] targetPos, boolean isRedTeam){
-        lastKnownPos = getPosition(cameraCenterOffsetX, cameraCenterOffsetY);
-        double xOffset = lastKnownPos[0]-targetPos[0];
-        double yOffset = lastKnownPos[1]-targetPos[1];
-        double angleOffset = AngleDifference(lastKnownPos[2],targetPos[2]);
-        double xyOffsetThreshold = 0.1;
-        double angleOffsetThreshold = 5;
-        int teamValue = isRedTeam ? -1 : 1;
-
-        while (true){  // TODO: NOT WHILE TRUE
-            if (Math.abs(xOffset)<xyOffsetThreshold){
-                if (xOffset<0 ) { // need to move right
-                    drive.driveFieldCentric(0 ,1 * teamValue * SpeedCoefficients.getStrafeSpeed(),  0);
-                }else {
-                    drive.driveFieldCentric(0, -1 * teamValue * SpeedCoefficients.getStrafeSpeed(),  0);
-                }
-            }
-            if (Math.abs(yOffset)<xyOffsetThreshold){
-                if (yOffset<0) { // need to down
-                    drive.driveRobotCentric( 1 *teamValue* SpeedCoefficients.getStrafeSpeed(), 0,0);
-                }else {
-                    drive.driveRobotCentric( -1 * teamValue* SpeedCoefficients.getStrafeSpeed(), 0,0);
-                }
-            }
-            if (Math.abs(angleOffset)<angleOffsetThreshold){
-                // need to turn left
-                if (angleOffset<0) {
-                    drive.driveRobotCentric( -1 * teamValue* SpeedCoefficients.getStrafeSpeed() * 0, 0,SpeedCoefficients.getTurnSpeed());
-                }else{
-                    drive.driveRobotCentric( -1 * teamValue* SpeedCoefficients.getStrafeSpeed() * 0, 0,SpeedCoefficients.getTurnSpeed() * -1);
-
-                }
-            }
+    public boolean goToPosition(double cameraCenterOffsetX, double cameraCenterOffsetY, double[] targetPos, boolean isRedTeam){
+        double[] pos = getPosition(cameraCenterOffsetX, cameraCenterOffsetY);
+        double xOffset = pos[0]-targetPos[0];
+        double yOffset = pos[1]-targetPos[1];
+        double angleOffset = angleDifference(pos[2],targetPos[2]);
+        double xyOffsetThreshold = 0.05;
+        double angleOffsetThreshold = 1.5;
+        boolean good = true;
+        double xd=0, yd=0, ad=0;
+        double speedFactor = 1;
+        double speedLimit = 0.5;
+        if (xOffset > xyOffsetThreshold) {
+            xd = Math.min(Math.sqrt(xOffset), speedLimit) * SpeedCoefficients.getAutonomousDriveSpeed() * speedFactor;
+            good = false;
         }
-
+        if (yOffset > xyOffsetThreshold) {
+            yd = Math.min(Math.sqrt(yOffset), speedLimit) * SpeedCoefficients.getAutonomousDriveSpeed() * speedFactor;
+            good = false;
+        }
+        if (angleOffset > angleOffsetThreshold) {
+            ad = Math.min(Math.sqrt(angleOffset/30), speedLimit) * SpeedCoefficients.getAutonomousTurnSpeed() * speedFactor;
+            good = false;
+        }
+        telemetry.addData("xd", xd);
+        telemetry.addData("yd", yd);
+        telemetry.addData("ad", ad);
+        telemetry.addData("adiff", angleOffset);
+        drive.driveRobotCentric(-xd, -yd, -ad);
+        return good;
     }
 
     public void moveToPixel() {

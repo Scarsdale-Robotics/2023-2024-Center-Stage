@@ -57,6 +57,7 @@ public class AutoCloseBlue22 extends LinearOpMode {
             drive.followMovementSequence(initCV);
             propLocation = robot.getCV().getPropLocation();
         }
+        robot.getCV().disablePropProcessor();
 
         MovementSequence main = new MovementSequenceBuilder().build();
 
@@ -107,28 +108,42 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .build();
         } else if (propLocation == 1) {
             main = new MovementSequenceBuilder()
-                    .forward(30)
+                    .forward(29)
                     .openRightClaw()
-                    .sleepFor(150)
-                    .backward(8)
+                    .backward(9)
+                    .forwardLeft(7, 22)
+                    .raiseArm(50, true)
+                    .flipElbow()
                     .turnRight(90)
-                    .backwardLeft(22, 6)
-                    .backwardLeft(5, 1)
-                    .forward(6)
-                    .left(23)
-                    .forwardLeft(97, 1)
-                    .backwardRight(97, 1)
-                    .right(17)
+                    .raiseArm(160, true)
                     .backward(6)
-                    .forward(6)
-                    .left(17)
-                    .forwardLeft(97, 1)
-                    .backwardRight(97, 1)
-                    .right(17)
-                    .backward(6)
-                    .forward(6)
-                    .left(19)
-                    .backward(11)
+                    .openLeftClaw()
+                    .sleepFor(500)
+                    .restElbow()
+                    .forwardLeft(9, 25)
+                    .lowerArm(180, true)
+                    .forward(75)
+                    .lowerArm(20, true)
+                    .forward(20)
+                    .lowerArm(10, true)
+                    .closeBothClaws()
+                    .sleepFor(1000)
+                    .turnRight(10) // shake pixel to not take 3
+                    .turnLeft(10)
+                    .backward(10)
+                    .raiseArm(10, true)
+                    .backward(85)
+                    .flipElbow()
+                    .backwardRight(3, 20)
+                    .raiseArm(180, true)
+                    .openBothClaws()
+                    .sleepFor(1000)
+                    .backward(8, false, true)
+                    .forwardLeft(4, 20, false, true)
+                    .lowerArm(180, true)
+                    .backward(13, false, true)
+                    .forward(7, false, true)
+                    .lowerArm(10, true)
                     .build();
         } else if (propLocation == 2) {
             main = new MovementSequenceBuilder()

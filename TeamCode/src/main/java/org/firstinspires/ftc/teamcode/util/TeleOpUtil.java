@@ -166,9 +166,12 @@ public class TeleOpUtil {
         // TODO: test if there is delay only when switching forward/backward (if so prolly below code)
 //        if (vfn < 0 && vf >= 0) {
 //            new Thread(() -> cv.switchCamera(cv.cameraName1));
+////            cv.switchCamera(cv.cameraName1);
 //        } else if (vfn > 0 && vf <= 0) {
 //            new Thread(() -> cv.switchCamera(cv.cameraName2));
+////            cv.switchCamera(cv.cameraName2);
 //        }
+
         vs=vsn;
         vf=vfn;
         vt=vtn;
@@ -274,11 +277,11 @@ public class TeleOpUtil {
         runArmClawControl();
         runEndgameControl();
 
-        //TODO: does this cause switch between "robot" centric and field centric
-        if (gamepad2.circle && gamepad2.dpad_left) {
-//            drive.resetIMU();
-            telemetry.addData("poop", Math.random());
-        }
+//        //TODO: does this cause switch between "robot" centric and field centric
+//        if (gamepad2.circle && gamepad2.dpad_left) {
+////            drive.resetIMU();
+//            telemetry.addData("poop", Math.random());
+//        }
 
         if (!gamepad2.dpad_left && cvDist < DISTANCE_BEFORE_BACKBOARD && !(inDep.getIsLeftClawOpen() || inDep.getIsRightClawOpen())) {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
