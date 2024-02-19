@@ -8,9 +8,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.function.Continuation;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.internal.camera.CameraImpl;
+import org.firstinspires.ftc.robotcore.internal.camera.CameraManagerImpl;
 import org.firstinspires.ftc.robotcore.internal.camera.delegating.CachingExposureControl;
+import org.firstinspires.ftc.robotcore.internal.camera.delegating.RefCountedSwitchableCameraImpl;
+import org.firstinspires.ftc.robotcore.internal.camera.delegating.SwitchableCameraName;
 import org.firstinspires.ftc.robotcore.internal.camera.delegating.SwitchableExposureControl;
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelGroupDetectionProcessor;
 // docs: https://javadoc.io/doc/org.firstinspires.ftc/RobotCore/latest/org/firstinspires/ftc/robotcore/internal/camera/delegating/CachingExposureControl.html
@@ -24,6 +30,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PropDetectionPipeline;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,6 +48,8 @@ import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvSwitchableWebcam;
 
 
 public class CVSubsystem extends SubsystemBase {
@@ -64,8 +73,8 @@ public class CVSubsystem extends SubsystemBase {
     private AprilTagProcessor aprilTag;
     public VisionPortal visionPortal;
     public final WebcamName cameraName1, cameraName2;
-    public final ExposureControl exposureControl;
-    private CameraName switchableCamera;
+//    public final ExposureControl exposureControl;
+    private SwitchableCameraName switchableCamera;
     private PropDetectionPipeline propProcessor;
     private PixelGroupDetectionProcessor pixelGroupProcessor;
     private boolean isRedTeam;
@@ -106,12 +115,12 @@ public class CVSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
         this.cameraName1 = cameraName1;
         this.cameraName2 = cameraName2;
-        switchableCamera = ClassFactory.getInstance()
-                .getCameraManager().nameForSwitchableCamera(this.cameraName2, this.cameraName1);
+//        switchableCamera = ClassFactory.getInstance()
+//                .getCameraManager().nameForSwitchableCamera(this.cameraName2, this.cameraName1);
         this.isRedTeam = isRedTeam;
         this.opMode = opMode;
         runtime.reset();
-        exposureControl = new CachingExposureControl();
+//        exposureControl = OpenCvSwitchableWebcam.getInstance().createWebcam(frontCamName);
 
         // create AprilTagProcessor and VisionPortal
         initAprilTag();
@@ -141,8 +150,9 @@ public class CVSubsystem extends SubsystemBase {
 
     private void initAprilTag() {
         //camera exposure control
-        exposureControl.setExposure(exposureControl.getMinExposure(TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS);
-        // Create the AprilTag processor.
+//        exposureControl.setExposure(exposureControl.getMinExposure(TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS);
+//        exposureControl.setExposure(1, TimeUnit.MILLISECONDS);
+        // Create the AprilTag processor
         propProcessor = new PropDetectionPipeline(isRedTeam);
         aprilTag = new AprilTagProcessor.Builder()
                 .setDrawTagOutline(true)
@@ -156,10 +166,10 @@ public class CVSubsystem extends SubsystemBase {
 
         builder.setCamera(switchableCamera);
 
-        builder.setCameraResolution(new Size(640, 480)); // android.util
+        builder.setCameraResolution(new Size(320, 240)); // android.util
 
         // TODO: DISABLE PROPPROCESSOR FOR TELEOP
-        builder.addProcessors(aprilTag, propProcessor, pixelGroupProcessor);
+        builder.addProcessors(aprilTag, propProcessor);
 
         // Build the Vision Portal, using the above settings.
         visionPortal = builder.build();
@@ -168,7 +178,10 @@ public class CVSubsystem extends SubsystemBase {
         // visionPortal.setProcessorEnabled(aprilTag, true);
         visionPortal.setProcessorEnabled(propProcessor, true);
         while (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING);
-        visionPortal.setActiveCamera(cameraName2);
+        SwitchableExposureControl exposureControl = visionPortal.getCameraControl(SwitchableExposureControl.class);
+        exposureControl.setExposure(exposureControl.getMinExposure(TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS);
+//        telemetry.addData("exposure min", exposureControl.getMinExposure(TimeUnit.NANOSECONDS));
+        switchCamera(cameraName2);
     }
 
     public void disablePropProcessor() {
