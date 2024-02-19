@@ -55,10 +55,10 @@ public class HardwareRobot {
         leftBack.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBack.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        leftFront.setRunMode(Motor.RunMode.VelocityControl);
-        rightFront.setRunMode(Motor.RunMode.VelocityControl);
-        leftBack.setRunMode(Motor.RunMode.VelocityControl);
-        rightBack.setRunMode(Motor.RunMode.VelocityControl);
+        leftFront.setRunMode(Motor.RunMode.RawPower);
+        rightFront.setRunMode(Motor.RunMode.RawPower);
+        leftBack.setRunMode(Motor.RunMode.RawPower);
+        rightBack.setRunMode(Motor.RunMode.RawPower);
 
         leftFront.setInverted(false);
         rightFront.setInverted(false);

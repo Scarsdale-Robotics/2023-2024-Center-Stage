@@ -163,6 +163,11 @@ public class DriveSubsystem extends SubsystemBase {
         leftFrontController.resetIntegral();
         rightFrontController.resetIntegral();
 
+        leftBack.resetEncoder();
+        rightBack.resetEncoder();
+        leftFront.resetEncoder();
+        rightFront.resetEncoder();
+
         // initialize variables
         double LB_start = getLBPosition(), RB_start = -getRBPosition(), LF_start = -getLFPosition(), RF_start = getRFPosition();
         double L = leftTicks, R = rightTicks;
@@ -215,20 +220,31 @@ public class DriveSubsystem extends SubsystemBase {
             double velocityGain = DrivePIDCoefficients.VELOCITY_GAIN;
             double LB_C = LB_PID.update(LB_p) * velocityGain;
             double RB_C = RB_PID.update(RB_p) * velocityGain;
-            double LF_C = LF_PID.update(LF_p) * velocityGain;
-            double RF_C = RF_PID.update(RF_p) * velocityGain;
+            double LF_C = LF_PID.update(-LF_p) * velocityGain;
+            double RF_C = RF_PID.update(-RF_p) * velocityGain;
+
+            telemetry.addData("LB_sp", LB_sp);
+            telemetry.addData("LB_p", LB_p);
+            telemetry.addData("RB_sp", RB_sp);
+            telemetry.addData("RB_p", RB_p);
+            telemetry.addData("LF_sp", LF_sp);
+            telemetry.addData("LF_p", LF_p);
+            telemetry.addData("RF_sp", RF_sp);
+            telemetry.addData("RF_p", RF_p);
 
             if (!LB_PID.atSetPoint(LB_p))
                 LB_v += LB_C;
             if (!RB_PID.atSetPoint(RB_p))
                 RB_v += RB_C;
-            if (!LF_PID.atSetPoint(LF_p))
+            if (!LF_PID.atSetPoint(-LF_p))
                 LF_v += LF_C;
-            if (!RF_PID.atSetPoint(RF_p))
+            if (!RF_PID.atSetPoint(-RF_p))
                 RF_v += RF_C;
 
             // update motor velocities
             updateMotorVelocities(LF_v, RF_v, LB_v, RB_v);
+
+            telemetry.update();
 
             // update elapsed time
             elapsedTime = runtime.milliseconds() / 1000 - startTime;
@@ -347,7 +363,7 @@ public class DriveSubsystem extends SubsystemBase {
         double secondHalfTime = travelTimes[1]; // time needed to travel the second half of the distance
         double totalTime = firstHalfTime + secondHalfTime;
 
-        double LDir = Math.abs(Math.sin(theta - Math.PI / 4)), RDir = Math.abs(Math.sin(theta + Math.PI / 4));
+        double LDir = Math.sin(theta - Math.PI / 4), RDir = Math.sin(theta + Math.PI / 4);
         double L_v, R_v; // LB and RB
 
         // in first half
@@ -379,7 +395,7 @@ public class DriveSubsystem extends SubsystemBase {
             }
             // trapezoidal graph
             else {
-                double a = -maxVelocity / (spread * secondHalfTime); // acceleration
+                double a = maxVelocity / (spread * secondHalfTime); // acceleration
                 if (elapsedTime < firstHalfTime + (1 - spread) * secondHalfTime) { // in plateau
                     L_v = (maxVelocity) * driveSpeed * LDir;
                     R_v = (maxVelocity) * driveSpeed * RDir;
@@ -786,7 +802,6 @@ public class DriveSubsystem extends SubsystemBase {
         telemetry.addData("rightBack Vel", getRBVelocity());
         telemetry.addData("-------","");
         telemetry.addData("atSetPoint", atSetPoint);
-        telemetry.update();
 
         return atSetPoint;
     }

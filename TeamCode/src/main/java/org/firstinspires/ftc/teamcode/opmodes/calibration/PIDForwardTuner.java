@@ -50,6 +50,10 @@ public class PIDForwardTuner extends LinearOpMode {
                 .forward(60)
                 .build();
 
+        MovementSequence backward = new MovementSequenceBuilder()
+                .backward(60)
+                .build();
+
         // begin tuning sequence
         while (opModeIsActive()) {
 //            double theta = Math.PI / 2;
@@ -66,7 +70,7 @@ public class PIDForwardTuner extends LinearOpMode {
             while (opModeIsActive() && !gamepad1.triangle);
             // backward 1000√2 ticks
 //            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), 3000, 3000, -Math.PI/2);
-            drive.followMovementSequence(forward);
+            drive.followMovementSequence(backward);
             while (opModeIsActive() && !gamepad1.triangle);
         }
 

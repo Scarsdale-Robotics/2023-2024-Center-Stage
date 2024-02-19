@@ -42,7 +42,7 @@ public class SpeedCoefficients {
     }
 
     public static double getAutonomousDriveSpeed() {
-        return 0.8;
+        return 1;
     }
 
     public static double getAutonomousTurnSpeed() {

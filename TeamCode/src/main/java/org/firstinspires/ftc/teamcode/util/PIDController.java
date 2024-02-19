@@ -64,8 +64,8 @@ public class PIDController {
         integralSum = integralSum < minIntegral ? minIntegral : Math.min(maxIntegral, integralSum);
 
         double output = (Kp * error) + (Ki * integralSum) + (Kd * derivative);
-        output = Math.min(1.0, output);
-        output = Math.max(-1.0, output);
+//        output = Math.min(1.0, output);
+//        output = Math.max(-1.0, output);
 
         // Update stuff for derivative
         lastError = error;

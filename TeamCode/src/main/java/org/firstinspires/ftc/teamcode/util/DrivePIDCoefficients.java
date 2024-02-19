@@ -7,17 +7,17 @@ public class DrivePIDCoefficients {
 
     public static double MAX_VELOCITY = 2000; // wheels ticks per second on ground
     public static double VELOCITY_SPREAD_PROPORTION = 1; // should only fall within [0, 1], for drive velocity curve
-    public static double VELOCITY_GAIN = 1.0; // for position control in drive movements
+    public static double VELOCITY_GAIN = 2.5; // for position control in drive movements
     public static double POWER_GAIN = 0.05; // for velocity control in wheels
 
     public static double drive_Kp = 1.0;
     public static double drive_Ki = 0.0;
     public static double drive_Kd = 0.0;
-    public static double errorTolerance_p = 30.5;
+    public static double errorTolerance_p = 10.5;
 
-    public static double velocity_Kp = 1.0;
-    public static double velocity_Ki = 0.0;
-    public static double velocity_Kd = 0.0;
+    public static double velocity_Kp = 0.001;
+    public static double velocity_Ki = 0.35;
+    public static double velocity_Kd = 0.0001;
     public static double errorTolerance_v = 11;
 
     public static double turn_Kp = 0.1;

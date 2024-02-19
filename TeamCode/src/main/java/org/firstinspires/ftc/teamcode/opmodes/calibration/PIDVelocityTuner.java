@@ -49,17 +49,15 @@ public class PIDVelocityTuner extends LinearOpMode {
         while (opModeIsActive()) {
             // drive with 30 ticks/sec for 2 secs maybe
             runtime.reset();
-            while (opModeIsActive() && (runtime.milliseconds() < 2000))
+            while (opModeIsActive() && ((runtime.milliseconds() < 2000) || !gamepad1.triangle))
                 drive.updateMotorVelocities(1000, 1000, 1000, 1000);
             drive.stopController();
-            while (opModeIsActive() && !gamepad1.triangle);
 
             // drive with -30 ticks/sec for 2 secs maybe
             runtime.reset();
-            while (opModeIsActive() && (runtime.milliseconds() < 2000))
+            while (opModeIsActive() && ((runtime.milliseconds() < 2000) || !gamepad1.triangle))
                 drive.updateMotorVelocities(-1000, -1000, -1000, -1000);
             drive.stopController();
-            while (opModeIsActive() && !gamepad1.triangle);
         }
 
         drive.stopController();
