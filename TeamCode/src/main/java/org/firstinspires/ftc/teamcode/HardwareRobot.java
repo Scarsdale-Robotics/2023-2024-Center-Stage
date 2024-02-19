@@ -12,11 +12,13 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 public class HardwareRobot {
     public final Motor leftFront;
@@ -122,11 +124,14 @@ public class HardwareRobot {
 
 
         backCamName = hardwareMap.get(WebcamName.class, "Webcam Back");
+//        ExposureControl exposureControlBack = OpenCvCameraFactory.getInstance().createWebcam(backCamName).getExposureControl();
+//        exposureControlBack.setExposure(exposureControlBack.getMinExposure(TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS);
 //        backCam = OpenCvCameraFactory.getInstance().createWebcam(backCamName);
 //        nameToCamera.put(backCamName, backCam);
 
         frontCamName = hardwareMap.get(WebcamName.class, "Webcam Front");
-//        frontCam = OpenCvCameraFactory.getInstance().createWebcam(frontCamName);
+//        ExposureControl exposureControlFront = OpenCvCameraFactory.getInstance().createWebcam(frontCamName).getExposureControl();
+//        exposureControlFront.setExposure(exposureControlFront.getMinExposure(TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS);
 //        FtcDashboard.getInstance().startCameraStream(frontCam, 0);
 //        nameToCamera.put(frontCamName, frontCam);
     }
