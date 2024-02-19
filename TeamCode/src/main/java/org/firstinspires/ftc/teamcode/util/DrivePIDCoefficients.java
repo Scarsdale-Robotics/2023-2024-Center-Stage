@@ -5,7 +5,8 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class DrivePIDCoefficients {
 
-    public static double MAX_VELOCITY = 2300;
+    public static double MAX_VELOCITY = 2000; // wheels ticks per second on ground
+    public static double VELOCITY_SPREAD_PROPORTION = 1; // should only fall within [0, 1]
     public static double drive_Kp = 0.0075;
     public static double drive_Ki = 0.05;
     public static double drive_Kd = 0.0;
@@ -16,7 +17,7 @@ public class DrivePIDCoefficients {
     public static double turn_Ki = 0.1;
     public static double turn_Kd = 0.001;
     public static double errorTolerance_p = 30.5;
-    public static double errorTolerance_v = 50;
+    public static double errorTolerance_v = 11;
     public static double errorTolerance_degrees = 1.0;
 
     public static double getDriveP() {

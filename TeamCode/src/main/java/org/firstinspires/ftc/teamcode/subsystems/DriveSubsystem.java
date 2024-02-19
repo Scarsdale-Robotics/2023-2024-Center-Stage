@@ -198,8 +198,8 @@ public class DriveSubsystem extends SubsystemBase {
         double LD = leftTicks * Math.signum(Math.sin(theta - Math.PI / 4)), RD = rightTicks * Math.signum(Math.sin(theta + Math.PI / 4));
         double LB_sp = LB_start + LD,
                 RB_sp = -RB_start + RD,
-                LF_sp = -RB_start + RD,
-                RF_sp = LB_start + LD;
+                LF_sp = -LF_start + RD,
+                RF_sp = RF_start + LD;
         double L = leftTicks, R = rightTicks;
 
         PIDController LB_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), LB_sp);
@@ -286,6 +286,194 @@ public class DriveSubsystem extends SubsystemBase {
         controller.stop();
         isBusy = false;
     }
+
+
+
+
+
+
+
+    /**
+     * Use only for autonomous. Move a certain distance following two motion vectors for diagonal motor pairs. Drive is robot centric.
+     * @param driveSpeed      Positive movement speed of the robot.
+     * @param leftTicks     How many ticks the back left and front right wheels should be displaced by.
+     * @param rightTicks      How many ticks the back right and front left wheels should be displaced by.
+     * @param theta      The direction of movement in radians in [-π, π].
+     * @param ignoreStartVelocity    If the initial velocity should be zero.
+     * @param ignoreEndVelocity    If the final velocity should be zero.
+     */
+    public void driveByAngularEncoder2(double driveSpeed, double leftTicks, double rightTicks, double theta, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
+        // check for clashing actions
+        if (DriveSubsystem.getIsBusy()) {
+            throw new RuntimeException("driveByAngularEncoder(): Tried to run two drive actions at once");
+        }
+
+        // prepare velocity PID controllers
+        leftBackController.resetIntegral();
+        rightBackController.resetIntegral();
+        leftFrontController.resetIntegral();
+        rightFrontController.resetIntegral();
+
+        // initialize variables
+        double LB_start = getLBPosition(), RB_start = -getRBPosition(), LF_start = -getLFPosition(), RF_start = getRFPosition();
+        double L = leftTicks, R = rightTicks;
+
+        PIDController LB_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), LB_start);
+        PIDController RB_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), RB_start);
+        PIDController LF_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), LF_start);
+        PIDController RF_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), RF_start);
+
+        // calculate time needed to complete entire movement
+        double[] travelTimes = calculateTravelTimes(Math.hypot(L,R), ignoreStartVelocity, ignoreEndVelocity);
+        double firstHalfTime = travelTimes[0]; // time needed to travel the first half of the distance
+        double secondHalfTime = travelTimes[1]; // time needed to travel the second half of the distance
+        double totalTime = firstHalfTime + secondHalfTime;
+
+        double startTime = runtime.milliseconds() / 1000; // beginning time of the movement
+        double elapsedTime = 0; // will act as the independent variable t for position & velocity calculations
+
+        while (elapsedTime < totalTime) {
+
+            // getting current positions
+            double LB_p = getLBPosition();
+            double RB_p = -getRBPosition();
+            double LF_p = -getLFPosition();
+            double RF_p = getRFPosition();
+
+            LB_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
+            RB_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
+            LF_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
+            RF_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
+
+
+            elapsedTime = runtime.milliseconds() / 1000 - startTime;
+        }
+    }
+
+
+
+    private static double[] calculateTravelTimes(double distance, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
+
+        // returns {firstHalfTime, secondHalfTime}
+
+        double maxVelocity = DrivePIDCoefficients.MAX_VELOCITY; // this is V
+        double spread = DrivePIDCoefficients.VELOCITY_SPREAD_PROPORTION; // this is s
+        double totalDist = distance; // this is D
+        double halfDist = totalDist / 2;
+
+        // calculate time for each half of the distance travelled
+        double firstHalfTime, // this is FH
+                secondHalfTime; // this is SH
+
+        // calculate time for the first half
+        if (ignoreStartVelocity) {
+
+            // the velocity vs time graph should look like this:
+            //
+            //         V
+            //         ^
+            //     MAX -__________________
+            //         |                 |
+            //         |                 |
+            //         |                 |
+            //         |       D/2       |
+            //         |                 |
+            //         |                 |
+            //        -|-----------------|-----------> t
+            //         0                FH
+            //
+            //  using area:
+            //      FH * MAX = D/2
+            //      FH = D/(2*MAX)
+
+            firstHalfTime = totalDist / (2 * maxVelocity);
+        }
+        else {
+
+            // the velocity vs time graph should look like this:
+            //
+            //         V
+            //         ^
+            //     MAX -            ______
+            //         |          / .    |
+            //         |        /   .    |
+            //         |      /     .    |
+            //         |    /     D/2    |
+            //         |  /         .    |
+            //         |/           .    |
+            //        -|------------|----|-----------> t
+            //         0           sFH  FH
+            //
+            //  using area:
+            //      1/2 * [FH + (FH-sFH)] * MAX = D/2
+            //      FH * (2-s) * MAX = D
+            //                D
+            //      FH = -----------
+            //            (2-s)*MAX
+
+            firstHalfTime = totalDist / ((2 - spread) * maxVelocity);
+        }
+
+        // calculate time for the second half
+        if (ignoreEndVelocity) {
+
+            // the velocity vs time graph should look like this:
+            //
+            //         V
+            //         ^
+            //     MAX -__________________
+            //         |                 |
+            //         |                 |
+            //         |                 |
+            //         |       D/2       |
+            //         |                 |
+            //         |                 |
+            //        -|-----------------|-----------> t
+            //         0                SH
+            //
+            //  using area:
+            //      SH * MAX = D/2
+            //      SH = D/(2*MAX)
+
+            secondHalfTime = totalDist / (2 * maxVelocity);
+        }
+        else {
+
+            // the velocity vs time graph should look like this:
+            //
+            //         V
+            //         ^
+            //     MAX -_____
+            //         |    . \
+            //         |    .   \
+            //         |    .     \
+            //         |    D/2     \
+            //         |    .         \
+            //         |    .           \
+            //        -|----|------------|---> t
+            //         0  (1-s)SH       SH
+            //
+            //  using area:
+            //      1/2 * [SH + (1-s)SH] * MAX = D/2
+            //      SH * (2-s) * MAX = D
+            //                D
+            //      SH = -----------
+            //            (2-s)*MAX
+
+            secondHalfTime = totalDist / ((2 - spread) * maxVelocity);
+        }
+
+        return new double[] { firstHalfTime, secondHalfTime };
+
+    }
+
+
+
+
+
+
+
+
 
     /**
      * Use only for autonomous. Move a certain distance in ticks. Drive is robot centric.
@@ -517,16 +705,11 @@ public class DriveSubsystem extends SubsystemBase {
         leftBackController.setSetPoint(leftBackVelocity);
         rightBackController.setSetPoint(rightBackVelocity);
 
-        double velocityToPower = 0.05;
-        double LF_D = leftFrontController.update(getLFVelocity()) * velocityToPower;
-        double RF_D = rightFrontController.update(-getRFVelocity()) * velocityToPower;
-        double LB_D = leftBackController.update(getLBVelocity()) * velocityToPower;
-        double RB_D = rightBackController.update(-getRBVelocity()) * velocityToPower;
-
-        leftFrontPower += LF_D;
-        rightFrontPower += RF_D;
-        leftBackPower += LB_D;
-        rightBackPower += RB_D;
+        double powerGain = 0.05;
+        double LF_D = leftFrontController.update(getLFVelocity()) * powerGain;
+        double RF_D = rightFrontController.update(-getRFVelocity()) * powerGain;
+        double LB_D = leftBackController.update(getLBVelocity()) * powerGain;
+        double RB_D = rightBackController.update(-getRBVelocity()) * powerGain;
 
         telemetry.addData("leftFront SP", leftFrontController.getSetPoint());
         telemetry.addData("leftFront Vel", getLFVelocity());
@@ -540,6 +723,15 @@ public class DriveSubsystem extends SubsystemBase {
         telemetry.addData("rightBack SP", rightBackController.getSetPoint());
         telemetry.addData("rightBack Vel", getRBVelocity());
         telemetry.update();
+
+        if (!leftFrontController.atSetPoint(getLFVelocity()))
+            leftFrontPower += LF_D;
+        if (!rightFrontController.atSetPoint(getRFVelocity()))
+            rightFrontPower += RF_D;
+        if (!leftBackController.atSetPoint(getLBVelocity()))
+            leftBackPower += LB_D;
+        if (!rightBackController.atSetPoint(getRBVelocity()))
+            rightBackPower += RB_D;
 
         driveWithMotorPowers(
                 leftFrontPower,
