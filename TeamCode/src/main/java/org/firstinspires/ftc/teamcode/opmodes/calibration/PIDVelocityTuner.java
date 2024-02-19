@@ -9,13 +9,11 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryImpl;
-import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
-import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 
 // FTC DASHBOARD
 // USAGE:
@@ -50,11 +48,17 @@ public class PIDVelocityTuner extends LinearOpMode {
         // begin tuning sequence
         while (opModeIsActive()) {
             // drive with 30 ticks/sec for 2 secs maybe
-            drive.driveWithMotorVelocities(1000, 1000, 1000, 1000);
+            runtime.reset();
+            while (opModeIsActive() && (runtime.milliseconds() < 2000))
+                drive.updateMotorVelocities(1000, 1000, 1000, 1000);
+            drive.stopController();
             while (opModeIsActive() && !gamepad1.triangle);
 
             // drive with -30 ticks/sec for 2 secs maybe
-            drive.driveWithMotorVelocities(-1000, -1000, -1000, -1000);
+            runtime.reset();
+            while (opModeIsActive() && (runtime.milliseconds() < 2000))
+                drive.updateMotorVelocities(-1000, -1000, -1000, -1000);
+            drive.stopController();
             while (opModeIsActive() && !gamepad1.triangle);
         }
 

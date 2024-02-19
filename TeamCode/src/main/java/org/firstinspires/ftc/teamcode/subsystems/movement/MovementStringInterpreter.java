@@ -68,6 +68,9 @@ public class MovementStringInterpreter {
 			String movementStringName = movementString.name;
 			String[] movementStringParams = movementString.params;
 
+			boolean ignoreStartVelocity = !movementSequenceBuilder.getMovements().isEmpty() &&
+					movementSequenceBuilder.getMovements().getLast().ignoreEndVelocity;
+
 			if (movementStringName.equals("openBothClaws")) {
 				if (movementStringParams.length != 0)
 					movementString.throwInterpretError();
@@ -85,18 +88,33 @@ public class MovementStringInterpreter {
 			Movement convertedMovement = movementString.toMovement();
 			if (movementString.extraParams.length > 0) {
 				if (movementString.extraParams[0].equals("true")) // linked modifier
-					movementSequenceBuilder.linkLastMovement();
+					if (!movementSequenceBuilder.getMovements().isEmpty())
+						movementSequenceBuilder.linkLastMovement();
+
+				boolean ignoreEndVelocity = !movementSequenceBuilder.getMovements().isEmpty() &&
+						movementSequenceBuilder.getMovements().getLast().ignoreEndVelocity &&
+						movementSequenceBuilder.getMovements().getLast().linkedToNext;
 
 				movementSequenceBuilder.append(convertedMovement);
 
-				if (movementString.extraParams.length > 1 && movementString.extraParams[1].equals("true")) // ignore
-					// velocity
-					// modifier
-					movementSequenceBuilder.ignoreLastMovementVelocity();
+				if (movementString.extraParams.length > 1 && movementString.extraParams[1].equals("true")) { // ignore velocity modifier
+					if (!movementSequenceBuilder.getMovements().isEmpty())
+						movementSequenceBuilder.setLastIgnoredEndVelocity();
+				}
+
+				if (ignoreStartVelocity)
+					movementSequenceBuilder.setLastIgnoredStartVelocity();
+
+				if (ignoreEndVelocity)
+					movementSequenceBuilder.setLastIgnoredEndVelocity();
+
 				continue;
 			}
 
 			movementSequenceBuilder.append(convertedMovement);
+
+			if (ignoreStartVelocity)
+				movementSequenceBuilder.setLastIgnoredStartVelocity();
 
 		}
 

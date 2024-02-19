@@ -606,7 +606,7 @@ public class CVSubsystem extends SubsystemBase {
                 //assume that we don't need to optimize getAprilTagRotationalOffset(tagID) since it runs anyway
                 drive.driveFieldCentric(0, 0, rotOff * 0.1 * SpeedCoefficients.getTurnSpeed()); // times some scaling factor (temporarily at 1)
             }
-            drive.driveByRectilinearEncoder(0, 0, 0);
+            drive.stopController();
 //            while (Math.abs(rotOff) > ERROR_ALIGNMENT && opMode.opModeIsActive()) {
 //                drive.driveByEncoder(0, 0, 0.2, (double) 1770 * rotOff / 180);
 //            }

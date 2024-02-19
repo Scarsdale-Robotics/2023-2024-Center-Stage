@@ -53,7 +53,7 @@ public class MovementThread implements Runnable {
                     L = Math.abs(u*c*Math.cos(theta)-u*c*Math.sin(theta))/Math.sqrt(2),
                     R = Math.abs(u*c*Math.cos(theta)+u*c*Math.sin(theta))/Math.sqrt(2);
 
-            drive.driveByAngularEncoder(POWER_DRIVE, L, R, theta, movement.ignoreVelocity);
+            drive.driveByAngularEncoder(POWER_DRIVE, L, R, theta, movement.ignoreStartVelocity, movement.ignoreEndVelocity);
         }
 
         // TURN CASES

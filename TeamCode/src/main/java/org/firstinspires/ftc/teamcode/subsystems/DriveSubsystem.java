@@ -128,41 +128,6 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Use only for autonomous. Move a certain distance in ticks. Drive is robot centric.
-     *
-     * @param rightSpeed   How fast the robot should strafe to the right (negative values = strafe left).
-     * @param forwardSpeed How fast the robot should move forward (negative values = move backwards).
-     * @param ticks        How far the robot should move.
-     */
-    public void driveByRectilinearEncoder(double rightSpeed, double forwardSpeed, double ticks) {
-        // check for clashing actions
-        if (DriveSubsystem.getIsBusy()) {
-            throw new RuntimeException("driveByRectilinearEncoder(): Tried to run two drive actions at once");
-        }
-
-        // begin action
-        double startEncoder = getRBPosition();
-        double setPoint = startEncoder + ticks;
-        double K;
-
-        PIDController PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), setPoint);
-
-        while (
-                opMode.opModeIsActive() &&
-                        Math.abs(setPoint- getRBPosition()) > DrivePIDCoefficients.getErrorTolerance_p() &&
-                        Math.abs(getRBVelocity()) > DrivePIDCoefficients.getErrorTolerance_v()
-        ) {
-            K = PID.update(getRBPosition());
-            driveRobotCentric(rightSpeed * K, forwardSpeed * K, 0);
-            isBusy = true;
-        }
-
-        // brake
-        controller.stop();
-        isBusy = false;
-    }
-
-    /**
      * Use only for autonomous. Move a certain distance following two motion vectors for diagonal motor pairs. Drive is robot centric.
      * @param driveSpeed      Positive movement speed of the robot.
      * @param leftTicks     How many ticks the back left and front right wheels should be displaced by.
@@ -170,128 +135,8 @@ public class DriveSubsystem extends SubsystemBase {
      * @param theta      The direction of movement in radians in [-π, π].
      */
     public void driveByAngularEncoder(double driveSpeed, double leftTicks, double rightTicks, double theta) {
-        driveByAngularEncoder(driveSpeed, leftTicks, rightTicks, theta, false);
+        driveByAngularEncoder(driveSpeed, leftTicks, rightTicks, theta, false, false);
     }
-
-    /**
-     * Use only for autonomous. Move a certain distance following two motion vectors for diagonal motor pairs. Drive is robot centric.
-     * @param driveSpeed      Positive movement speed of the robot.
-     * @param leftTicks     How many ticks the back left and front right wheels should be displaced by.
-     * @param rightTicks      How many ticks the back right and front left wheels should be displaced by.
-     * @param theta      The direction of movement in radians in [-π, π].
-     * @param ignoreVelocity    If the wheels should ignore fully stopping after reaching the setpoints.
-     */
-    public void driveByAngularEncoder(double driveSpeed, double leftTicks, double rightTicks, double theta, boolean ignoreVelocity) {
-        // check for clashing actions
-        if (DriveSubsystem.getIsBusy()) {
-            throw new RuntimeException("driveByAngularEncoder(): Tried to run two drive actions at once");
-        }
-
-        // prepare velocity PID controllers
-        leftBackController.resetIntegral();
-        rightBackController.resetIntegral();
-        leftFrontController.resetIntegral();
-        rightFrontController.resetIntegral();
-
-        // begin action
-        double LB_start = getLBPosition(), RB_start = getRBPosition(), LF_start = getLFPosition(), RF_start = getRFPosition();
-        double LD = leftTicks * Math.signum(Math.sin(theta - Math.PI / 4)), RD = rightTicks * Math.signum(Math.sin(theta + Math.PI / 4));
-        double LB_sp = LB_start + LD,
-                RB_sp = -RB_start + RD,
-                LF_sp = -LF_start + RD,
-                RF_sp = RF_start + LD;
-        double L = leftTicks, R = rightTicks;
-
-        PIDController LB_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), LB_sp);
-        PIDController RB_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), RB_sp);
-        PIDController LF_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), LF_sp);
-        PIDController RF_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), RF_sp);
-
-        boolean LB_atSetPoint = false, RB_atSetPoint = false, LF_atSetPoint = false, RF_atSetPoint = false;
-
-        while ( // checking condition
-                opMode.opModeIsActive() && !(
-                        LB_atSetPoint &&
-                        RB_atSetPoint &&
-                        LF_atSetPoint &&
-                        RF_atSetPoint)
-        ) {
-            // getting current positions
-            double LB_p = getLBPosition();
-            double RB_p = -getRBPosition();
-            double LF_p = -getLFPosition();
-            double RF_p = getRFPosition();
-
-            LB_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
-            RB_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
-            LF_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
-            RF_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
-
-            double LB_K = LB_PID.update(LB_p);
-            double RB_K = RB_PID.update(RB_p);
-            double LF_K = LF_PID.update(LF_p);
-            double RF_K = RF_PID.update(RF_p);
-
-            double LDir = Math.abs(Math.sin(theta - Math.PI / 4)), RDir = Math.abs(Math.sin(theta + Math.PI / 4));
-            double LB_v = driveSpeed * LDir * LB_K; // for bL
-            double RB_v = driveSpeed * RDir * RB_K; // for bR
-            double LF_v = driveSpeed * RDir * LF_K; // for fL
-            double RF_v = driveSpeed * LDir * RF_K; // for fR
-
-            if (telemetry != null) {
-                telemetry.addData("CURRENT MOVEMENT:", currentMovement);
-                telemetry.addData("LB setpoint",LB_sp);
-                telemetry.addData("LB position",LB_p);
-                telemetry.addData("LF setpoint",LF_sp);
-                telemetry.addData("LF position",LF_p);
-                telemetry.addData("RB setpoint",RB_sp);
-                telemetry.addData("RB position",RB_p);
-                telemetry.addData("RF setpoint",RF_sp);
-                telemetry.addData("RF position",RF_p);
-                telemetry.update();
-            }
-
-            double thetaDiff = 0.01 * normalizeAngle(getYaw()-this.heading); // originally factored into to each motor
-
-            // setting the powers of the motors
-//            double maxVelocity = DrivePIDCoefficients.MAX_VELOCITY;
-//            driveWithMotorVelocities(
-//                    maxVelocity * LF_v, // fL
-//                    maxVelocity * RF_v, // fR
-//                    maxVelocity * LB_v, // bL
-//                    maxVelocity * RB_v  // bR
-//            );
-
-            driveWithMotorPowers(
-                    LF_v, // fL
-                    RF_v, // fR
-                    LB_v, // bL
-                    RB_v  // bR
-            );
-
-            double positionErrorTolerance = DrivePIDCoefficients.getErrorTolerance_p();
-            LB_atSetPoint = LB_atSetPoint ||
-                    (Math.abs(Math.abs(getLBPosition()-LB_start) - Math.abs(L)) < positionErrorTolerance); // position
-            RB_atSetPoint = RB_atSetPoint ||
-                    (Math.abs(Math.abs(getRBPosition()-RB_start) - Math.abs(R)) < positionErrorTolerance); // position
-            LF_atSetPoint = LF_atSetPoint ||
-                    (Math.abs(Math.abs(getLFPosition()-LF_start) - Math.abs(L)) < positionErrorTolerance); // position
-            RF_atSetPoint = RF_atSetPoint ||
-                    (Math.abs(Math.abs(getRFPosition()-RF_start) - Math.abs(R)) < positionErrorTolerance); // position
-
-            isBusy = true;
-        }
-
-        // brake
-        controller.stop();
-        isBusy = false;
-    }
-
-
-
-
-
-
 
     /**
      * Use only for autonomous. Move a certain distance following two motion vectors for diagonal motor pairs. Drive is robot centric.
@@ -302,11 +147,15 @@ public class DriveSubsystem extends SubsystemBase {
      * @param ignoreStartVelocity    If the initial velocity should be zero.
      * @param ignoreEndVelocity    If the final velocity should be zero.
      */
-    public void driveByAngularEncoder2(double driveSpeed, double leftTicks, double rightTicks, double theta, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
+    public void driveByAngularEncoder(double driveSpeed, double leftTicks, double rightTicks, double theta, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
         // check for clashing actions
         if (DriveSubsystem.getIsBusy()) {
             throw new RuntimeException("driveByAngularEncoder(): Tried to run two drive actions at once");
         }
+
+        // stop drivetrain at start
+        if (!ignoreStartVelocity)
+            stopController();
 
         // prepare velocity PID controllers
         leftBackController.resetIntegral();
@@ -324,7 +173,8 @@ public class DriveSubsystem extends SubsystemBase {
         PIDController RF_PID = new PIDController(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD(), RF_start);
 
         // calculate time needed to complete entire movement
-        double[] travelTimes = calculateTravelTimes(Math.hypot(L,R), ignoreStartVelocity, ignoreEndVelocity);
+        double totalDistance = Math.hypot(L,R);
+        double[] travelTimes = calculateTravelTimes(totalDistance, ignoreStartVelocity, ignoreEndVelocity);
         double firstHalfTime = travelTimes[0]; // time needed to travel the first half of the distance
         double secondHalfTime = travelTimes[1]; // time needed to travel the second half of the distance
         double totalTime = firstHalfTime + secondHalfTime;
@@ -332,26 +182,221 @@ public class DriveSubsystem extends SubsystemBase {
         double startTime = runtime.milliseconds() / 1000; // beginning time of the movement
         double elapsedTime = 0; // will act as the independent variable t for position & velocity calculations
 
-        while (elapsedTime < totalTime) {
-
-            // getting current positions
-            double LB_p = getLBPosition();
-            double RB_p = -getRBPosition();
-            double LF_p = -getLFPosition();
-            double RF_p = getRFPosition();
+        while (opMode.opModeIsActive() && elapsedTime < totalTime) {
 
             LB_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
             RB_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
             LF_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
             RF_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
 
+            LB_PID.setErrorTolerance(DrivePIDCoefficients.getErrorTolerance_p());
+            RB_PID.setErrorTolerance(DrivePIDCoefficients.getErrorTolerance_p());
+            LF_PID.setErrorTolerance(DrivePIDCoefficients.getErrorTolerance_p());
+            RF_PID.setErrorTolerance(DrivePIDCoefficients.getErrorTolerance_p());
 
+            // handle wheel velocities
+            double[] velocitySetpoints = calculateVelocitySetpoints(driveSpeed, theta, elapsedTime, travelTimes, ignoreStartVelocity, ignoreEndVelocity);
+            double LB_v = velocitySetpoints[0], RF_v = velocitySetpoints[0], RB_v = velocitySetpoints[1], LF_v = velocitySetpoints[1];
+
+            // handle wheel positions
+            double[] positionSetpoints = calculatePositionSetpoints(LB_start, RB_start, driveSpeed, theta, elapsedTime, travelTimes, ignoreStartVelocity, ignoreEndVelocity);
+            double LB_sp = positionSetpoints[0], RF_sp = positionSetpoints[0], RB_sp = positionSetpoints[1], LF_sp = positionSetpoints[1];
+
+            LB_PID.setSetPoint(LB_sp);
+            RB_PID.setSetPoint(RB_sp);
+            LF_PID.setSetPoint(LF_sp);
+            RF_PID.setSetPoint(RF_sp);
+
+            double LB_p = getLBPosition();
+            double RB_p = -getRBPosition();
+            double LF_p = -getLFPosition();
+            double RF_p = getRFPosition();
+
+            double velocityGain = DrivePIDCoefficients.VELOCITY_GAIN;
+            double LB_C = LB_PID.update(LB_p) * velocityGain;
+            double RB_C = RB_PID.update(RB_p) * velocityGain;
+            double LF_C = LF_PID.update(LF_p) * velocityGain;
+            double RF_C = RF_PID.update(RF_p) * velocityGain;
+
+            if (!LB_PID.atSetPoint(LB_p))
+                LB_v += LB_C;
+            if (!RB_PID.atSetPoint(RB_p))
+                RB_v += RB_C;
+            if (!LF_PID.atSetPoint(LF_p))
+                LF_v += LF_C;
+            if (!RF_PID.atSetPoint(RF_p))
+                RF_v += RF_C;
+
+            // update motor velocities
+            updateMotorVelocities(LF_v, RF_v, LB_v, RB_v);
+
+            // update elapsed time
             elapsedTime = runtime.milliseconds() / 1000 - startTime;
         }
+
+        // stop drivetrain at end
+        if (!ignoreEndVelocity)
+            stopController();
     }
 
+    /**
+     * Calculates the target positions for the leftBack and rightBack wheels in a movement at a certain time.
+     */
+    private static double[] calculatePositionSetpoints(double L_start, double R_start, double driveSpeed, double theta, double elapsedTime, double[] travelTimes, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
 
+        // this method returns {L_sp, R_sp}
 
+        double maxVelocity = DrivePIDCoefficients.MAX_VELOCITY;
+        double spread = DrivePIDCoefficients.VELOCITY_SPREAD_PROPORTION; // this is s
+        double firstHalfTime = travelTimes[0]; // time needed to travel the first half of the distance
+        double secondHalfTime = travelTimes[1]; // time needed to travel the second half of the distance
+        double totalTime = firstHalfTime + secondHalfTime;
+
+        double currentDistance = 0; // distance travelled to be calculated
+
+        // five temporal waypoints:
+        // W_0) 0
+        // W_1) spread * firstHalfTime
+        // W_2) firstHalfTime
+        // W_3) firstHalfTime + (1 - spread) * secondHalfTime
+        // W_4) firstHalfTime + secondHalfTime
+        //
+        //         V
+        //         ^
+        //     MAX -            ___________
+        //         |          / .    .    . \
+        //         |        /   .    .    .   \
+        //         |      /     .    .    .     \
+        //         |    /       .    .    .       \
+        //         |  /         .    .    .         \
+        //         |/           .    .    .           \
+        //        -|------------|----|-----------------|-------> t
+        //         W_0         W_1  W_2  W_3          W_4
+        //
+        double[] waypoints = new double[] {
+                0,
+                spread * firstHalfTime,
+                firstHalfTime,
+                firstHalfTime + (1 - spread) * secondHalfTime,
+                firstHalfTime + secondHalfTime
+        };
+        double waypointTime;
+
+        // calculate distance travelled
+        // waypoint 1
+        waypointTime = Math.max(elapsedTime - waypoints[0], 0); // elapsed non-negative time since waypoint 1
+        if (elapsedTime >= waypoints[1]) // clip time to waypoint 1
+            waypointTime = waypoints[1] - waypoints[0];
+        // rectangular graph
+        if (ignoreStartVelocity) {
+            currentDistance += waypointTime * maxVelocity * driveSpeed;
+        }
+        // trapezoidal graph
+        else {
+            double a = maxVelocity / waypoints[1]; // acceleration
+            currentDistance += 0.5 * a * Math.pow(waypointTime, 2) * driveSpeed;
+        }
+
+        // waypoint 2
+        waypointTime = Math.max(elapsedTime - waypoints[1], 0); // elapsed non-negative time since waypoint 2
+        if (elapsedTime >= waypoints[2]) // clip time to waypoint 2
+            waypointTime = waypoints[2] - waypoints[1];
+        // rectangular graph
+        currentDistance += waypointTime * maxVelocity * driveSpeed;
+
+        // waypoint 3
+        waypointTime = Math.max(elapsedTime - waypoints[2], 0); // elapsed non-negative time since waypoint 3
+        if (elapsedTime >= waypoints[3]) // clip time to waypoint 3
+            waypointTime = waypoints[3] - waypoints[2];
+        // rectangular graph
+        currentDistance += waypointTime * maxVelocity * driveSpeed;
+
+        // waypoint 4
+        waypointTime = Math.max(elapsedTime - waypoints[3], 0); // elapsed non-negative time since waypoint 4
+        if (elapsedTime >= waypoints[4]) // clip time to waypoint 4
+            waypointTime = waypoints[4] - waypoints[3];
+        // rectangular graph
+        if (ignoreEndVelocity) {
+            currentDistance += waypointTime * maxVelocity * driveSpeed;
+        }
+        // trapezoidal graph
+        else {
+            double a = maxVelocity / waypoints[1]; // acceleration
+            currentDistance += 0.5 * (waypoints[4] - waypoints[3]) * (maxVelocity * driveSpeed) - 0.5 * a * Math.pow(waypoints[4] - waypoints[3] - waypointTime, 2) * driveSpeed;
+        }
+
+        // calculate setpoints
+        // LB
+        double L_sp = L_start + currentDistance * Math.sin(theta - Math.PI / 4);
+        // RB
+        double R_sp = R_start + currentDistance * Math.sin(theta + Math.PI / 4);
+
+        return new double[] { L_sp, R_sp };
+    }
+
+    /**
+     * Calculates the target velocities for the leftBack and rightBack wheels in a movement at a certain time.
+     */
+    private static double[] calculateVelocitySetpoints(double driveSpeed, double theta, double elapsedTime, double[] travelTimes, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
+
+        // this method returns {L_v, R_v}
+
+        double maxVelocity = DrivePIDCoefficients.MAX_VELOCITY;
+        double spread = DrivePIDCoefficients.VELOCITY_SPREAD_PROPORTION; // this is s
+        double firstHalfTime = travelTimes[0]; // time needed to travel the first half of the distance
+        double secondHalfTime = travelTimes[1]; // time needed to travel the second half of the distance
+        double totalTime = firstHalfTime + secondHalfTime;
+
+        double LDir = Math.abs(Math.sin(theta - Math.PI / 4)), RDir = Math.abs(Math.sin(theta + Math.PI / 4));
+        double L_v, R_v; // LB and RB
+
+        // in first half
+        if (elapsedTime < firstHalfTime) {
+            // rectangular graph
+            if (ignoreStartVelocity) {
+                L_v = (maxVelocity) * driveSpeed * LDir;
+                R_v = (maxVelocity) * driveSpeed * RDir;
+            }
+            // trapezoidal graph
+            else {
+                double a = maxVelocity / (spread * firstHalfTime); // acceleration
+                if (elapsedTime < spread * firstHalfTime) { // in slope
+                    // y = at
+                    L_v = (a * elapsedTime) * driveSpeed * LDir;
+                    R_v = (a * elapsedTime) * driveSpeed * RDir;
+                } else { // in plateau
+                    L_v = (maxVelocity) * driveSpeed * LDir;
+                    R_v = (maxVelocity) * driveSpeed * RDir;
+                }
+            }
+        }
+        // in second half
+        else {
+            // rectangular graph
+            if (ignoreEndVelocity) {
+                L_v = (maxVelocity) * driveSpeed * LDir;
+                R_v = (maxVelocity) * driveSpeed * RDir;
+            }
+            // trapezoidal graph
+            else {
+                double a = -maxVelocity / (spread * secondHalfTime); // acceleration
+                if (elapsedTime < firstHalfTime + (1 - spread) * secondHalfTime) { // in plateau
+                    L_v = (maxVelocity) * driveSpeed * LDir;
+                    R_v = (maxVelocity) * driveSpeed * RDir;
+                } else { // in slope
+                    // y = a(T-t)
+                    L_v = (a * (totalTime - elapsedTime)) * driveSpeed * LDir;
+                    R_v = (a * (totalTime - elapsedTime)) * driveSpeed * RDir;
+                }
+            }
+        }
+
+        return new double[] { L_v, R_v };
+    }
+
+    /**
+     * Calculates how long a drive movement will take.
+     */
     private static double[] calculateTravelTimes(double distance, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
 
         // returns {firstHalfTime, secondHalfTime}
@@ -464,16 +509,7 @@ public class DriveSubsystem extends SubsystemBase {
         }
 
         return new double[] { firstHalfTime, secondHalfTime };
-
     }
-
-
-
-
-
-
-
-
 
     /**
      * Use only for autonomous. Move a certain distance in ticks. Drive is robot centric.
@@ -524,7 +560,7 @@ public class DriveSubsystem extends SubsystemBase {
         }
 
         // brake
-        controller.stop();
+        stopController();
         while (getYaw() == 0D && heading == 0D && opMode.opModeIsActive()) { // wait until imu reads heading correctly
             heading = getYaw();
         }
@@ -576,7 +612,7 @@ public class DriveSubsystem extends SubsystemBase {
 
         }
 
-        controller.stop();
+        stopController();
     }
 
     /**
@@ -647,6 +683,10 @@ public class DriveSubsystem extends SubsystemBase {
      */
     public void stopController() {
         controller.stop();
+        leftBackPower = 0;
+        rightBackPower = 0;
+        leftFrontPower = 0;
+        rightFrontPower = 0;
     }
 
     public IMU getIMU() {
@@ -668,9 +708,9 @@ public class DriveSubsystem extends SubsystemBase {
      */
     private double normalizeAngle(double degrees) {
         double angle = degrees;
-        while (angle <= -180)
+        while (opMode.opModeIsActive() && angle <= -180)
             angle += 360;
-        while (angle > 180)
+        while (opMode.opModeIsActive() && angle > 180)
             angle -= 360;
         return angle;
     }
@@ -682,8 +722,9 @@ public class DriveSubsystem extends SubsystemBase {
      * @param rightFrontVelocity    the velocity of the rightFront motor in encoder ticks/second.
      * @param leftBackVelocity     the velocity of the leftBack motor in encoder ticks/second.
      * @param rightBackVelocity     the velocity of the rightBack motor in encoder ticks/second.
+     * @return  whether all of the wheels have reached the target velocity.
      */
-    public void driveWithMotorVelocities(double leftFrontVelocity, double rightFrontVelocity, double leftBackVelocity, double rightBackVelocity) {
+    public boolean updateMotorVelocities(double leftFrontVelocity, double rightFrontVelocity, double leftBackVelocity, double rightBackVelocity) {
 
         leftFrontVelocity = clipWheelVelocity(leftFrontVelocity);
         rightFrontVelocity = clipWheelVelocity(rightFrontVelocity);
@@ -705,24 +746,11 @@ public class DriveSubsystem extends SubsystemBase {
         leftBackController.setSetPoint(leftBackVelocity);
         rightBackController.setSetPoint(rightBackVelocity);
 
-        double powerGain = 0.05;
+        double powerGain = DrivePIDCoefficients.POWER_GAIN;
         double LF_D = leftFrontController.update(getLFVelocity()) * powerGain;
         double RF_D = rightFrontController.update(-getRFVelocity()) * powerGain;
         double LB_D = leftBackController.update(getLBVelocity()) * powerGain;
         double RB_D = rightBackController.update(-getRBVelocity()) * powerGain;
-
-        telemetry.addData("leftFront SP", leftFrontController.getSetPoint());
-        telemetry.addData("leftFront Vel", getLFVelocity());
-        telemetry.addData("----","");
-        telemetry.addData("rightFront SP", rightFrontController.getSetPoint());
-        telemetry.addData("rightFront Vel", getRFVelocity());
-        telemetry.addData("-----","");
-        telemetry.addData("leftBack SP", leftBackController.getSetPoint());
-        telemetry.addData("leftBack Vel", getLBVelocity());
-        telemetry.addData("------","");
-        telemetry.addData("rightBack SP", rightBackController.getSetPoint());
-        telemetry.addData("rightBack Vel", getRBVelocity());
-        telemetry.update();
 
         if (!leftFrontController.atSetPoint(getLFVelocity()))
             leftFrontPower += LF_D;
@@ -740,6 +768,27 @@ public class DriveSubsystem extends SubsystemBase {
                 rightBackPower
         );
 
+        boolean atSetPoint = leftFrontController.atSetPoint(getLFVelocity()) &&
+                rightFrontController.atSetPoint(getRFVelocity()) &&
+                leftBackController.atSetPoint(getLBVelocity()) &&
+                rightBackController.atSetPoint(getRBVelocity());
+
+        telemetry.addData("leftFront SP", leftFrontController.getSetPoint());
+        telemetry.addData("leftFront Vel", getLFVelocity());
+        telemetry.addData("----","");
+        telemetry.addData("rightFront SP", rightFrontController.getSetPoint());
+        telemetry.addData("rightFront Vel", getRFVelocity());
+        telemetry.addData("-----","");
+        telemetry.addData("leftBack SP", leftBackController.getSetPoint());
+        telemetry.addData("leftBack Vel", getLBVelocity());
+        telemetry.addData("------","");
+        telemetry.addData("rightBack SP", rightBackController.getSetPoint());
+        telemetry.addData("rightBack Vel", getRBVelocity());
+        telemetry.addData("-------","");
+        telemetry.addData("atSetPoint", atSetPoint);
+        telemetry.update();
+
+        return atSetPoint;
     }
 
     /**
