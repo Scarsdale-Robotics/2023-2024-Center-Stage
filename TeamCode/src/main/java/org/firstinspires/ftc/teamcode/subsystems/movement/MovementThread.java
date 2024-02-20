@@ -144,6 +144,9 @@ public class MovementThread implements Runnable {
         DrivePIDCoefficients.MAX_ATTAINABLE_VELOCITY = Math.min(DrivePIDCoefficients.MAX_VELOCITY, DrivePIDCoefficients.MAX_VELOCITY * c / 60.0 + DrivePIDCoefficients.MAX_VELOCITY * 2.0 / 5.0);
         DrivePIDCoefficients.VELOCITY_USED_GAIN = Math.min(40, DrivePIDCoefficients.VELOCITY_GAIN + Math.abs(b) * 2);
 
+        DrivePIDCoefficients.MAX_ATTAINABLE_VELOCITY = DrivePIDCoefficients.MAX_VELOCITY;
+        DrivePIDCoefficients.VELOCITY_USED_GAIN = 50;
+
         drive.driveByAngularEncoder(POWER_DRIVE, L, R, theta, driveMovement.ignoreStartVelocity, driveMovement.ignoreEndVelocity);
 
     }
