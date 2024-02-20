@@ -6,11 +6,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
+import org.firstinspires.ftc.teamcode.util.DrivePIDCoefficients;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 
 public class MovementThread implements Runnable {
     public static volatile double K_FORWARD = 64.04;
-    public static volatile double K_STRAFE = 72.948;
+    public static volatile double K_STRAFE = 75.131;
     public static volatile double K_ARM = 11.111;
 
     private static final double POWER_DRIVE = SpeedCoefficients.getAutonomousDriveSpeed();
@@ -139,6 +140,9 @@ public class MovementThread implements Runnable {
                 u = Math.hypot(MovementThread.K_STRAFE * Math.cos(theta), MovementThread.K_FORWARD * Math.sin(theta)),
                 L = Math.abs(u*c*Math.cos(theta)-u*c*Math.sin(theta))/Math.sqrt(2),
                 R = Math.abs(u*c*Math.cos(theta)+u*c*Math.sin(theta))/Math.sqrt(2);
+
+        DrivePIDCoefficients.MAX_ATTAINABLE_VELOCITY = Math.min(DrivePIDCoefficients.MAX_VELOCITY, DrivePIDCoefficients.MAX_VELOCITY * c / 60.0 + DrivePIDCoefficients.MAX_VELOCITY * 2.0 / 5.0);
+        DrivePIDCoefficients.VELOCITY_USED_GAIN = Math.min(40, DrivePIDCoefficients.VELOCITY_GAIN + Math.abs(b) * 2);
 
         drive.driveByAngularEncoder(POWER_DRIVE, L, R, theta, driveMovement.ignoreStartVelocity, driveMovement.ignoreEndVelocity);
 

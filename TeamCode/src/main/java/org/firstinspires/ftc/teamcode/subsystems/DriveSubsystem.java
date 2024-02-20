@@ -198,7 +198,8 @@ public class DriveSubsystem extends SubsystemBase {
 
         // calculate time needed to complete entire movement
         double totalDistance = Math.hypot(L,R);
-        double[] travelTimes = calculateTravelTimes(totalDistance, ignoreStartVelocity, ignoreEndVelocity);
+        double maxVelocity = DrivePIDCoefficients.MAX_ATTAINABLE_VELOCITY;
+        double[] travelTimes = calculateTravelTimes(totalDistance, maxVelocity, ignoreStartVelocity, ignoreEndVelocity);
         double firstHalfTime = travelTimes[0]; // time needed to travel the first half of the distance
         double secondHalfTime = travelTimes[1]; // time needed to travel the second half of the distance
         double totalTime = firstHalfTime + secondHalfTime;
@@ -219,11 +220,11 @@ public class DriveSubsystem extends SubsystemBase {
             RF_PID.setErrorTolerance(DrivePIDCoefficients.getErrorTolerance_p());
 
             // handle wheel velocities
-            double[] velocitySetpoints = calculateVelocitySetpoints(driveSpeed, theta, elapsedTime, travelTimes, ignoreStartVelocity, ignoreEndVelocity);
+            double[] velocitySetpoints = calculateVelocitySetpoints(driveSpeed, theta, elapsedTime, travelTimes, maxVelocity, ignoreStartVelocity, ignoreEndVelocity);
             double LB_v = velocitySetpoints[0], RF_v = velocitySetpoints[0], RB_v = velocitySetpoints[1], LF_v = velocitySetpoints[1];
 
             // handle wheel positions
-            double[] positionSetpoints = calculatePositionSetpoints(LB_start, RB_start, driveSpeed, theta, elapsedTime, travelTimes, ignoreStartVelocity, ignoreEndVelocity);
+            double[] positionSetpoints = calculatePositionSetpoints(LB_start, RB_start, driveSpeed, theta, elapsedTime, travelTimes, maxVelocity, ignoreStartVelocity, ignoreEndVelocity);
             double LB_sp = positionSetpoints[0], RF_sp = positionSetpoints[0], RB_sp = positionSetpoints[1], LF_sp = positionSetpoints[1];
 
             LB_PID.setSetPoint(LB_sp);
@@ -236,12 +237,14 @@ public class DriveSubsystem extends SubsystemBase {
             double LF_p = getLFPosition();
             double RF_p = -getRFPosition();
 
-            double velocityGain = DrivePIDCoefficients.VELOCITY_GAIN;
+            double velocityGain = Math.min(DrivePIDCoefficients.VELOCITY_USED_GAIN, DrivePIDCoefficients.VELOCITY_USED_GAIN * 3 * (totalTime - elapsedTime));
             double LB_C = LB_PID.update(LB_p) * velocityGain;
             double RB_C = RB_PID.update(RB_p) * velocityGain;
             double LF_C = LF_PID.update(LF_p) * velocityGain;
             double RF_C = RF_PID.update(RF_p) * velocityGain;
 
+            telemetry.addData("totalDistance", totalDistance);
+            telemetry.addData("totalTime", totalTime);
             telemetry.addData("LB_sp", LB_sp);
             telemetry.addData("LB_p", LB_p);
             telemetry.addData("RB_sp", RB_sp);
@@ -282,15 +285,8 @@ public class DriveSubsystem extends SubsystemBase {
             }
             telemetry.addData("thetaDiff", thetaDiff);
 
-            double maxVelocity = DrivePIDCoefficients.MAX_VELOCITY;
             // update motor velocities
             updateMotorVelocities(LF_v, RF_v, LB_v, RB_v);
-//            driveWithMotorPowers(
-//                    clipWheelVelocity(LF_v) / maxVelocity,
-//                    clipWheelVelocity(RF_v) / maxVelocity,
-//                    clipWheelVelocity(LB_v) / maxVelocity,
-//                    clipWheelVelocity(RB_v) / maxVelocity
-//                    );
 
             telemetry.update();
 
@@ -306,11 +302,10 @@ public class DriveSubsystem extends SubsystemBase {
     /**
      * Calculates the target positions for the leftBack and rightBack wheels in a movement at a certain time.
      */
-    private static double[] calculatePositionSetpoints(double L_start, double R_start, double driveSpeed, double theta, double elapsedTime, double[] travelTimes, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
+    private static double[] calculatePositionSetpoints(double L_start, double R_start, double driveSpeed, double theta, double elapsedTime, double[] travelTimes, double maxVelocity, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
 
         // this method returns {L_sp, R_sp}
 
-        double maxVelocity = DrivePIDCoefficients.MAX_VELOCITY;
         double spread = DrivePIDCoefficients.VELOCITY_SPREAD_PROPORTION; // this is s
         double firstHalfTime = travelTimes[0]; // time needed to travel the first half of the distance
         double secondHalfTime = travelTimes[1]; // time needed to travel the second half of the distance
@@ -401,11 +396,10 @@ public class DriveSubsystem extends SubsystemBase {
     /**
      * Calculates the target velocities for the leftBack and rightBack wheels in a movement at a certain time.
      */
-    private static double[] calculateVelocitySetpoints(double driveSpeed, double theta, double elapsedTime, double[] travelTimes, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
+    private static double[] calculateVelocitySetpoints(double driveSpeed, double theta, double elapsedTime, double[] travelTimes, double maxVelocity, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
 
         // this method returns {L_v, R_v}
 
-        double maxVelocity = DrivePIDCoefficients.MAX_VELOCITY;
         double spread = DrivePIDCoefficients.VELOCITY_SPREAD_PROPORTION; // this is s
         double firstHalfTime = travelTimes[0]; // time needed to travel the first half of the distance
         double secondHalfTime = travelTimes[1]; // time needed to travel the second half of the distance
@@ -461,11 +455,10 @@ public class DriveSubsystem extends SubsystemBase {
     /**
      * Calculates how long a drive movement will take.
      */
-    private static double[] calculateTravelTimes(double distance, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
+    private static double[] calculateTravelTimes(double distance, double maxVelocity, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
 
         // returns {firstHalfTime, secondHalfTime}
-
-        double maxVelocity = DrivePIDCoefficients.MAX_VELOCITY; // this is V
+        // maxVelocity is V
         double spread = DrivePIDCoefficients.VELOCITY_SPREAD_PROPORTION; // this is s
         double totalDist = distance; // this is D
         double halfDist = totalDist / 2;
@@ -619,7 +612,6 @@ public class DriveSubsystem extends SubsystemBase {
 
             driveRobotCentric(0, 0, turnSpeed * K);
 
-
             isBusy = true;
         }
 
@@ -649,6 +641,8 @@ public class DriveSubsystem extends SubsystemBase {
                 Movement movement = movements.removeFirst();
                 currentMovement = "["+movement.toString()+"]";
                 telemetry.addData("CURRENT MOVEMENT:", currentMovement);
+                telemetry.addData("IGNORE START:", movement.ignoreStartVelocity);
+                telemetry.addData("IGNORE END:", movement.ignoreEndVelocity);
                 telemetry.update();
                 linked = movement.linkedToNext;
                 MovementThread thread = new MovementThread(movement);
@@ -810,31 +804,53 @@ public class DriveSubsystem extends SubsystemBase {
 
         double maxVelocity = DrivePIDCoefficients.MAX_VELOCITY;
 
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
         lastLatency = latency.milliseconds() / 1000;
         double LF_c_v = Double.MAX_VALUE; // get corrected LF_v
-        while (opMode.opModeIsActive() && Math.abs(LF_c_v) > maxVelocity) {
+        while (opMode.opModeIsActive() && Math.abs(LF_c_v) > 3 * maxVelocity) {
             LF_c_v = getLFVelocity();
+            if (timer.seconds() > 1) {
+                LF_c_v = 0;
+                leftFrontPower = 0;
+                break;
+            }
         }
         telemetry.addData("LF latency", latency.milliseconds() / 1000 - lastLatency);
 
         lastLatency = latency.milliseconds() / 1000;
         double RF_c_v = Double.MAX_VALUE; // get corrected RF_v
-        while (opMode.opModeIsActive() && Math.abs(RF_c_v) > maxVelocity) {
+        while (opMode.opModeIsActive() && Math.abs(RF_c_v) > 3 * maxVelocity) {
             RF_c_v = -getRFVelocity();
+            if (timer.seconds() > 1) {
+                RF_c_v = 0;
+                rightFrontPower = 0;
+                break;
+            }
         }
         telemetry.addData("RF latency", latency.milliseconds() / 1000 - lastLatency);
 
         lastLatency = latency.milliseconds() / 1000;
         double LB_c_v = Double.MAX_VALUE; // get corrected LB_v
-        while (opMode.opModeIsActive() && Math.abs(LB_c_v) > maxVelocity) {
+        while (opMode.opModeIsActive() && Math.abs(LB_c_v) > 3 * maxVelocity) {
             LB_c_v = getLBVelocity();
+            if (timer.seconds() > 1) {
+                LB_c_v = 0;
+                leftBackPower = 0;
+                break;
+            }
         }
         telemetry.addData("LB latency", latency.milliseconds() / 1000 - lastLatency);
 
         lastLatency = latency.milliseconds() / 1000;
         double RB_c_v = Double.MAX_VALUE; // get corrected RB_v
-        while (opMode.opModeIsActive() && Math.abs(RB_c_v) > maxVelocity) {
+        while (opMode.opModeIsActive() && Math.abs(RB_c_v) > 3 * maxVelocity) {
             RB_c_v = -getRBVelocity();
+            if (timer.seconds() > 1) {
+                RB_c_v = 0;
+                rightBackPower = 0;
+                break;
+            }
         }
         telemetry.addData("RB latency", latency.milliseconds() / 1000 - lastLatency);
 
