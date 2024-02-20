@@ -42,6 +42,28 @@ public class MovementThread implements Runnable {
     public void run() {
         Movement.MovementType type = movement.MOVEMENT_TYPE;
 
+        // CV CASES
+        if (type.isCVType) {
+            if (type == Movement.MovementType.APRIL_TAG_ALIGN_PAR_ROT) {
+                CVSubsystem.Position pos = null;
+                while (pos == null) {
+                    pos = cv.getPosToAprilTag((int) movement.DEGREES_TURN);
+                }
+                // right turn is positive
+                movement.DEGREES_TURN = movement.DEGREES_TURN - pos.turn;
+                type.isDriveType = true;
+            }
+            if (type == Movement.MovementType.APRIL_TAG_ALIGN_POS) {
+                CVSubsystem.Position pos = null;
+                while (pos == null) {
+                    pos = cv.getPosToAprilTag((int)movement.DEGREES_TURN);
+                }
+                movement.INCHES_FORWARD = pos.y - movement.INCHES_FORWARD;
+                movement.INCHES_STRAFE = pos.x + movement.INCHES_STRAFE;
+                type.isDriveType = true;
+            }
+        }
+
         // DRIVE CASES
         if (type.isDriveType) {
             double  a = movement.INCHES_FORWARD * type.SGN_forward,
@@ -97,14 +119,6 @@ public class MovementThread implements Runnable {
         // WRIST CASES
         if (type == Movement.MovementType.SET_WRIST) {
             inDep.setWristPosition(movement.SERVO_POSITION);
-        }
-
-        // CV CASES
-        if (type.isCVType) {
-            if (type == Movement.MovementType.WHITE_PXL_ALIGN)
-                cv.moveToWhitePixel();
-            if (type == Movement.MovementType.APRIL_TAG_ALIGN)
-                cv.moveToWhitePixel();
         }
     }
 

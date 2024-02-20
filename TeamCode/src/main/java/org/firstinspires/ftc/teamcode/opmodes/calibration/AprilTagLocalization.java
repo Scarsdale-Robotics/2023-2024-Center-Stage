@@ -14,23 +14,37 @@ import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 @Autonomous(name="April Tag Localization")
 @Config
 public class AprilTagLocalization extends LinearOpMode {
-    public static double speedFactor = 2;
-    public static double slowFactor = 1;
-    public static double angleFactor = 0.005;
-    public static double xyOffsetThreshold = 0.1;
-    public static double angleOffsetThreshold = 5;
+    public static int ID = 9;
+    public static double aOffsetTarget = -25;
+    public static double aSlowFactor = 0.001;
+    public static double aSpeedCoef = 0.1;
+    public static double aSpeedLimit = 0.1;
+    public static double aThreshold = 0.001;
+    public static boolean useFrontCamera = true;
+    public static double xOffsetTarget = 0;
+    public static double xSlowFactor = 0.001;
+    public static double xSpeedCoef = -0.1;
+    public static double xSpeedLimit = 0.5;
+    public static double xThreshold = 0.02;
+    public static double yOffsetTarget = 11;
+    public static double ySlowFactor = 0.001;
+    public static double ySpeedCoef = -0.1;
+    public static double ySpeedLimit = 0.5;
+    public static double yThreshold = 0.02;
     private MultipleTelemetry telemetry = new MultipleTelemetry(new TelemetryImpl((OpMode) this), FtcDashboard.getInstance().getTelemetry());
     @Override
     public void runOpMode() throws InterruptedException {
         RobotSystem robot = new RobotSystem(hardwareMap, false, this, telemetry);
         CVSubsystem cv = robot.getCV();
         cv.disablePropProcessor();
-        cv.switchCamera(cv.cameraName1);
+        cv.switchCamera(useFrontCamera ? cv.cameraName2 : cv.cameraName1);
         waitForStart();
-        while (opModeIsActive() && !cv.goToPosition(0, 0, new double[]{1.5, 1.5, 0}, speedFactor, slowFactor, angleFactor, xyOffsetThreshold, angleOffsetThreshold)) {
-            telemetry.addData("locX", cv.getPosition(0, 0)[0]);
-            telemetry.addData("locY", cv.getPosition(0, 0)[1]);
-            telemetry.addData("locRot", cv.getPosition(0, 0)[2]);
+        CVSubsystem.LocalizationState prev = new CVSubsystem.LocalizationState(false, 0, 0, 0);
+        while (opModeIsActive() && !prev.unchanged) {
+            prev = cv.faceTag(ID, xOffsetTarget, yOffsetTarget, aOffsetTarget, prev, xThreshold, yThreshold, aThreshold, xSpeedCoef, ySpeedCoef, aSpeedCoef, xSlowFactor, ySlowFactor, aSlowFactor, xSpeedLimit, ySpeedLimit, aSpeedLimit);
+//            telemetry.addData("locX", cv.getPosition(0, 0)[0]);
+//            telemetry.addData("locY", cv.getPosition(0, 0)[1]);
+//            telemetry.addData("locRot", cv.getPosition(0, 0)[2]);
             telemetry.update();
         }
     }

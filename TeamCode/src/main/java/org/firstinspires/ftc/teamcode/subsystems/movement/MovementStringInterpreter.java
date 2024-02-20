@@ -180,10 +180,16 @@ public class MovementStringInterpreter {
 
 			switch (name) {
 
-				case "alignWithWhitePixel":
-					if (!isIn(params.length, 0))
+				case "alignWithAprilTagParRot":
+					if (!isIn(params.length, 2))
 						throwInterpretError();
-					movement = alignWithWhitePixel();
+					movement = alignWithAprilTagParRot((int)eval(params[0]), eval(params[1]));
+					break;
+
+				case "alignWithAprilTagPos":
+					if (!isIn(params.length, 3))
+						throwInterpretError();
+					movement = alignWithAprilTagPos((int)eval(params[0]), eval(params[1]), eval(params[2]));
 					break;
 
 				case "forward":
@@ -351,9 +357,11 @@ public class MovementStringInterpreter {
 	/////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////
 
-	private static Movement alignWithWhitePixel() {
-		return (new Movement(Movement.MovementType.WHITE_PXL_ALIGN, 0, 0, 0, 0, 0, 0));
-
+	private static Movement alignWithAprilTagParRot(int tagid, double turnOffset) {
+		return (new Movement(Movement.MovementType.APRIL_TAG_ALIGN_PAR_ROT, 0, 0, turnOffset, tagid, 0, 0));
+	}
+	public static Movement alignWithAprilTagPos(int tagid, double yOffset, double xOffset) {
+		return (new Movement(Movement.MovementType.APRIL_TAG_ALIGN_POS, -yOffset, xOffset, 0, tagid, 0, 0));
 	}
 
 	/**

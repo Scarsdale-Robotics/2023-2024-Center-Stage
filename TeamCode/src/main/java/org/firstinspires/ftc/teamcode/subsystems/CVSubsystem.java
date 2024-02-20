@@ -169,7 +169,7 @@ public class CVSubsystem extends SubsystemBase {
         while (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING);
         ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
         exposureControl.setMode(ExposureControl.Mode.Manual);
-        exposureControl.setExposure(1, TimeUnit.MILLISECONDS);
+        exposureControl.setExposure(15, TimeUnit.MILLISECONDS);
         switchCamera(cameraName2);
     }
 
@@ -428,19 +428,21 @@ public class CVSubsystem extends SubsystemBase {
         ArrayList<Double> yEst   = new ArrayList<>();
         ArrayList<Double> rotEst = new ArrayList<>();
         for (AprilTagDetection detection : currentDetections) {
-            double rotOff = detection.ftcPose.yaw;
-            // 24 inches per tile
-            double radians = Math.toRadians(detection.ftcPose.bearing - detection.ftcPose.yaw);
-            double xOff   = (Math.cos(radians) * detection.ftcPose.range) / 24 - cameraCenterOffsetX;
-            double yOff   = (Math.sin(radians) * detection.ftcPose.range) / 24 - cameraCenterOffsetY;
-            if (detection.id < 7) {
-                xEst.add(APRIL_TAG_LOCATIONS[detection.id-1][0] + yOff);
-                yEst.add(APRIL_TAG_LOCATIONS[detection.id-1][1] + xOff);
-                rotEst.add((rotOff + 360) % 360);
-            } else {
-                xEst.add(APRIL_TAG_LOCATIONS[detection.id-1][0] - yOff);
-                yEst.add(APRIL_TAG_LOCATIONS[detection.id-1][1] - xOff);
-                rotEst.add((rotOff + 540) % 360);
+            if (detection.ftcPose != null) {
+                double rotOff = detection.ftcPose.yaw;
+                // 24 inches per tile
+                double radians = Math.toRadians(detection.ftcPose.bearing - detection.ftcPose.yaw);
+                double xOff   = (Math.cos(radians) * detection.ftcPose.range) / 24 - cameraCenterOffsetX;
+                double yOff   = (Math.sin(radians) * detection.ftcPose.range) / 24 - cameraCenterOffsetY;
+                if (detection.id < 7) {
+                    xEst.add(APRIL_TAG_LOCATIONS[detection.id-1][0] + yOff);
+                    yEst.add(APRIL_TAG_LOCATIONS[detection.id-1][1] + xOff);
+                    rotEst.add((rotOff + 360) % 360);
+                } else {
+                    xEst.add(APRIL_TAG_LOCATIONS[detection.id-1][0] - yOff);
+                    yEst.add(APRIL_TAG_LOCATIONS[detection.id-1][1] - xOff);
+                    rotEst.add((rotOff + 540) % 360);
+                }
             }
         }
         Collections.sort(xEst);
@@ -462,6 +464,78 @@ public class CVSubsystem extends SubsystemBase {
         return d;
     }
 
+    public static class LocalizationState {
+        public boolean unchanged;
+        public double xPower;
+        public double yPower;
+        public double aPower;
+        public LocalizationState(boolean unchanged, double xPower, double yPower, double aPower) {
+            this.unchanged = unchanged;
+            this.xPower = xPower;
+            this.yPower = yPower;
+            this.aPower = aPower;
+        }
+    }
+
+    public static class Position {
+        public double x;
+        public double y;
+        public double turn;
+        public Position(double x, double y, double turn) {
+            this.x = x;
+            this.y = y;
+            this.turn = turn;
+        }
+    }
+
+    public Position getPosToAprilTag(int tagid) {
+        for (AprilTagDetection detection : aprilTag.getDetections()) {
+            if (detection.id == tagid) {
+                return new Position(detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.yaw);
+            }
+        }
+        return null;
+    }
+
+    @Deprecated
+    public LocalizationState faceTag(int id, double xOffsetTarget, double yOffsetTarget, double aOffsetTarget, LocalizationState lastState, double _X_THRESHOLD, double _Y_THRESHOLD, double _A_THRESHOLD, double _X_SPEED_COEF, double _Y_SPEED_COEF, double _A_SPEED_COEF, double _X_SLOW_FACTOR, double _Y_SLOW_FACTOR, double _A_SLOW_FACTOR, double _X_SPEED_LIMIT, double _Y_SPEED_LIMIT, double _A_SPEED_LIMIT) {
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        boolean unchanged = false;
+        boolean detected = false;
+        double xPower = 0, yPower = 0, aPower = 0;
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.id == id) {
+                unchanged = true;
+                detected = true;
+                // negative x offset is more left target
+                double xDiff = (detection.ftcPose.range*Math.sin(Math.toRadians(detection.ftcPose.yaw))) + xOffsetTarget;  // robot left of target is positive, right is negative
+                // positive y offset is more "in" target
+                double yDiff = (detection.ftcPose.range*Math.cos(Math.toRadians(detection.ftcPose.yaw))) - yOffsetTarget;  // positive means too far, negative means too close
+                // positive angle offset is more counterclockwise target
+                double aDiff = detection.ftcPose.yaw + aOffsetTarget;  // left turn of robot is more negative, right turn is more positive
+                if (Math.abs(xDiff) > _X_THRESHOLD) {
+                    xPower = Math.signum(xDiff)*Math.min(Math.pow(Math.abs(xDiff), _X_SLOW_FACTOR) * _X_SPEED_COEF, _X_SPEED_LIMIT);
+                    unchanged = false;
+                }
+                if (Math.abs(yDiff) > _Y_THRESHOLD) {
+                    yPower = -Math.signum(yDiff)*Math.min(Math.pow(Math.abs(yDiff), _Y_SLOW_FACTOR) * _Y_SPEED_COEF, _Y_SPEED_LIMIT);
+                    unchanged = false;
+                }
+                if (Math.abs(aDiff) > _A_THRESHOLD) {
+                    aPower = -Math.signum(aDiff)*Math.min(Math.pow(Math.abs(aDiff), _A_SLOW_FACTOR) * _A_SPEED_COEF, _A_SPEED_LIMIT);
+                    unchanged = false;
+                }
+            }
+        }
+        if (!detected || unchanged) {
+            drive.driveRobotCentric(-xPower, -yPower, -aPower);
+        } else {
+            drive.driveRobotCentric(xPower, yPower, aPower);
+        }
+        return new LocalizationState(unchanged, xPower, yPower, aPower);
+    }
+
+    @Deprecated
     public boolean goToPosition(double cameraCenterOffsetX, double cameraCenterOffsetY, double[] targetPos, double speedFactor, double slowFactor, double angleFactor, double xyOffsetThreshold, double angleOffsetThreshold){
         double[] pos = getPosition(cameraCenterOffsetX, cameraCenterOffsetY);
         double xOffset = pos[0]-targetPos[0];
@@ -488,7 +562,7 @@ public class CVSubsystem extends SubsystemBase {
         telemetry.addData("xdiff", xOffset);
         telemetry.addData("ydiff", yOffset);
         telemetry.addData("adiff", angleOffset);
-        drive.driveRobotCentric(-xd, -yd, -ad);
+        drive.driveRobotCentric(xd, -yd, ad);
         return good;
     }
 

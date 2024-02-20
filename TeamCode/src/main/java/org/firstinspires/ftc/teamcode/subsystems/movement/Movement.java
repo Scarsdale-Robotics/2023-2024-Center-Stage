@@ -22,8 +22,8 @@ public class Movement {
         SET_WRIST(0.0,0.0,0.0,0.0, false, false, false, false, false),
         LOWER_ARM(0.0,0.0,0.0,-1.0, false, false, false, true, false),
         RAISE_ARM(0.0,0.0,0.0,1.0, false, false, false, true, false),
-        WHITE_PXL_ALIGN(1.0, 1.0, 1.0, 0.0, false, false, false, false, true),
-        APRIL_TAG_ALIGN(1.0, 1.0, 1.0, 0.0, false, false, false, false, true);
+        APRIL_TAG_ALIGN_PAR_ROT(1.0, 1.0, 1.0, 0.0, false, false, false, false, true),
+        APRIL_TAG_ALIGN_POS(1.0, 1.0, 1.0, 0.0, false, false, false, false, true);
 
         public double SGN_forward;
         public double SGN_strafe;
@@ -117,10 +117,10 @@ public class Movement {
                 return "LOWER_ARM";
             case RAISE_ARM:
                 return "RAISE_ARM";
-            case WHITE_PXL_ALIGN:
-                return "WHITE_PXL_ALIGN";
-            case APRIL_TAG_ALIGN:
-                return "APRIL_TAG_ALIGN";
+            case APRIL_TAG_ALIGN_PAR_ROT:
+                return "APRIL_TAG_ALIGN_PAR_ROT";
+            case APRIL_TAG_ALIGN_POS:
+                return "APRIL_TAG_ALIGN_POS";
             default:
                 return "null";
         }

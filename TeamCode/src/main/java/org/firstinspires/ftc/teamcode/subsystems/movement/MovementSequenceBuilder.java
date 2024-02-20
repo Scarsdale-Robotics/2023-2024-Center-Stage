@@ -88,8 +88,8 @@ public class MovementSequenceBuilder {
         return this.append(MovementStringInterpreter.toMovementSequenceBuilder(s));
     }
 
-    public MovementSequenceBuilder alignWithWhitePixel() {
-        movements.add(new Movement(Movement.MovementType.WHITE_PXL_ALIGN, 0, 0, 0, 0, 0, 0));
+    public MovementSequenceBuilder alignWithAprilTag() {
+        movements.add(new Movement(Movement.MovementType.APRIL_TAG_ALIGN_PAR_ROT, 0, 0, 0, 0, 0, 0));
         return this;
     }
 
@@ -408,6 +408,30 @@ public class MovementSequenceBuilder {
         if (ignoreEndVelocity)
             setLastIgnoredEndVelocity();
 
+        return this;
+    }
+
+    /**
+     * Automatically modify rotation to parallel to the AprilTag.
+     *
+     * @param tagid an int representing the id of the tag to align with.
+     * @param turnOffset a double representing the target turnOffset, where positive values are the camera facing more right of the AprilTag.
+     */
+    public MovementSequenceBuilder alignWithAprilTagParRot(int tagid, double turnOffset) {
+        movements.add(new Movement(Movement.MovementType.APRIL_TAG_ALIGN_PAR_ROT, 0, 0, turnOffset, tagid, 0, 0));
+        return this;
+    }
+
+    /**
+     * Align to a position according to AprilTag readings.
+     *
+     * @param tagid an int representing the id of the tag to align with.
+     * @param yOffset a double >= 0 representing the targeted yOffset compared to the AprilTag, which positive values are "inwards".
+     * @param xOffset a double representing the targeted xOffset compared to the AprilTag, where positive values have robot more right of the AprilTag.
+     */
+    public MovementSequenceBuilder alignWithAprilTagPos(int tagid, double yOffset, double xOffset) {
+        // kinda scuffed passing info through wrong params
+        movements.add(new Movement(Movement.MovementType.APRIL_TAG_ALIGN_POS, -yOffset, xOffset, 0, tagid, 0, 0));
         return this;
     }
 

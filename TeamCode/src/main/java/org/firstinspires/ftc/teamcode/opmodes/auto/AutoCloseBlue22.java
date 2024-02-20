@@ -80,9 +80,11 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .restElbow()
                     .forwardLeft(7, 31)
                     .lowerArm(150, true)
-                    .forward(89, false, true)
+                    .forward(87, false, true)
                     .lowerArm(40, true)
-                    .forward(10)
+                    .alignWithAprilTagParRot(9, -27)
+                    .alignWithAprilTagPos(9, 12, 12)
+                    .forward(12)
                     .lowerArm(20, true)
                     .closeBothClaws()  // white intake
                     .sleepFor(1000)
