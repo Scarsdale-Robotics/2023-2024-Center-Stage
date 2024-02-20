@@ -36,13 +36,19 @@ public class DriveSubsystem extends SubsystemBase {
     private static double rightBackPower = 0;
     private static double leftFrontPower = 0;
     private static double rightFrontPower = 0;
-    private static PIDController leftFrontController  = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
-    private static PIDController rightFrontController = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
-    private static PIDController rightBackController  = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
-    private static PIDController leftBackController   = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
+    public static PIDController leftFrontController  = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
+    public static PIDController rightFrontController = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
+    public static PIDController rightBackController  = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
+    public static PIDController leftBackController   = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
     private Telemetry telemetry;
     public static volatile double heading=0D;
     private final ElapsedTime runtime;
+    private final ElapsedTime latency;
+    private final ElapsedTime LFdeltaTime;
+    private final ElapsedTime RFdeltaTime;
+    private final ElapsedTime RBdeltaTime;
+    private final ElapsedTime LBdeltaTime;
+    private double lastLatency;
 
     // for debugging
     public static String currentMovement="";
@@ -84,6 +90,19 @@ public class DriveSubsystem extends SubsystemBase {
 
         runtime = new ElapsedTime();
         runtime.reset();
+
+        latency = new ElapsedTime();
+        latency.reset();
+        lastLatency = latency.milliseconds() / 1000;
+
+        LFdeltaTime = new ElapsedTime();
+        LFdeltaTime.reset();
+        RFdeltaTime = new ElapsedTime();
+        RFdeltaTime.reset();
+        RBdeltaTime = new ElapsedTime();
+        RBdeltaTime.reset();
+        LBdeltaTime = new ElapsedTime();
+        LBdeltaTime.reset();
         
     }
 
@@ -238,14 +257,14 @@ public class DriveSubsystem extends SubsystemBase {
             telemetry.addData("LF_C", LF_C);
             telemetry.addData("RF_C", RF_C);
 
-            if (!LB_PID.atSetPoint(LB_p))
-                LB_v += LB_C;
-            if (!RB_PID.atSetPoint(RB_p))
-                RB_v += RB_C;
-            if (!LF_PID.atSetPoint(LF_p))
-                LF_v += LF_C;
-            if (!RF_PID.atSetPoint(RF_p))
-                RF_v += RF_C;
+            double AVG_C = (LB_C + RB_C + LF_C + RF_C) / 4.0;
+
+            if (!(LB_PID.getAbsoluteDiff(LB_p) + RB_PID.getAbsoluteDiff(RB_p) + LF_PID.getAbsoluteDiff(LF_p) + RF_PID.getAbsoluteDiff(RF_p) < 4 * DrivePIDCoefficients.getErrorTolerance_p())) {
+                LB_v += AVG_C;
+                RB_v += AVG_C;
+                LF_v += AVG_C;
+                RF_v += AVG_C;
+            }
 
             // these are fine
             telemetry.addData("LB_v", LB_v);
@@ -253,12 +272,13 @@ public class DriveSubsystem extends SubsystemBase {
             telemetry.addData("LF_v", LF_v);
             telemetry.addData("RF_v", RF_v);
 
+            double turnVelocityGain = DrivePIDCoefficients.TURN_VELOCITY_GAIN;
             double thetaDiff = normalizeAngle(getYaw() - this.heading);
             if (Math.abs(thetaDiff) < 5) {
-                LB_v += velocityGain * thetaDiff;
-                RB_v -= velocityGain * thetaDiff;
-                LF_v += velocityGain * thetaDiff;
-                RF_v -= velocityGain * thetaDiff;
+                LB_v += turnVelocityGain * thetaDiff;
+                RB_v -= turnVelocityGain * thetaDiff;
+                LF_v += turnVelocityGain * thetaDiff;
+                RF_v -= turnVelocityGain * thetaDiff;
             }
             telemetry.addData("thetaDiff", thetaDiff);
 
@@ -577,7 +597,7 @@ public class DriveSubsystem extends SubsystemBase {
         while (
                 opMode.opModeIsActive() && !(
                         Math.abs(degrees - (cumulativeAngle + normalizeAngle(previousAngle-getYaw()))) < DrivePIDCoefficients.getErrorTolerance_degrees() &&
-                                Math.abs(getRBVelocity()) < DrivePIDCoefficients.getErrorTolerance_v())
+                                Math.abs(getLBVelocity()) + Math.abs(getRBVelocity()) + Math.abs(getLFVelocity()) + Math.abs(getRFVelocity()) < 4 * DrivePIDCoefficients.getErrorTolerance_v())
         ) {
             PID.setPID(DrivePIDCoefficients.getTurnP(), DrivePIDCoefficients.getTurnI(), DrivePIDCoefficients.getTurnD());
 
@@ -790,21 +810,33 @@ public class DriveSubsystem extends SubsystemBase {
 
         double maxVelocity = DrivePIDCoefficients.MAX_VELOCITY;
 
+        lastLatency = latency.milliseconds() / 1000;
         double LF_c_v = Double.MAX_VALUE; // get corrected LF_v
-        while (opMode.opModeIsActive() && Math.abs(LF_c_v) > maxVelocity)
+        while (opMode.opModeIsActive() && Math.abs(LF_c_v) > maxVelocity) {
             LF_c_v = getLFVelocity();
+        }
+        telemetry.addData("LF latency", latency.milliseconds() / 1000 - lastLatency);
 
+        lastLatency = latency.milliseconds() / 1000;
         double RF_c_v = Double.MAX_VALUE; // get corrected RF_v
-        while (opMode.opModeIsActive() && Math.abs(RF_c_v) > maxVelocity)
+        while (opMode.opModeIsActive() && Math.abs(RF_c_v) > maxVelocity) {
             RF_c_v = -getRFVelocity();
+        }
+        telemetry.addData("RF latency", latency.milliseconds() / 1000 - lastLatency);
 
+        lastLatency = latency.milliseconds() / 1000;
         double LB_c_v = Double.MAX_VALUE; // get corrected LB_v
-        while (opMode.opModeIsActive() && Math.abs(LB_c_v) > maxVelocity)
+        while (opMode.opModeIsActive() && Math.abs(LB_c_v) > maxVelocity) {
             LB_c_v = getLBVelocity();
+        }
+        telemetry.addData("LB latency", latency.milliseconds() / 1000 - lastLatency);
 
+        lastLatency = latency.milliseconds() / 1000;
         double RB_c_v = Double.MAX_VALUE; // get corrected RB_v
-        while (opMode.opModeIsActive() && Math.abs(RB_c_v) > maxVelocity)
+        while (opMode.opModeIsActive() && Math.abs(RB_c_v) > maxVelocity) {
             RB_c_v = -getRBVelocity();
+        }
+        telemetry.addData("RB latency", latency.milliseconds() / 1000 - lastLatency);
 
         double powerGain = DrivePIDCoefficients.POWER_GAIN;
         double LF_D = leftFrontController.update(LF_c_v) * powerGain;
