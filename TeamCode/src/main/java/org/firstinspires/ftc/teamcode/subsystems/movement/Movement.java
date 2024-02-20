@@ -49,8 +49,9 @@ public class Movement {
     public boolean linkedToNext;
     public boolean ignoreStartVelocity;
     public boolean ignoreEndVelocity;
+    public AprilTagValues aprilTagValues;
 
-    Movement(MovementType type, double forward, double strafe, double turn, double elevation, double servoPosition, long wait) {
+    Movement(MovementType type, double forward, double strafe, double turn, double elevation, double servoPosition, long wait, AprilTagValues aprilTagValues) {
         this.MOVEMENT_TYPE = type;
         this.INCHES_FORWARD = forward;
         this.INCHES_STRAFE = strafe;
@@ -58,6 +59,7 @@ public class Movement {
         this.DEGREES_ELEVATION = elevation;
         this.SERVO_POSITION = servoPosition;
         this.WAIT = wait;
+        this.aprilTagValues = this.aprilTagValues;
         linkedToNext = false;
         ignoreStartVelocity = false;
         ignoreEndVelocity = false;
