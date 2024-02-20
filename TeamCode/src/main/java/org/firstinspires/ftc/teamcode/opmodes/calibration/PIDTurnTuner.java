@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryImpl;
@@ -21,7 +22,7 @@ import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 // TODO: Camera stream monitor
 
 @Config
-@Autonomous(name = "Drivetrain Turn PID Tuner")
+@TeleOp(name = "Drivetrain Turn PID Tuner")
 public class PIDTurnTuner extends LinearOpMode {
     public static double turnDegrees = 180;
     final private ElapsedTime runtime = new ElapsedTime();

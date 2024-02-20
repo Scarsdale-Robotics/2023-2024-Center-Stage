@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryImpl;
@@ -26,7 +27,7 @@ import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 // TODO: Camera stream monitor
 
 @Config
-@Autonomous(name = "Drivetrain Strafe PID Tuner")
+@TeleOp(name = "Drivetrain Strafe PID Tuner")
 public class PIDStrafeTuner extends LinearOpMode {
 
     final private ElapsedTime runtime = new ElapsedTime();
@@ -48,23 +49,23 @@ public class PIDStrafeTuner extends LinearOpMode {
 
         waitForStart();
 
-        MovementSequence forward = new MovementSequenceBuilder()
-                .right(82.25)
+        MovementSequence right = new MovementSequenceBuilder()
+                .right(60)
                 .build();
-        MovementSequence backward = new MovementSequenceBuilder()
-                .backwardRight(fwd,str)
+        MovementSequence left = new MovementSequenceBuilder()
+                .left(60)
                 .build();
 
         // begin tuning sequence
         while (opModeIsActive()) {
             // right 1000√2 ticks
 //            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), -2000, 2000, 0);
-            drive.followMovementSequence(backward);
+            drive.followMovementSequence(right);
             while (opModeIsActive() && !gamepad1.triangle);
 
             // left 1000√2 ticks
 //            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), 2000, -2000, Math.PI);
-            drive.followMovementSequence(backward);
+            drive.followMovementSequence(left);
             while (opModeIsActive() && !gamepad1.triangle);
         }
 

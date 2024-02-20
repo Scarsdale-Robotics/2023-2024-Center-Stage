@@ -36,10 +36,10 @@ public class DriveSubsystem extends SubsystemBase {
     private static double rightBackPower = 0;
     private static double leftFrontPower = 0;
     private static double rightFrontPower = 0;
-    private static PIDController leftFrontController = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
+    private static PIDController leftFrontController  = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
     private static PIDController rightFrontController = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
-    private static PIDController leftBackController = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
-    private static PIDController rightBackController = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
+    private static PIDController rightBackController  = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
+    private static PIDController leftBackController   = new PIDController(DrivePIDCoefficients.getVelocityP(), DrivePIDCoefficients.getVelocityI(), DrivePIDCoefficients.getVelocityD());
     private Telemetry telemetry;
     public static volatile double heading=0D;
     private final ElapsedTime runtime;
@@ -214,14 +214,14 @@ public class DriveSubsystem extends SubsystemBase {
 
             double LB_p = getLBPosition();
             double RB_p = -getRBPosition();
-            double LF_p = -getLFPosition();
-            double RF_p = getRFPosition();
+            double LF_p = getLFPosition();
+            double RF_p = -getRFPosition();
 
             double velocityGain = DrivePIDCoefficients.VELOCITY_GAIN;
             double LB_C = LB_PID.update(LB_p) * velocityGain;
             double RB_C = RB_PID.update(RB_p) * velocityGain;
-            double LF_C = LF_PID.update(-LF_p) * velocityGain;
-            double RF_C = RF_PID.update(-RF_p) * velocityGain;
+            double LF_C = LF_PID.update(LF_p) * velocityGain;
+            double RF_C = RF_PID.update(RF_p) * velocityGain;
 
             telemetry.addData("LB_sp", LB_sp);
             telemetry.addData("LB_p", LB_p);
@@ -232,17 +232,45 @@ public class DriveSubsystem extends SubsystemBase {
             telemetry.addData("RF_sp", RF_sp);
             telemetry.addData("RF_p", RF_p);
 
+            // these are fine
+            telemetry.addData("LB_C", LB_C);
+            telemetry.addData("RB_C", RB_C);
+            telemetry.addData("LF_C", LF_C);
+            telemetry.addData("RF_C", RF_C);
+
             if (!LB_PID.atSetPoint(LB_p))
                 LB_v += LB_C;
             if (!RB_PID.atSetPoint(RB_p))
                 RB_v += RB_C;
-            if (!LF_PID.atSetPoint(-LF_p))
+            if (!LF_PID.atSetPoint(LF_p))
                 LF_v += LF_C;
-            if (!RF_PID.atSetPoint(-RF_p))
+            if (!RF_PID.atSetPoint(RF_p))
                 RF_v += RF_C;
 
+            // these are fine
+            telemetry.addData("LB_v", LB_v);
+            telemetry.addData("RB_v", RB_v);
+            telemetry.addData("LF_v", LF_v);
+            telemetry.addData("RF_v", RF_v);
+
+            double thetaDiff = normalizeAngle(getYaw() - this.heading);
+            if (Math.abs(thetaDiff) < 5) {
+                LB_v += velocityGain * thetaDiff;
+                RB_v -= velocityGain * thetaDiff;
+                LF_v += velocityGain * thetaDiff;
+                RF_v -= velocityGain * thetaDiff;
+            }
+            telemetry.addData("thetaDiff", thetaDiff);
+
+            double maxVelocity = DrivePIDCoefficients.MAX_VELOCITY;
             // update motor velocities
             updateMotorVelocities(LF_v, RF_v, LB_v, RB_v);
+//            driveWithMotorPowers(
+//                    clipWheelVelocity(LF_v) / maxVelocity,
+//                    clipWheelVelocity(RF_v) / maxVelocity,
+//                    clipWheelVelocity(LB_v) / maxVelocity,
+//                    clipWheelVelocity(RB_v) / maxVelocity
+//                    );
 
             telemetry.update();
 
@@ -676,9 +704,7 @@ public class DriveSubsystem extends SubsystemBase {
     /**
      * @return the current power of the robot's back right wheel.
      */
-    public double getRBVelocity() {
-        return rightBack.getCorrectedVelocity();
-    }
+    public double getRBVelocity() { return rightBack.getCorrectedVelocity(); }
 
     /**
      * @return the current power of the robot's front left wheel.
@@ -768,13 +794,19 @@ public class DriveSubsystem extends SubsystemBase {
         double LB_D = leftBackController.update(getLBVelocity()) * powerGain;
         double RB_D = rightBackController.update(-getRBVelocity()) * powerGain;
 
+        // these are not fine
+        telemetry.addData("LF_D", LF_D);
+        telemetry.addData("RF_D", RF_D);
+        telemetry.addData("LB_D", LB_D);
+        telemetry.addData("RB_D", RB_D);
+
         if (!leftFrontController.atSetPoint(getLFVelocity()))
             leftFrontPower += LF_D;
-        if (!rightFrontController.atSetPoint(getRFVelocity()))
+        if (!rightFrontController.atSetPoint(-getRFVelocity()))
             rightFrontPower += RF_D;
         if (!leftBackController.atSetPoint(getLBVelocity()))
             leftBackPower += LB_D;
-        if (!rightBackController.atSetPoint(getRBVelocity()))
+        if (!rightBackController.atSetPoint(-getRBVelocity()))
             rightBackPower += RB_D;
 
         driveWithMotorPowers(
@@ -789,17 +821,23 @@ public class DriveSubsystem extends SubsystemBase {
                 leftBackController.atSetPoint(getLBVelocity()) &&
                 rightBackController.atSetPoint(getRBVelocity());
 
+        // power is not fine
+
         telemetry.addData("leftFront SP", leftFrontController.getSetPoint());
         telemetry.addData("leftFront Vel", getLFVelocity());
+        telemetry.addData("leftFrontPower", leftFrontPower);
         telemetry.addData("----","");
         telemetry.addData("rightFront SP", rightFrontController.getSetPoint());
         telemetry.addData("rightFront Vel", getRFVelocity());
+        telemetry.addData("rightFrontPower", rightFrontPower);
         telemetry.addData("-----","");
         telemetry.addData("leftBack SP", leftBackController.getSetPoint());
         telemetry.addData("leftBack Vel", getLBVelocity());
+        telemetry.addData("leftBackPower", leftBackPower);
         telemetry.addData("------","");
         telemetry.addData("rightBack SP", rightBackController.getSetPoint());
         telemetry.addData("rightBack Vel", getRBVelocity());
+        telemetry.addData("rightBackPower", rightBackPower);
         telemetry.addData("-------","");
         telemetry.addData("atSetPoint", atSetPoint);
 

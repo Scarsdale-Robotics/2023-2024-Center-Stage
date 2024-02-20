@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryImpl;
@@ -26,7 +27,7 @@ import org.opencv.core.Mat;
 // TODO: Camera stream monitor
 
 @Config
-@Autonomous(name = "Drivetrain Forward PID Tuner")
+@TeleOp(name = "Drivetrain Forward PID Tuner")
 public class PIDForwardTuner extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
     private HardwareRobot hardwareRobot;
