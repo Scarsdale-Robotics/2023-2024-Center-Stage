@@ -61,7 +61,7 @@ public class PIDController {
 
         // Calculate integral
         integralSum += error * timer.seconds(); // riemann sum rectangle
-        integralSum = integralSum < minIntegral ? minIntegral : Math.min(maxIntegral, integralSum);
+//        integralSum = integralSum < minIntegral ? minIntegral : Math.min(maxIntegral, integralSum);
 
         double output = (Kp * error) + (Ki * integralSum) + (Kd * derivative);
 //        output = Math.min(1.0, output);
@@ -94,6 +94,10 @@ public class PIDController {
 
     public boolean atSetPoint(double pv) {
         return Math.abs(pv-setPoint) < errorTolerance;
+    }
+
+    public double getAbsoluteDiff(double pv) {
+        return Math.abs(pv-setPoint);
     }
 
     public void setErrorTolerance(double errorTolerance) {
