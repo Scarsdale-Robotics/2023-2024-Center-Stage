@@ -44,7 +44,7 @@ public class MovementThread implements Runnable {
 
         // CV CASES
         if (type.isCVType) {
-            AprilTagValues aprilTagValues = movement.aprilTagValues;
+            AprilTagValues aprilTagValues = movement.APRIL_TAG_VALUES;
             
             if (type == Movement.MovementType.APRIL_TAG_ALIGN_PAR_ROT) {
                 CVSubsystem.Position pos = null;
