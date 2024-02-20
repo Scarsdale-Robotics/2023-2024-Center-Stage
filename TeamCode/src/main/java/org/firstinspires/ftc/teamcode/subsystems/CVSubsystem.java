@@ -169,7 +169,7 @@ public class CVSubsystem extends SubsystemBase {
         while (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING);
         ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
         exposureControl.setMode(ExposureControl.Mode.Manual);
-        exposureControl.setExposure(exposureControl.getMinExposure(TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS);
+        exposureControl.setExposure(1, TimeUnit.MILLISECONDS);
         switchCamera(cameraName2);
     }
 
@@ -428,7 +428,7 @@ public class CVSubsystem extends SubsystemBase {
         ArrayList<Double> yEst   = new ArrayList<>();
         ArrayList<Double> rotEst = new ArrayList<>();
         for (AprilTagDetection detection : currentDetections) {
-            double rotOff = (detection.ftcPose.x > 0 ? 1 : -1) * detection.ftcPose.yaw;
+            double rotOff = detection.ftcPose.yaw;
             // 24 inches per tile
             double radians = Math.toRadians(detection.ftcPose.bearing - detection.ftcPose.yaw);
             double xOff   = (Math.cos(radians) * detection.ftcPose.range) / 24 - cameraCenterOffsetX;
@@ -458,35 +458,35 @@ public class CVSubsystem extends SubsystemBase {
     {
         double d=angle2-angle1;
         if (d > 180) d-=360;
+        if (d < 180) d+=360;
         return d;
     }
 
-    public boolean goToPosition(double cameraCenterOffsetX, double cameraCenterOffsetY, double[] targetPos, boolean isRedTeam){
+    public boolean goToPosition(double cameraCenterOffsetX, double cameraCenterOffsetY, double[] targetPos, double speedFactor, double slowFactor, double angleFactor, double xyOffsetThreshold, double angleOffsetThreshold){
         double[] pos = getPosition(cameraCenterOffsetX, cameraCenterOffsetY);
         double xOffset = pos[0]-targetPos[0];
         double yOffset = pos[1]-targetPos[1];
         double angleOffset = angleDifference(pos[2],targetPos[2]);
-        double xyOffsetThreshold = 0.05;
-        double angleOffsetThreshold = 1.5;
         boolean good = true;
         double xd=0, yd=0, ad=0;
-        double speedFactor = 1;
         double speedLimit = 0.5;
-        if (xOffset > xyOffsetThreshold) {
-            xd = Math.min(Math.sqrt(xOffset), speedLimit) * SpeedCoefficients.getAutonomousDriveSpeed() * speedFactor;
+        if (Math.abs(xOffset) > xyOffsetThreshold) {
+            xd = Math.signum(xOffset)*Math.min(Math.pow(Math.abs(xOffset), slowFactor)*Math.sin(Math.toRadians(angleOffset))*speedFactor, speedLimit) * SpeedCoefficients.getAutonomousDriveSpeed();
             good = false;
         }
-        if (yOffset > xyOffsetThreshold) {
-            yd = Math.min(Math.sqrt(yOffset), speedLimit) * SpeedCoefficients.getAutonomousDriveSpeed() * speedFactor;
+        if (Math.abs(yOffset) > xyOffsetThreshold) {
+            yd = Math.signum(yOffset)*Math.min(Math.pow(Math.abs(yOffset), slowFactor)*Math.cos(Math.toRadians(angleOffset))*speedFactor, speedLimit) * SpeedCoefficients.getAutonomousDriveSpeed();
             good = false;
         }
-        if (angleOffset > angleOffsetThreshold) {
-            ad = Math.min(Math.sqrt(angleOffset/30), speedLimit) * SpeedCoefficients.getAutonomousTurnSpeed() * speedFactor;
+        if (Math.abs(angleOffset) > angleOffsetThreshold) {
+            ad = Math.signum(angleOffset)*Math.min(Math.pow(Math.abs(angleOffset*angleFactor), slowFactor) * speedFactor, speedLimit * angleFactor) * SpeedCoefficients.getAutonomousTurnSpeed();
             good = false;
         }
         telemetry.addData("xd", xd);
         telemetry.addData("yd", yd);
         telemetry.addData("ad", ad);
+        telemetry.addData("xdiff", xOffset);
+        telemetry.addData("ydiff", yOffset);
         telemetry.addData("adiff", angleOffset);
         drive.driveRobotCentric(-xd, -yd, -ad);
         return good;
