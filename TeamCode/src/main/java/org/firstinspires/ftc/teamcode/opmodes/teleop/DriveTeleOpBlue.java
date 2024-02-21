@@ -80,7 +80,8 @@ public class DriveTeleOpBlue extends LinearOpMode {
                         // calculate degree of arm
                         armPos = teleOp.robot.getInDep().getLeftArmPosition() * 360 / armTickPerRevolution + degreeOfRobotArmInGroundState;
                         // calculate target distance from backdrop (can check math in shared doc)
-                        targetDistance = (wantedDistanceFromEndOfArmToBackdrop * 2 - java.lang.Math.sqrt(3.0) * armLength * java.lang.Math.cos(java.lang.Math.toRadians(270 - armPos)) - robotHeight - java.lang.Math.sin(java.lang.Math.toRadians(270 - armPos))) / java.lang.Math.sqrt(3.0);
+                        // TODO: INVERT COS
+                        targetDistance = (wantedDistanceFromEndOfArmToBackdrop * 2 + java.lang.Math.sqrt(3.0) * armLength * java.lang.Math.cos(java.lang.Math.toRadians(270 - armPos)) - robotHeight - armLength * java.lang.Math.sin(java.lang.Math.toRadians(270 - armPos))) / java.lang.Math.sqrt(3.0);
                         // calculate relative error (direction preserved)
                         relativeError = (currentDistance - targetDistance) / targetDistance;
                         if (Math.abs(relativeError) > errorThreshold) {

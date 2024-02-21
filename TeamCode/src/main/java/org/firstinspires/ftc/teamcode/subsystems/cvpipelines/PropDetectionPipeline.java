@@ -10,6 +10,7 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
@@ -57,6 +58,7 @@ public class PropDetectionPipeline implements VisionProcessor {
 
 
     public double getTotalContourArea() {
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT, new Size(3, 3));
         Mat hsvmat = new Mat();
         Imgproc.cvtColor(sub, hsvmat, Imgproc.COLOR_RGB2HSV);
 
@@ -66,6 +68,8 @@ public class PropDetectionPipeline implements VisionProcessor {
             Mat mask2 = new Mat();
             Core.inRange(hsvmat, redLowerRange1, redUpperRange1, mask1);
             Core.inRange(hsvmat, redLowerRange2, redUpperRange2, mask2);
+            Imgproc.morphologyEx(mask1, mask1, Imgproc.MORPH_OPEN, kernel);
+            Imgproc.morphologyEx(mask2, mask2, Imgproc.MORPH_OPEN, kernel);
             List<MatOfPoint> cl2 = new ArrayList<>();
             Imgproc.findContours(mask1, contourList, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
             Imgproc.findContours(mask2, cl2, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
@@ -73,6 +77,7 @@ public class PropDetectionPipeline implements VisionProcessor {
         }else {
             Mat mask = new Mat();
             Core.inRange(hsvmat, blueLowerRange, blueUpperRange, mask);
+            Imgproc.morphologyEx(mask, mask, Imgproc.MORPH_OPEN, kernel);
             Imgproc.findContours(mask, contourList, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         }
         for (int i = 0; i < contourList.size(); i++)
