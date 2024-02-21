@@ -727,7 +727,9 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public double getYaw() {
-        return imu.getAngularOrientation().firstAngle * 180.0 / Math.PI;
+        // facing audience = -90, facing backdrop = 90, facing away ("out") = 0, facing in = 180
+        int offsetAngle = -90;
+        return (imu.getAngularOrientation().firstAngle * 180.0 / Math.PI + 180 + offsetAngle) % 360 - 180;
     }
 
     /**
