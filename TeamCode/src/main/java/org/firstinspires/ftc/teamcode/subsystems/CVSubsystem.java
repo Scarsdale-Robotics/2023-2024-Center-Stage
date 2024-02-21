@@ -167,13 +167,15 @@ public class CVSubsystem extends SubsystemBase {
         // visionPortal.setProcessorEnabled(aprilTag, true);
         visionPortal.setProcessorEnabled(propProcessor, true);
         while (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING);
-        incShutter();
         switchCamera(cameraName2);
+        autoExposure();
     }
-    public void incShutter() {
+
+    public void autoExposure() {
         ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
         exposureControl.setMode(ExposureControl.Mode.Manual);
-        exposureControl.setExposure(210, TimeUnit.MILLISECONDS);
+        // tune duration at comp, higher for brighter view (ie. in darker environments)
+        exposureControl.setExposure(50, TimeUnit.MILLISECONDS);
     }
 
     public void decShutter() {

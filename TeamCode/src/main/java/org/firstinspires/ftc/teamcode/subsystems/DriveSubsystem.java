@@ -66,11 +66,40 @@ public class DriveSubsystem extends SubsystemBase {
         threadPool = Executors.newCachedThreadPool();
 
         if (this.telemetry != null) {
+            telemetry.addData("MAX_VELOCITY", 0);
             this.telemetry.addData("L diff",0);
             this.telemetry.addData("R diff",0);
 
             this.telemetry.addData("Degrees setpoint",0);
             this.telemetry.addData("Degrees position",0);
+
+            this.telemetry.addData("LB_sp", 0);
+            this.telemetry.addData("LB_p", 0);
+            this.telemetry.addData("RB_sp", 0);
+            this.telemetry.addData("RB_p", 0);
+            this.telemetry.addData("LF_sp", 0);
+            this.telemetry.addData("LF_p", 0);
+            this.telemetry.addData("RF_sp", 0);
+            this.telemetry.addData("RF_p", 0);
+
+            // these are fine
+            this.telemetry.addData("LB_v (sp)", 0);
+            this.telemetry.addData("RB_v (sp)", 0);
+            this.telemetry.addData("LF_v (sp)", 0);
+            this.telemetry.addData("RF_v (sp)", 0);
+
+            // these might not be fine
+            this.telemetry.addData("LB Velocity", getLBVelocity());
+            this.telemetry.addData("RB Velocity", getRBVelocity());
+            this.telemetry.addData("LF Velocity", getLFVelocity());
+            this.telemetry.addData("RF Velocity", getRFVelocity());
+
+            this.telemetry.addData("LB Abs Error", 0);
+            this.telemetry.addData("RB Abs Error", 0);
+            this.telemetry.addData("LF Abs Error", 0);
+            this.telemetry.addData("RF Abs Error", 0);
+
+            this.telemetry.addData("HEADING", heading);
 
             this.telemetry.update();
         }
@@ -146,11 +175,6 @@ public class DriveSubsystem extends SubsystemBase {
         if (!ignoreStartVelocity)
             stopController();
 
-        leftBack.resetEncoder();
-        rightBack.resetEncoder();
-        leftFront.resetEncoder();
-        rightFront.resetEncoder();
-
         // initialize variables
         double LB_start = getLBPosition(), RB_start = -getRBPosition(), LF_start = -getLFPosition(), RF_start = getRFPosition();
         double L = leftTicks, R = rightTicks;
@@ -168,12 +192,18 @@ public class DriveSubsystem extends SubsystemBase {
         double secondHalfTime = travelTimes[1]; // time needed to travel the second half of the distance
         double totalTime = firstHalfTime + secondHalfTime;
 
-        double startTime = runtime.milliseconds() / 1000; // beginning time of the movement
+        double startTime = runtime.seconds(); // beginning time of the movement
         double elapsedTime = 0; // will act as the independent variable t for position & velocity calculations
+
+        double LBTurnPosDiff = 0;
+        double RBTurnPosDiff = 0;
+        double LFTurnPosDiff = 0;
+        double RFTurnPosDiff = 0;
 
         while (opMode.opModeIsActive() && elapsedTime < totalTime) {
 
             telemetry.addData("CURRENT MOVEMENT:", DriveSubsystem.currentMovement);
+            telemetry.addData("MAX_VELOCITY", maxVelocity);
 
             LB_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
             RB_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
@@ -189,21 +219,39 @@ public class DriveSubsystem extends SubsystemBase {
             double[] velocitySetpoints = calculateVelocitySetpoints(driveSpeed, theta, elapsedTime, travelTimes, maxVelocity, ignoreStartVelocity, ignoreEndVelocity);
             double LB_v = velocitySetpoints[0], RF_v = velocitySetpoints[0], RB_v = velocitySetpoints[1], LF_v = velocitySetpoints[1];
 
+            // handle turn correction
+            double turnVelocityGain = DrivePIDCoefficients.TURN_VELOCITY_GAIN;
+            double turnPositionGain = DrivePIDCoefficients.TURN_POSITION_GAIN;
+            double deltaTime = runtime.seconds() - elapsedTime;
+            double currentHeading = getYaw();
+            double thetaDiff = normalizeAngle(currentHeading - this.heading);
+            telemetry.addData("HEADING", currentHeading);
+            if (Math.abs(thetaDiff) < 15) {
+                LB_v += turnVelocityGain * thetaDiff;
+                RB_v -= turnVelocityGain * thetaDiff;
+                LF_v += turnVelocityGain * thetaDiff;
+                RF_v -= turnVelocityGain * thetaDiff;
+                LBTurnPosDiff += turnPositionGain * thetaDiff * deltaTime;
+                RBTurnPosDiff += turnPositionGain * thetaDiff * deltaTime;
+                LFTurnPosDiff -= turnPositionGain * thetaDiff * deltaTime;
+                RFTurnPosDiff -= turnPositionGain * thetaDiff * deltaTime;
+            }
+
             // handle wheel positions
             double[] positionSetpoints = calculatePositionSetpoints(LB_start, RB_start, driveSpeed, theta, elapsedTime, travelTimes, maxVelocity, ignoreStartVelocity, ignoreEndVelocity);
             double LB_sp = positionSetpoints[0], RF_sp = positionSetpoints[0], RB_sp = positionSetpoints[1], LF_sp = positionSetpoints[1];
 
-            LB_PID.setSetPoint(LB_sp);
-            RB_PID.setSetPoint(RB_sp);
-            LF_PID.setSetPoint(LF_sp);
-            RF_PID.setSetPoint(RF_sp);
+            LB_PID.setSetPoint(LB_sp + LBTurnPosDiff);
+            RB_PID.setSetPoint(RB_sp + RBTurnPosDiff);
+            LF_PID.setSetPoint(LF_sp + LFTurnPosDiff);
+            RF_PID.setSetPoint(RF_sp + RFTurnPosDiff);
 
             double LB_p = getLBPosition();
             double RB_p = -getRBPosition();
             double LF_p = getLFPosition();
             double RF_p = -getRFPosition();
 
-            double velocityGain = DrivePIDCoefficients.VELOCITY_USED_GAIN;
+            double velocityGain = DrivePIDCoefficients.VELOCITY_GAIN;
             double LB_C = LB_PID.update(LB_p) * velocityGain;
             double RB_C = RB_PID.update(RB_p) * velocityGain;
             double LF_C = LF_PID.update(LF_p) * velocityGain;
@@ -211,14 +259,14 @@ public class DriveSubsystem extends SubsystemBase {
 
 //            telemetry.addData("totalDistance", totalDistance);
 //            telemetry.addData("totalTime", totalTime);
-//            telemetry.addData("LB_sp", LB_sp);
-//            telemetry.addData("LB_p", LB_p);
-//            telemetry.addData("RB_sp", RB_sp);
-//            telemetry.addData("RB_p", RB_p);
-//            telemetry.addData("LF_sp", LF_sp);
-//            telemetry.addData("LF_p", LF_p);
-//            telemetry.addData("RF_sp", RF_sp);
-//            telemetry.addData("RF_p", RF_p);
+            telemetry.addData("LB_sp", LB_PID.getSetPoint());
+            telemetry.addData("LB_p", LB_p);
+            telemetry.addData("RB_sp", RB_PID.getSetPoint());
+            telemetry.addData("RB_p", RB_p);
+            telemetry.addData("LF_sp", LF_PID.getSetPoint());
+            telemetry.addData("LF_p", LF_p);
+            telemetry.addData("RF_sp", RF_PID.getSetPoint());
+            telemetry.addData("RF_p", RF_p);
 
             // these are fine
 //            telemetry.addData("LB_C", LB_C);
@@ -228,6 +276,11 @@ public class DriveSubsystem extends SubsystemBase {
 
             double AVG_C = (LB_C + RB_C + LF_C + RF_C) / 4.0;
 
+            this.telemetry.addData("LB Abs Error", LB_PID.getAbsoluteDiff(LB_p));
+            this.telemetry.addData("RB Abs Error", RB_PID.getAbsoluteDiff(RB_p));
+            this.telemetry.addData("LF Abs Error", LF_PID.getAbsoluteDiff(LF_p));
+            this.telemetry.addData("RF Abs Error", RF_PID.getAbsoluteDiff(RF_p));
+
             if (!(LB_PID.getAbsoluteDiff(LB_p) + RB_PID.getAbsoluteDiff(RB_p) + LF_PID.getAbsoluteDiff(LF_p) + RF_PID.getAbsoluteDiff(RF_p) < 4 * DrivePIDCoefficients.getErrorTolerance_p())) {
                 LB_v += AVG_C;
                 RB_v += AVG_C;
@@ -236,39 +289,30 @@ public class DriveSubsystem extends SubsystemBase {
             }
 
             // these are fine
-            telemetry.addData("LB_v", LB_v);
-            telemetry.addData("RB_v", RB_v);
-            telemetry.addData("LF_v", LF_v);
-            telemetry.addData("RF_v", RF_v);
+            telemetry.addData("LB_v (sp)", LB_v);
+            telemetry.addData("RB_v (sp)", RB_v);
+            telemetry.addData("LF_v (sp)", LF_v);
+            telemetry.addData("RF_v (sp)", RF_v);
 
             // these might not be fine
             telemetry.addData("LB Velocity", getLBVelocity());
             telemetry.addData("RB Velocity", getRBVelocity());
             telemetry.addData("LF Velocity", getLFVelocity());
             telemetry.addData("RF Velocity", getRFVelocity());
-
-            double turnVelocityGain = DrivePIDCoefficients.TURN_VELOCITY_GAIN;
-            double thetaDiff = normalizeAngle(getYaw() - this.heading);
-            if (Math.abs(thetaDiff) < 5) {
-                LB_v += turnVelocityGain * thetaDiff;
-                RB_v -= turnVelocityGain * thetaDiff;
-                LF_v += turnVelocityGain * thetaDiff;
-                RF_v -= turnVelocityGain * thetaDiff;
-            }
             telemetry.addData("thetaDiff", thetaDiff);
 
             // normalize velocities and drive with motor powers
             driveWithMotorPowers(
-                    LF_v / maxVelocity,
-                    RF_v / maxVelocity,
-                    LB_v / maxVelocity,
-                    RB_v / maxVelocity
+                    (LF_v + LFTurnPosDiff) / maxVelocity,
+                    (RF_v + RFTurnPosDiff) / maxVelocity,
+                    (LB_v + LBTurnPosDiff) / maxVelocity,
+                    (RB_v + RBTurnPosDiff) / maxVelocity
                     );
 
             telemetry.update();
 
             // update elapsed time
-            elapsedTime = runtime.milliseconds() / 1000 - startTime;
+            elapsedTime = runtime.seconds() - startTime;
         }
 
         // stop drivetrain at end
@@ -571,16 +615,16 @@ public class DriveSubsystem extends SubsystemBase {
         ) {
             PID.setPID(DrivePIDCoefficients.getTurnP(), DrivePIDCoefficients.getTurnI(), DrivePIDCoefficients.getTurnD());
 
-            double currentYaw = getYaw();
+            double currentHeading = getYaw();
 
-            cumulativeAngle += normalizeAngle(previousAngle-currentYaw);
-            previousAngle = currentYaw;
+            cumulativeAngle += normalizeAngle(previousAngle-currentHeading);
+            previousAngle = currentHeading;
 
             K = PID.update(cumulativeAngle);
 
             if (telemetry != null) {
                 telemetry.addData("CURRENT MOVEMENT:", currentMovement);
-                telemetry.addData("Yaw",currentYaw);
+                telemetry.addData("HEADING", currentHeading);
                 telemetry.addData("Degrees Disp setpoint",setPoint);
                 telemetry.addData("Degrees diff",setPoint-cumulativeAngle);
                 telemetry.addData("Degrees cumulative",cumulativeAngle);
@@ -604,6 +648,11 @@ public class DriveSubsystem extends SubsystemBase {
      * @param movementSequence      The MovementSequence to be followed.
      */
     public void followMovementSequence(MovementSequence movementSequence) {
+
+        leftBack.resetEncoder();
+        rightBack.resetEncoder();
+        leftFront.resetEncoder();
+        rightFront.resetEncoder();
 
         ArrayDeque<Movement> movements = movementSequence.movements.clone();
 
