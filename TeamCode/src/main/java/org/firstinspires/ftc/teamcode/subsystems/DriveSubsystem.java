@@ -89,15 +89,20 @@ public class DriveSubsystem extends SubsystemBase {
             this.telemetry.addData("RF_v (sp)", 0);
 
             // these might not be fine
-            this.telemetry.addData("LB Velocity", getLBVelocity());
-            this.telemetry.addData("RB Velocity", getRBVelocity());
-            this.telemetry.addData("LF Velocity", getLFVelocity());
-            this.telemetry.addData("RF Velocity", getRFVelocity());
+            this.telemetry.addData("LB Velocity", 0);
+            this.telemetry.addData("RB Velocity", 0);
+            this.telemetry.addData("LF Velocity", 0);
+            this.telemetry.addData("RF Velocity", 0);
 
             this.telemetry.addData("LB Abs Error", 0);
             this.telemetry.addData("RB Abs Error", 0);
             this.telemetry.addData("LF Abs Error", 0);
             this.telemetry.addData("RF Abs Error", 0);
+
+            telemetry.addData("LB Power", 0);
+            telemetry.addData("RB Power", 0);
+            telemetry.addData("LF Power", 0);
+            telemetry.addData("RF Power", 0);
 
             this.telemetry.addData("HEADING", heading);
 
@@ -301,12 +306,23 @@ public class DriveSubsystem extends SubsystemBase {
             telemetry.addData("RF Velocity", getRFVelocity());
             telemetry.addData("thetaDiff", thetaDiff);
 
+            double theoreticalMaxVelocity = DrivePIDCoefficients.MAX_VELOCITY;
+            double LF_power = (LF_v + LFTurnPosDiff) / theoreticalMaxVelocity;
+            double RF_power = (LF_v + LFTurnPosDiff) / theoreticalMaxVelocity;
+            double LB_power = (LF_v + LFTurnPosDiff) / theoreticalMaxVelocity;
+            double RB_power = (LF_v + LFTurnPosDiff) / theoreticalMaxVelocity;
+
+            telemetry.addData("LB Power", LF_power);
+            telemetry.addData("RB Power", RF_power);
+            telemetry.addData("LF Power", LB_power);
+            telemetry.addData("RF Power", RB_power);
+
             // normalize velocities and drive with motor powers
             driveWithMotorPowers(
-                    (LF_v + LFTurnPosDiff) / maxVelocity,
-                    (RF_v + RFTurnPosDiff) / maxVelocity,
-                    (LB_v + LBTurnPosDiff) / maxVelocity,
-                    (RB_v + RBTurnPosDiff) / maxVelocity
+                    LF_power,
+                    RF_power,
+                    LB_power,
+                    RB_power
                     );
 
             telemetry.update();
