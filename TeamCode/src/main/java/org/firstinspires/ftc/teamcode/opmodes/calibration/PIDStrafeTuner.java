@@ -33,8 +33,8 @@ public class PIDStrafeTuner extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
     private static DriveSubsystem drive;
     private static InDepSubsystem inDep;
-    public static double fwd = 20;
-    public static double str = 20;
+    public static double fwd = 0;
+    public static double str = 60;
     private MultipleTelemetry telemetry = new MultipleTelemetry(new TelemetryImpl((OpMode) this), FtcDashboard.getInstance().getTelemetry());
 
 
@@ -49,20 +49,20 @@ public class PIDStrafeTuner extends LinearOpMode {
 
         waitForStart();
 
-        MovementSequence right = new MovementSequenceBuilder()
-                .right(60)
-                .build();
-        MovementSequence left = new MovementSequenceBuilder()
-                .left(60)
-                .build();
 
         // begin tuning sequence
         while (opModeIsActive()) {
+            MovementSequence right = new MovementSequenceBuilder()
+                    .forwardRight(fwd, str)
+                    .build();
             // right 1000√2 ticks
 //            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), -2000, 2000, 0);
             drive.followMovementSequence(right);
             while (opModeIsActive() && !gamepad1.triangle);
 
+            MovementSequence left = new MovementSequenceBuilder()
+                    .backwardLeft(fwd, str)
+                    .build();
             // left 1000√2 ticks
 //            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), 2000, -2000, Math.PI);
             drive.followMovementSequence(left);

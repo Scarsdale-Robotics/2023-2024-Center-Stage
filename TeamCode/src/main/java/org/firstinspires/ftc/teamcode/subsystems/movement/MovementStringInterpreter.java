@@ -358,10 +358,10 @@ public class MovementStringInterpreter {
 	/////////////////////////////////////////////////////
 
 	private static Movement alignWithAprilTagParRot(int tagid, double turnOffset) {
-		return (new Movement(Movement.MovementType.APRIL_TAG_ALIGN_PAR_ROT, 0, 0, turnOffset, tagid, 0, 0));
+		return (new Movement(Movement.MovementType.APRIL_TAG_ALIGN_PAR_ROT, 0, 0, turnOffset, tagid, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 	}
 	public static Movement alignWithAprilTagPos(int tagid, double yOffset, double xOffset) {
-		return (new Movement(Movement.MovementType.APRIL_TAG_ALIGN_POS, -yOffset, xOffset, 0, tagid, 0, 0));
+		return (new Movement(Movement.MovementType.APRIL_TAG_ALIGN_POS, -yOffset, xOffset, 0, tagid, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 	}
 
 	/**
@@ -370,7 +370,7 @@ public class MovementStringInterpreter {
 	 * @param inches How far the robot should move in inches.
 	 */
 	private static Movement forward(double inches) {
-		return (new Movement(Movement.MovementType.FORWARD, inches, 0, 0, 0, 0, 0));
+		return (new Movement(Movement.MovementType.FORWARD, inches, 0, 0, 0, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -380,7 +380,7 @@ public class MovementStringInterpreter {
 	 * @param inches How far the robot should move in inches.
 	 */
 	private static Movement backward(double inches) {
-		return (new Movement(Movement.MovementType.BACKWARD, inches, 0, 0, 0, 0, 0));
+		return (new Movement(Movement.MovementType.BACKWARD, inches, 0, 0, 0, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -390,7 +390,7 @@ public class MovementStringInterpreter {
 	 * @param inches How far the robot should strafe in inches.
 	 */
 	private static Movement left(double inches) {
-		return (new Movement(Movement.MovementType.STRAFE_LEFT, 0, inches, 0, 0, 0, 0));
+		return (new Movement(Movement.MovementType.STRAFE_LEFT, 0, inches, 0, 0, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -400,7 +400,7 @@ public class MovementStringInterpreter {
 	 * @param inches How far the robot should strafe in inches.
 	 */
 	private static Movement right(double inches) {
-		return (new Movement(Movement.MovementType.STRAFE_RIGHT, 0, inches, 0, 0, 0, 0));
+		return (new Movement(Movement.MovementType.STRAFE_RIGHT, 0, inches, 0, 0, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -410,7 +410,7 @@ public class MovementStringInterpreter {
 	 * @param degrees How much the robot should turn in degrees.
 	 */
 	private static Movement turnLeft(double degrees) {
-		return (new Movement(Movement.MovementType.TURN_LEFT, 0, 0, degrees, 0, 0, 0));
+		return (new Movement(Movement.MovementType.TURN_LEFT, 0, 0, degrees, 0, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -420,7 +420,7 @@ public class MovementStringInterpreter {
 	 * @param degrees How much the robot should turn in degrees.
 	 */
 	private static Movement turnRight(double degrees) {
-		return (new Movement(Movement.MovementType.TURN_RIGHT, 0, 0, degrees, 0, 0, 0));
+		return (new Movement(Movement.MovementType.TURN_RIGHT, 0, 0, degrees, 0, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -431,7 +431,7 @@ public class MovementStringInterpreter {
 	 * @param inchesLeft    How much the robot should strafe left in inches.
 	 */
 	private static Movement forwardLeft(double inchesForward, double inchesLeft) {
-		return (new Movement(Movement.MovementType.FORWARD_LEFT, inchesForward, inchesLeft, 0, 0, 0, 0));
+		return (new Movement(Movement.MovementType.FORWARD_LEFT, inchesForward, inchesLeft, 0, 0, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -442,7 +442,7 @@ public class MovementStringInterpreter {
 	 * @param inchesRight   How much the robot should strafe right in inches.
 	 */
 	private static Movement forwardRight(double inchesForward, double inchesRight) {
-		return (new Movement(Movement.MovementType.FORWARD_RIGHT, inchesForward, inchesRight, 0, 0, 0, 0));
+		return (new Movement(Movement.MovementType.FORWARD_RIGHT, inchesForward, inchesRight, 0, 0, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -453,7 +453,7 @@ public class MovementStringInterpreter {
 	 * @param inchesLeft     How much the robot should strafe left in inches.
 	 */
 	private static Movement backwardLeft(double inchesBackward, double inchesLeft) {
-		return (new Movement(Movement.MovementType.BACKWARD_LEFT, inchesBackward, inchesLeft, 0, 0, 0, 0));
+		return (new Movement(Movement.MovementType.BACKWARD_LEFT, inchesBackward, inchesLeft, 0, 0, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -464,7 +464,7 @@ public class MovementStringInterpreter {
 	 * @param inchesRight    How much the robot should strafe right in inches.
 	 */
 	private static Movement backwardRight(double inchesBackward, double inchesRight) {
-		return (new Movement(Movement.MovementType.BACKWARD_RIGHT, inchesBackward, inchesRight, 0, 0, 0, 0));
+		return (new Movement(Movement.MovementType.BACKWARD_RIGHT, inchesBackward, inchesRight, 0, 0, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -474,7 +474,7 @@ public class MovementStringInterpreter {
 	 * @param ms The wait time in milliseconds.
 	 */
 	private static Movement sleepFor(long ms) {
-		return (new Movement(Movement.MovementType.DELAY, 0, 0, 0, 0, 0, ms));
+		return (new Movement(Movement.MovementType.DELAY, 0, 0, 0, 0, 0, ms, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -482,7 +482,7 @@ public class MovementStringInterpreter {
 	 * Appends a rest elbow event to this MovementSequenceBuilder.
 	 */
 	private static Movement restElbow() {
-		return (new Movement(Movement.MovementType.REST_ELBOW, 0, 0, 0, 0, 0, 0));
+		return (new Movement(Movement.MovementType.REST_ELBOW, 0, 0, 0, 0, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -490,7 +490,7 @@ public class MovementStringInterpreter {
 	 * Appends a flip elbow event to this MovementSequenceBuilder.
 	 */
 	private static Movement flipElbow() {
-		return (new Movement(Movement.MovementType.FLIP_ELBOW, 0, 0, 0, 0, 0, 0));
+		return (new Movement(Movement.MovementType.FLIP_ELBOW, 0, 0, 0, 0, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -498,7 +498,7 @@ public class MovementStringInterpreter {
 	 * Appends a set wrist event to this MovementSequenceBuilder.
 	 */
 	private static Movement setWrist(double servoPosition) {
-		return (new Movement(Movement.MovementType.SET_WRIST, 0, 0, 0, 0, servoPosition, 0));
+		return (new Movement(Movement.MovementType.SET_WRIST, 0, 0, 0, 0, servoPosition, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -507,7 +507,7 @@ public class MovementStringInterpreter {
 	 * MovementSequenceBuilder.
 	 */
 	private static Movement openLeftClaw() {
-		return (new Movement(Movement.MovementType.OPEN_LEFT_CLAW, 0, 0, 0, 0, 0, 0));
+		return (new Movement(Movement.MovementType.OPEN_LEFT_CLAW, 0, 0, 0, 0, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -516,7 +516,7 @@ public class MovementStringInterpreter {
 	 * MovementSequenceBuilder.
 	 */
 	private static Movement openRightClaw() {
-		return (new Movement(Movement.MovementType.OPEN_RIGHT_CLAW, 0, 0, 0, 0, 0, 0));
+		return (new Movement(Movement.MovementType.OPEN_RIGHT_CLAW, 0, 0, 0, 0, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -525,7 +525,7 @@ public class MovementStringInterpreter {
 	 * MovementSequenceBuilder.
 	 */
 	private static Movement closeLeftClaw() {
-		return (new Movement(Movement.MovementType.CLOSE_LEFT_CLAW, 0, 0, 0, 0, 0, 0));
+		return (new Movement(Movement.MovementType.CLOSE_LEFT_CLAW, 0, 0, 0, 0, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -534,7 +534,7 @@ public class MovementStringInterpreter {
 	 * MovementSequenceBuilder.
 	 */
 	private static Movement closeRightClaw() {
-		return (new Movement(Movement.MovementType.CLOSE_RIGHT_CLAW, 0, 0, 0, 0, 0, 0));
+		return (new Movement(Movement.MovementType.CLOSE_RIGHT_CLAW, 0, 0, 0, 0, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -544,7 +544,7 @@ public class MovementStringInterpreter {
 	 * @param degrees The angle for the arm to be elevated in degrees.
 	 */
 	private static Movement lowerArm(double degrees) {
-		return (new Movement(Movement.MovementType.LOWER_ARM, 0, 0, 0, degrees, 0, 0));
+		return (new Movement(Movement.MovementType.LOWER_ARM, 0, 0, 0, degrees, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 
@@ -554,7 +554,7 @@ public class MovementStringInterpreter {
 	 * @param degrees The angle for the arm to be elevated in degrees.
 	 */
 	private static Movement raiseArm(double degrees) {
-		return (new Movement(Movement.MovementType.RAISE_ARM, 0, 0, 0, degrees, 0, 0));
+		return (new Movement(Movement.MovementType.RAISE_ARM, 0, 0, 0, degrees, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 
 	}
 

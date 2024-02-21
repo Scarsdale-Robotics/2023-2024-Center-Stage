@@ -88,11 +88,6 @@ public class MovementSequenceBuilder {
         return this.append(MovementStringInterpreter.toMovementSequenceBuilder(s));
     }
 
-    public MovementSequenceBuilder alignWithAprilTag() {
-        movements.add(new Movement(Movement.MovementType.APRIL_TAG_ALIGN_PAR_ROT, 0, 0, 0, 0, 0, 0));
-        return this;
-    }
-
     /**
      * Appends a forward movement to this MovementSequenceBuilder.
      *
@@ -104,7 +99,7 @@ public class MovementSequenceBuilder {
         // ignore this end velocity if linked to an ignored end velocity
         boolean ignoreEndVelocity = ignoreStartVelocity && movements.getLast().linkedToNext;
 
-        movements.add(new Movement(Movement.MovementType.FORWARD, inches, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.FORWARD, inches, 0, 0, 0, 0, 0, new AprilTagValues()));
 
         if (ignoreStartVelocity)
             setLastIgnoredStartVelocity();
@@ -125,7 +120,7 @@ public class MovementSequenceBuilder {
         // ignore this end velocity if linked to an ignored end velocity
         boolean ignoreEndVelocity = ignoreStartVelocity && movements.getLast().linkedToNext;
 
-        movements.add(new Movement(Movement.MovementType.BACKWARD, inches, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.BACKWARD, inches, 0, 0, 0, 0, 0, new AprilTagValues()));
 
         if (ignoreStartVelocity)
             setLastIgnoredStartVelocity();
@@ -146,7 +141,7 @@ public class MovementSequenceBuilder {
         // ignore this end velocity if linked to an ignored end velocity
         boolean ignoreEndVelocity = ignoreStartVelocity && movements.getLast().linkedToNext;
 
-        movements.add(new Movement(Movement.MovementType.STRAFE_LEFT, 0, inches, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.STRAFE_LEFT, 0, inches, 0, 0, 0, 0, new AprilTagValues()));
 
         if (ignoreStartVelocity)
             setLastIgnoredStartVelocity();
@@ -167,7 +162,7 @@ public class MovementSequenceBuilder {
         // ignore this end velocity if linked to an ignored end velocity
         boolean ignoreEndVelocity = ignoreStartVelocity && movements.getLast().linkedToNext;
 
-        movements.add(new Movement(Movement.MovementType.STRAFE_RIGHT, 0, inches, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.STRAFE_RIGHT, 0, inches, 0, 0, 0, 0, new AprilTagValues()));
 
         if (ignoreStartVelocity)
             setLastIgnoredStartVelocity();
@@ -183,7 +178,7 @@ public class MovementSequenceBuilder {
      * @param degrees How much the robot should turn in degrees.
      */
     public MovementSequenceBuilder turnLeft(double degrees) {
-        movements.add(new Movement(Movement.MovementType.TURN_LEFT, 0, 0, degrees, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.TURN_LEFT, 0, 0, degrees, 0, 0, 0, new AprilTagValues()));
         return this;
     }
 
@@ -193,7 +188,7 @@ public class MovementSequenceBuilder {
      * @param degrees How much the robot should turn in degrees.
      */
     public MovementSequenceBuilder turnRight(double degrees) {
-        movements.add(new Movement(Movement.MovementType.TURN_RIGHT, 0, 0, degrees, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.TURN_RIGHT, 0, 0, degrees, 0, 0, 0, new AprilTagValues()));
         return this;
     }
 
@@ -209,7 +204,7 @@ public class MovementSequenceBuilder {
         // ignore this end velocity if linked to an ignored end velocity
         boolean ignoreEndVelocity = ignoreStartVelocity && movements.getLast().linkedToNext;
 
-        movements.add(new Movement(Movement.MovementType.FORWARD_LEFT, inchesForward, inchesLeft, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.FORWARD_LEFT, inchesForward, inchesLeft, 0, 0, 0, 0, new AprilTagValues()));
 
         if (ignoreStartVelocity)
             setLastIgnoredStartVelocity();
@@ -231,7 +226,7 @@ public class MovementSequenceBuilder {
         // ignore this end velocity if linked to an ignored end velocity
         boolean ignoreEndVelocity = ignoreStartVelocity && movements.getLast().linkedToNext;
 
-        movements.add(new Movement(Movement.MovementType.FORWARD_RIGHT, inchesForward, inchesRight, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.FORWARD_RIGHT, inchesForward, inchesRight, 0, 0, 0, 0, new AprilTagValues()));
 
         if (ignoreStartVelocity)
             setLastIgnoredStartVelocity();
@@ -253,7 +248,7 @@ public class MovementSequenceBuilder {
         // ignore this end velocity if linked to an ignored end velocity
         boolean ignoreEndVelocity = ignoreStartVelocity && movements.getLast().linkedToNext;
 
-        movements.add(new Movement(Movement.MovementType.BACKWARD_LEFT, inchesBackward, inchesLeft, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.BACKWARD_LEFT, inchesBackward, inchesLeft, 0, 0, 0, 0, new AprilTagValues()));
 
         if (ignoreStartVelocity)
             setLastIgnoredStartVelocity();
@@ -275,7 +270,7 @@ public class MovementSequenceBuilder {
         // ignore this end velocity if linked to an ignored end velocity
         boolean ignoreEndVelocity = ignoreStartVelocity && movements.getLast().linkedToNext;
 
-        movements.add(new Movement(Movement.MovementType.BACKWARD_RIGHT, inchesBackward, inchesRight, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.BACKWARD_RIGHT, inchesBackward, inchesRight, 0, 0, 0, 0, new AprilTagValues()));
 
         if (ignoreStartVelocity)
             setLastIgnoredStartVelocity();
@@ -291,7 +286,7 @@ public class MovementSequenceBuilder {
      * @param ms The wait time in milliseconds.
      */
     public MovementSequenceBuilder sleepFor(long ms) {
-        movements.add(new Movement(Movement.MovementType.DELAY, 0, 0, 0, 0, 0, ms));
+        movements.add(new Movement(Movement.MovementType.DELAY, 0, 0, 0, 0, 0, ms, new AprilTagValues()));
         return this;
     }
 
@@ -299,7 +294,7 @@ public class MovementSequenceBuilder {
      * Appends a rest elbow event to this MovementSequenceBuilder.
      */
     public MovementSequenceBuilder restElbow() {
-        movements.add(new Movement(Movement.MovementType.REST_ELBOW, 0, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.REST_ELBOW, 0, 0, 0, 0, 0, 0, new AprilTagValues()));
         return this;
     }
 
@@ -307,7 +302,7 @@ public class MovementSequenceBuilder {
      * Appends a flip elbow event to this MovementSequenceBuilder.
      */
     public MovementSequenceBuilder flipElbow() {
-        movements.add(new Movement(Movement.MovementType.FLIP_ELBOW, 0, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.FLIP_ELBOW, 0, 0, 0, 0, 0, 0, new AprilTagValues()));
         return this;
     }
 
@@ -315,7 +310,7 @@ public class MovementSequenceBuilder {
      * Appends a set wrist event to this MovementSequenceBuilder.
      */
     public MovementSequenceBuilder setWrist(double servoPosition) {
-        movements.add(new Movement(Movement.MovementType.SET_WRIST, 0, 0, 0, 0, servoPosition, 0));
+        movements.add(new Movement(Movement.MovementType.SET_WRIST, 0, 0, 0, 0, servoPosition, 0, new AprilTagValues()));
         return this;
     }
 
@@ -338,7 +333,7 @@ public class MovementSequenceBuilder {
      * MovementSequenceBuilder.
      */
     public MovementSequenceBuilder openLeftClaw() {
-        movements.add(new Movement(Movement.MovementType.OPEN_LEFT_CLAW, 0, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.OPEN_LEFT_CLAW, 0, 0, 0, 0, 0, 0, new AprilTagValues()));
         return this;
     }
 
@@ -347,7 +342,7 @@ public class MovementSequenceBuilder {
      * MovementSequenceBuilder.
      */
     public MovementSequenceBuilder openRightClaw() {
-        movements.add(new Movement(Movement.MovementType.OPEN_RIGHT_CLAW, 0, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.OPEN_RIGHT_CLAW, 0, 0, 0, 0, 0, 0, new AprilTagValues()));
         return this;
     }
 
@@ -356,7 +351,7 @@ public class MovementSequenceBuilder {
      * MovementSequenceBuilder.
      */
     public MovementSequenceBuilder closeLeftClaw() {
-        movements.add(new Movement(Movement.MovementType.CLOSE_LEFT_CLAW, 0, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.CLOSE_LEFT_CLAW, 0, 0, 0, 0, 0, 0, new AprilTagValues()));
         return this;
     }
 
@@ -365,7 +360,7 @@ public class MovementSequenceBuilder {
      * MovementSequenceBuilder.
      */
     public MovementSequenceBuilder closeRightClaw() {
-        movements.add(new Movement(Movement.MovementType.CLOSE_RIGHT_CLAW, 0, 0, 0, 0, 0, 0));
+        movements.add(new Movement(Movement.MovementType.CLOSE_RIGHT_CLAW, 0, 0, 0, 0, 0, 0, new AprilTagValues()));
         return this;
     }
 
@@ -380,7 +375,7 @@ public class MovementSequenceBuilder {
         // ignore this end velocity if linked to an ignored end velocity
         boolean ignoreEndVelocity = ignoreStartVelocity && movements.getLast().linkedToNext;
 
-        movements.add(new Movement(Movement.MovementType.LOWER_ARM, 0, 0, 0, degrees, 0, 0));
+        movements.add(new Movement(Movement.MovementType.LOWER_ARM, 0, 0, 0, degrees, 0, 0, new AprilTagValues()));
 
         if (ignoreStartVelocity)
             setLastIgnoredStartVelocity();
@@ -401,7 +396,7 @@ public class MovementSequenceBuilder {
         // ignore this end velocity if linked to an ignored end velocity
         boolean ignoreEndVelocity = ignoreStartVelocity && movements.getLast().linkedToNext;
 
-        movements.add(new Movement(Movement.MovementType.RAISE_ARM, 0, 0, 0, degrees, 0, 0));
+        movements.add(new Movement(Movement.MovementType.RAISE_ARM, 0, 0, 0, degrees, 0, 0, new AprilTagValues()));
 
         if (ignoreStartVelocity)
             setLastIgnoredStartVelocity();
@@ -412,26 +407,25 @@ public class MovementSequenceBuilder {
     }
 
     /**
-     * Automatically modify rotation to parallel to the AprilTag.
+     * Appends a rotational AprilTag alignment event to this MovementSequence.
      *
-     * @param tagid an int representing the id of the tag to align with.
+     * @param tagID an int representing the id of the tag to align with.
      * @param turnOffset a double representing the target turnOffset, where positive values are the camera facing more right of the AprilTag.
      */
-    public MovementSequenceBuilder alignWithAprilTagParRot(int tagid, double turnOffset) {
-        movements.add(new Movement(Movement.MovementType.APRIL_TAG_ALIGN_PAR_ROT, 0, 0, turnOffset, tagid, 0, 0));
+    public MovementSequenceBuilder alignWithAprilTagParRot(int tagID, double turnOffset) {
+        movements.add(new Movement(Movement.MovementType.APRIL_TAG_ALIGN_PAR_ROT, 0, 0, 0, 0, 0, 0, new AprilTagValues(tagID, turnOffset, 0, 0)));
         return this;
     }
 
     /**
-     * Align to a position according to AprilTag readings.
+     * Appends a positional AprilTag alignment event to this MovementSequence.
      *
-     * @param tagid an int representing the id of the tag to align with.
+     * @param tagID an int representing the id of the tag to align with.
      * @param yOffset a double >= 0 representing the targeted yOffset compared to the AprilTag, which positive values are "inwards".
      * @param xOffset a double representing the targeted xOffset compared to the AprilTag, where positive values have robot more right of the AprilTag.
      */
-    public MovementSequenceBuilder alignWithAprilTagPos(int tagid, double yOffset, double xOffset) {
-        // kinda scuffed passing info through wrong params
-        movements.add(new Movement(Movement.MovementType.APRIL_TAG_ALIGN_POS, -yOffset, xOffset, 0, tagid, 0, 0));
+    public MovementSequenceBuilder alignWithAprilTagPos(int tagID, double yOffset, double xOffset) {
+        movements.add(new Movement(Movement.MovementType.APRIL_TAG_ALIGN_POS, 0, 0, 0, 0, 0, 0, new AprilTagValues(tagID, 0, xOffset, yOffset)));
         return this;
     }
 

@@ -6,11 +6,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
+import org.firstinspires.ftc.teamcode.util.DrivePIDCoefficients;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 
 public class MovementThread implements Runnable {
     public static volatile double K_FORWARD = 64.04;
-    public static volatile double K_STRAFE = 72.948;
+    public static volatile double K_STRAFE = 75.131;
     public static volatile double K_ARM = 11.111;
 
     private static final double POWER_DRIVE = SpeedCoefficients.getAutonomousDriveSpeed();
@@ -44,43 +45,36 @@ public class MovementThread implements Runnable {
 
         // CV CASES
         if (type.isCVType) {
+            AprilTagValues aprilTagValues = movement.APRIL_TAG_VALUES;
+            
             if (type == Movement.MovementType.APRIL_TAG_ALIGN_PAR_ROT) {
                 CVSubsystem.Position pos = null;
-                while (pos == null) {
-                    pos = cv.getPosToAprilTag((int) movement.DEGREES_TURN);
+                while (opMode.opModeIsActive() && pos == null) {
+                    pos = cv.getPosToAprilTag((int) aprilTagValues.tagID);
                 }
                 // right turn is positive
-                movement.DEGREES_TURN = movement.DEGREES_TURN - pos.turn;
-                type.isDriveType = true;
+                Movement alignment = new Movement(Movement.MovementType.TURN_RIGHT, 0, 0, aprilTagValues.turnOffset - pos.turn, 0, 0, 0, new AprilTagValues());
+                executeTurnMovement(alignment);
             }
+            
             if (type == Movement.MovementType.APRIL_TAG_ALIGN_POS) {
                 CVSubsystem.Position pos = null;
-                while (pos == null) {
-                    pos = cv.getPosToAprilTag((int)movement.DEGREES_TURN);
+                while (opMode.opModeIsActive() && pos == null) {
+                    pos = cv.getPosToAprilTag((int) aprilTagValues.tagID);
                 }
-                movement.INCHES_FORWARD = pos.y - movement.INCHES_FORWARD;
-                movement.INCHES_STRAFE = pos.x + movement.INCHES_STRAFE;
-                type.isDriveType = true;
+                Movement alignment = new Movement(Movement.MovementType.FORWARD_RIGHT, pos.y - aprilTagValues.yOffset, pos.x + aprilTagValues.xOffset, 0, 0, 0, 0, new AprilTagValues());
+                executeDriveMovement(alignment);
             }
         }
 
         // DRIVE CASES
         if (type.isDriveType) {
-            double  a = movement.INCHES_FORWARD * type.SGN_forward,
-                    b = movement.INCHES_STRAFE * type.SGN_strafe,
-                    c = Math.hypot(a,b),
-                    theta = Math.atan2(a,b),
-
-                    u = Math.hypot(MovementThread.K_STRAFE * Math.cos(theta), MovementThread.K_FORWARD * Math.sin(theta)),
-                    L = Math.abs(u*c*Math.cos(theta)-u*c*Math.sin(theta))/Math.sqrt(2),
-                    R = Math.abs(u*c*Math.cos(theta)+u*c*Math.sin(theta))/Math.sqrt(2);
-
-            drive.driveByAngularEncoder(POWER_DRIVE, L, R, theta, movement.ignoreStartVelocity, movement.ignoreEndVelocity);
+            executeDriveMovement(movement);
         }
 
         // TURN CASES
         if (type.isTurnType) {
-            drive.turnByIMU(POWER_TURN, movement.DEGREES_TURN * type.SGN_turn);
+            executeTurnMovement(movement);
         }
 
         // ARM CASES
@@ -130,4 +124,42 @@ public class MovementThread implements Runnable {
         runtime.reset();
         while (opMode.opModeIsActive() && (runtime.milliseconds() < ms));
     }
+
+    /**
+     * Executes a drive type movement in this MovementThread.
+     * @param driveMovement the movement to be executed.
+     */
+    private void executeDriveMovement(Movement driveMovement) {
+        Movement.MovementType type = driveMovement.MOVEMENT_TYPE;
+
+        double  a = driveMovement.INCHES_FORWARD * type.SGN_forward,
+                b = driveMovement.INCHES_STRAFE * type.SGN_strafe,
+                c = Math.hypot(a,b),
+                theta = Math.atan2(a,b),
+
+                u = Math.hypot(MovementThread.K_STRAFE * Math.cos(theta), MovementThread.K_FORWARD * Math.sin(theta)),
+                L = Math.abs(u*c*Math.cos(theta)-u*c*Math.sin(theta))/Math.sqrt(2),
+                R = Math.abs(u*c*Math.cos(theta)+u*c*Math.sin(theta))/Math.sqrt(2);
+
+        DrivePIDCoefficients.MAX_ATTAINABLE_VELOCITY = Math.min(DrivePIDCoefficients.MAX_VELOCITY, DrivePIDCoefficients.MAX_VELOCITY * c / 60.0 + DrivePIDCoefficients.MAX_VELOCITY * 2.0 / 5.0);
+        DrivePIDCoefficients.VELOCITY_USED_GAIN = Math.min(40, DrivePIDCoefficients.VELOCITY_GAIN + Math.abs(b) * 2);
+
+        DrivePIDCoefficients.MAX_ATTAINABLE_VELOCITY = DrivePIDCoefficients.MAX_VELOCITY;
+        DrivePIDCoefficients.VELOCITY_USED_GAIN = 50;
+
+        drive.driveByAngularEncoder(POWER_DRIVE, L, R, theta, driveMovement.ignoreStartVelocity, driveMovement.ignoreEndVelocity);
+
+    }
+
+    /**
+     * Executes a turn type movement in this MovementThread.
+     * @param turnMovement the movement to be executed.
+     */
+    private void executeTurnMovement(Movement turnMovement) {
+        Movement.MovementType type = turnMovement.MOVEMENT_TYPE;
+
+        drive.turnByIMU(POWER_TURN, turnMovement.DEGREES_TURN * type.SGN_turn);
+
+    }
+    
 }

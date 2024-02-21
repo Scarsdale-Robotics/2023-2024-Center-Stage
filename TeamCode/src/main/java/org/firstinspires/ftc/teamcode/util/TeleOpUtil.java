@@ -50,12 +50,13 @@ public class TeleOpUtil {
         drive = robot.getDrive();
         cv = robot.getCV();
         cv.disablePropProcessor();
+        cv.decShutter();
         cv.switchCamera(cv.cameraName1);
         this.isRedTeam = isRedTeam;
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
         this.telemetry = telemetry;
-        this.lastTurnStart = robot.getIMU().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        this.lastTurnStart = robot.getDrive().getYaw();
         this.inDep = robot.getInDep();
         this.endgame = robot.getEndgame();
         inDep.open();

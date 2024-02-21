@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -32,7 +34,7 @@ public class HardwareRobot {
     public final Servo rightClaw;
     public final ServoImplEx wrist;
     public final CRServo drone;
-    public final IMU imu;
+    public final AdafruitBNO055IMU imu;
     //    public final OpenCvCamera frontCam;
     public final WebcamName frontCamName;
     //    public final OpenCvCamera backCam;
@@ -115,12 +117,12 @@ public class HardwareRobot {
         wrist.setPwmRange(new PwmControl.PwmRange(500, 2500));
         elbow.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
-        imu = hardwareMap.get(IMU.class, "imu");
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
-        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
-        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
-        imu.resetYaw();
+        imu = hardwareMap.get(AdafruitBNO055IMU.class, "imu");
+//        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
+//        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+//        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
+//        imu.resetDeviceConfigurationForOpMode();
+        imu.initialize(new BNO055IMU.Parameters());
 
 
         backCamName = hardwareMap.get(WebcamName.class, "Webcam Back");
@@ -134,10 +136,5 @@ public class HardwareRobot {
 //        exposureControlFront.setExposure(exposureControlFront.getMinExposure(TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS);
 //        FtcDashboard.getInstance().startCameraStream(frontCam, 0);
 //        nameToCamera.put(frontCamName, frontCam);
-    }
-
-    public double getYaw() {
-        double angle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-        return angle;
     }
 }

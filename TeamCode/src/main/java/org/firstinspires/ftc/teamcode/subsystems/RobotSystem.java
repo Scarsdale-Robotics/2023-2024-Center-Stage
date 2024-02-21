@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -47,16 +48,13 @@ public class RobotSystem {
                 opMode);
         endgame = new EndgameSubsystem(hardwareRobot.drone);
         MovementThread.initSubsystems(drive, inDep, cv, opMode);
-        while (getIMU().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) == 0D && opMode.opModeIsActive()) {
-            getIMU().resetYaw();
-        }
-        getIMU().resetYaw();
+        drive.resetIMU();
     }
 
     public HardwareRobot getHardwareRobot() {
         return hardwareRobot;
     }
-    public IMU getIMU() {
+    public AdafruitBNO055IMU getIMU() {
         return hardwareRobot.imu;
     }
     public InDepSubsystem getInDep() {
