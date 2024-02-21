@@ -459,9 +459,10 @@ public class CVSubsystem extends SubsystemBase {
         Collections.sort(xEst);
         Collections.sort(yEst);
         Collections.sort(rotEst);
-        double xMed   = xEst.get(xEst.size() / 2);
-        double yMed   = yEst.get(xEst.size() / 2);
-        double rotMed = rotEst.get(xEst.size() / 2);
+        double xMed = 0, yMed = 0, rotMed = 0;
+        if (xEst.size() > 0) xMed = xEst.get(xEst.size() / 2);
+        if (yEst.size() > 0) yMed = yEst.get(yEst.size() / 2);
+        if (rotEst.size() > 0) rotMed = rotEst.get(rotEst.size() / 2);
         lastKnownPos = new double[]{xMed, yMed, rotMed};
         //xMed, yMed is in term of number of tiles
         return lastKnownPos;

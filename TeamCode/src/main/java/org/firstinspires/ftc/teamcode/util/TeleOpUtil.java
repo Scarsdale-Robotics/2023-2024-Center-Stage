@@ -179,7 +179,7 @@ public class TeleOpUtil {
 
         //TODO: GET EXTERNAL IMU FOR FIELD CENTRIC
 //        drive.driveFieldCentric(vsn, vfn, vtn);
-        drive.driveRobotCentric(vs, vf, vt);
+        drive.driveFieldCentric(vs, vf, vt);
     }
 //HHHHHHHHHHIIIIIIIII
     //poopypoop poop
