@@ -279,10 +279,12 @@ public class TeleOpUtil {
         runEndgameControl();
 
 //        //TODO: does this cause switch between "robot" centric and field centric
-//        if (gamepad2.circle && gamepad2.dpad_left) {
-////            drive.resetIMU();
+        if (gamepad2.circle && gamepad2.dpad_left) {
+            drive.resetIMU();
+            gamepad1.rumble(500);
+            gamepad2.rumble(500);
 //            telemetry.addData("poop", Math.random());
-//        }
+        }
 
         if (!gamepad2.dpad_left && cvDist < DISTANCE_BEFORE_BACKBOARD && !(inDep.getIsLeftClawOpen() || inDep.getIsRightClawOpen())) {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);

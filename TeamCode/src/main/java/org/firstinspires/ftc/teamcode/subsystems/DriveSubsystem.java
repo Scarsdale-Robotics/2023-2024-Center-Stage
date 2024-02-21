@@ -4,6 +4,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -26,6 +27,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     private static volatile boolean isBusy;
     private static volatile ExecutorService threadPool;
+    // facing audience = -90, facing backdrop = 90, facing away ("out") = 0, facing in = 180
+    private int offsetAngle = -90;
     private final MecanumDrive controller;
     private final AdafruitBNO055IMU imu;
     private final LinearOpMode opMode;
@@ -773,11 +776,10 @@ public class DriveSubsystem extends SubsystemBase {
 
     public void resetIMU() {
         imu.resetDeviceConfigurationForOpMode();
+        imu.initialize(new BNO055IMU.Parameters());
     }
 
     public double getYaw() {
-        // facing audience = -90, facing backdrop = 90, facing away ("out") = 0, facing in = 180
-        int offsetAngle = -90;
         return (imu.getAngularOrientation().firstAngle * 180.0 / Math.PI + 180 + offsetAngle) % 360 - 180;
     }
 
