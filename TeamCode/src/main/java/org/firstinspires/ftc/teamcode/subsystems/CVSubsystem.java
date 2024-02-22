@@ -491,11 +491,11 @@ public class CVSubsystem extends SubsystemBase {
 
     public static class Position {
         public double x;
-        public double y;
+        public double range;
         public double turn;
-        public Position(double x, double y, double turn) {
+        public Position(double x, double range, double turn) {
             this.x = x;
-            this.y = y;
+            this.range = range;
             this.turn = turn;
         }
     }

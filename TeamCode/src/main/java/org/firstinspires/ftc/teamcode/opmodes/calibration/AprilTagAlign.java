@@ -19,8 +19,11 @@ public class AprilTagAlign extends LinearOpMode {
         RobotSystem robot = new RobotSystem(hardwareMap, false, this, telemetry);
         waitForStart();
         MovementSequence main = new MovementSequenceBuilder()
-                .alignWithAprilTagParRot(9, turnOffset)
+//                .turnRight(16.5)
+//                .left(5)
+//                .forward(10)
                 .alignWithAprilTagPos(9, yOffset, xOffset, turnOffset)
+                .alignWithAprilTagParRot(9, turnOffset)
                 .build();
         robot.getDrive().followMovementSequence(main);
     }
