@@ -424,8 +424,8 @@ public class MovementSequenceBuilder {
      * @param yOffset a double >= 0 representing the targeted yOffset compared to the AprilTag, which positive values are "inwards".
      * @param xOffset a double representing the targeted xOffset compared to the AprilTag, where positive values have robot more right of the AprilTag.
      */
-    public MovementSequenceBuilder alignWithAprilTagPos(int tagID, double yOffset, double xOffset) {
-        movements.add(new Movement(Movement.MovementType.APRIL_TAG_ALIGN_POS, 0, 0, 0, 0, 0, 0, new AprilTagValues(tagID, 0, xOffset, yOffset)));
+    public MovementSequenceBuilder alignWithAprilTagPos(int tagID, double yOffset, double xOffset, double turnOffset) {
+        movements.add(new Movement(Movement.MovementType.APRIL_TAG_ALIGN_POS, 0, 0, 0, 0, 0, 0, new AprilTagValues(tagID, turnOffset, xOffset, yOffset)));
         return this;
     }
 

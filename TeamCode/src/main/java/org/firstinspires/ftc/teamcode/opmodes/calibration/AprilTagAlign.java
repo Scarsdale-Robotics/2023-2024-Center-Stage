@@ -11,13 +11,16 @@ import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilde
 @Autonomous
 @Config
 public class AprilTagAlign extends LinearOpMode {
+    public static double turnOffset = 16.5;
+    public static double yOffset = 10;
+    public static double xOffset = 0;
     @Override
     public void runOpMode() throws InterruptedException {
         RobotSystem robot = new RobotSystem(hardwareMap, false, this, telemetry);
         waitForStart();
         MovementSequence main = new MovementSequenceBuilder()
-                .alignWithAprilTagParRot(9, 25)
-                .alignWithAprilTagPos(9, 20, -5)
+                .alignWithAprilTagParRot(9, turnOffset)
+                .alignWithAprilTagPos(9, yOffset, xOffset, turnOffset)
                 .build();
         robot.getDrive().followMovementSequence(main);
     }

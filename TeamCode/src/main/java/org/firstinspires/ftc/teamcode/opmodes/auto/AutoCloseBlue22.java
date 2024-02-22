@@ -59,6 +59,8 @@ public class AutoCloseBlue22 extends LinearOpMode {
         }
         robot.getCV().disablePropProcessor();
 
+        double turnOffset = 16.5;
+
         MovementSequence main = new MovementSequenceBuilder().build();
 
         int WHITE_REPS = 2;
@@ -84,8 +86,8 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .lowerArm(150, true)
                     .forward(87, false, true)
                     .lowerArm(40, true)
-                    .alignWithAprilTagParRot(9, -27)
-                    .alignWithAprilTagPos(9, 12, 12)
+                    .alignWithAprilTagParRot(9, turnOffset)
+                    .alignWithAprilTagPos(9, 12, 12, turnOffset)
                     .forward(12)
                     .lowerArm(20, true)
                     .closeBothClaws()  // white intake

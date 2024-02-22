@@ -503,7 +503,8 @@ public class CVSubsystem extends SubsystemBase {
     public Position getPosToAprilTag(int tagid) {
         for (AprilTagDetection detection : aprilTag.getDetections()) {
             if (detection.id == tagid) {
-                return new Position(detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.yaw);
+                // scuffed
+                return new Position(detection.ftcPose.x * 0.3937, detection.ftcPose.range * 0.3937, detection.ftcPose.yaw);
             }
         }
         return null;

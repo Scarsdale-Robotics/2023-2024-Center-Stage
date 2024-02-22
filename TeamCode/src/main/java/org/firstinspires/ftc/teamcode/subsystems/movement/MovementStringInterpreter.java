@@ -187,9 +187,9 @@ public class MovementStringInterpreter {
 					break;
 
 				case "alignWithAprilTagPos":
-					if (!isIn(params.length, 3))
+					if (!isIn(params.length, 4))
 						throwInterpretError();
-					movement = alignWithAprilTagPos((int)eval(params[0]), eval(params[1]), eval(params[2]));
+					movement = alignWithAprilTagPos((int)eval(params[0]), eval(params[1]), eval(params[2]), eval(params[3]));
 					break;
 
 				case "forward":
@@ -360,8 +360,8 @@ public class MovementStringInterpreter {
 	private static Movement alignWithAprilTagParRot(int tagid, double turnOffset) {
 		return (new Movement(Movement.MovementType.APRIL_TAG_ALIGN_PAR_ROT, 0, 0, turnOffset, tagid, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 	}
-	public static Movement alignWithAprilTagPos(int tagid, double yOffset, double xOffset) {
-		return (new Movement(Movement.MovementType.APRIL_TAG_ALIGN_POS, -yOffset, xOffset, 0, tagid, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
+	public static Movement alignWithAprilTagPos(int tagid, double yOffset, double xOffset, double turnOffset) {
+		return (new Movement(Movement.MovementType.APRIL_TAG_ALIGN_POS, yOffset, xOffset, turnOffset, tagid, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
 	}
 
 	/**

@@ -62,8 +62,10 @@ public class MovementThread implements Runnable {
                 while (opMode.opModeIsActive() && pos == null) {
                     pos = cv.getPosToAprilTag((int) aprilTagValues.tagID);
                 }
-                Movement alignment = new Movement(Movement.MovementType.FORWARD_RIGHT, pos.y - aprilTagValues.yOffset, pos.x + aprilTagValues.xOffset, 0, 0, 0, 0, new AprilTagValues());
-                executeDriveMovement(alignment);
+                Movement forward = new Movement(Movement.MovementType.FORWARD, pos.y * Math.cos(Math.toRadians(aprilTagValues.turnOffset)) - aprilTagValues.yOffset, 0, 0, 0, 0, 0, new AprilTagValues());
+                Movement strafe = new Movement(Movement.MovementType.STRAFE_RIGHT, 0, -pos.y * Math.signum(pos.x) * Math.sin(Math.toRadians(aprilTagValues.turnOffset)) + aprilTagValues.xOffset, 0, 0, 0, 0, new AprilTagValues());
+                executeDriveMovement(forward);
+                executeDriveMovement(strafe);
             }
         }
 
