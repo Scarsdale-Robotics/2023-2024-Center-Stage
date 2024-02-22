@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 
 public class MovementThread implements Runnable {
     public static volatile double K_FORWARD = 63.511;
-    public static volatile double K_STRAFE = 64.055;
+    public static volatile double K_STRAFE = 75.917;
     public static volatile double K_ARM = 11.111;
 
     private static final double POWER_DRIVE = SpeedCoefficients.getAutonomousDriveSpeed();
@@ -141,7 +141,7 @@ public class MovementThread implements Runnable {
                 L = Math.abs(u*c*Math.cos(theta)-u*c*Math.sin(theta))/Math.sqrt(2),
                 R = Math.abs(u*c*Math.cos(theta)+u*c*Math.sin(theta))/Math.sqrt(2);
 
-        DrivePIDCoefficients.MAX_ATTAINABLE_VELOCITY = Math.min(DrivePIDCoefficients.MAX_VELOCITY, DrivePIDCoefficients.MAX_VELOCITY * c / 60.0 + DrivePIDCoefficients.MAX_VELOCITY / 4.0);
+        DrivePIDCoefficients.MAX_ATTAINABLE_VELOCITY = Math.min(DrivePIDCoefficients.MAX_VELOCITY, DrivePIDCoefficients.MAX_VELOCITY * (c*c) / 5400.0 + DrivePIDCoefficients.MAX_VELOCITY / (3.0) );
 
         drive.driveByAngularEncoder(POWER_DRIVE, L, R, theta, driveMovement.ignoreStartVelocity, driveMovement.ignoreEndVelocity);
 
