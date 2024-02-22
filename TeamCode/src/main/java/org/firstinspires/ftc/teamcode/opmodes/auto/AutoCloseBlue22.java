@@ -66,6 +66,7 @@ public class AutoCloseBlue22 extends LinearOpMode {
 
         if (propLocation == 0) {
             main = new MovementSequenceBuilder()
+                    .setWrist(0.7)
                     .forwardLeft(28, 7)
                     .raiseArm(10, true)
                     .openRightClaw()  // purple
@@ -107,6 +108,7 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .build();
         } else if (propLocation == 1) {
             main = new MovementSequenceBuilder()
+                    .setWrist(0.7)
                     .forwardLeft(38, 7)
                     .raiseArm(10, true)
                     .turnRight(90)
@@ -145,6 +147,7 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .build();
         } else if (propLocation == 2) {
             main = new MovementSequenceBuilder()
+                    .setWrist(0.7)
                     .forward(34)
                     .turnRight(90)
                     .forward(6)

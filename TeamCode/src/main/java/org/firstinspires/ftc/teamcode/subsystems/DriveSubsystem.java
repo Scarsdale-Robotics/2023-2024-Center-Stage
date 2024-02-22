@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.subsystems.movement.Movement;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.util.DrivePIDCoefficients;
 import org.firstinspires.ftc.teamcode.util.PIDController;
+import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -220,6 +221,7 @@ public class DriveSubsystem extends SubsystemBase {
             LF_PID.setErrorTolerance(DrivePIDCoefficients.getErrorTolerance_p());
             RF_PID.setErrorTolerance(DrivePIDCoefficients.getErrorTolerance_p());
 
+            telemetry.addData("THETA", theta);
             // handle wheel velocities
             double[] velocitySetpoints = calculateVelocitySetpoints(driveSpeed, theta, elapsedTime, travelTimes, maxVelocity, ignoreStartVelocity, ignoreEndVelocity);
             double LB_v = velocitySetpoints[0], RF_v = velocitySetpoints[0], RB_v = velocitySetpoints[1], LF_v = velocitySetpoints[1];
@@ -243,7 +245,7 @@ public class DriveSubsystem extends SubsystemBase {
             }
 
             // handle wheel positions
-            double[] positionSetpoints = calculatePositionSetpoints(LB_start, RB_start, driveSpeed, theta, elapsedTime, travelTimes, maxVelocity, ignoreStartVelocity, ignoreEndVelocity);
+            double[] positionSetpoints = calculatePositionSetpoints(LB_start, RB_start, theta, elapsedTime, travelTimes, maxVelocity, ignoreStartVelocity, ignoreEndVelocity);
             double LB_sp = positionSetpoints[0], RF_sp = positionSetpoints[0], RB_sp = positionSetpoints[1], LF_sp = positionSetpoints[1];
 
             LB_PID.setSetPoint(LB_sp + LBTurnPosDiff);
@@ -274,12 +276,13 @@ public class DriveSubsystem extends SubsystemBase {
             telemetry.addData("RF_p", RF_p);
 
             // these are fine
-//            telemetry.addData("LB_C", LB_C);
-//            telemetry.addData("RB_C", RB_C);
-//            telemetry.addData("LF_C", LF_C);
-//            telemetry.addData("RF_C", RF_C);
+            telemetry.addData("LB_C", LB_C);
+            telemetry.addData("RB_C", RB_C);
+            telemetry.addData("LF_C", LF_C);
+            telemetry.addData("RF_C", RF_C);
 
-            double AVG_C = (LB_C + RB_C + LF_C + RF_C) / 4.0;
+            double L_AVG_C = (Math.abs(LB_C) + Math.abs(RF_C)) / 2.0;
+            double R_AVG_C = (Math.abs(RB_C) + Math.abs(LF_C)) / 2.0;
 
             this.telemetry.addData("LB Abs Error", LB_PID.getAbsoluteDiff(LB_p));
             this.telemetry.addData("RB Abs Error", RB_PID.getAbsoluteDiff(RB_p));
@@ -287,10 +290,10 @@ public class DriveSubsystem extends SubsystemBase {
             this.telemetry.addData("RF Abs Error", RF_PID.getAbsoluteDiff(RF_p));
 
             if (!(LB_PID.getAbsoluteDiff(LB_p) + RB_PID.getAbsoluteDiff(RB_p) + LF_PID.getAbsoluteDiff(LF_p) + RF_PID.getAbsoluteDiff(RF_p) < 4 * DrivePIDCoefficients.getErrorTolerance_p())) {
-                LB_v += AVG_C;
-                RB_v += AVG_C;
-                LF_v += AVG_C;
-                RF_v += AVG_C;
+                LB_v += L_AVG_C * Math.signum(LB_C);
+                RB_v += R_AVG_C * Math.signum(RB_C);
+                LF_v += R_AVG_C * Math.signum(LF_C);
+                RF_v += L_AVG_C * Math.signum(RF_C);
             }
 
             // these are fine
@@ -308,14 +311,14 @@ public class DriveSubsystem extends SubsystemBase {
 
             double theoreticalMaxVelocity = DrivePIDCoefficients.MAX_VELOCITY;
             double LF_power = (LF_v + LFTurnPosDiff) / theoreticalMaxVelocity;
-            double RF_power = (LF_v + LFTurnPosDiff) / theoreticalMaxVelocity;
-            double LB_power = (LF_v + LFTurnPosDiff) / theoreticalMaxVelocity;
-            double RB_power = (LF_v + LFTurnPosDiff) / theoreticalMaxVelocity;
+            double RF_power = (RF_v + RFTurnPosDiff) / theoreticalMaxVelocity;
+            double LB_power = (LB_v + LBTurnPosDiff) / theoreticalMaxVelocity;
+            double RB_power = (RB_v + RBTurnPosDiff) / theoreticalMaxVelocity;
 
-            telemetry.addData("LB Power", LF_power);
-            telemetry.addData("RB Power", RF_power);
-            telemetry.addData("LF Power", LB_power);
-            telemetry.addData("RF Power", RB_power);
+            telemetry.addData("LB Power", LB_power);
+            telemetry.addData("RB Power", RB_power);
+            telemetry.addData("LF Power", LF_power);
+            telemetry.addData("RF Power", RF_power);
 
             // normalize velocities and drive with motor powers
             driveWithMotorPowers(
@@ -339,7 +342,7 @@ public class DriveSubsystem extends SubsystemBase {
     /**
      * Calculates the target positions for the leftBack and rightBack wheels in a movement at a certain time.
      */
-    private static double[] calculatePositionSetpoints(double L_start, double R_start, double driveSpeed, double theta, double elapsedTime, double[] travelTimes, double maxVelocity, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
+    private static double[] calculatePositionSetpoints(double L_start, double R_start, double theta, double elapsedTime, double[] travelTimes, double maxVelocity, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
 
         // this method returns {L_sp, R_sp}
 
@@ -385,12 +388,12 @@ public class DriveSubsystem extends SubsystemBase {
             waypointTime = waypoints[1] - waypoints[0];
         // rectangular graph
         if (ignoreStartVelocity) {
-            currentDistance += waypointTime * maxVelocity * driveSpeed;
+            currentDistance += waypointTime * maxVelocity;
         }
         // trapezoidal graph
         else {
             double a = maxVelocity / waypoints[1]; // acceleration
-            currentDistance += 0.5 * a * Math.pow(waypointTime, 2) * driveSpeed;
+            currentDistance += 0.5 * a * Math.pow(waypointTime, 2);
         }
 
         // waypoint 2
@@ -398,14 +401,14 @@ public class DriveSubsystem extends SubsystemBase {
         if (elapsedTime >= waypoints[2]) // clip time to waypoint 2
             waypointTime = waypoints[2] - waypoints[1];
         // rectangular graph
-        currentDistance += waypointTime * maxVelocity * driveSpeed;
+        currentDistance += waypointTime * maxVelocity;
 
         // waypoint 3
         waypointTime = Math.max(elapsedTime - waypoints[2], 0); // elapsed non-negative time since waypoint 3
         if (elapsedTime >= waypoints[3]) // clip time to waypoint 3
             waypointTime = waypoints[3] - waypoints[2];
         // rectangular graph
-        currentDistance += waypointTime * maxVelocity * driveSpeed;
+        currentDistance += waypointTime * maxVelocity;
 
         // waypoint 4
         waypointTime = Math.max(elapsedTime - waypoints[3], 0); // elapsed non-negative time since waypoint 4
@@ -413,12 +416,12 @@ public class DriveSubsystem extends SubsystemBase {
             waypointTime = waypoints[4] - waypoints[3];
         // rectangular graph
         if (ignoreEndVelocity) {
-            currentDistance += waypointTime * maxVelocity * driveSpeed;
+            currentDistance += waypointTime * maxVelocity;
         }
         // trapezoidal graph
         else {
             double a = maxVelocity / waypoints[1]; // acceleration
-            currentDistance += 0.5 * (waypoints[4] - waypoints[3]) * (maxVelocity * driveSpeed) - 0.5 * a * Math.pow(waypoints[4] - waypoints[3] - waypointTime, 2) * driveSpeed;
+            currentDistance += 0.5 * (waypoints[4] - waypoints[3]) * (maxVelocity) - 0.5 * a * Math.pow(waypoints[4] - waypoints[3] - waypointTime, 2);
         }
 
         // calculate setpoints

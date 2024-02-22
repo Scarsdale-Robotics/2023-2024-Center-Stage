@@ -7,7 +7,6 @@ public class DrivePIDCoefficients {
 
     public static final double MAX_VELOCITY = 2000; // wheels ticks per second on ground
     public static double MAX_ATTAINABLE_VELOCITY = MAX_VELOCITY;
-    public static double POWER_GAIN = 0.11; // for velocity control in wheels
     public static double TURN_VELOCITY_GAIN = 50; // for position control in drive movements
     public static double TURN_POSITION_GAIN = 0.0001; // for position control in drive movements
     public static double VELOCITY_GAIN = 50; // for position control in drive movements
