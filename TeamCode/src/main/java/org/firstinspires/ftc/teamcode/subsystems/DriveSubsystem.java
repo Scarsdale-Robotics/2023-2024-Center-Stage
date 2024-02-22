@@ -622,7 +622,7 @@ public class DriveSubsystem extends SubsystemBase {
         // begin action
         double startAngle = getYaw();
         double setPoint = degrees;
-        double cumulativeAngle = 0, previousAngle = getYaw();
+        double cumulativeAngle = 0, previousAngle = heading;
         double K;
 
         PIDController PID = new PIDController(DrivePIDCoefficients.getTurnP(), DrivePIDCoefficients.getTurnI(), DrivePIDCoefficients.getTurnD(), setPoint);
@@ -658,7 +658,7 @@ public class DriveSubsystem extends SubsystemBase {
 
         // brake
         stopController();
-        heading = getYaw();
+        heading += degrees;
         isBusy = false;
     }
 
