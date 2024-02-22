@@ -32,9 +32,9 @@ public class InDepSubsystem extends SubsystemBase {
     private Level level = Level.GROUND;
 
     public enum Level {
-        GROUND(0, 0.31, false),
-        BACKBOARD_HIGH(1261,0.39, true),
-        BACKBOARD_MID(2150,0.34, true), // tuned values
+        GROUND(0, 0.58, false),
+        BACKBOARD_HIGH(1261,0.55, true),
+        BACKBOARD_MID(2150,0.58, true), // tuned values
         BACKBOARD_LOW(2330, 0.27, true);
 
         public final int target;
@@ -62,12 +62,12 @@ public class InDepSubsystem extends SubsystemBase {
         }
     }
     public enum EndEffector {
-        LEFT_CLAW_OPEN(0.8),
+        LEFT_CLAW_OPEN(0.75),
         LEFT_CLAW_CLOSED(0.55),
-        RIGHT_CLAW_OPEN(0.0),
+        RIGHT_CLAW_OPEN(0.05),
         RIGHT_CLAW_CLOSED(0.25),
-        ELBOW_REST(0.99),
-        ELBOW_FLIPPED(0.0);
+        ELBOW_REST(0.763),
+        ELBOW_FLIPPED(0.262);
         public final double servoPosition;
 
         EndEffector(double servoPosition) {
@@ -182,9 +182,9 @@ public class InDepSubsystem extends SubsystemBase {
         if (level != getLevelBelow()) {
             level = getLevelBelow();
         }
-        setElbowPosition(calculateElbowPosition(armPos-delta));
 
-        wrist.setPosition(level.wristTarget);
+        setElbowPosition(calculateElbowPosition(armPos-delta));
+        setWristPosition(calculateWristPosition(armPos-delta));
 
         opMode.telemetry.addData("chicken: ", "nugget");
         opMode.telemetry.addData("elbowPos", elbow.getPosition());
@@ -226,17 +226,10 @@ public class InDepSubsystem extends SubsystemBase {
                 telemetry.addData("L Setpoint", L_setPoint);
                 telemetry.update();
             }
-            if (getLeftArmPosition() >= Level.BACKBOARD_LOW.target+delta) {
-                wrist.setPosition(Level.BACKBOARD_LOW.wristTarget);
-            } else if (getLeftArmPosition() >= Level.BACKBOARD_MID.target+delta) {
-                wrist.setPosition(Level.BACKBOARD_MID.wristTarget);
-            } else if (getLeftArmPosition() >= Level.BACKBOARD_HIGH.target+delta) {
-                wrist.setPosition(Level.BACKBOARD_HIGH.wristTarget);
-            } else if(getLeftArmPosition() >= Level.GROUND.target+delta) {
-                wrist.setPosition(Level.GROUND.wristTarget);
-            } else {
-                wrist.setPosition(0.25);
-            }
+
+            double armPos = getLeftArmPosition();
+            setElbowPosition(calculateElbowPosition(armPos-delta));
+            setWristPosition(calculateWristPosition(armPos-delta));
 
             isBusy = true;
         }
@@ -375,6 +368,38 @@ public class InDepSubsystem extends SubsystemBase {
             return m_elbow*armPos - m_elbow*500 + EndEffector.ELBOW_REST.servoPosition;
         else
             return EndEffector.ELBOW_FLIPPED.servoPosition;
+    }
+
+    /**
+     * Calculates the wrist's position based on the arm's position
+     */
+    private double calculateWristPosition(double armPos) {
+        double lowerBound = 1261;
+        double[][] points = new double[][] {
+                {1867, 0.46},
+                {1955, 0.47},
+                {2089, 0.49},
+                {2132, 0.52},
+                {2264, 0.56},
+                {2302, 0.57},
+                {2366, 0.58}
+        };
+
+        if (armPos < 1261)
+            return 0.58;
+        else {
+            for (int i = 0; i < points.length; i++) {
+                if (armPos < points[i][0]) {
+                    if (i == 0)
+                        return points[0][1];
+
+                    double[] previousPoint = points[i-1], currentPoint = points[i];
+                    double slope = (currentPoint[1] - previousPoint[1]) / (currentPoint[0] - previousPoint[0]);
+                    return previousPoint[1] + slope * (armPos - previousPoint[0]);
+                }
+            }
+            return points[points.length-1][1];
+        }
     }
 
     /**

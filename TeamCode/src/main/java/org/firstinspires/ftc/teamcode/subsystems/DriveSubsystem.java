@@ -234,8 +234,8 @@ public class DriveSubsystem extends SubsystemBase {
             double turnPositionGain = DrivePIDCoefficients.TURN_POSITION_GAIN;
             double deltaTime = runtime.seconds() - elapsedTime;
             double currentHeading = getYaw();
-            double thetaDiff = normalizeAngle(currentHeading - this.heading);
-            telemetry.addData("HEADING", currentHeading);
+            double thetaDiff = normalizeAngle(currentHeading - heading);
+            telemetry.addData("HEADING", heading);
             if (Math.abs(thetaDiff) < 15) {
                 LB_v += turnVelocityGain * thetaDiff;
                 RB_v -= turnVelocityGain * thetaDiff;
@@ -623,12 +623,10 @@ public class DriveSubsystem extends SubsystemBase {
         }
 
         // begin action
-        double startAngle = getYaw();
-        double setPoint = degrees;
-        double cumulativeAngle = 0, previousAngle = heading;
+        double cumulativeAngle = 0, previousAngle = getYaw();
         double K;
 
-        PIDController PID = new PIDController(DrivePIDCoefficients.getTurnP(), DrivePIDCoefficients.getTurnI(), DrivePIDCoefficients.getTurnD(), setPoint);
+        PIDController PID = new PIDController(DrivePIDCoefficients.getTurnP(), DrivePIDCoefficients.getTurnI(), DrivePIDCoefficients.getTurnD(), degrees);
 
         while (
                 opMode.opModeIsActive() && !(
@@ -646,9 +644,9 @@ public class DriveSubsystem extends SubsystemBase {
 
             if (telemetry != null) {
                 telemetry.addData("CURRENT MOVEMENT:", currentMovement);
-                telemetry.addData("HEADING", currentHeading);
-                telemetry.addData("Degrees Disp setpoint",setPoint);
-                telemetry.addData("Degrees diff",setPoint-cumulativeAngle);
+                telemetry.addData("HEADING", heading);
+                telemetry.addData("Degrees Disp setpoint", degrees);
+                telemetry.addData("Degrees diff", degrees - cumulativeAngle);
                 telemetry.addData("Degrees cumulative",cumulativeAngle);
                 telemetry.addData("K",K);
                 telemetry.update();
@@ -662,6 +660,8 @@ public class DriveSubsystem extends SubsystemBase {
         // brake
         stopController();
         heading += degrees;
+        telemetry.addData("HEADING", heading);
+        telemetry.update();
         isBusy = false;
     }
 
@@ -799,7 +799,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public double getYaw() {
-        return (imu.getAngularOrientation().firstAngle * 180.0 / Math.PI + 180 + offsetAngle) % 360 - 180;
+        return normalizeAngle(imu.getAngularOrientation().firstAngle * 180.0 / Math.PI + offsetAngle);
     }
 
     /**

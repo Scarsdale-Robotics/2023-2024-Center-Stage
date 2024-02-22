@@ -68,20 +68,17 @@ public class AutoCloseBlue22 extends LinearOpMode {
 
         if (propLocation == 0) {
             main = new MovementSequenceBuilder()
-                    .setWrist(0.7)
                     .forwardLeft(28, 7)
                     .raiseArm(10, true)
                     .openRightClaw()  // purple
                     .sleepFor(500)
                     .backwardLeft(7, 19)
                     .raiseArm(40, true)
-                    .flipElbow()
                     .turnRight(90)
                     .raiseArm(160, true)
                     .backward(4)
                     .openLeftClaw()  // yellow
                     .sleepFor(500)
-                    .restElbow()
                     .forwardLeft(7, 31)
                     .lowerArm(150, true)
                     .forward(87, false, true)
@@ -94,14 +91,12 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .sleepFor(1000)
                     .backward(99, false, true)
                     .raiseArm(20, true)
-                    .flipElbow()
                     .backwardRight(3, 18, false, true)
                     .raiseArm(170, true)
                     .backward(7, false, true)
                     .openBothClaws()  // white deposit
                     .sleepFor(1000)
                     .forward(5, false, true)
-                    .restElbow()
                     .left(17, false, true)
                     .lowerArm(170, true)
                     .backward(9, false, true)
@@ -110,19 +105,16 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .build();
         } else if (propLocation == 1) {
             main = new MovementSequenceBuilder()
-                    .setWrist(0.7)
                     .forwardLeft(38, 7)
                     .raiseArm(10, true)
                     .turnRight(90)
                     .openRightClaw()  // purple
                     .sleepFor(500)
-                    .flipElbow()
                     .backwardRight(19, 14)
                     .raiseArm(200, true)
                     .backward(4)
                     .openLeftClaw()  // yellow
                     .sleepFor(1000)
-                    .restElbow()
                     .forwardLeft(12, 25, false, true)
                     .lowerArm(180, true)
                     .forward(65, false, true)
@@ -133,14 +125,12 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .sleepFor(1000)
                     .backward(97)
                     .raiseArm(20, true)
-                    .flipElbow()
                     .backwardRight(8, 27)
                     .raiseArm(170, true)
                     .backward(7)
                     .openBothClaws()  // white deposit
                     .sleepFor(1000)
                     .forward(3, false, true)
-                    .restElbow()
                     .left(16, false, true)
                     .lowerArm(170, true)
                     .backward(7, false, true)
@@ -149,20 +139,17 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .build();
         } else if (propLocation == 2) {
             main = new MovementSequenceBuilder()
-                    .setWrist(0.7)
                     .forward(34)
                     .turnRight(90)
                     .forward(6)
                     .raiseArm(10, true)
                     .openRightClaw()  // purple
                     .sleepFor(500)
-                    .flipElbow()
                     .backward(32)
                     .raiseArm(200, true)
                     .backward(3)
                     .openLeftClaw()  // yellow
                     .sleepFor(500)
-                    .restElbow()
                     .forwardLeft(17.68, 17.68, false, true)
                     .lowerArm(190, true)
                     .forward(58, false, true)
@@ -172,14 +159,12 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .sleepFor(1000)
                     .backward(88, false, true)
                     .raiseArm(20, true)
-                    .flipElbow()
                     .backwardRight(14.68, 25.68, false, true)
                     .raiseArm(170, true)
                     .backward(6)
                     .openBothClaws()  // white deposit
                     .sleepFor(1000)
                     .forward(3, false, true)
-                    .restElbow()
                     .left(26, false, true)
                     .lowerArm(170, true)
                     .backward(10, false, true)

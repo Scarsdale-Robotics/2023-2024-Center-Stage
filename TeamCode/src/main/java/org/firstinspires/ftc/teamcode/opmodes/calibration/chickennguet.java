@@ -110,8 +110,8 @@ public class chickennguet extends LinearOpMode {
             double diff = gamepad1.right_trigger - gamepad1.left_trigger;
             telemetry.addData("armpos", inDep.getLeftArmPosition());
             telemetry.addData("spd", speed*diff);
-            hardwareRobot.arm1.motor.setPower(speed*diff);
-            hardwareRobot.arm2.motor.setPower(speed*diff);
+            hardwareRobot.arm1.motor.setPower(0.25 * speed*diff);
+            hardwareRobot.arm2.motor.setPower(0.25 * speed*diff);
             telemetry.addData("armvelocity", inDep.getLeftArmVelocity());
             telemetry.addData("chicken", "nugget :>");
             telemetry.update();

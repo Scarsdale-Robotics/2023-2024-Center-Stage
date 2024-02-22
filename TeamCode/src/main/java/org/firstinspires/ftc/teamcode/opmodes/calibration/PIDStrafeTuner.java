@@ -33,8 +33,8 @@ public class PIDStrafeTuner extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
     private static DriveSubsystem drive;
     private static InDepSubsystem inDep;
-    public static double fwd = 0;
-    public static double str = 60;
+    public static double fwd = 6;
+    public static double str = 6;
     private MultipleTelemetry telemetry = new MultipleTelemetry(new TelemetryImpl((OpMode) this), FtcDashboard.getInstance().getTelemetry());
 
 

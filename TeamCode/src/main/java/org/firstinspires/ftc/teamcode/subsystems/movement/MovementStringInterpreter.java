@@ -357,11 +357,11 @@ public class MovementStringInterpreter {
 	/////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////
 
-	private static Movement alignWithAprilTagParRot(int tagid, double turnOffset) {
-		return (new Movement(Movement.MovementType.APRIL_TAG_ALIGN_PAR_ROT, 0, 0, turnOffset, tagid, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
+	private static Movement alignWithAprilTagParRot(int tagID, double turnOffset) {
+		return (new Movement(Movement.MovementType.APRIL_TAG_ALIGN_PAR_ROT, 0, 0, 0, 0, 0, 0, new AprilTagValues(tagID, turnOffset, 0, 0)));
 	}
-	public static Movement alignWithAprilTagPos(int tagid, double yOffset, double xOffset, double turnOffset) {
-		return (new Movement(Movement.MovementType.APRIL_TAG_ALIGN_POS, yOffset, xOffset, turnOffset, tagid, 0, 0, new AprilTagValues(-1, 0, 0, 0)));
+	public static Movement alignWithAprilTagPos(int tagID, double yOffset, double xOffset, double turnOffset) {
+		return (new Movement(Movement.MovementType.APRIL_TAG_ALIGN_POS, 0, 0, 0, 0, 0, 0, new AprilTagValues(tagID, turnOffset, xOffset, yOffset)));
 	}
 
 	/**
