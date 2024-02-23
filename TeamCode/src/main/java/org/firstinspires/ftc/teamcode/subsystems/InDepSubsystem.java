@@ -278,13 +278,13 @@ public class InDepSubsystem extends SubsystemBase {
         int positionDifference = Math.abs(currentArmPosition - targetPosition);
 
         // Check if the arm is within 25 ticks of the target position
-        if (positionDifference <= 25) {
+        if (positionDifference <= 50) {
             // If within 25 ticks, adjust the target to move 25 ticks further
             // Determine direction of adjustment based on whether current position is less than or greater than target
             if (currentArmPosition < targetPosition) {
-                targetPosition += 26; // Move further by 25 ticks
+                targetPosition += positionDifference; // Move further by 30 ticks
             } else {
-                targetPosition -= 26; // Move further by 25 ticks in the opposite direction
+                targetPosition -= positionDifference; // Move further by 30 ticks in the opposite direction
             }
         }
 
