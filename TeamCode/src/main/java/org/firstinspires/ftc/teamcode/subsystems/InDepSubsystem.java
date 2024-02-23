@@ -265,9 +265,31 @@ public class InDepSubsystem extends SubsystemBase {
     /**
      * Moves the arm to a target level.
      */
+//    public void setLevel(Level level) {
+//        wrist.setPosition(level.wristTarget);
+//        raiseToSetPoint(SpeedCoefficients.getArmSpeed(), level.target);
+//    }
+
     public void setLevel(Level level) {
-        wrist.setPosition(level.wristTarget);
-        raiseToSetPoint(SpeedCoefficients.getArmSpeed(), level.target);
+        wrist.setPosition(level.wristTarget); // Set the wrist position to the target defined by the level
+
+        int currentArmPosition = getLeftArmPosition(); // Assuming getLeftArmPosition() gives the current position of the arm
+        int targetPosition = level.target;
+        int positionDifference = Math.abs(currentArmPosition - targetPosition);
+
+        // Check if the arm is within 25 ticks of the target position
+        if (positionDifference <= 25) {
+            // If within 25 ticks, adjust the target to move 25 ticks further
+            // Determine direction of adjustment based on whether current position is less than or greater than target
+            if (currentArmPosition < targetPosition) {
+                targetPosition += 26; // Move further by 25 ticks
+            } else {
+                targetPosition -= 26; // Move further by 25 ticks in the opposite direction
+            }
+        }
+
+        // Proceed to move the arm to the adjusted target position
+        raiseToSetPoint(SpeedCoefficients.getArmSpeed(), targetPosition - currentArmPosition);
     }
 
     /**
