@@ -22,8 +22,8 @@ public class AprilTagAlign extends LinearOpMode {
 //                .turnRight(16.5)
 //                .left(5)
 //                .forward(10)
-                .alignWithAprilTagPos(9, yOffset, xOffset, turnOffset)
                 .alignWithAprilTagParRot(9, turnOffset)
+                .alignWithAprilTagPos(9, yOffset, xOffset, turnOffset)
                 .build();
         robot.getDrive().followMovementSequence(main);
     }

@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.util.DrivePIDCoefficients;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 public class MovementThread implements Runnable {
     public static volatile double K_FORWARD = 63.511;
@@ -48,24 +49,27 @@ public class MovementThread implements Runnable {
             AprilTagValues aprilTagValues = movement.APRIL_TAG_VALUES;
             
             if (type == Movement.MovementType.APRIL_TAG_ALIGN_PAR_ROT) {
-                CVSubsystem.Position pos = null;
+                AprilTagPoseFtc pos = null;
                 while (opMode.opModeIsActive() && pos == null) {
                     pos = cv.getPosToAprilTag((int) aprilTagValues.tagID);
                 }
                 // right turn is positive
-                Movement alignment = new Movement(Movement.MovementType.TURN_RIGHT, 0, 0, aprilTagValues.turnOffset - pos.turn, 0, 0, 0, new AprilTagValues());
+                Movement alignment = new Movement(Movement.MovementType.TURN_RIGHT, 0, 0, aprilTagValues.turnOffset - pos.yaw, 0, 0, 0, new AprilTagValues());
                 executeTurnMovement(alignment);
             }
             
             if (type == Movement.MovementType.APRIL_TAG_ALIGN_POS) {
-                CVSubsystem.Position pos = null;
+                AprilTagPoseFtc pos = null;
                 while (opMode.opModeIsActive() && pos == null) {
                     pos = cv.getPosToAprilTag((int) aprilTagValues.tagID);
                 }
-                Movement strafe = new Movement(Movement.MovementType.STRAFE_RIGHT, 0, pos.range * Math.signum(pos.x) * Math.sin(Math.toRadians(aprilTagValues.turnOffset)) + aprilTagValues.xOffset, 0, 0, 0, 0, new AprilTagValues());
-                Movement forward = new Movement(Movement.MovementType.FORWARD, pos.range * Math.cos(Math.toRadians(aprilTagValues.turnOffset)) - aprilTagValues.yOffset, 0, 0, 0, 0, 0, new AprilTagValues());
-                executeDriveMovement(strafe);
-                executeDriveMovement(forward);
+                Movement alignment = new Movement(
+                        Movement.MovementType.FORWARD_RIGHT,
+                        pos.range*Math.cos(Math.toRadians(aprilTagValues.turnOffset+pos.bearing))- aprilTagValues.yOffset,
+                        -pos.range*Math.sin(Math.toRadians(aprilTagValues.turnOffset+pos.bearing))- aprilTagValues.xOffset,
+                        0, 0, 0, 0, new AprilTagValues()
+                );
+                executeDriveMovement(alignment);
             }
         }
 

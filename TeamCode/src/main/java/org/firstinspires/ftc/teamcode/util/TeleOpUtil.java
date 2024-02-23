@@ -288,7 +288,6 @@ public class TeleOpUtil {
         runArmClawControl();
         runEndgameControl();
 
-//        //TODO: does this cause switch between "robot" centric and field centric
         if (gamepad2.circle && gamepad2.dpad_left) {
             drive.resetIMU();
             gamepad1.rumble(500);

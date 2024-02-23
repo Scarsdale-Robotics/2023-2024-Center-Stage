@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.cvpipelines.PixelGroupDetection
 // docs: https://javadoc.io/doc/org.firstinspires.ftc/RobotCore/latest/org/firstinspires/ftc/robotcore/internal/camera/delegating/CachingExposureControl.html
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 import org.opencv.core.Point;
 import org.openftc.easyopencv.OpenCvCamera;
 
@@ -154,7 +155,7 @@ public class CVSubsystem extends SubsystemBase {
 
         builder.setCamera(switchableCamera);
 
-        builder.setCameraResolution(new Size(800, 600)); // android.util
+        builder.setCameraResolution(new Size(640, 480)); // android.util
 
         // TODO: DISABLE PROPPROCESSOR FOR TELEOP
         builder.addProcessors(aprilTag, propProcessor);
@@ -500,11 +501,10 @@ public class CVSubsystem extends SubsystemBase {
         }
     }
 
-    public Position getPosToAprilTag(int tagid) {
+    public AprilTagPoseFtc getPosToAprilTag(int tagid) {
         for (AprilTagDetection detection : aprilTag.getDetections()) {
             if (detection.id == tagid) {
-                // scuffed
-                return new Position(detection.ftcPose.x * 0.3937, detection.ftcPose.range * 0.3937, detection.ftcPose.yaw);
+                return detection.ftcPose;
             }
         }
         return null;
