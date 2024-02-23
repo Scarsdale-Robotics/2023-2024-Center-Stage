@@ -1,13 +1,16 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryImpl;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementThread;
 
@@ -19,6 +22,7 @@ public class RobotSystem {
     private EndgameSubsystem endgame;
 
     public RobotSystem(HardwareMap hardwareMap, boolean isRedTeam, LinearOpMode opMode, Telemetry telemetry) {
+        MultipleTelemetry multipleTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         this.hardwareRobot = new HardwareRobot(hardwareMap);
         inDep = new InDepSubsystem(
                 hardwareRobot.arm1,
@@ -28,7 +32,7 @@ public class RobotSystem {
                 hardwareRobot.leftClaw,
                 hardwareRobot.rightClaw,
                 opMode,
-                new MultipleTelemetry(telemetry)
+                multipleTelemetry
         );
         drive = new DriveSubsystem(
                 hardwareRobot.leftFront,
@@ -37,7 +41,7 @@ public class RobotSystem {
                 hardwareRobot.rightBack,
                 hardwareRobot.imu,
                 opMode,
-                new MultipleTelemetry(telemetry)
+                multipleTelemetry
         );
         cv = new CVSubsystem(
                 hardwareRobot.frontCamName,

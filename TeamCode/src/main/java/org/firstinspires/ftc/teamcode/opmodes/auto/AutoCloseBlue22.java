@@ -105,36 +105,51 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .build();
         } else if (propLocation == 1) {
             main = new MovementSequenceBuilder()
-                    .forwardLeft(38, 7)
+                    //(16.75,63.5,-90)
+                    .forwardLeft(25.5, 2.25)
                     .raiseArm(10, true)
-                    .turnRight(90)
                     .openRightClaw()  // purple
                     .sleepFor(500)
-                    .backwardRight(19, 14)
-                    .raiseArm(200, true)
-                    .backward(4)
+                    .turnRight(90)
+                    .backwardLeft(5, 5)
+                    .backward(19)
+                    .raiseArm(205, true)
+                    .backward(5)
                     .openLeftClaw()  // yellow
                     .sleepFor(1000)
-                    .forwardLeft(12, 25, false, true)
-                    .lowerArm(180, true)
-                    .forward(65, false, true)
-                    .forward(20)
-                    .lowerArm(10, true)
-                    .lowerArm(10)
+                    .forward(3)
+                    .forwardLeft(15, 24)
+                    .lowerArm(146, true)
+                    .forward(72.5)
+                    .lowerArm(69, true)
+                    .forwardRight(15.5, 1.5)
                     .closeBothClaws()  // white intake
-                    .sleepFor(1000)
-                    .backward(97)
-                    .raiseArm(20, true)
-                    .backwardRight(8, 27)
-                    .raiseArm(170, true)
+                    .sleepFor(500)
+                    .openBothClaws()
+                    .sleepFor(500)
+                    .closeBothClaws()  // white intake 2_0
+                    .sleepFor(777)
+                    .closeBothClaws()  // don't worry about the suspiciously
+                    .backwardRight(3, 0)
+                    .raiseArm(10)
+                    .backwardRight(1, 0)
+                    .raiseArm(15)
+                    .closeBothClaws()  // high number of closeBothClaws()
+                    .flipElbow()
+                    .sleepFor(777)
+                    .closeBothClaws()  // keep them
+                    .restElbow()
+                    .backwardRight(88, 2.5)
+                    .backwardRight(16.75, 24)
+                    .raiseArm(165, true)
                     .backward(7)
                     .openBothClaws()  // white deposit
                     .sleepFor(1000)
                     .forward(3, false, true)
-                    .left(16, false, true)
+                    .left(24, false, true)
                     .lowerArm(170, true)
-                    .backward(7, false, true)
-                    .forward(7, false, true)  // lower arm maneuver
+                    .backward(11, false, true)
+                    .forward(4, false, true)  // lower arm maneuver
                     .lowerArm(20, true)
                     .build();
         } else if (propLocation == 2) {

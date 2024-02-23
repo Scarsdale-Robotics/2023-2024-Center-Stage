@@ -374,7 +374,7 @@ public class InDepSubsystem extends SubsystemBase {
      * Calculates the wrist's position based on the arm's position
      */
     private double calculateWristPosition(double armPos) {
-        double lowerBound = 1261;
+        double lowerBound = 1000;
         double[][] points = new double[][] {
                 {1867, 0.46},
                 {1955, 0.47},
@@ -385,7 +385,7 @@ public class InDepSubsystem extends SubsystemBase {
                 {2366, 0.58}
         };
 
-        if (armPos < 1261)
+        if (armPos < lowerBound)
             return 0.58;
         else {
             for (int i = 0; i < points.length; i++) {

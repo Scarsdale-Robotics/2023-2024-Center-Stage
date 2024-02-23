@@ -166,7 +166,7 @@ public class CVSubsystem extends SubsystemBase {
         // Disable or re-enable the aprilTag processor at any time.
         // visionPortal.setProcessorEnabled(aprilTag, true);
         visionPortal.setProcessorEnabled(propProcessor, true);
-        while (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING);
+        while (opMode.opModeInInit() && visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING);
         switchCamera(cameraName2);
         autoExposure();
     }

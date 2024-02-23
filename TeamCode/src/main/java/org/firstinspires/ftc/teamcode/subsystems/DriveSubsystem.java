@@ -109,6 +109,8 @@ public class DriveSubsystem extends SubsystemBase {
             telemetry.addData("RF Power", 0);
 
             this.telemetry.addData("HEADING", heading);
+            this.telemetry.addData("YAW", getYaw());
+            this.telemetry.addData("thetaDiff", 0);
 
             this.telemetry.update();
         }
@@ -184,6 +186,12 @@ public class DriveSubsystem extends SubsystemBase {
         if (!ignoreStartVelocity)
             stopController();
 
+        // reset wheel encoders to 0
+        leftBack.resetEncoder();
+        rightBack.resetEncoder();
+        leftFront.resetEncoder();
+        rightFront.resetEncoder();
+
         // initialize variables
         double LB_start = getLBPosition(), RB_start = -getRBPosition(), LF_start = -getLFPosition(), RF_start = getRFPosition();
         double L = leftTicks, R = rightTicks;
@@ -236,6 +244,7 @@ public class DriveSubsystem extends SubsystemBase {
             double currentHeading = getYaw();
             double thetaDiff = normalizeAngle(currentHeading - heading);
             telemetry.addData("HEADING", heading);
+            telemetry.addData("YAW", getYaw());
             if (Math.abs(thetaDiff) < 15) {
                 LB_v += turnVelocityGain * thetaDiff;
                 RB_v -= turnVelocityGain * thetaDiff;
@@ -645,6 +654,7 @@ public class DriveSubsystem extends SubsystemBase {
             if (telemetry != null) {
                 telemetry.addData("CURRENT MOVEMENT:", currentMovement);
                 telemetry.addData("HEADING", heading);
+                telemetry.addData("YAW", getYaw());
                 telemetry.addData("Degrees Disp setpoint", degrees);
                 telemetry.addData("Degrees diff", degrees - cumulativeAngle);
                 telemetry.addData("Degrees cumulative",cumulativeAngle);
@@ -659,8 +669,9 @@ public class DriveSubsystem extends SubsystemBase {
 
         // brake
         stopController();
-        heading += degrees;
+        heading = normalizeAngle(heading - degrees);
         telemetry.addData("HEADING", heading);
+        telemetry.addData("YAW", getYaw());
         telemetry.update();
         isBusy = false;
     }
@@ -670,11 +681,6 @@ public class DriveSubsystem extends SubsystemBase {
      * @param movementSequence      The MovementSequence to be followed.
      */
     public void followMovementSequence(MovementSequence movementSequence) {
-
-        leftBack.resetEncoder();
-        rightBack.resetEncoder();
-        leftFront.resetEncoder();
-        rightFront.resetEncoder();
 
         ArrayDeque<Movement> movements = movementSequence.movements.clone();
 
