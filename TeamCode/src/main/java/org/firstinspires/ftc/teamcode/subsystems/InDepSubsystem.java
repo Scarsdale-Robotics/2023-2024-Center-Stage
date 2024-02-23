@@ -196,39 +196,47 @@ public class InDepSubsystem extends SubsystemBase {
      * @param ticks      The angle to displace the arm by in ticks.
      */
     public void raiseByEncoder(double power, double ticks) {
+
         // check for clashing actions
         if (InDepSubsystem.getIsBusy()) {
             throw new RuntimeException("Tried to run two arm actions at once (arm is busy)");
         }
+
         // begin action
-        double L_startEncoder = arm1.motor.getCurrentPosition();
-        double L_setPoint = L_startEncoder + ticks;
+        double L_startEncoder = getLeftArmPosition(), R_startEncoder = getRightArmPosition();
+        double L_setPoint = L_startEncoder + ticks, R_setPoint = R_startEncoder + ticks;
         PIDController L_PID = new PIDController(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd(), L_setPoint);
+        PIDController R_PID = new PIDController(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd(), R_setPoint);
 
         while (
                 opMode.opModeIsActive() && !(
                         Math.abs(L_setPoint - getLeftArmPosition()) < InDepPIDCoefficients.getErrorTolerance_p() &&
-                                Math.abs(getLeftArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v())
+                                Math.abs(getLeftArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v() &&
+                        Math.abs(R_setPoint - getRightArmPosition()) < InDepPIDCoefficients.getErrorTolerance_p() &&
+                                Math.abs(getRightArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v()
+                )
         ) {
             L_PID.setPID(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd());
+            R_PID.setPID(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd());
 
             double L_K = L_PID.update(getLeftArmPosition());
+            double R_K = R_PID.update(getRightArmPosition());
 
             arm1.motor.setPower(power * L_K);
-            arm2.motor.setPower(power * L_K);
-
-//            setWristPosition(0.25);
+            arm2.motor.setPower(power * R_K);
 
             if (telemetry != null) {
                 telemetry.addData("CURRENT MOVEMENT:", DriveSubsystem.currentMovement);
                 telemetry.addData("L Arm pos", getLeftArmPosition());
                 telemetry.addData("L Setpoint", L_setPoint);
+                telemetry.addData("R Arm pos", getRightArmPosition());
+                telemetry.addData("R Setpoint", R_setPoint);
                 telemetry.update();
             }
 
-            double armPos = getLeftArmPosition();
-            setElbowPosition(calculateElbowPosition(armPos-delta));
-            setWristPosition(calculateWristPosition(armPos-delta));
+            double L_armPos = getLeftArmPosition();
+            setElbowPosition(calculateElbowPosition(L_armPos-delta));
+            setWristPosition(calculateWristPosition(L_armPos-delta));
 
             isBusy = true;
         }
@@ -265,31 +273,9 @@ public class InDepSubsystem extends SubsystemBase {
     /**
      * Moves the arm to a target level.
      */
-//    public void setLevel(Level level) {
-//        wrist.setPosition(level.wristTarget);
-//        raiseToSetPoint(SpeedCoefficients.getArmSpeed(), level.target);
-//    }
-
     public void setLevel(Level level) {
-        wrist.setPosition(level.wristTarget); // Set the wrist position to the target defined by the level
-
-        int currentArmPosition = getLeftArmPosition(); // Assuming getLeftArmPosition() gives the current position of the arm
-        int targetPosition = level.target;
-        int positionDifference = Math.abs(currentArmPosition - targetPosition);
-
-        // Check if the arm is within 25 ticks of the target position
-        if (positionDifference <= 50) {
-            // If within 25 ticks, adjust the target to move 25 ticks further
-            // Determine direction of adjustment based on whether current position is less than or greater than target
-            if (currentArmPosition < targetPosition) {
-                targetPosition += positionDifference; // Move further by 30 ticks
-            } else {
-                targetPosition -= positionDifference; // Move further by 30 ticks in the opposite direction
-            }
-        }
-
-        // Proceed to move the arm to the adjusted target position
-        raiseToSetPoint(SpeedCoefficients.getArmSpeed(), targetPosition - currentArmPosition);
+        wrist.setPosition(level.wristTarget);
+        raiseToSetPoint(SpeedCoefficients.getArmSpeed(), level.target);
     }
 
     /**
