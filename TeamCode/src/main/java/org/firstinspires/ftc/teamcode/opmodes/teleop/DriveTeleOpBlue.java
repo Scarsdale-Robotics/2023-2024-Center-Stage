@@ -18,9 +18,11 @@ public class DriveTeleOpBlue extends LinearOpMode {
     public void runOpMode() {
         teleOp = new TeleOpUtil(hardwareMap, telemetry, false, gamepad1, gamepad2, this);
 
-        waitForStart();
         teleOp.robot.getInDep().setLevel(InDepSubsystem.Level.GROUND); // arm, wrist
         teleOp.robot.getInDep().rest(); // elbow
+
+        waitForStart();
+        teleOp.start();
         teleOp.cv.switchCamera(teleOp.cv.cameraName1);
 
         if (opModeIsActive()) {

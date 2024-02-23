@@ -59,7 +59,6 @@ public class TeleOpUtil {
         this.lastTurnStart = robot.getDrive().getYaw();
         this.inDep = robot.getInDep();
         this.endgame = robot.getEndgame();
-        inDep.open();
         if (isRedTeam)
         {
             intoBackboardMode = new MovementSequenceBuilder()
@@ -77,6 +76,17 @@ public class TeleOpUtil {
                     .build();
         }
 
+    }
+
+    public void start() {
+        try {
+            inDep.open();
+            inDep.setLevel(InDepSubsystem.Level.GROUND); // arm, wrist
+            Thread.sleep(100);
+            inDep.rest(); // elbow
+        } catch (InterruptedException e) {
+//            e.printStackTrace();
+        }
     }
 
     private void runArmRigidControl() {

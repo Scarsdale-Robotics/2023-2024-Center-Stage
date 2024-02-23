@@ -111,8 +111,7 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .openRightClaw()  // purple
                     .sleepFor(500)
                     .turnRight(90)
-                    .backwardLeft(5, 5)
-                    .backward(19)
+                    .backwardLeft(24, 7)
                     .raiseArm(205, true)
                     .backward(5)
                     .openLeftClaw()  // yellow

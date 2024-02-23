@@ -99,7 +99,6 @@ public class InDepSubsystem extends SubsystemBase {
 
 //        setLevel(Level.GROUND); // arm, wrist
 //        rest(); // elbow
-        close(); // claw
 
         isBusy = false;
 
