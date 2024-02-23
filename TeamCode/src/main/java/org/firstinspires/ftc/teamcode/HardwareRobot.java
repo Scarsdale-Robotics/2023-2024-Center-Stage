@@ -57,10 +57,10 @@ public class HardwareRobot {
         leftBack.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBack.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        leftFront.setRunMode(Motor.RunMode.RawPower);
-        rightFront.setRunMode(Motor.RunMode.RawPower);
-        leftBack.setRunMode(Motor.RunMode.RawPower);
-        rightBack.setRunMode(Motor.RunMode.RawPower);
+        leftFront.setRunMode(Motor.RunMode.VelocityControl);
+        rightFront.setRunMode(Motor.RunMode.VelocityControl);
+        leftBack.setRunMode(Motor.RunMode.VelocityControl);
+        rightBack.setRunMode(Motor.RunMode.VelocityControl);
 
         leftFront.setInverted(false);
         rightFront.setInverted(false);
@@ -84,7 +84,7 @@ public class HardwareRobot {
 
         arm1 = new Motor(hardwareMap, "arm1", Motor.GoBILDA.RPM_312);
         arm1.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm1.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        arm1.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         arm1.setRunMode(Motor.RunMode.VelocityControl);
         arm1.resetEncoder();
         arm1.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -94,7 +94,7 @@ public class HardwareRobot {
 
         arm2 = new Motor(hardwareMap, "arm2", Motor.GoBILDA.RPM_312);
         arm2.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm2.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        arm2.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         arm2.setRunMode(Motor.RunMode.VelocityControl);
         arm2.resetEncoder();
         arm2.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

@@ -10,6 +10,8 @@ public class PIDController {
     private double Kd;
     private double minIntegral;
     private double maxIntegral;
+    private double minOutput;
+    private double maxOutput;
     private double setPoint;
     private double integralSum;
     private double lastError;
@@ -25,8 +27,11 @@ public class PIDController {
         this.Ki = Ki;
         this.Kd = Kd;
 
-        this.minIntegral = -1.0;
-        this.maxIntegral = 1.0;
+        this.minIntegral = Double.MIN_VALUE;
+        this.maxIntegral = Double.MAX_VALUE;
+
+        this.minOutput = Double.MIN_VALUE;
+        this.maxOutput = Double.MAX_VALUE;
 
         this.setPoint = setPoint;
 
@@ -61,11 +66,12 @@ public class PIDController {
 
         // Calculate integral
         integralSum += error * timer.seconds(); // riemann sum rectangle
-//        integralSum = integralSum < minIntegral ? minIntegral : Math.min(maxIntegral, integralSum);
+        integralSum = Math.min(maxIntegral, integralSum);
+        integralSum = Math.max(minIntegral, integralSum);
 
         double output = (Kp * error) + (Ki * integralSum) + (Kd * derivative);
-//        output = Math.min(1.0, output);
-//        output = Math.max(-1.0, output);
+        output = Math.min(maxOutput, output);
+        output = Math.max(minOutput, output);
 
         // Update stuff for derivative
         lastError = error;
@@ -86,6 +92,16 @@ public class PIDController {
 
     public void resetIntegral() {
         this.integralSum = 0;
+    }
+
+    public void setIntegralBounds(double lowerBound, double higherBound) {
+        minIntegral = lowerBound;
+        maxIntegral = higherBound;
+    }
+
+    public void setOutputBounds(double lowerBound, double higherBound) {
+        minOutput = lowerBound;
+        maxOutput = higherBound;
     }
 
     public double getSetPoint() {
