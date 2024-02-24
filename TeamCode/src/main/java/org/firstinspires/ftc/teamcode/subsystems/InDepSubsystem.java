@@ -146,7 +146,7 @@ public class InDepSubsystem extends SubsystemBase {
     }
 
     /**
-     * Sets the raw power of the arm.
+     * Sets the adjusted powers of the arm motors.
      */
     public void rawPower(double power) {
         // TODO: add ranges
@@ -186,6 +186,14 @@ public class InDepSubsystem extends SubsystemBase {
     }
 
     /**
+     * Sets the raw powers of the arm motors.
+     */
+    public void setArmPowers(double power) {
+        leftArm.motor.setPower(power);
+        rightArm.motor.setPower(power);
+    }
+
+    /**
      * Use only for autonomous. Change the angle of the arm by a certain amount of ticks.
      * @param armSpeed      How fast the arm should raise.
      * @param ticks      The angle to displace the arm by in ticks (negative values = lower arm).
@@ -206,7 +214,7 @@ public class InDepSubsystem extends SubsystemBase {
 
         // begin action
         double L_start = getLeftArmPosition(), R_start = getRightArmPosition();
-        double D = ticks;
+        double D = Math.abs(ticks);
 
         PIDController L_PID = new PIDController(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd(), L_start);
         PIDController R_PID = new PIDController(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd(), R_start);
@@ -240,13 +248,13 @@ public class InDepSubsystem extends SubsystemBase {
             R_PID.setErrorTolerance(InDepPIDCoefficients.getErrorTolerance_p());
 
             // handle arm velocity setpoint
-            double velocitySetpoint = calculator.calculateVelocitySetpoints(armSpeed, elapsedTime, travelTimes, maxVelocity, false, false);
+            double velocitySetpoint = calculator.calculateVelocitySetpoints(armSpeed, elapsedTime, travelTimes, maxVelocity, ticks, false, false);
             double L_v = velocitySetpoint;
             double R_v = velocitySetpoint;
 
             // handle arm position setpoints
-            double L_sp = calculator.calculatePositionSetpoints(L_start, elapsedTime, travelTimes, maxVelocity, false, false);
-            double R_sp = calculator.calculatePositionSetpoints(R_start, elapsedTime, travelTimes, maxVelocity, false, false);
+            double L_sp = calculator.calculatePositionSetpoints(L_start, ticks, elapsedTime, travelTimes, maxVelocity, false, false);
+            double R_sp = calculator.calculatePositionSetpoints(R_start, ticks, elapsedTime, travelTimes, maxVelocity, false, false);
 
             L_PID.setSetPoint(L_sp);
             R_PID.setSetPoint(R_sp);
@@ -508,7 +516,7 @@ public class InDepSubsystem extends SubsystemBase {
      * @return the power of the left arm motor
      */
     public double getLeftArmVelocity() {
-        return leftArm.motor.getPower();
+        return leftArm.getCorrectedVelocity();
     }
 
     /**
@@ -522,7 +530,7 @@ public class InDepSubsystem extends SubsystemBase {
      * @return the power of the right arm motor
      */
     public double getRightArmVelocity() {
-        return rightArm.motor.getPower();
+        return rightArm.getCorrectedVelocity();
     }
 
     /**

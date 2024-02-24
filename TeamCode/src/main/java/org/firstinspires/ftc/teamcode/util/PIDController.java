@@ -322,7 +322,7 @@ public class PIDController {
     /**
      * Calculates the target velocity for the motor in a movement at a certain time.
      */
-    public double calculateVelocitySetpoints(double speed, double elapsedTime, double[] travelTimes, double maxVelocity, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
+    public double calculateVelocitySetpoints(double speed, double elapsedTime, double[] travelTimes, double maxVelocity, double ticks, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
 
         // this method returns v
 
@@ -368,7 +368,7 @@ public class PIDController {
             }
         }
 
-        return v;
+        return v * Math.signum(ticks);
     }
 
     /**
@@ -467,7 +467,7 @@ public class PIDController {
     /**
      * Calculates the target position for the motor in a movement at a certain time.
      */
-    public double calculatePositionSetpoints(double start, double elapsedTime, double[] travelTimes, double maxVelocity, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
+    public double calculatePositionSetpoints(double start, double ticks, double elapsedTime, double[] travelTimes, double maxVelocity, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
 
         // this method returns sp
 
@@ -549,7 +549,7 @@ public class PIDController {
         }
 
         // calculate final setpoint
-        double sp = start + currentDistance;
+        double sp = start + currentDistance * Math.signum(ticks);
 
         return sp;
     }

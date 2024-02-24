@@ -6,11 +6,11 @@ import com.acmerobotics.dashboard.config.Config;
 public class InDepPIDCoefficients {
 
     //TODO: tune these constants
-    public static final double MAX_VELOCITY = 0; // ticks per second either arm motor
-    public static double VELOCITY_GAIN = 0; // position correction
+    public static final double MAX_VELOCITY = 2000; // ticks per second either arm motor
+    public static double VELOCITY_GAIN = 10; // position correction
     public static double VELOCITY_SPREAD_PROPORTION = 1; // nathan's favorite constant
                                                 // should only be set within [0,1]
-    public static double Kp = 0.0;
+    public static double Kp = 1.0;
     public static double Ki = 0.0;
     public static double Kd = 0.0;
 
