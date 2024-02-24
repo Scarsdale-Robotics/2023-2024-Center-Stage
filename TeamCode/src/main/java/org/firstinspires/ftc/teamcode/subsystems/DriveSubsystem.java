@@ -40,6 +40,7 @@ public class DriveSubsystem extends SubsystemBase {
     private Telemetry telemetry;
     public static volatile double heading=0D;
     private final ElapsedTime runtime;
+    private static final ElapsedTime PIDTimer = new ElapsedTime();
 
     // for debugging
     public static String currentMovement="";
@@ -211,7 +212,7 @@ public class DriveSubsystem extends SubsystemBase {
         double secondHalfTime = travelTimes[1]; // time needed to travel the second half of the distance
         double totalTime = firstHalfTime + secondHalfTime;
 
-        double startTime = runtime.seconds(); // beginning time of the movement
+        double startTime = PIDTimer.seconds(); // beginning time of the movement
         double elapsedTime = 0; // will act as the independent variable t for position & velocity calculations
 
         double LBTurnPosDiff = 0;
@@ -244,7 +245,7 @@ public class DriveSubsystem extends SubsystemBase {
             // handle turn correction
             double turnVelocityGain = DrivePIDCoefficients.TURN_VELOCITY_GAIN;
             double turnPositionGain = DrivePIDCoefficients.TURN_POSITION_GAIN;
-            double deltaTime = runtime.seconds() - elapsedTime;
+            double deltaTime = PIDTimer.seconds() - elapsedTime;
             double currentHeading = getYaw();
             double thetaDiff = normalizeAngle(currentHeading - heading);
             telemetry.addData("HEADING", heading);
@@ -347,7 +348,7 @@ public class DriveSubsystem extends SubsystemBase {
             telemetry.update();
 
             // update elapsed time
-            elapsedTime = runtime.seconds() - startTime;
+            elapsedTime = PIDTimer.seconds() - startTime;
 
             isBusy = true;
         }

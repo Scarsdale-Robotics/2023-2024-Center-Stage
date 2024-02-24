@@ -12,6 +12,8 @@ import org.firstinspires.ftc.teamcode.util.InDepPIDCoefficients;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
+import java.util.Arrays;
+
 public class InDepSubsystem extends SubsystemBase {
     private final Motor leftArm;
     private final Motor rightArm;
@@ -29,7 +31,7 @@ public class InDepSubsystem extends SubsystemBase {
 
     private final LinearOpMode opMode;
     private MultipleTelemetry telemetry;
-    private ElapsedTime runtime;
+    private static final ElapsedTime PIDTimer = new ElapsedTime();
 
     private Level level = Level.GROUND;
 
@@ -96,9 +98,6 @@ public class InDepSubsystem extends SubsystemBase {
         this.opMode = opMode;
         this.telemetry = telemetry;
         this.delta = 0;
-
-        this.runtime = new ElapsedTime();
-        runtime.reset();
 
 //         reset everything
 
@@ -228,13 +227,13 @@ public class InDepSubsystem extends SubsystemBase {
         R_PID.setOutputBounds(-1, 1);
 
         // calculate time needed to complete entire arm movement
-        double maxVelocity = InDepPIDCoefficients.MAX_VELOCITY;
+        double maxVelocity = InDepPIDCoefficients.MAX_ATTAINABLE_VELOCITY;
         double[] travelTimes = calculator.calculateTravelTimes(D, maxVelocity, false, false);
         double firstHalfTime = travelTimes[0]; // time needed to turn the first half of the angle
         double secondHalfTime = travelTimes[1]; // time needed to turn the second half of the angle
         double totalTime = firstHalfTime + secondHalfTime;
 
-        double startTime = runtime.seconds(); // beginning time of the arm movement
+        double startTime = PIDTimer.seconds(); // beginning time of the arm movement
         double elapsedTime = 0; // will act as the independent variable t for position & velocity calculations
 
         while (opMode.opModeIsActive() && elapsedTime < totalTime) {
@@ -289,7 +288,7 @@ public class InDepSubsystem extends SubsystemBase {
             telemetry.addData("R Velocity", getRightArmVelocity());
 
             // normalize velocities and turn arm with motor powers
-            double theoreticalMaxVelocity = InDepPIDCoefficients.MAX_VELOCITY;
+            double theoreticalMaxVelocity = InDepPIDCoefficients.MAX_ATTAINABLE_VELOCITY;
             double L_power = L_v / theoreticalMaxVelocity;
             double R_power = R_v / theoreticalMaxVelocity;
 
@@ -301,8 +300,12 @@ public class InDepSubsystem extends SubsystemBase {
 
             telemetry.update();
 
+            // nathan addition (hopefully doesn't break everything):
+            setElbowPosition(calculateElbowPosition(getLeftArmPosition()));
+            setWristPosition(calculateWristPosition(getLeftArmPosition()));
+
             // update elapsed time
-            elapsedTime = runtime.seconds() - startTime;
+            elapsedTime = PIDTimer.seconds() - startTime;
 
             isBusy = true;
         }
@@ -455,31 +458,98 @@ public class InDepSubsystem extends SubsystemBase {
      */
     private double calculateWristPosition(double armPos) {
         double lowerBound = 1000;
-        double[][] points = new double[][] {
-                {1867, 0.46},
-                {1955, 0.47},
-                {2089, 0.49},
-                {2132, 0.52},
-                {2264, 0.56},
-                {2302, 0.57},
-                {2366, 0.58}
+//        double[][] points = new double[][] {
+//                {1867, 0.46},
+//                {1955, 0.47},
+//                {2089, 0.49},
+//                {2132, 0.52},
+//                {2264, 0.56},
+//                {2302, 0.57},
+//                {2366, 0.58}
+//        };
+//
+//        if (armPos < lowerBound)
+//            return 0.58;
+//        else {
+//            for (int i = 0; i < points.length; i++) {
+//                if (armPos < points[i][0]) {
+//                    if (i == 0)
+//                        return points[0][1];
+//
+//                    double[] previousPoint = points[i-1], currentPoint = points[i];
+//                    double slope = (currentPoint[1] - previousPoint[1]) / (currentPoint[0] - previousPoint[0]);
+//                    return previousPoint[1] + slope * (armPos - previousPoint[0]);
+//                }
+//            }
+//            return points[points.length-1][1];
+//        }
+//        double a = 66;  // constant
+//        if (armPos < lowerBound)
+//            return 0.58;
+//        if ((27/380.0)*(armPos-380)+90<180) {
+//            return (-13/4500.0)*((((27/380.0)*(armPos-380)+90)+90-a)-153)+0.58;
+//        }
+//        return (-13/4500.0)*((-((27/380.0)*(armPos-380)+90)+450-a)-153)+0.58;
+
+
+        // stephen equations
+
+        double alpha = 40; // angle of wrist to the ground, constant
+
+        // calculate equations for conversions between:
+        //  - arm encoder ticks & arm angle in degrees
+        //  - wrist angle in degrees & wrist servo position
+        double[][] a = new double[][]{ // (ticks_a, theta_a)
+                {0, 56},
+                {384, 90},
+                {2391, 270}
         };
-
-        if (armPos < lowerBound)
-            return 0.58;
-        else {
-            for (int i = 0; i < points.length; i++) {
-                if (armPos < points[i][0]) {
-                    if (i == 0)
-                        return points[0][1];
-
-                    double[] previousPoint = points[i-1], currentPoint = points[i];
-                    double slope = (currentPoint[1] - previousPoint[1]) / (currentPoint[0] - previousPoint[0]);
-                    return previousPoint[1] + slope * (armPos - previousPoint[0]);
-                }
-            }
-            return points[points.length-1][1];
+        double[][] w = new double[][]{ // (theta_w, servoPosition_w)
+                {116, 0.3},
+                {180, 0.48},
+                {270, 0.725}
+        };
+        int n = a.length;
+        double[] m_a = new double[n];
+        for (int i = 0; i < n; i++) {
+            double[] curr = a[i];
+            double[] next = a[(i+1) % n];
+            m_a[i] = (curr[1] - next[1]) / (curr[0] - next[0]);
         }
+        double[] w_a = new double[n];
+        for (int i = 0; i < n; i++) {
+            double[] curr = w[i];
+            double[] next = w[(i+1) % n];
+            w_a[i] = (curr[1] - next[1]) / (curr[0] - next[0]);
+        }
+        double m_a_avg = Arrays.stream(m_a).average().getAsDouble();
+        double m_w_avg = Arrays.stream(w_a).average().getAsDouble();
+
+        telemetry.addData("m_a_avg", m_a_avg);
+        telemetry.addData("m_w_avg", m_w_avg);
+
+        // calculate arm angle in degrees
+        double theta_a = a[0][1] + m_a_avg * (armPos - a[0][0]);
+
+        // calculate wrist angle in degrees
+        double theta_w;
+        double c = 0.0033; // independent variable coefficient to ground adjustment function
+        if (theta_a < 180)
+            theta_w = alpha + 270 - theta_a + Math.max(-alpha, -alpha * Math.exp(-armPos * c));
+        else
+            theta_w = alpha - 90 + theta_a;
+
+        // calculate servo position
+        double w_servoPosition = w[0][1] + m_w_avg * (theta_w - w[0][0]);
+
+        telemetry.addData("theta_a", theta_a);
+        telemetry.addData("theta_w", theta_w);
+
+        telemetry.addData("Math.max(-alpha, -alpha * Math.exp(-armPos * c))", Math.max(-alpha, -alpha * Math.exp(-armPos * c)));
+        telemetry.addData("w_servoPosition", w_servoPosition);
+
+        return w_servoPosition;
+
     }
 
     /**

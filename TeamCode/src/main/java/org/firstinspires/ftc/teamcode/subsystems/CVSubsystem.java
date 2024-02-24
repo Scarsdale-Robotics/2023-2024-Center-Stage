@@ -155,7 +155,7 @@ public class CVSubsystem extends SubsystemBase {
 
         builder.setCamera(switchableCamera);
 
-        builder.setCameraResolution(new Size(640, 360)); // android.util
+        builder.setCameraResolution(new Size(640, 480)); // android.util
 
         // TODO: DISABLE PROPPROCESSOR FOR TELEOP
         builder.addProcessors(aprilTag, propProcessor);
@@ -167,8 +167,8 @@ public class CVSubsystem extends SubsystemBase {
         // Disable or re-enable the aprilTag processor at any time.
         // visionPortal.setProcessorEnabled(aprilTag, true);
         visionPortal.setProcessorEnabled(propProcessor, true);
-        while (opMode.opModeInInit() && visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING);
-        switchCamera(cameraName2);
+        while ((opMode.opModeInInit() || opMode.opModeIsActive()) && visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING);
+//        switchCamera(cameraName2);
         autoExposure();
     }
 
@@ -176,7 +176,7 @@ public class CVSubsystem extends SubsystemBase {
         ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
         exposureControl.setMode(ExposureControl.Mode.Manual);
         // tune duration at comp, higher for brighter view (ie. in darker environments)
-        exposureControl.setExposure(50, TimeUnit.MILLISECONDS);
+        exposureControl.setExposure(222, TimeUnit.MILLISECONDS);
     }
 
     public void decShutter() {

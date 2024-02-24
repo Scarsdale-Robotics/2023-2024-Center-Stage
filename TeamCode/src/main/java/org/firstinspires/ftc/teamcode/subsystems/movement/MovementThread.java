@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.util.DrivePIDCoefficients;
+import org.firstinspires.ftc.teamcode.util.InDepPIDCoefficients;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
@@ -85,6 +86,8 @@ public class MovementThread implements Runnable {
 
         // ARM CASES
         if (type.isArmType) {
+            double d = movement.DEGREES_ELEVATION;
+            InDepPIDCoefficients.MAX_ATTAINABLE_VELOCITY = Math.min(InDepPIDCoefficients.MAX_VELOCITY, InDepPIDCoefficients.MAX_VELOCITY * (d*d) / 5400.0 + InDepPIDCoefficients.MAX_VELOCITY / (3.0) );
             inDep.raiseByEncoder(
                 POWER_ARM,
                 movement.DEGREES_ELEVATION * MovementThread.K_ARM * type.SGN_elevation

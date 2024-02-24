@@ -56,73 +56,71 @@ public class AutoCloseBlue22 extends LinearOpMode {
             main = new MovementSequenceBuilder()
                     // (16.75,63.5,-90)
                     .forwardLeft(28, 6.5+15)
-                    .raiseArm(3.5, true)
+                    .raiseArm(3.5, true)  // 3.5
                     .turnRight(90)
                     .openRightClaw()
                     .sleepFor(321)
-                    .flipElbow()
                     .backwardRight(17-15, 7.25)
-                    .raiseArm(211.5, true)
+                    .raiseArm(206.5, true)  // 210
                     .backward(4)
                     .openLeftClaw()
                     .sleepFor(333)
                     .forwardLeft(8, 31.5)
-                    .lowerArm(146, true)
-                    .forwardRight(15.5+72.5+2, 2.1)
-                    .lowerArm(69, true)
+                    .lowerArm(145, true)  // 65
+                    .forwardRight(15.5+72.5+2+2, 1.1)
+                    .lowerArm(60, true)  // 5
                     .closeBothClaws()  // white intake
                     .sleepFor(500)
                     .backwardRight(4, 0)
-                    .raiseArm(25, true)
+                    .raiseArm(25, true)  // 30
                     .closeBothClaws()  // high number of closeBothClaws()
                     .flipElbow()
                     .sleepFor(321)
                     .closeBothClaws()  // keep them
                     .restElbow()
-                    .backwardLeft(80, 1.75)
+                    .backwardLeft(80-1, 1.75)
                     .backwardRight(20.75, 31)
-                    .raiseArm(165, true)
+                    .raiseArm(160, true)  // 190
                     .openBothClaws()  // white deposit
                     .sleepFor(321)
-                    .lowerArm(175)
+                    .lowerArm(170)  // 20
                     .forward(3)
-                    .lowerArm(15, true)
+                    .lowerArm(20, true)  // 0
                     .build();
         } else if (propLocation == 1) {
             main = new MovementSequenceBuilder()
                     //(16.75,63.5,-90)
-                    .forwardLeft(37, 15)
+                    .forwardLeft(38, 15)
                     .turnRight(90)
                     .raiseArm(10, true)  // 10
                     .openRightClaw()
                     .sleepFor(250)
-                    .backwardLeft(25-12.75, 4-14.5)
-                    .raiseArm(205, true)  // 215
+                    .backwardLeft(25-12.75, 4-14.5-1)
+                    .raiseArm(200, true)  // 210
                     .openLeftClaw()
                     .sleepFor(333)
-                    .restElbow()
                     .forwardLeft(14, 23)
-                    .lowerArm(180, true)  // 35
-                    .forwardRight(82, 3.75)
-                    .lowerArm(30, true) // 5
+                    .lowerArm(155, true)  // 55
+                    .forwardRight(84, 2)
+                    .lowerArm(52, true) // 3
                     .closeBothClaws()
                     .sleepFor(500)
                     .backwardRight(3, 0)
-                    .raiseArm(15, true)  // 20
+                    .raiseArm(17, true)  // 20
                     .closeBothClaws()
                     .flipElbow()
                     .sleepFor(321)
                     .closeBothClaws()
                     .restElbow()
-                    .backwardLeft(78, 0)
+                    .backwardLeft(80, 0)
                     .backwardRight(14, 22.25)
                     .raiseArm(170, true)  // 190
                     .backward(5)
                     .openBothClaws()
                     .sleepFor(500)
-                    .lowerArm(175)
+                    .lowerArm(175)  // 15
                     .forward(3)
-                    .lowerArm(15, true)
+                    .lowerArm(15, true)  // 0
                     .build();
         } else if (propLocation == 2) {
             main = new MovementSequenceBuilder()
@@ -130,36 +128,37 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     // 36 6
                     // (16.75,63.5,-90)
                     .forwardRight(29.5, 1)
-                    .raiseArm(10, true)  // 10
+                    .raiseArm(3.5, true)  // 3.5
                     .turnRight(90)
+                    .forward(1)
                     .openRightClaw()
                     .sleepFor(333)
-                    .backwardLeft(29.25, 5.75)
-                    .raiseArm(205, true)  // 215
+                    .backwardLeft(29, 6.75)
+                    .raiseArm(206.5, true)  // 210
 //                    .backward(3)
                     .openLeftClaw()
                     .sleepFor(333)
-                    .forwardLeft(9, 23-1.75-5)
-                    .lowerArm(205, true)  // 10
-                    .forwardRight(72.5+15.5+5.5, 0)
+                    .forwardLeft(9, 23-1.75-5-1)
+                    .lowerArm(207, true)  // 3
+                    .forwardRight(72.5+15.5+4.5, 0)
                     .closeBothClaws()  // white intake
                     .sleepFor(555)
                     .backwardRight(4, 0)
-                    .raiseArm(15, true)  // 25
+                    .raiseArm(22, true)  // 25
                     .closeBothClaws()
                     .flipElbow()
                     .sleepFor(321)
                     .closeBothClaws()
                     .restElbow()
-                    .backwardLeft(80, 0)
+                    .backwardLeft(79, 0)
                     .backwardRight(16.75, 29-1.75-4)
                     .raiseArm(165, true)  // 190
-                    .backward(4)
+                    .backward(3)
                     .openBothClaws()  // white deposit
                     .sleepFor(333)
-                    .lowerArm(175)
+                    .lowerArm(175)  // 15
                     .forward(3)
-                    .lowerArm(15, true)
+                    .lowerArm(15, true)  // 0
                     .build();
         }
 
