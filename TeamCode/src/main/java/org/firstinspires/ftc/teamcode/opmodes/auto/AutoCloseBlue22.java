@@ -130,22 +130,22 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     // 36 6
                     // (16.75,63.5,-90)
                     .forwardRight(29.5, 1)
-                    .raiseArm(10, true)
+                    .raiseArm(10, true)  // 10
                     .turnRight(90)
                     .openRightClaw()
                     .sleepFor(333)
                     .backwardLeft(29.25, 5.75)
-                    .raiseArm(205, true)
+                    .raiseArm(205, true)  // 215
 //                    .backward(3)
                     .openLeftClaw()
                     .sleepFor(333)
                     .forwardLeft(9, 23-1.75-5)
-                    .lowerArm(146+69, true)
+                    .lowerArm(205, true)  // 10
                     .forwardRight(72.5+15.5+5.5, 0)
                     .closeBothClaws()  // white intake
                     .sleepFor(555)
                     .backwardRight(4, 0)
-                    .raiseArm(25, true)
+                    .raiseArm(15, true)  // 25
                     .closeBothClaws()
                     .flipElbow()
                     .sleepFor(321)
@@ -153,7 +153,7 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .restElbow()
                     .backwardLeft(80, 0)
                     .backwardRight(16.75, 29-1.75-4)
-                    .raiseArm(165, true)
+                    .raiseArm(165, true)  // 190
                     .backward(4)
                     .openBothClaws()  // white deposit
                     .sleepFor(333)
