@@ -32,8 +32,8 @@ public class chickennguet extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         this.hardwareRobot = new HardwareRobot(hardwareMap);
         inDep = new InDepSubsystem(
-                hardwareRobot.arm1,
-                hardwareRobot.arm2,
+                hardwareRobot.leftArm,
+                hardwareRobot.rightArm,
                 hardwareRobot.elbow,
                 hardwareRobot.wrist,
                 hardwareRobot.leftClaw,
@@ -55,8 +55,8 @@ public class chickennguet extends LinearOpMode {
         dbTelemetry.addData("RClaw Pos",inDep.getRightClawPosition());
         dbTelemetry.addData("Wrist Pos",inDep.getWristPosition());
         dbTelemetry.addData("Elbow Pos",inDep.getElbowPosition());
-        dbTelemetry.addData("LArm Pos", hardwareRobot.arm1.getCurrentPosition());
-        dbTelemetry.addData("RArm Pos", hardwareRobot.arm2.getCurrentPosition());
+        dbTelemetry.addData("LArm Pos", hardwareRobot.leftArm.getCurrentPosition());
+        dbTelemetry.addData("RArm Pos", hardwareRobot.rightArm.getCurrentPosition());
         dbTelemetry.update();
 
         waitForStart();
@@ -97,10 +97,10 @@ public class chickennguet extends LinearOpMode {
             dbTelemetry.addData("RClaw Pos",inDep.getRightClawPosition());
             dbTelemetry.addData("Wrist Pos",inDep.getWristPosition());
             dbTelemetry.addData("Elbow Pos",inDep.getElbowPosition());
-            dbTelemetry.addData("LArm Pos", hardwareRobot.arm1.getCurrentPosition());
-            dbTelemetry.addData("RArm Pos", hardwareRobot.arm2.getCurrentPosition());
-            telemetry.addData("LArm Pos", hardwareRobot.arm1.getCurrentPosition());
-            telemetry.addData("RArm Pos", hardwareRobot.arm2.getCurrentPosition());
+            dbTelemetry.addData("LArm Pos", hardwareRobot.leftArm.getCurrentPosition());
+            dbTelemetry.addData("RArm Pos", hardwareRobot.rightArm.getCurrentPosition());
+            telemetry.addData("LArm Pos", hardwareRobot.leftArm.getCurrentPosition());
+            telemetry.addData("RArm Pos", hardwareRobot.rightArm.getCurrentPosition());
             dbTelemetry.addData("Drone Pos", endgame.getPower());
             dbTelemetry.update();
             telemetry.update();
@@ -110,8 +110,8 @@ public class chickennguet extends LinearOpMode {
             double diff = gamepad1.right_trigger - gamepad1.left_trigger;
             telemetry.addData("armpos", inDep.getLeftArmPosition());
             telemetry.addData("spd", speed*diff);
-            hardwareRobot.arm1.motor.setPower(0.25 * speed*diff);
-            hardwareRobot.arm2.motor.setPower(0.25 * speed*diff);
+            hardwareRobot.leftArm.motor.setPower(0.25 * speed*diff);
+            hardwareRobot.rightArm.motor.setPower(0.25 * speed*diff);
             telemetry.addData("armvelocity", inDep.getLeftArmVelocity());
             telemetry.addData("chicken", "nugget :>");
             telemetry.update();

@@ -24,10 +24,6 @@ public class DrivePIDCoefficients {
     public static double turn_Ki = 0.0;
     public static double turn_Kp = 0.04;
 
-    public static double velocity_Kd = 0.0000002;
-    public static double velocity_Ki = 0.0000001;
-    public static double velocity_Kp = 0.002;
-
 
     public static double getDriveP() {
         return drive_Kp;
@@ -39,18 +35,6 @@ public class DrivePIDCoefficients {
 
     public static double getDriveD() {
         return drive_Kd;
-    }
-
-    public static double getVelocityP() {
-        return velocity_Kp;
-    }
-
-    public static double getVelocityI() {
-        return velocity_Ki;
-    }
-
-    public static double getVelocityD() {
-        return velocity_Kd;
     }
 
     public static double getTurnP() {

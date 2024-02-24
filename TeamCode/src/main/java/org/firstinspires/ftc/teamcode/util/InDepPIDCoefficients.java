@@ -4,11 +4,18 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class InDepPIDCoefficients {
-    public static double Kp = 0.0025;
+
+    //TODO: tune these constants
+    public static final double MAX_VELOCITY = 0; // ticks per second either arm motor
+    public static double VELOCITY_GAIN = 0; // position correction
+    public static double VELOCITY_SPREAD_PROPORTION = 1; // nathan's favorite constant
+                                                // should only be set within [0,1]
+    public static double Kp = 0.0;
     public static double Ki = 0.0;
-    public static double Kd = 0.00005;
-    public static double errorTolerance_p = 10.1;
-    public static double errorTolerance_v = 0.25;
+    public static double Kd = 0.0;
+
+    public static double errorTolerance_p = 0.0;
+
 
     public static double getKp() {
         return Kp;
@@ -26,7 +33,4 @@ public class InDepPIDCoefficients {
         return errorTolerance_p;
     }
 
-    public static double getErrorTolerance_v() {
-        return errorTolerance_v;
-    }
 }

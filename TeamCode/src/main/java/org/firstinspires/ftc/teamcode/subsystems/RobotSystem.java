@@ -4,13 +4,9 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryImpl;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementThread;
 
@@ -25,8 +21,8 @@ public class RobotSystem {
         MultipleTelemetry multipleTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         this.hardwareRobot = new HardwareRobot(hardwareMap);
         inDep = new InDepSubsystem(
-                hardwareRobot.arm1,
-                hardwareRobot.arm2,
+                hardwareRobot.leftArm,
+                hardwareRobot.rightArm,
                 hardwareRobot.elbow,
                 hardwareRobot.wrist,
                 hardwareRobot.leftClaw,

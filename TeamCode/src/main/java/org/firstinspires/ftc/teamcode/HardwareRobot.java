@@ -1,34 +1,24 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-
-import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 public class HardwareRobot {
     public final Motor leftFront;
     public final Motor rightFront;
     public final Motor leftBack;
     public final Motor rightBack;
-    public final Motor arm1;
-    public final Motor arm2;
+    public final Motor leftArm;
+    public final Motor rightArm;
     public final ServoImplEx elbow;
     public final Servo leftClaw;
     public final Servo rightClaw;
@@ -82,25 +72,25 @@ public class HardwareRobot {
         leftBack.setPositionTolerance(10);
         rightBack.setPositionTolerance(10);
 
-        arm1 = new Motor(hardwareMap, "arm1", Motor.GoBILDA.RPM_312);
-        arm1.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm1.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        arm1.setRunMode(Motor.RunMode.VelocityControl);
-        arm1.resetEncoder();
-        arm1.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        arm1.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        arm1.setPositionTolerance(10);
-        arm1.setPositionCoefficient(0.01);
+        leftArm = new Motor(hardwareMap, "leftArm", Motor.GoBILDA.RPM_312);
+        leftArm.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftArm.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftArm.setRunMode(Motor.RunMode.VelocityControl);
+        leftArm.resetEncoder();
+        leftArm.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftArm.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        leftArm.setPositionTolerance(10);
+        leftArm.setPositionCoefficient(0.01);
 
-        arm2 = new Motor(hardwareMap, "arm2", Motor.GoBILDA.RPM_312);
-        arm2.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm2.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        arm2.setRunMode(Motor.RunMode.VelocityControl);
-        arm2.resetEncoder();
-        arm2.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        arm2.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        arm2.setPositionTolerance(10);
-        arm2.setPositionCoefficient(0.01);
+        rightArm = new Motor(hardwareMap, "rightArm", Motor.GoBILDA.RPM_312);
+        rightArm.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightArm.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightArm.setRunMode(Motor.RunMode.VelocityControl);
+        rightArm.resetEncoder();
+        rightArm.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightArm.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        rightArm.setPositionTolerance(10);
+        rightArm.setPositionCoefficient(0.01);
 
         leftClaw = hardwareMap.servo.get("leftClaw");
         rightClaw = hardwareMap.servo.get("rightClaw");

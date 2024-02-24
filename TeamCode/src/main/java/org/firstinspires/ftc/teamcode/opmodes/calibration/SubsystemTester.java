@@ -19,8 +19,8 @@ public class SubsystemTester extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         this.hardwareRobot = new HardwareRobot(hardwareMap);
         inDep = new InDepSubsystem(
-                hardwareRobot.arm1,
-                hardwareRobot.arm2,
+                hardwareRobot.leftArm,
+                hardwareRobot.rightArm,
                 hardwareRobot.elbow,
                 hardwareRobot.wrist,
                 hardwareRobot.leftClaw,
