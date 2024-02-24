@@ -16,21 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilde
 @Config
 public class AutoCloseBlue22 extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
-    private InDepSubsystem inDep;
     private DriveSubsystem drive;
-    private CVSubsystem cvFront;
-    private CVSubsystem cvBack;
-    public static double _1a = 21;
-    public static double _1b = 12.5;
-    public static double _2 = 31;
-    public static double WHITE_OFFSET_X = 6;
-    public static double _3 = 27;
-    public static double _99 = 13.5;
-    public static double _22a = 10;
-    public static double _22b = 8;
-    public static double _4 = 5;
-    public static double _5 = 190;
-    public static double WHITE_TRAVEL = 80.25;
     public static String sequence = "";
     public static boolean useString = false;
 
@@ -69,148 +55,111 @@ public class AutoCloseBlue22 extends LinearOpMode {
         if (propLocation == 0) {
             main = new MovementSequenceBuilder()
                     // (16.75,63.5,-90)
-                    .raiseArm(10)
-                    .forwardLeft(24, 6.5)
-                    .openRightClaw()
-                    .sleepFor(500)
-                    .flipElbow()
-                    .backwardLeft(2.25, 17)
-                    .raiseArm(205, true)
+                    .forwardLeft(28, 6.5+15)
+                    .raiseArm(3.5, true)
                     .turnRight(90)
-                    .backward(4.5)
+                    .openRightClaw()
+                    .sleepFor(321)
+                    .flipElbow()
+                    .backwardRight(17-15, 7.25)
+                    .raiseArm(211.5, true)
+                    .backward(4)
                     .openLeftClaw()
-                    .sleepFor(1000)
-                    .forwardLeft(8.75, 35.75)
+                    .sleepFor(333)
+                    .forwardLeft(8, 31.5)
                     .lowerArm(146, true)
-                    .forward(72.5)
+                    .forwardRight(15.5+72.5+2, 2.1)
                     .lowerArm(69, true)
-                    .forwardRight(15.5, 1.75)
                     .closeBothClaws()  // white intake
                     .sleepFor(500)
-                    .openBothClaws()
-                    .sleepFor(500)
-                    .closeBothClaws()  // white intake 2_0
-                    .sleepFor(777)
-                    .closeBothClaws()  // don't worry about the suspiciously
-                    .backwardRight(3, 0)
-                    .raiseArm(10)
-                    .backwardRight(1, 0)
-                    .raiseArm(15)
+                    .backwardRight(4, 0)
+                    .raiseArm(25, true)
                     .closeBothClaws()  // high number of closeBothClaws()
                     .flipElbow()
-                    .sleepFor(777)
+                    .sleepFor(321)
                     .closeBothClaws()  // keep them
                     .restElbow()
-                    .backwardLeft(88, 1.75)
-                    .backwardRight(16.75, 29)
+                    .backwardLeft(80, 1.75)
+                    .backwardRight(20.75, 31)
                     .raiseArm(165, true)
-                    .backward(7)
                     .openBothClaws()  // white deposit
-                    .sleepFor(1000)
-                    .forward(3, false, true)
-                    .left(24, false, true)
-                    .lowerArm(170, true)
-                    .backward(11, false, true)
-                    .forward(4, false, true)  // lower arm maneuver
-                    .lowerArm(20, true)
+                    .sleepFor(321)
+                    .lowerArm(175)
+                    .forward(3)
+                    .lowerArm(15, true)
                     .build();
         } else if (propLocation == 1) {
             main = new MovementSequenceBuilder()
                     //(16.75,63.5,-90)
-                    .forwardLeft(25.5, 2.25)
-                    .raiseArm(10, true)
-                    .openRightClaw()  // purple
-                    .sleepFor(500)
+                    .forwardLeft(37, 15)
                     .turnRight(90)
-                    .backwardLeft(24, 8)
-                    .raiseArm(205, true)
-                    .backward(5)
-                    .openLeftClaw()  // yellow
-                    .sleepFor(1000)
-                    .forward(3)
+                    .raiseArm(10, true)  // 10
+                    .openRightClaw()
+                    .sleepFor(250)
+                    .backwardLeft(25-12.75, 4-14.5)
+                    .raiseArm(205, true)  // 215
+                    .openLeftClaw()
+                    .sleepFor(333)
                     .restElbow()
-                    .forwardLeft(15, 24)
-                    .lowerArm(146, true)
-                    .forward(72.5)
-                    .lowerArm(69, true)
-                    .forwardRight(15.5, 1.75)
-                    .closeBothClaws()  // white intake
+                    .forwardLeft(14, 23)
+                    .lowerArm(180, true)  // 35
+                    .forwardRight(82, 3.75)
+                    .lowerArm(30, true) // 5
+                    .closeBothClaws()
                     .sleepFor(500)
+                    .backwardRight(3, 0)
+                    .raiseArm(15, true)  // 20
+                    .closeBothClaws()
+                    .flipElbow()
+                    .sleepFor(321)
+                    .closeBothClaws()
+                    .restElbow()
+                    .backwardLeft(78, 0)
+                    .backwardRight(14, 22.25)
+                    .raiseArm(170, true)  // 190
+                    .backward(5)
                     .openBothClaws()
                     .sleepFor(500)
-                    .closeBothClaws()  // white intake 2_0
-                    .sleepFor(777)
-                    .closeBothClaws()  // don't worry about the suspiciously
-                    .backwardRight(3, 0)
-                    .raiseArm(10)
-                    .backwardRight(1, 0)
-                    .raiseArm(15)
-                    .closeBothClaws()  // high number of closeBothClaws()
-                    .flipElbow()
-                    .sleepFor(777)
-                    .closeBothClaws()  // keep them
-                    .restElbow()
-                    .backwardLeft(88, 1.75)
-                    .backwardRight(16.75, 29)
-                    .raiseArm(165, true)
-                    .backward(7)
-                    .openBothClaws()  // white deposit
-                    .sleepFor(1000)
-                    .forward(3, false, true)
-                    .left(24, false, true)
-                    .lowerArm(170, true)
-                    .backward(11, false, true)
-                    .forward(4, false, true)  // lower arm maneuver
-                    .lowerArm(20, true)
+                    .lowerArm(175)
+                    .forward(3)
+                    .lowerArm(15, true)
                     .build();
         } else if (propLocation == 2) {
             main = new MovementSequenceBuilder()
                     // 43 30 0
                     // 36 6
                     // (16.75,63.5,-90)
-                    .raiseArm(10)
-                    .forwardRight(28.75, 5)
+                    .forwardRight(29.5, 1)
+                    .raiseArm(10, true)
                     .turnRight(90)
                     .openRightClaw()
-                    .sleepFor(500)
-                    .backwardLeft(30.25, 5.75)
+                    .sleepFor(333)
+                    .backwardLeft(29.25, 5.75)
                     .raiseArm(205, true)
-                    .backward(3)
+//                    .backward(3)
                     .openLeftClaw()
-                    .sleepFor(1000)
-                    .forwardLeft(9, 23)
-                    .lowerArm(146, true)
-                    .forward(72.5)
-                    .lowerArm(69, true)
-                    .forwardRight(15.5, 1.75)
+                    .sleepFor(333)
+                    .forwardLeft(9, 23-1.75-5)
+                    .lowerArm(146+69, true)
+                    .forwardRight(72.5+15.5+5.5, 0)
                     .closeBothClaws()  // white intake
-                    .sleepFor(500)
-                    .openBothClaws()
-                    .sleepFor(500)
-                    .closeBothClaws()  // white intake 2_0
-                    .sleepFor(777)
-                    .closeBothClaws()  // don't worry about the suspiciously
-                    .backwardRight(3, 0)
-                    .raiseArm(10)
-                    .backwardRight(1, 0)
-                    .raiseArm(15)
-                    .closeBothClaws()  // high number of closeBothClaws()
+                    .sleepFor(555)
+                    .backwardRight(4, 0)
+                    .raiseArm(25, true)
+                    .closeBothClaws()
                     .flipElbow()
-                    .sleepFor(777)
-                    .closeBothClaws()  // keep them
+                    .sleepFor(321)
+                    .closeBothClaws()
                     .restElbow()
-                    .backwardLeft(88, 1.75)
-                    .backwardRight(16.75, 29)
+                    .backwardLeft(80, 0)
+                    .backwardRight(16.75, 29-1.75-4)
                     .raiseArm(165, true)
-                    .backward(7)
+                    .backward(4)
                     .openBothClaws()  // white deposit
-                    .sleepFor(1000)
-                    .forward(3, false, true)
-                    .left(24, false, true)
-                    .lowerArm(170, true)
-                    .backward(11, false, true)
-                    .forward(4, false, true)  // lower arm maneuver
-                    .lowerArm(20, true)
+                    .sleepFor(333)
+                    .lowerArm(175)
+                    .forward(3)
+                    .lowerArm(15, true)
                     .build();
         }
 

@@ -669,7 +669,7 @@ public class DriveSubsystem extends SubsystemBase {
 
         // brake
         stopController();
-        heading = normalizeAngle(heading - degrees);
+        heading = getYaw();
         telemetry.addData("HEADING", heading);
         telemetry.addData("YAW", getYaw());
         telemetry.update();

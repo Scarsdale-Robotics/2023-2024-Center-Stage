@@ -10,7 +10,7 @@ public class DrivePIDCoefficients {
     public static double TURN_VELOCITY_GAIN = 50; // for position control in drive movements
     public static double TURN_POSITION_GAIN = 0.0001; // for position control in drive movements
     public static double VELOCITY_GAIN = 50; // for position control in drive movements
-    public static double VELOCITY_SPREAD_PROPORTION = 1; // should only fall within [0, 1], for drive velocity curve
+    public static double VELOCITY_SPREAD_PROPORTION = 0.5; // should only fall within [0, 1], for drive velocity curve
 
     public static double drive_Kd = 0.0124;
     public static double drive_Ki = 0.0;

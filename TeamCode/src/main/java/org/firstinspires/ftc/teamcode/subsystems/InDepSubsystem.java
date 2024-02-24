@@ -207,6 +207,10 @@ public class InDepSubsystem extends SubsystemBase {
         double L_setPoint = L_startEncoder + ticks, R_setPoint = R_startEncoder + ticks;
         PIDController L_PID = new PIDController(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd(), L_setPoint);
         PIDController R_PID = new PIDController(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd(), R_setPoint);
+        L_PID.setIntegralBounds(-1, 1);
+        R_PID.setIntegralBounds(-1, 1);
+        L_PID.setOutputBounds(-1, 1);
+        R_PID.setOutputBounds(-1, 1);
 
         while (
                 opMode.opModeIsActive() && !(
@@ -231,6 +235,7 @@ public class InDepSubsystem extends SubsystemBase {
                 telemetry.addData("L Setpoint", L_setPoint);
                 telemetry.addData("R Arm pos", getRightArmPosition());
                 telemetry.addData("R Setpoint", R_setPoint);
+                telemetry.addData("L integralSum", L_PID.getIntegralSum());
                 telemetry.update();
             }
 

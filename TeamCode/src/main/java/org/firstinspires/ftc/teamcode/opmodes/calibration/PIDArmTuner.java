@@ -30,6 +30,7 @@ public class PIDArmTuner extends LinearOpMode {
     private static InDepSubsystem inDep;
     private MultipleTelemetry telemetry = new MultipleTelemetry(new TelemetryImpl((OpMode) this), FtcDashboard.getInstance().getTelemetry());
 
+    public static double ticks = 2000;
 
     @Override
     // The "Main" code will go in here
@@ -61,10 +62,10 @@ public class PIDArmTuner extends LinearOpMode {
 //                    );
 
             // forward 1000√2 ticks
-            inDep.raiseByEncoder(SpeedCoefficients.getArmSpeed(), 2000);
+            inDep.raiseByEncoder(SpeedCoefficients.getArmSpeed(), ticks);
             while (opModeIsActive() && !gamepad1.triangle);
             // backward 1000√2 ticks
-            inDep.raiseByEncoder(SpeedCoefficients.getArmSpeed(), -2000);
+            inDep.raiseByEncoder(SpeedCoefficients.getArmSpeed(), -ticks);
             while (opModeIsActive() && !gamepad1.triangle);
         }
 

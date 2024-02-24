@@ -46,7 +46,7 @@ public class CVSubsystem extends SubsystemBase {
     private DriveSubsystem drive;
 
     public final int SAMPLE_COUNT = 20;
-    public final long SAMPLE_WAIT_MILLISECONDS = 222;
+    public final long SAMPLE_WAIT_MILLISECONDS = 55;
     public final int LOCATION_LEFT   =  0;
     public final int LOCATION_CENTER =  1;
     public final int LOCATION_RIGHT  =  2;
@@ -155,7 +155,7 @@ public class CVSubsystem extends SubsystemBase {
 
         builder.setCamera(switchableCamera);
 
-        builder.setCameraResolution(new Size(640, 480)); // android.util
+        builder.setCameraResolution(new Size(320, 240)); // android.util
 
         // TODO: DISABLE PROPPROCESSOR FOR TELEOP
         builder.addProcessors(aprilTag, propProcessor);
