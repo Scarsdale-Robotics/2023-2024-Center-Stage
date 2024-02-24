@@ -155,7 +155,7 @@ public class CVSubsystem extends SubsystemBase {
 
         builder.setCamera(switchableCamera);
 
-        builder.setCameraResolution(new Size(320, 240)); // android.util
+        builder.setCameraResolution(new Size(640, 360)); // android.util
 
         // TODO: DISABLE PROPPROCESSOR FOR TELEOP
         builder.addProcessors(aprilTag, propProcessor);
