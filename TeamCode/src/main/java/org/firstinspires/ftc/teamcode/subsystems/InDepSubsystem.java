@@ -6,14 +6,15 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.util.InDepPIDCoefficients;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
 public class InDepSubsystem extends SubsystemBase {
-    private final Motor arm1;
-    private final Motor arm2;
+    private final Motor leftArm;
+    private final Motor rightArm;
 
     private final Servo leftClaw;
     private final Servo rightClaw;
@@ -28,6 +29,7 @@ public class InDepSubsystem extends SubsystemBase {
 
     private final LinearOpMode opMode;
     private MultipleTelemetry telemetry;
+    private ElapsedTime runtime;
 
     private Level level = Level.GROUND;
 
@@ -76,14 +78,14 @@ public class InDepSubsystem extends SubsystemBase {
     }
     public final int ELBOW_TURN_TICKS = 5038;
 
-    public InDepSubsystem(Motor arm1, Motor arm2, ServoImplEx elbow, ServoImplEx wrist, Servo leftClaw, Servo rightClaw, LinearOpMode opMode) {
-        this(arm1,arm2,elbow,wrist,leftClaw,rightClaw,opMode,null);
+    public InDepSubsystem(Motor leftArm, Motor rightArm, ServoImplEx elbow, ServoImplEx wrist, Servo leftClaw, Servo rightClaw, LinearOpMode opMode) {
+        this(leftArm, rightArm,elbow,wrist,leftClaw,rightClaw,opMode,null);
     }
 
-    public InDepSubsystem(Motor arm1, Motor arm2, ServoImplEx elbow, ServoImplEx wrist, Servo leftClaw, Servo rightClaw, LinearOpMode opMode, MultipleTelemetry telemetry) {
+    public InDepSubsystem(Motor leftArm, Motor rightArm, ServoImplEx elbow, ServoImplEx wrist, Servo leftClaw, Servo rightClaw, LinearOpMode opMode, MultipleTelemetry telemetry) {
         // initialize objects
-        this.arm1 = arm1;
-        this.arm2 = arm2;
+        this.leftArm = leftArm;
+        this.rightArm = rightArm;
 
         this.rightClaw = rightClaw;
         this.leftClaw = leftClaw;
@@ -94,6 +96,9 @@ public class InDepSubsystem extends SubsystemBase {
         this.opMode = opMode;
         this.telemetry = telemetry;
         this.delta = 0;
+
+        this.runtime = new ElapsedTime();
+        runtime.reset();
 
 //         reset everything
 
@@ -147,20 +152,19 @@ public class InDepSubsystem extends SubsystemBase {
         // TODO: add ranges
         int armPos = getLeftArmPosition();
 
-        // TODO: desmos graph stuff need to be adjusted
         double K_power = calculatePowerCoefficient(armPos-delta);
 
         // set bounds
         if (armPos < delta && power < 0 && !opMode.gamepad1.a) {
-            arm1.motor.setPower(0);
-            arm2.motor.setPower(0);
+            leftArm.motor.setPower(0);
+            rightArm.motor.setPower(0);
         } else {
             if (EndgameSubsystem.droneReleased && opMode.gamepad2.left_trigger > 0.5 && opMode.gamepad2.right_trigger > 0.5) {
-                arm1.motor.setPower(power);
-                arm2.motor.setPower(power);
+                leftArm.motor.setPower(power);
+                rightArm.motor.setPower(power);
             } else {
-                arm1.motor.setPower(K_power * power);
-                arm2.motor.setPower(K_power * power);
+                leftArm.motor.setPower(K_power * power);
+                rightArm.motor.setPower(K_power * power);
             }
         }
         opMode.telemetry.addData("level: ", level);
@@ -168,21 +172,12 @@ public class InDepSubsystem extends SubsystemBase {
         opMode.telemetry.addData("elbow pos: ", elbow.getPosition());
         opMode.telemetry.addData("level wrist target: ", level.wristTarget);
 
-//        if (level != getLevelBelow()) {
-//            level = getLevelBelow();
-//            if (level.elbowFlipped) {
-//                flip();
-//            } else {
-//                rest();
-//            }
-//        }
-
-        // TODO: desmos graph stuff need to be adjusted
         if (level != getLevelBelow()) {
             level = getLevelBelow();
         }
 
         setElbowPosition(calculateElbowPosition(armPos-delta));
+        // TODO: add ada's equations?
         setWristPosition(calculateWristPosition(armPos-delta));
 
         opMode.telemetry.addData("chicken: ", "nugget");
@@ -191,66 +186,121 @@ public class InDepSubsystem extends SubsystemBase {
     }
 
     /**
-     * Use only for autonomous. Change the elevation of the arm by a certain angle in ticks.
-     * @param power      How fast the arm should raise (negative values = lower arm).
-     * @param ticks      The angle to displace the arm by in ticks.
+     * Use only for autonomous. Change the angle of the arm by a certain amount of ticks.
+     * @param armSpeed      How fast the arm should raise.
+     * @param ticks      The angle to displace the arm by in ticks (negative values = lower arm).
      */
-    public void raiseByEncoder(double power, double ticks) {
+    public void raiseByEncoder(double armSpeed, double ticks) {
 
         // check for clashing actions
         if (InDepSubsystem.getIsBusy()) {
             throw new RuntimeException("Tried to run two arm actions at once (arm is busy)");
         }
 
+        // stop arm at start
+        stopMotors();
+
+        // reset arm encoders to 0
+        leftArm.resetEncoder();
+        rightArm.resetEncoder();
+
         // begin action
-        double L_startEncoder = getLeftArmPosition(), R_startEncoder = getRightArmPosition();
-        double L_setPoint = L_startEncoder + ticks, R_setPoint = R_startEncoder + ticks;
-        PIDController L_PID = new PIDController(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd(), L_setPoint);
-        PIDController R_PID = new PIDController(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd(), R_setPoint);
+        double L_start = getLeftArmPosition(), R_start = getRightArmPosition();
+        double D = ticks;
+
+        PIDController L_PID = new PIDController(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd(), L_start);
+        PIDController R_PID = new PIDController(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd(), R_start);
+        PIDController calculator = new PIDController();
+        calculator.setVelocitySpreadProportion(InDepPIDCoefficients.VELOCITY_SPREAD_PROPORTION);
+
         L_PID.setIntegralBounds(-1, 1);
-        R_PID.setIntegralBounds(-1, 1);
         L_PID.setOutputBounds(-1, 1);
+
+        R_PID.setIntegralBounds(-1, 1);
         R_PID.setOutputBounds(-1, 1);
 
-        while (
-                opMode.opModeIsActive() && !(
-                        Math.abs(L_setPoint - getLeftArmPosition()) < InDepPIDCoefficients.getErrorTolerance_p() &&
-                                Math.abs(getLeftArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v() &&
-                        Math.abs(R_setPoint - getRightArmPosition()) < InDepPIDCoefficients.getErrorTolerance_p() &&
-                                Math.abs(getRightArmVelocity()) < InDepPIDCoefficients.getErrorTolerance_v()
-                )
-        ) {
+        // calculate time needed to complete entire arm movement
+        double maxVelocity = InDepPIDCoefficients.MAX_VELOCITY;
+        double[] travelTimes = calculator.calculateTravelTimes(D, maxVelocity, false, false);
+        double firstHalfTime = travelTimes[0]; // time needed to turn the first half of the angle
+        double secondHalfTime = travelTimes[1]; // time needed to turn the second half of the angle
+        double totalTime = firstHalfTime + secondHalfTime;
+
+        double startTime = runtime.seconds(); // beginning time of the arm movement
+        double elapsedTime = 0; // will act as the independent variable t for position & velocity calculations
+
+        while (opMode.opModeIsActive() && elapsedTime < totalTime) {
+
+            calculator.setVelocitySpreadProportion(InDepPIDCoefficients.VELOCITY_SPREAD_PROPORTION);
+
             L_PID.setPID(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd());
             R_PID.setPID(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd());
 
-            double L_K = L_PID.update(getLeftArmPosition());
-            double R_K = R_PID.update(getRightArmPosition());
+            L_PID.setErrorTolerance(InDepPIDCoefficients.getErrorTolerance_p());
+            R_PID.setErrorTolerance(InDepPIDCoefficients.getErrorTolerance_p());
 
-            arm1.motor.setPower(power * L_K);
-            arm2.motor.setPower(power * R_K);
+            // handle arm velocity setpoint
+            double velocitySetpoint = calculator.calculateVelocitySetpoints(armSpeed, elapsedTime, travelTimes, maxVelocity, false, false);
+            double L_v = velocitySetpoint;
+            double R_v = velocitySetpoint;
 
-            if (telemetry != null) {
-                telemetry.addData("CURRENT MOVEMENT:", DriveSubsystem.currentMovement);
-                telemetry.addData("L Arm pos", getLeftArmPosition());
-                telemetry.addData("L Setpoint", L_setPoint);
-                telemetry.addData("R Arm pos", getRightArmPosition());
-                telemetry.addData("R Setpoint", R_setPoint);
-                telemetry.addData("L integralSum", L_PID.getIntegralSum());
-                telemetry.update();
+            // handle arm position setpoints
+            double L_sp = calculator.calculatePositionSetpoints(L_start, elapsedTime, travelTimes, maxVelocity, false, false);
+            double R_sp = calculator.calculatePositionSetpoints(R_start, elapsedTime, travelTimes, maxVelocity, false, false);
+
+            L_PID.setSetPoint(L_sp);
+            R_PID.setSetPoint(R_sp);
+
+            double L_p = getLeftArmPosition();
+            double R_p = getRightArmPosition();
+
+            // position correction using PID
+            double velocityGain = InDepPIDCoefficients.VELOCITY_GAIN;
+            double L_C = L_PID.update(L_p) * velocityGain;
+            double R_C = R_PID.update(R_p) * velocityGain;
+
+            telemetry.addData("L_sp", L_PID.getSetPoint());
+            telemetry.addData("L_p", L_p);
+            telemetry.addData("R_sp", R_PID.getSetPoint());
+            telemetry.addData("R_p", R_p);
+            telemetry.addData("L_C", L_C);
+            telemetry.addData("R_C", R_C);
+
+            telemetry.addData("L Abs Error", L_PID.getAbsoluteDiff(L_p));
+            telemetry.addData("R Abs Error", R_PID.getAbsoluteDiff(R_p));
+
+            if (!(L_PID.getAbsoluteDiff(L_p) + R_PID.getAbsoluteDiff(R_p) < 2 * InDepPIDCoefficients.getErrorTolerance_p())) {
+                L_v += L_C;
+                R_v += R_C;
             }
 
-            double L_armPos = getLeftArmPosition();
-            setElbowPosition(calculateElbowPosition(L_armPos-delta));
-            setWristPosition(calculateWristPosition(L_armPos-delta));
+            telemetry.addData("L_v (sp)", L_v);
+            telemetry.addData("R_v (sp)", R_v);
+
+            telemetry.addData("L Velocity", getLeftArmVelocity());
+            telemetry.addData("R Velocity", getRightArmVelocity());
+
+            // normalize velocities and turn arm with motor powers
+            double theoreticalMaxVelocity = InDepPIDCoefficients.MAX_VELOCITY;
+            double L_power = L_v / theoreticalMaxVelocity;
+            double R_power = R_v / theoreticalMaxVelocity;
+
+            telemetry.addData("L Power", L_power);
+            telemetry.addData("R Power", R_power);
+
+            leftArm.motor.setPower(L_power);
+            rightArm.motor.setPower(R_power);
+
+            telemetry.update();
+
+            // update elapsed time
+            elapsedTime = runtime.seconds() - startTime;
 
             isBusy = true;
         }
 
-        // brake
-        arm1.stopMotor();
-        arm2.stopMotor();
-        arm1.motor.setPower(0);
-        arm2.motor.setPower(0);
+        // brake arms at end
+        stopMotors();
         isBusy = false;
     }
 
@@ -281,6 +331,16 @@ public class InDepSubsystem extends SubsystemBase {
     public void setLevel(Level level) {
         wrist.setPosition(level.wristTarget);
         raiseToSetPoint(SpeedCoefficients.getArmSpeed(), level.target);
+    }
+
+    /**
+     * Stops the arm motors.
+     */
+    public void stopMotors() {
+        leftArm.stopMotor();
+        rightArm.stopMotor();
+        leftArm.motor.setPower(0);
+        rightArm.motor.setPower(0);
     }
 
     /**
@@ -441,28 +501,28 @@ public class InDepSubsystem extends SubsystemBase {
      * @return the position of the left arm motor, in ticks.
      */
     public int getLeftArmPosition() {
-        return arm1.motor.getCurrentPosition();
+        return leftArm.motor.getCurrentPosition();
     }
 
     /**
      * @return the power of the left arm motor
      */
     public double getLeftArmVelocity() {
-        return arm1.motor.getPower();
+        return leftArm.motor.getPower();
     }
 
     /**
      * @return the position of the right arm motor, in ticks.
      */
     public int getRightArmPosition() {
-        return arm2.motor.getCurrentPosition();
+        return rightArm.motor.getCurrentPosition();
     }
 
     /**
      * @return the power of the right arm motor
      */
     public double getRightArmVelocity() {
-        return arm2.motor.getPower();
+        return rightArm.motor.getPower();
     }
 
     /**

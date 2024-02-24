@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes.calibration;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,7 +10,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryImpl;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
-import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.InDepSubsystem;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 
@@ -37,8 +35,8 @@ public class PIDArmTuner extends LinearOpMode {
     public void runOpMode() {
         this.hardwareRobot = new HardwareRobot(hardwareMap);
         inDep = new InDepSubsystem(
-                hardwareRobot.arm1,
-                hardwareRobot.arm2,
+                hardwareRobot.leftArm,
+                hardwareRobot.rightArm,
                 hardwareRobot.elbow,
                 hardwareRobot.wrist,
                 hardwareRobot.leftClaw,
