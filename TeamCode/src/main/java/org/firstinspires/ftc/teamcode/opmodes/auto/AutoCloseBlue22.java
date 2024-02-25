@@ -60,14 +60,14 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .turnRight(90)
                     .openRightClaw()
                     .sleepFor(321)
-                    .backwardRight(17-15, 7.25)
+                    .backwardRight(17-15, 7.5)
                     .raiseArm(206.5, true)  // 210
                     .backward(4)
                     .openLeftClaw()
                     .sleepFor(333)
-                    .forwardLeft(8, 31.5)
+                    .forwardLeft(8, 31.5-2)
                     .lowerArm(145, true)  // 65
-                    .forwardRight(15.5+72.5+2+2, 1.1)
+                    .forwardRight(15.5+72.5+1, 0.6)
                     .lowerArm(60, true)  // 5
                     .closeBothClaws()  // white intake
                     .sleepFor(500)
@@ -78,7 +78,7 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .sleepFor(321)
                     .closeBothClaws()  // keep them
                     .restElbow()
-                    .backwardLeft(80-1, 1.75)
+                    .backwardLeft(80-3, 1.75)
                     .backwardRight(20.75, 31)
                     .raiseArm(160, true)  // 190
                     .openBothClaws()  // white deposit
@@ -130,17 +130,17 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .forwardRight(29.5, 1)
                     .raiseArm(3.5, true)  // 3.5
                     .turnRight(90)
-                    .forward(1)
+                    .forward(2)
                     .openRightClaw()
                     .sleepFor(333)
-                    .backwardLeft(29, 6.75)
+                    .backwardLeft(29, 6)
                     .raiseArm(206.5, true)  // 210
 //                    .backward(3)
                     .openLeftClaw()
                     .sleepFor(333)
                     .forwardLeft(9, 23-1.75-5-1)
                     .lowerArm(207, true)  // 3
-                    .forwardRight(72.5+15.5+4.5, 0)
+                    .forwardRight(72.5+15.5+4.5-1, 0)
                     .closeBothClaws()  // white intake
                     .sleepFor(555)
                     .backwardRight(4, 0)

@@ -36,10 +36,10 @@ public class PropDetectionPipeline implements VisionProcessor {
 //    public static Scalar blueLowerRange = new Scalar(78,33,88);
 
     public static Scalar redUpperRange1 = new Scalar(66,255,255);  // Range needs fixing
-    public static Scalar redLowerRange1 = new Scalar(0,95,196);
+    public static Scalar redLowerRange1 = new Scalar(0,41,69);
 
-    public static Scalar redUpperRange2 = new Scalar(63, 255, 199);  // Range needs fixing
-    public static Scalar redLowerRange2 = new Scalar(0, 69, 65);
+    public static Scalar redUpperRange2 = new Scalar(179, 255, 255);  // Range needs fixing
+    public static Scalar redLowerRange2 = new Scalar(155, 41, 69);
 
     public AtomicBoolean hasStarted = new AtomicBoolean(false);
 
@@ -71,11 +71,8 @@ public class PropDetectionPipeline implements VisionProcessor {
             Core.inRange(hsvmat, redLowerRange2, redUpperRange2, mask2);
             Imgproc.morphologyEx(mask1, mask1, Imgproc.MORPH_OPEN, kernel);
             Imgproc.morphologyEx(mask2, mask2, Imgproc.MORPH_OPEN, kernel);
-            List<MatOfPoint> cl2 = new ArrayList<>();
-            Imgproc.findContours(mask1, contourList, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-            Imgproc.findContours(mask2, cl2, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-            contourList.addAll(cl2);
-            if (DRAW_OUTPUT) Core.bitwise_or(mask1, mask2, mask);
+            Core.bitwise_or(mask1, mask2, mask);
+            Imgproc.findContours(mask, contourList, temp, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         } else {
             Core.inRange(hsvmat, blueLowerRange, blueUpperRange, mask);
             Imgproc.morphologyEx(mask, mask, Imgproc.MORPH_OPEN, kernel);

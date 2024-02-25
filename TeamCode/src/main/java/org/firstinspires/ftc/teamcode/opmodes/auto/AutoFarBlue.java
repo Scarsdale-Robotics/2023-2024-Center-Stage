@@ -44,7 +44,7 @@ public class AutoFarBlue extends LinearOpMode {
         MovementSequence initCV = new MovementSequenceBuilder().build();
         if (!useString)
             initCV = new MovementSequenceBuilder()
-                .forwardLeft(4, 12) // calibrate
+//                .forwardLeft(4, 12) // calibrate
                 .build();
         else
             initCV = seqs[0];
@@ -68,29 +68,28 @@ public class AutoFarBlue extends LinearOpMode {
         if (propLocation == 0) {
             // left
             placePurple = new MovementSequenceBuilder()
-                    .forwardLeft(29.5, 5.75)
+                    .forwardLeft(24, 3.5)
+                    .raiseArm(5, true)
                     .turnLeft(90)
                     .openRightClaw()
                     .sleepFor(150)
                     .backward(8)
-                    .forwardLeft(6, 26)
+                    .forwardLeft(1, 19)
                     .turnRight(180)
                     .build();
             placeYellow = new MovementSequenceBuilder()
-                    .backward(47)
-                    .raiseArm(20, true)
-                    .backwardLeft(35, 20)
-                    .flipElbow()
+                    .backward(49)
+                    .raiseArm(15, true)
+                    .backwardLeft(40, 21)
                     .raiseArm(200, true)
                     .openLeftClaw()
                     .sleepFor(150)
                     .build();
             park = new MovementSequenceBuilder()
-                    .forward(8)
+                    .forward(2)
                     .left(31)
-                    .restElbow()
                     .lowerArm(170, true)
-                    .backward(19)
+                    .backward(14)
                     .lowerArm(40)
                     .lowerArm(10)
                     .forward(2, true)
@@ -133,28 +132,26 @@ public class AutoFarBlue extends LinearOpMode {
 //                    .build();
         } else if (propLocation == 1) {
             placePurple = new MovementSequenceBuilder()
-                    .closeBothClaws()
-                    .forwardLeft(28.5, 1.75)
+                    .forwardLeft(23, 1.75)
+                    .raiseArm(5, true)
                     .openRightClaw()
                     .sleepFor(150)
-                    .backwardLeft(25, 2)
+                    .backwardLeft(19, 2)
                     .turnRight(90)  // -37 60
                     .build();
             placeYellow = new MovementSequenceBuilder()
                     .backward(47)
-                    .raiseArm(20, true)
-                    .backwardLeft(39, 38)
-                    .flipElbow()
+                    .raiseArm(15, true)
+                    .backwardLeft(31, 31.5)
                     .raiseArm(200, true)
                     .openLeftClaw()
                     .sleepFor(150)
                     .build();
             park = new MovementSequenceBuilder()
-                    .forward(8)
+                    .forward(2)
                     .left(24)
-                    .restElbow()
                     .lowerArm(170, true)
-                    .backward(19)
+                    .backward(14)
                     .lowerArm(40)
                     .lowerArm(10)
                     .forward(2, true)
@@ -187,8 +184,8 @@ public class AutoFarBlue extends LinearOpMode {
 //                    .build();
         } else if (propLocation == 2) {
             placePurple = new MovementSequenceBuilder()
-                    .closeBothClaws()
                     .forwardRight(17.5,6.25)
+                    .raiseArm(5, true)
                     .openRightClaw()
                     .sleepFor(150)
                     .backwardLeft(6, 1)
@@ -197,19 +194,17 @@ public class AutoFarBlue extends LinearOpMode {
                     .build();
             placeYellow = new MovementSequenceBuilder()
                     .backward(47)
-                    .raiseArm(20, true)
-                    .backwardLeft(32, 29)
-                    .flipElbow()
+                    .raiseArm(15, true)
+                    .backwardLeft(28.25, 32)
                     .raiseArm(200, true)
                     .openLeftClaw()
                     .sleepFor(150)
                     .build();
             park = new MovementSequenceBuilder()
-                    .forward(8)
+                    .forward(2)
                     .left(17)
-                    .restElbow()
                     .lowerArm(170, true)
-                    .backward(19)
+                    .backward(15)
                     .lowerArm(40)
                     .lowerArm(10)
                     .forward(2, true)

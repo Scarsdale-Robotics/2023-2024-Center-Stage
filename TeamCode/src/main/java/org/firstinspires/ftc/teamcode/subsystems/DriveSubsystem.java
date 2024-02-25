@@ -26,6 +26,9 @@ import java.util.concurrent.Future;
 
 public class DriveSubsystem extends SubsystemBase {
 
+    public static volatile String CRASHED = "{";
+
+
     private static volatile boolean isBusy;
     private static volatile ExecutorService threadPool;
     // facing audience = -90, facing backdrop = 90, facing away ("out") = 0, facing in = 180
@@ -40,7 +43,6 @@ public class DriveSubsystem extends SubsystemBase {
     private Telemetry telemetry;
     public static volatile double heading=0D;
     private final ElapsedTime runtime;
-    private static final ElapsedTime PIDTimer = new ElapsedTime();
 
     // for debugging
     public static String currentMovement="";
@@ -71,7 +73,7 @@ public class DriveSubsystem extends SubsystemBase {
         threadPool = Executors.newCachedThreadPool();
 
         if (this.telemetry != null) {
-            telemetry.addData("MAX_VELOCITY", 0);
+            this.telemetry.addData("MAX_VELOCITY", 0);
             this.telemetry.addData("L diff",0);
             this.telemetry.addData("R diff",0);
 
@@ -180,8 +182,13 @@ public class DriveSubsystem extends SubsystemBase {
     public void driveByAngularEncoder(double driveSpeed, double leftTicks, double rightTicks, double theta, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
         // check for clashing actions
         if (DriveSubsystem.getIsBusy()) {
+            CRASHED += currentMovement+", ";
+            telemetry.addData("CRASHED BECAUSE BUSY", CRASHED);
+            telemetry.update();
             throw new RuntimeException("driveByAngularEncoder(): Tried to run two drive actions at once");
         }
+
+        isBusy = true;
 
         // stop drivetrain at start
         if (!ignoreStartVelocity)
@@ -212,7 +219,7 @@ public class DriveSubsystem extends SubsystemBase {
         double secondHalfTime = travelTimes[1]; // time needed to travel the second half of the distance
         double totalTime = firstHalfTime + secondHalfTime;
 
-        double startTime = PIDTimer.seconds(); // beginning time of the movement
+        double startTime = runtime.seconds(); // beginning time of the movement
         double elapsedTime = 0; // will act as the independent variable t for position & velocity calculations
 
         double LBTurnPosDiff = 0;
@@ -222,6 +229,7 @@ public class DriveSubsystem extends SubsystemBase {
 
         while (opMode.opModeIsActive() && elapsedTime < totalTime) {
 
+            telemetry.addData("CRASHED BECAUSE BUSY", CRASHED);
             telemetry.addData("CURRENT MOVEMENT:", DriveSubsystem.currentMovement);
             telemetry.addData("MAX_VELOCITY", maxVelocity);
 
@@ -245,11 +253,11 @@ public class DriveSubsystem extends SubsystemBase {
             // handle turn correction
             double turnVelocityGain = DrivePIDCoefficients.TURN_VELOCITY_GAIN;
             double turnPositionGain = DrivePIDCoefficients.TURN_POSITION_GAIN;
-            double deltaTime = PIDTimer.seconds() - elapsedTime;
+            double deltaTime = runtime.seconds() - elapsedTime;
             double currentHeading = getYaw();
             double thetaDiff = normalizeAngle(currentHeading - heading);
-            telemetry.addData("HEADING", heading);
-            telemetry.addData("YAW", getYaw());
+//            telemetry.addData("HEADING", heading);
+//            telemetry.addData("YAW", getYaw());
             if (Math.abs(thetaDiff) < 15) {
                 LB_v += turnVelocityGain * thetaDiff;
                 RB_v -= turnVelocityGain * thetaDiff;
@@ -283,28 +291,28 @@ public class DriveSubsystem extends SubsystemBase {
             double RF_C = RF_PID.update(RF_p) * velocityGain;
 
             // works only with rawPower mode
-            telemetry.addData("LB_sp", LB_PID.getSetPoint());
-            telemetry.addData("LB_p", LB_p);
-            telemetry.addData("RB_sp", RB_PID.getSetPoint());
-            telemetry.addData("RB_p", RB_p);
-            telemetry.addData("LF_sp", LF_PID.getSetPoint());
-            telemetry.addData("LF_p", LF_p);
-            telemetry.addData("RF_sp", RF_PID.getSetPoint());
-            telemetry.addData("RF_p", RF_p);
+//            telemetry.addData("LB_sp", LB_PID.getSetPoint());
+//            telemetry.addData("LB_p", LB_p);
+//            telemetry.addData("RB_sp", RB_PID.getSetPoint());
+//            telemetry.addData("RB_p", RB_p);
+//            telemetry.addData("LF_sp", LF_PID.getSetPoint());
+//            telemetry.addData("LF_p", LF_p);
+//            telemetry.addData("RF_sp", RF_PID.getSetPoint());
+//            telemetry.addData("RF_p", RF_p);
 
             // these are fine
-            telemetry.addData("LB_C", LB_C);
-            telemetry.addData("RB_C", RB_C);
-            telemetry.addData("LF_C", LF_C);
-            telemetry.addData("RF_C", RF_C);
+//            telemetry.addData("LB_C", LB_C);
+//            telemetry.addData("RB_C", RB_C);
+//            telemetry.addData("LF_C", LF_C);
+//            telemetry.addData("RF_C", RF_C);
 
             double L_AVG_C = (Math.abs(LB_C) + Math.abs(RF_C)) / 2.0;
             double R_AVG_C = (Math.abs(RB_C) + Math.abs(LF_C)) / 2.0;
 
-            telemetry.addData("LB Abs Error", LB_PID.getAbsoluteDiff(LB_p));
-            telemetry.addData("RB Abs Error", RB_PID.getAbsoluteDiff(RB_p));
-            telemetry.addData("LF Abs Error", LF_PID.getAbsoluteDiff(LF_p));
-            telemetry.addData("RF Abs Error", RF_PID.getAbsoluteDiff(RF_p));
+//            telemetry.addData("LB Abs Error", LB_PID.getAbsoluteDiff(LB_p));
+//            telemetry.addData("RB Abs Error", RB_PID.getAbsoluteDiff(RB_p));
+//            telemetry.addData("LF Abs Error", LF_PID.getAbsoluteDiff(LF_p));
+//            telemetry.addData("RF Abs Error", RF_PID.getAbsoluteDiff(RF_p));
 
             if (!(LB_PID.getAbsoluteDiff(LB_p) + RB_PID.getAbsoluteDiff(RB_p) + LF_PID.getAbsoluteDiff(LF_p) + RF_PID.getAbsoluteDiff(RF_p) < 4 * DrivePIDCoefficients.getErrorTolerance_p())) {
                 LB_v += L_AVG_C * Math.signum(LB_C);
@@ -314,17 +322,17 @@ public class DriveSubsystem extends SubsystemBase {
             }
 
             // these are fine
-            telemetry.addData("LB_v (sp)", LB_v);
-            telemetry.addData("RB_v (sp)", RB_v);
-            telemetry.addData("LF_v (sp)", LF_v);
-            telemetry.addData("RF_v (sp)", RF_v);
+//            telemetry.addData("LB_v (sp)", LB_v);
+//            telemetry.addData("RB_v (sp)", RB_v);
+//            telemetry.addData("LF_v (sp)", LF_v);
+//            telemetry.addData("RF_v (sp)", RF_v);
 
             // these might not be fine
-            telemetry.addData("LB Velocity", getLBVelocity());
-            telemetry.addData("RB Velocity", getRBVelocity());
-            telemetry.addData("LF Velocity", getLFVelocity());
-            telemetry.addData("RF Velocity", getRFVelocity());
-            telemetry.addData("thetaDiff", thetaDiff);
+//            telemetry.addData("LB Velocity", getLBVelocity());
+//            telemetry.addData("RB Velocity", getRBVelocity());
+//            telemetry.addData("LF Velocity", getLFVelocity());
+//            telemetry.addData("RF Velocity", getRFVelocity());
+//            telemetry.addData("thetaDiff", thetaDiff);
 
             // normalize velocities and drive with motor powers
             double theoreticalMaxVelocity = DrivePIDCoefficients.MAX_VELOCITY;
@@ -333,10 +341,10 @@ public class DriveSubsystem extends SubsystemBase {
             double LB_power = (LB_v + LBTurnPosDiff) / theoreticalMaxVelocity;
             double RB_power = (RB_v + RBTurnPosDiff) / theoreticalMaxVelocity;
 
-            telemetry.addData("LB Power", LB_power);
-            telemetry.addData("RB Power", RB_power);
-            telemetry.addData("LF Power", LF_power);
-            telemetry.addData("RF Power", RF_power);
+//            telemetry.addData("LB Power", LB_power);
+//            telemetry.addData("RB Power", RB_power);
+//            telemetry.addData("LF Power", LF_power);
+//            telemetry.addData("RF Power", RF_power);
 
             driveWithMotorPowers(
                     LF_power,
@@ -348,7 +356,7 @@ public class DriveSubsystem extends SubsystemBase {
             telemetry.update();
 
             // update elapsed time
-            elapsedTime = PIDTimer.seconds() - startTime;
+            elapsedTime = runtime.seconds() - startTime;
 
             isBusy = true;
         }
@@ -367,8 +375,13 @@ public class DriveSubsystem extends SubsystemBase {
     public void turnByIMU(double turnSpeed, double degrees) {
         // check for clashing actions
         if (DriveSubsystem.getIsBusy()) {
+            CRASHED += currentMovement+", ";
+            telemetry.addData("CRASHED BECAUSE BUSY", CRASHED);
+            telemetry.update();
             throw new RuntimeException("turnByIMU(): Tried to run two drive actions at once");
         }
+
+        isBusy = true;
 
         // begin action
         double cumulativeAngle = 0, previousAngle = getYaw();
@@ -391,6 +404,7 @@ public class DriveSubsystem extends SubsystemBase {
             K = PID.update(cumulativeAngle);
 
             if (telemetry != null) {
+                telemetry.addData("CRASHED BECAUSE BUSY", CRASHED);
                 telemetry.addData("CURRENT MOVEMENT:", currentMovement);
                 telemetry.addData("HEADING", heading);
                 telemetry.addData("YAW", getYaw());
@@ -428,22 +442,28 @@ public class DriveSubsystem extends SubsystemBase {
 
             // fetch all linked movements
             boolean linked = true;
+            boolean needsWait = false;
             while (!movements.isEmpty() && linked && opMode.opModeIsActive()) {
                 Movement movement = movements.removeFirst();
                 currentMovement = "["+movement.toString()+"]";
+                telemetry.addData("CRASHED BECAUSE BUSY", CRASHED);
                 telemetry.addData("CURRENT MOVEMENT:", currentMovement);
                 telemetry.addData("IGNORE START:", movement.ignoreStartVelocity);
                 telemetry.addData("IGNORE END:", movement.ignoreEndVelocity);
                 telemetry.update();
                 linked = movement.linkedToNext;
+                needsWait = needsWait || movement.MOVEMENT_TYPE.isDriveType || movement.MOVEMENT_TYPE.isArmType || movement.MOVEMENT_TYPE.isTurnType || movement.MOVEMENT_TYPE.isCVType;
                 MovementThread thread = new MovementThread(movement);
                 Future<?> status = threadPool.submit(thread);
                 threadStatus.add(status); // start the MovementThread
             }
 
+            if (needsWait)
+                sleepFor(55);
+
             // wait until all linked movements are completed
             boolean running = true;
-            while (running && opMode.opModeIsActive()) {
+            while (running && opMode.opModeIsActive() || (DriveSubsystem.getIsBusy() || InDepSubsystem.getIsBusy())) {
                 if (!opMode.opModeIsActive()) {
                     threadPool.shutdownNow();
                     break;
@@ -566,8 +586,8 @@ public class DriveSubsystem extends SubsystemBase {
      * @param ms Timeout in milliseconds.
      */
     private void sleepFor(long ms) {
-        runtime.reset();
-        while (opMode.opModeIsActive() && (runtime.milliseconds() < ms));
+        double startTime = runtime.milliseconds();
+        while (opMode.opModeIsActive() && (runtime.milliseconds() - startTime < ms));
     }
 
 }

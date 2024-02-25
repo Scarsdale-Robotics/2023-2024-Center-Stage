@@ -201,8 +201,13 @@ public class InDepSubsystem extends SubsystemBase {
 
         // check for clashing actions
         if (InDepSubsystem.getIsBusy()) {
+            DriveSubsystem.CRASHED += DriveSubsystem.currentMovement+", ";
+            telemetry.addData("CRASHED BECAUSE BUSY", DriveSubsystem.CRASHED);
+            telemetry.update();
             throw new RuntimeException("Tried to run two arm actions at once (arm is busy)");
         }
+
+        isBusy = true;
 
         // stop arm at start
         stopMotors();
@@ -238,6 +243,8 @@ public class InDepSubsystem extends SubsystemBase {
 
         while (opMode.opModeIsActive() && elapsedTime < totalTime) {
 
+            telemetry.addData("CRASHED BECAUSE BUSY", DriveSubsystem.CRASHED);
+
             calculator.setVelocitySpreadProportion(InDepPIDCoefficients.VELOCITY_SPREAD_PROPORTION);
 
             L_PID.setPID(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd());
@@ -266,34 +273,34 @@ public class InDepSubsystem extends SubsystemBase {
             double L_C = L_PID.update(L_p) * velocityGain;
             double R_C = R_PID.update(R_p) * velocityGain;
 
-            telemetry.addData("L_sp", L_PID.getSetPoint());
-            telemetry.addData("L_p", L_p);
-            telemetry.addData("R_sp", R_PID.getSetPoint());
-            telemetry.addData("R_p", R_p);
-            telemetry.addData("L_C", L_C);
-            telemetry.addData("R_C", R_C);
+//            telemetry.addData("L_sp", L_PID.getSetPoint());
+//            telemetry.addData("L_p", L_p);
+//            telemetry.addData("R_sp", R_PID.getSetPoint());
+//            telemetry.addData("R_p", R_p);
+//            telemetry.addData("L_C", L_C);
+//            telemetry.addData("R_C", R_C);
 
-            telemetry.addData("L Abs Error", L_PID.getAbsoluteDiff(L_p));
-            telemetry.addData("R Abs Error", R_PID.getAbsoluteDiff(R_p));
+//            telemetry.addData("L Abs Error", L_PID.getAbsoluteDiff(L_p));
+//            telemetry.addData("R Abs Error", R_PID.getAbsoluteDiff(R_p));
 
             if (!(L_PID.getAbsoluteDiff(L_p) + R_PID.getAbsoluteDiff(R_p) < 2 * InDepPIDCoefficients.getErrorTolerance_p())) {
                 L_v += L_C;
                 R_v += R_C;
             }
 
-            telemetry.addData("L_v (sp)", L_v);
-            telemetry.addData("R_v (sp)", R_v);
+//            telemetry.addData("L_v (sp)", L_v);
+//            telemetry.addData("R_v (sp)", R_v);
 
-            telemetry.addData("L Velocity", getLeftArmVelocity());
-            telemetry.addData("R Velocity", getRightArmVelocity());
+//            telemetry.addData("L Velocity", getLeftArmVelocity());
+//            telemetry.addData("R Velocity", getRightArmVelocity());
 
             // normalize velocities and turn arm with motor powers
             double theoreticalMaxVelocity = InDepPIDCoefficients.MAX_ATTAINABLE_VELOCITY;
             double L_power = L_v / theoreticalMaxVelocity;
             double R_power = R_v / theoreticalMaxVelocity;
 
-            telemetry.addData("L Power", L_power);
-            telemetry.addData("R Power", R_power);
+//            telemetry.addData("L Power", L_power);
+//            telemetry.addData("R Power", R_power);
 
             leftArm.motor.setPower(L_power);
             rightArm.motor.setPower(R_power);
@@ -525,8 +532,8 @@ public class InDepSubsystem extends SubsystemBase {
         double m_a_avg = Arrays.stream(m_a).average().getAsDouble();
         double m_w_avg = Arrays.stream(w_a).average().getAsDouble();
 
-        telemetry.addData("m_a_avg", m_a_avg);
-        telemetry.addData("m_w_avg", m_w_avg);
+//        telemetry.addData("m_a_avg", m_a_avg);
+//        telemetry.addData("m_w_avg", m_w_avg);
 
         // calculate arm angle in degrees
         double theta_a = a[0][1] + m_a_avg * (armPos - a[0][0]);
@@ -542,11 +549,11 @@ public class InDepSubsystem extends SubsystemBase {
         // calculate servo position
         double w_servoPosition = w[0][1] + m_w_avg * (theta_w - w[0][0]);
 
-        telemetry.addData("theta_a", theta_a);
-        telemetry.addData("theta_w", theta_w);
-
-        telemetry.addData("Math.max(-alpha, -alpha * Math.exp(-armPos * c))", Math.max(-alpha, -alpha * Math.exp(-armPos * c)));
-        telemetry.addData("w_servoPosition", w_servoPosition);
+//        telemetry.addData("theta_a", theta_a);
+//        telemetry.addData("theta_w", theta_w);
+//
+//        telemetry.addData("Math.max(-alpha, -alpha * Math.exp(-armPos * c))", Math.max(-alpha, -alpha * Math.exp(-armPos * c)));
+//        telemetry.addData("w_servoPosition", w_servoPosition);
 
         return w_servoPosition;
 
