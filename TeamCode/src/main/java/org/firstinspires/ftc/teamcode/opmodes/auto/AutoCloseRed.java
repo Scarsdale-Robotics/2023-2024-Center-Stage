@@ -30,6 +30,7 @@ public class AutoCloseRed extends LinearOpMode {
     public void runOpMode() {
         RobotSystem robot = new RobotSystem(hardwareMap, true, this, telemetry);
         robot.getInDep().autoInit();
+        robot.getCV().autoExposure();
         drive = robot.getDrive();
         runtime.reset();
 
