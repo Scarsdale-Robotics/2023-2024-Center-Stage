@@ -29,7 +29,7 @@ public class AutoFarBlue extends LinearOpMode {
     // The "Main" code will go in here
     public void runOpMode() {
         RobotSystem robot = new RobotSystem(hardwareMap, false, this, telemetry);
-        robot.getInDep().close();
+        robot.getInDep().autoInit();
         drive = robot.getDrive();
         runtime.reset();
 

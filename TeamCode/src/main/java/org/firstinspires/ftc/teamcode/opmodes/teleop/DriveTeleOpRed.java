@@ -13,7 +13,7 @@ public class DriveTeleOpRed extends LinearOpMode {
         TeleOpUtil teleOp = new TeleOpUtil(hardwareMap, telemetry, true, gamepad1, gamepad2, this);
         waitForStart();
         teleOp.start();
-        teleOp.cv.switchCamera(teleOp.cv.cameraName1);
+//        teleOp.cv.switchCamera(teleOp.cv.cameraName1);
 
         if (opModeIsActive()) {
             while (opModeIsActive()) {

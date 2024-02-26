@@ -103,9 +103,15 @@ public class InDepSubsystem extends SubsystemBase {
 
 //        setLevel(Level.GROUND); // arm, wrist
 //        rest(); // elbow
+//        close();
 
         isBusy = false;
 
+    }
+
+    public void autoInit() {
+        close();
+        setWristPosition(0.83);
     }
 
     public Level getLevelBelow() {
@@ -201,6 +207,7 @@ public class InDepSubsystem extends SubsystemBase {
 
         // check for clashing actions
         if (InDepSubsystem.getIsBusy()) {
+            stopMotors();
             DriveSubsystem.CRASHED += DriveSubsystem.currentMovement+", ";
             telemetry.addData("CRASHED BECAUSE BUSY", DriveSubsystem.CRASHED);
             telemetry.update();

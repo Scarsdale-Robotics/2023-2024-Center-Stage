@@ -41,7 +41,7 @@ public class PIDTurnTuner extends LinearOpMode {
                 hardwareRobot.leftBack,
                 hardwareRobot.rightBack,
                 hardwareRobot.imu,
-                this,
+                this,true,
                 telemetry
         );
         runtime.reset();

@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementStringInterpreter;
 
-@Autonomous(name = "Auto Close Blue")
+@Autonomous(name = "[OLD / DO NOT USE] Auto Close Blue")
 @Config
 public class AutoCloseBlue extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
@@ -29,7 +29,7 @@ public class AutoCloseBlue extends LinearOpMode {
     // The "Main" code will go in here
     public void runOpMode() {
         RobotSystem robot = new RobotSystem(hardwareMap, false, this, telemetry);
-        robot.getInDep().close();
+        robot.getInDep().autoInit();
         drive = robot.getDrive();
         runtime.reset();
 

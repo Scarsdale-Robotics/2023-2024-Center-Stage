@@ -46,7 +46,8 @@ public class chickennguet extends LinearOpMode {
                 hardwareRobot.leftBack,
                 hardwareRobot.rightBack,
                 hardwareRobot.imu,
-                this
+                this,
+                false
         );
         endgame = new EndgameSubsystem(hardwareRobot.drone);
         FtcDashboard dashboard = FtcDashboard.getInstance();

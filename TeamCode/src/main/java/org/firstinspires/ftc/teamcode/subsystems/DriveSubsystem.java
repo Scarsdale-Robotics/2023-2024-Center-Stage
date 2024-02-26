@@ -31,8 +31,9 @@ public class DriveSubsystem extends SubsystemBase {
 
     private static volatile boolean isBusy;
     private static volatile ExecutorService threadPool;
-    // facing audience = -90, facing backdrop = 90, facing away ("out") = 0, facing in = 180
-    private int offsetAngle = -90;
+    // BLUE: facing audience = -90, facing backdrop = 90, facing away ("out") = 0, facing in = 180
+    // RED: facing audience = 90, facing audience = -90, facing away ("out") = 180, facing in = 0
+    private int offsetAngle;
     private final MecanumDrive controller;
     private final AdafruitBNO055IMU imu;
     private final LinearOpMode opMode;
@@ -48,10 +49,14 @@ public class DriveSubsystem extends SubsystemBase {
     public static String currentMovement="";
 
     public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, AdafruitBNO055IMU imu, LinearOpMode opMode) {
-        this(leftFront, rightFront, leftBack, rightBack, imu, opMode, null);
+        this(leftFront, rightFront, leftBack, rightBack, imu, opMode, true, null);
     }
 
-    public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, AdafruitBNO055IMU imu, LinearOpMode opMode, Telemetry telemetry) {
+    public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, AdafruitBNO055IMU imu, LinearOpMode opMode, boolean isRedTeam) {
+        this(leftFront, rightFront, leftBack, rightBack, imu, opMode, isRedTeam, null);
+    }
+
+    public DriveSubsystem(Motor leftFront, Motor rightFront, Motor leftBack, Motor rightBack, AdafruitBNO055IMU imu, LinearOpMode opMode, boolean isRedTeam, Telemetry telemetry) {
         this.rightBack = rightBack;
         this.leftBack = leftBack;
         this.rightFront = rightFront;
@@ -71,7 +76,7 @@ public class DriveSubsystem extends SubsystemBase {
         heading = getYaw();
         isBusy = false;
         threadPool = Executors.newCachedThreadPool();
-
+        offsetAngle = isRedTeam ? 90 : -90;
         if (this.telemetry != null) {
             this.telemetry.addData("MAX_VELOCITY", 0);
             this.telemetry.addData("L diff",0);
@@ -182,6 +187,7 @@ public class DriveSubsystem extends SubsystemBase {
     public void driveByAngularEncoder(double driveSpeed, double leftTicks, double rightTicks, double theta, boolean ignoreStartVelocity, boolean ignoreEndVelocity) {
         // check for clashing actions
         if (DriveSubsystem.getIsBusy()) {
+            stopController();
             CRASHED += currentMovement+", ";
             telemetry.addData("CRASHED BECAUSE BUSY", CRASHED);
             telemetry.update();
@@ -375,6 +381,7 @@ public class DriveSubsystem extends SubsystemBase {
     public void turnByIMU(double turnSpeed, double degrees) {
         // check for clashing actions
         if (DriveSubsystem.getIsBusy()) {
+            stopController();
             CRASHED += currentMovement+", ";
             telemetry.addData("CRASHED BECAUSE BUSY", CRASHED);
             telemetry.update();

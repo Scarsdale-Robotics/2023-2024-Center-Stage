@@ -37,6 +37,7 @@ public class RobotSystem {
                 hardwareRobot.rightBack,
                 hardwareRobot.imu,
                 opMode,
+                isRedTeam,
                 multipleTelemetry
         );
         cv = new CVSubsystem(

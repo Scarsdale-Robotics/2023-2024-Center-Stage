@@ -82,7 +82,7 @@ public class TeleOpUtil {
         try {
             inDep.open();
             inDep.setLevel(InDepSubsystem.Level.GROUND); // arm, wrist
-            Thread.sleep(100);
+            Thread.sleep(300);
             inDep.rest(); // elbow
         } catch (InterruptedException e) {
 //            e.printStackTrace();
@@ -295,14 +295,13 @@ public class TeleOpUtil {
 //            telemetry.addData("poop", Math.random());
         }
 
-        if (!gamepad2.dpad_left && cvDist < DISTANCE_BEFORE_BACKBOARD && !(inDep.getIsLeftClawOpen() || inDep.getIsRightClawOpen())) {
+        if (!gamepad2.dpad_right && ((cvDist < DISTANCE_BEFORE_BACKBOARD && !(inDep.getIsLeftClawOpen() || inDep.getIsRightClawOpen())) || gamepad2.dpad_down)) {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
         } else {
-            if (gamepad2.dpad_up) SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
-            else SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
+            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
         }
 
-        if (gamepad2.dpad_left) {
+        if (gamepad2.dpad_right) {
             gamepad1.rumble(500);
             gamepad2.rumble(500);
         }

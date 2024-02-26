@@ -29,7 +29,7 @@ public class AutoFarRed extends LinearOpMode {
     // The "Main" code will go in here
     public void runOpMode() {
         RobotSystem robot = new RobotSystem(hardwareMap, true, this, telemetry);
-        robot.getInDep().close();
+        robot.getInDep().autoInit();
         drive = robot.getDrive();
         runtime.reset();
 
@@ -58,19 +58,19 @@ public class AutoFarRed extends LinearOpMode {
         if (propLocation == 0) {
             main = new MovementSequenceBuilder()// START POSE (-40.75,-63.5,90)
                     .forwardLeft(26.5-12, 7.25+2)
-                    .raiseArm(5, true)  // 5
+                    .raiseArm(3.5, true)  // 3.5
                     .openRightClaw()
                     .sleepFor(300)
                     .backwardRight(23-14, 16)
                     .turnLeft(90)
                     .backward(39+4.5)
-                    .raiseArm(20, true)  // 25
-                    .backwardRight(36, 30+6)
+                    .raiseArm(21.5, true)  // 25
+                    .backwardRight(34, 30+3)
                     .raiseArm(185, true)  // 210
                     .openLeftClaw()
                     .sleepFor(300)
                     .forward(2)
-                    .right(18)
+                    .right(16)
                     .lowerArm(190, true)  // 20
                     .backward(12)
                     .forward(8)
@@ -82,10 +82,10 @@ public class AutoFarRed extends LinearOpMode {
                     .raiseArm(3.5, true)  // 3.5
                     .openRightClaw()
                     .sleepFor(300)
-                    .backwardRight(18, 8)
+                    .backwardRight(18, 3)
                     .turnLeft(90)
-                    .backward(39+9)
-                    .backwardRight(34, 27)
+                    .backward(39+9+5)
+                    .backwardRight(27, 27)
                     .raiseArm(206.5, true)  // 210
                     .openLeftClaw()
                     .sleepFor(300)
@@ -98,15 +98,17 @@ public class AutoFarRed extends LinearOpMode {
                     .build();
         } else if (propLocation == 2) {
             main = new MovementSequenceBuilder()// START POSE (-40.75,-63.5,90)
-                    .forwardRight(28.5+1, 7.75-4.75)
+                    .forwardRight(27.5, 7.75-4.75)
                     .raiseArm(3.5, true)  // 3.5
                     .turnRight(90)
+                    .forwardLeft(0, 2)
                     .openRightClaw()
                     .sleepFor(300)
+                    .backwardRight(3, 1)
                     .backwardRight(7, 24)
                     .turnLeft(180)
                     .backward(66+4.75)
-                    .backwardRight(19, 13)
+                    .backwardRight(19, 16)
                     .raiseArm(206.5, true)  // 210
                     .openLeftClaw()
                     .sleepFor(300)

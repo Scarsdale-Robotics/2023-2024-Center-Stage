@@ -46,7 +46,7 @@ public class SpeedCoefficients {
     }
 
     public static double getAutonomousTurnSpeed() {
-        return 0.69;
+        return 0.8;
     }
 
     public static double getAutonomousArmSpeed() {return 0.6;}
