@@ -176,7 +176,7 @@ public class CVSubsystem extends SubsystemBase {
         ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
         exposureControl.setMode(ExposureControl.Mode.Manual);
         // tune duration at comp, higher for brighter view (ie. in darker environments)
-        exposureControl.setExposure(5, TimeUnit.MILLISECONDS);
+        exposureControl.setExposure(30, TimeUnit.MILLISECONDS);
     }
 
     public void decShutter() {

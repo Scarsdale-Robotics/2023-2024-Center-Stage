@@ -297,9 +297,10 @@ public class TeleOpUtil {
 
         if (!gamepad2.dpad_right && ((cvDist < DISTANCE_BEFORE_BACKBOARD && !(inDep.getIsLeftClawOpen() || inDep.getIsRightClawOpen())) || gamepad2.dpad_down)) {
             SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_SLOW);
-        } else {
-            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
         }
+//        else {
+//            SpeedCoefficients.setMode(SpeedCoefficients.MoveMode.MODE_FAST);
+//        }
 
         if (gamepad2.dpad_right) {
             gamepad1.rumble(500);

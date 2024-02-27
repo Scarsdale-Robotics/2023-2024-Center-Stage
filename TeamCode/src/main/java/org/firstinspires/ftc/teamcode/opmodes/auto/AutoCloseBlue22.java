@@ -56,19 +56,19 @@ public class AutoCloseBlue22 extends LinearOpMode {
         if (propLocation == 0) {
             main = new MovementSequenceBuilder()
                     // (16.75,63.5,-90)
-                    .forwardLeft(28, 6.5+15)
+                    .forwardLeft(29, 6.5+15)
                     .raiseArm(3.5, true)  // 3.5
                     .turnRight(90)
                     .openRightClaw()
                     .sleepFor(321)
-                    .backwardRight(17-15, 7.5)
-                    .raiseArm(206.5, true)  // 210
+                    .backwardRight(17-15, 10)
+                    .raiseArm(211.5, true)  // 215
                     .backward(4)
                     .openLeftClaw()
                     .sleepFor(333)
-                    .forwardLeft(8, 31.5-2)
-                    .lowerArm(145, true)  // 65
-                    .forwardRight(15.5+72.5+1, 0.6)
+                    .forwardLeft(8, 31.5)
+                    .lowerArm(150, true)  // 65
+                    .forwardRight(15.5+72.5+1, -2)
                     .lowerArm(60, true)  // 5
                     .closeBothClaws()  // white intake
                     .sleepFor(500)
@@ -91,18 +91,18 @@ public class AutoCloseBlue22 extends LinearOpMode {
         } else if (propLocation == 1) {
             main = new MovementSequenceBuilder()
                     //(16.75,63.5,-90)
-                    .forwardLeft(38, 15)
-                    .turnRight(90)
+                    .forwardLeft(41, 15)
                     .raiseArm(10, true)  // 10
+                    .turnRight(90)
                     .openRightClaw()
                     .sleepFor(250)
-                    .backwardLeft(25-12.75, 4-14.5-1)
-                    .raiseArm(200, true)  // 210
+                    .backwardLeft(25-10.5, 4-14.5-1-6)
+                    .raiseArm(205, true)  // 215
                     .openLeftClaw()
                     .sleepFor(333)
-                    .forwardLeft(14, 23)
-                    .lowerArm(155, true)  // 55
-                    .forwardRight(84, 2)
+                    .forwardLeft(14, 29.5)
+                    .lowerArm(160, true)  // 55
+                    .forwardRight(84, 0)
                     .lowerArm(52, true) // 3
                     .closeBothClaws()
                     .sleepFor(500)
@@ -114,7 +114,7 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .closeBothClaws()
                     .restElbow()
                     .backwardLeft(80, 0)
-                    .backwardRight(14, 22.25)
+                    .backwardRight(14, 30)
                     .raiseArm(170, true)  // 190
                     .backward(5)
                     .openBothClaws()
@@ -131,16 +131,16 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .forwardRight(29.5, 1)
                     .raiseArm(3.5, true)  // 3.5
                     .turnRight(90)
-                    .forward(2)
+                    .forward(1)
                     .openRightClaw()
                     .sleepFor(333)
                     .backwardLeft(29, 6)
-                    .raiseArm(206.5, true)  // 210
+                    .raiseArm(211.5, true)  // 215
 //                    .backward(3)
                     .openLeftClaw()
                     .sleepFor(333)
-                    .forwardLeft(9, 23-1.75-5-1)
-                    .lowerArm(207, true)  // 3
+                    .forwardLeft(9, 23-1.75-3.5)
+                    .lowerArm(212, true)  // 3
                     .forwardRight(72.5+15.5+4.5-1, 0)
                     .closeBothClaws()  // white intake
                     .sleepFor(555)
@@ -152,7 +152,7 @@ public class AutoCloseBlue22 extends LinearOpMode {
                     .closeBothClaws()
                     .restElbow()
                     .backwardLeft(79, 0)
-                    .backwardRight(16.75, 29-1.75-4)
+                    .backwardRight(16.75, 29-1.75-1)
                     .raiseArm(165, true)  // 190
                     .backward(3)
                     .openBothClaws()  // white deposit
