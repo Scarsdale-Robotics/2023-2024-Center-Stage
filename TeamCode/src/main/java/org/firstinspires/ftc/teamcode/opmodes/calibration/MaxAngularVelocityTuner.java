@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes.calibration;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -12,9 +11,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryImpl;
 import org.firstinspires.ftc.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
-import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
-import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
 import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 
 // FTC DASHBOARD
@@ -25,9 +21,8 @@ import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 // TODO: Camera stream monitor
 
 @Config
-@TeleOp(name = "Drivetrain Turn PID Tuner")
-public class PIDTurnTuner extends LinearOpMode {
-    public static double turnDegrees = 180;
+@TeleOp(name = "Max Angular Velocity Tuner")
+public class MaxAngularVelocityTuner extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
     private HardwareRobot hardwareRobot;
     private static DriveSubsystem drive;
@@ -37,31 +32,41 @@ public class PIDTurnTuner extends LinearOpMode {
     @Override
     // The "Main" code will go in here
     public void runOpMode() {
-        RobotSystem robot = new RobotSystem(hardwareMap, false, this, telemetry);
-        drive = robot.getDrive();
+        this.hardwareRobot = new HardwareRobot(hardwareMap);
+        drive = new DriveSubsystem(
+                hardwareRobot.leftFront,
+                hardwareRobot.rightFront,
+                hardwareRobot.leftBack,
+                hardwareRobot.rightBack,
+                hardwareRobot.imu,
+                this,
+                false,
+                telemetry
+        );
         runtime.reset();
 
         waitForStart();
 
+        double max = -1;
         // begin tuning sequence
         while (opModeIsActive()) {
 
-            MovementSequence forward = new MovementSequenceBuilder()
-                    .turnRight(turnDegrees)
-                    .build();
+            double power = -gamepad1.right_stick_x;
+            if (Math.abs(power) > 0.5)
+                drive.driveRobotCentric(0, 0, power);
+            else
+                drive.stopController();
 
-            // forward 1000√2 ticks
-//            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), 3000, 3000, Math.PI/2);
-            drive.followMovementSequence(forward);
-            while (opModeIsActive() && !gamepad1.triangle);
-            // backward 1000√2 ticks
+            double velocity = drive.getAngularVelocity();
 
-            MovementSequence backward = new MovementSequenceBuilder()
-                    .turnLeft(turnDegrees)
-                    .build();
-//            drive.driveByAngularEncoder(SpeedCoefficients.getAutonomousDriveSpeed(), 3000, 3000, -Math.PI/2);
-            drive.followMovementSequence(backward);
-            while (opModeIsActive() && !gamepad1.triangle);
+            max = Math.max(Math.abs(max), Math.abs(velocity));
+
+            telemetry.addData("Angular Velocity", velocity);
+
+            telemetry.addData("Max Angular Velocity", max);
+
+            telemetry.update();
+
         }
 
         drive.stopController();

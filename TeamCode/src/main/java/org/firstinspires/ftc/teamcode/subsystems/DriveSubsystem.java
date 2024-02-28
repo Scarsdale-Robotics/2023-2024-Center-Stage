@@ -6,7 +6,6 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -16,7 +15,6 @@ import org.firstinspires.ftc.teamcode.subsystems.movement.Movement;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.util.DrivePIDCoefficients;
 import org.firstinspires.ftc.teamcode.util.PIDController;
-import org.firstinspires.ftc.teamcode.util.SpeedCoefficients;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -43,6 +41,8 @@ public class DriveSubsystem extends SubsystemBase {
     private final Motor rightBack;
     private Telemetry telemetry;
     public static volatile double heading=0D;
+    public static volatile double imuResetValue=0D;
+    public static volatile double deltaTime=0D;
     private final ElapsedTime runtime;
 
     // for debugging
@@ -70,51 +70,51 @@ public class DriveSubsystem extends SubsystemBase {
         this.imu = imu;
         this.opMode = opMode;
         this.telemetry = telemetry;
-        while (getYaw() == 0D && heading == 0D && opMode.opModeIsActive()) { // wait until imu reads heading correctly
-            heading = getYaw();
-        }
-        heading = getYaw();
         isBusy = false;
         threadPool = Executors.newCachedThreadPool();
         offsetAngle = isRedTeam ? 90 : -90;
         if (this.telemetry != null) {
-            this.telemetry.addData("MAX_VELOCITY", 0);
-            this.telemetry.addData("L diff",0);
-            this.telemetry.addData("R diff",0);
-
-            this.telemetry.addData("Degrees setpoint",0);
-            this.telemetry.addData("Degrees position",0);
-
-            this.telemetry.addData("LB_sp", 0);
-            this.telemetry.addData("LB_p", 0);
-            this.telemetry.addData("RB_sp", 0);
-            this.telemetry.addData("RB_p", 0);
-            this.telemetry.addData("LF_sp", 0);
-            this.telemetry.addData("LF_p", 0);
-            this.telemetry.addData("RF_sp", 0);
-            this.telemetry.addData("RF_p", 0);
-
-            // these are fine
-            this.telemetry.addData("LB_v (sp)", 0);
-            this.telemetry.addData("RB_v (sp)", 0);
-            this.telemetry.addData("LF_v (sp)", 0);
-            this.telemetry.addData("RF_v (sp)", 0);
-
-            // these might not be fine
-            this.telemetry.addData("LB Velocity", 0);
-            this.telemetry.addData("RB Velocity", 0);
-            this.telemetry.addData("LF Velocity", 0);
-            this.telemetry.addData("RF Velocity", 0);
-
-            this.telemetry.addData("LB Abs Error", 0);
-            this.telemetry.addData("RB Abs Error", 0);
-            this.telemetry.addData("LF Abs Error", 0);
-            this.telemetry.addData("RF Abs Error", 0);
-
-            telemetry.addData("LB Power", 0);
-            telemetry.addData("RB Power", 0);
-            telemetry.addData("LF Power", 0);
-            telemetry.addData("RF Power", 0);
+//            this.telemetry.addData("MAX_VELOCITY", 0);
+//            this.telemetry.addData("L diff",0);
+//            this.telemetry.addData("R diff",0);
+//
+//            this.telemetry.addData("Degrees setpoint",0);
+//            this.telemetry.addData("Degrees position",0);
+//
+//            this.telemetry.addData("LB_sp", 0);
+//            this.telemetry.addData("LB_p", 0);
+//            this.telemetry.addData("RB_sp", 0);
+//            this.telemetry.addData("RB_p", 0);
+//            this.telemetry.addData("LF_sp", 0);
+//            this.telemetry.addData("LF_p", 0);
+//            this.telemetry.addData("RF_sp", 0);
+//            this.telemetry.addData("RF_p", 0);
+//
+//            // these are fine
+//            this.telemetry.addData("LB_v (sp)", 0);
+//            this.telemetry.addData("RB_v (sp)", 0);
+//            this.telemetry.addData("LF_v (sp)", 0);
+//            this.telemetry.addData("RF_v (sp)", 0);
+//
+//            // these might not be fine
+//            this.telemetry.addData("LB Velocity", 0);
+//            this.telemetry.addData("RB Velocity", 0);
+//            this.telemetry.addData("LF Velocity", 0);
+//            this.telemetry.addData("RF Velocity", 0);
+//
+//            this.telemetry.addData("LB Abs Error", 0);
+//            this.telemetry.addData("RB Abs Error", 0);
+//            this.telemetry.addData("LF Abs Error", 0);
+//            this.telemetry.addData("RF Abs Error", 0);
+//
+//            telemetry.addData("LB Power", 0);
+//            telemetry.addData("RB Power", 0);
+//            telemetry.addData("LF Power", 0);
+//            telemetry.addData("RF Power", 0);
+            while (getYaw() == 0D && heading == 0D && opMode.opModeIsActive()) { // wait until imu reads heading correctly
+                heading = getYaw();
+            }
+            heading = getYaw();
 
             this.telemetry.addData("HEADING", heading);
             this.telemetry.addData("YAW", getYaw());
@@ -219,7 +219,7 @@ public class DriveSubsystem extends SubsystemBase {
 
         // calculate time needed to complete entire movement
         double totalDistance = Math.hypot(L,R);
-        double maxVelocity = DrivePIDCoefficients.MAX_ATTAINABLE_VELOCITY;
+        double maxVelocity = DrivePIDCoefficients.MAX_ADJUSTED_VELOCITY;
         double[] travelTimes = calculator.calculateTravelTimes(totalDistance, maxVelocity, ignoreStartVelocity, ignoreEndVelocity);
         double firstHalfTime = travelTimes[0]; // time needed to travel the first half of the distance
         double secondHalfTime = travelTimes[1]; // time needed to travel the second half of the distance
@@ -237,8 +237,9 @@ public class DriveSubsystem extends SubsystemBase {
 
             telemetry.addData("CRASHED BECAUSE BUSY", CRASHED);
             telemetry.addData("CURRENT MOVEMENT:", DriveSubsystem.currentMovement);
-            telemetry.addData("MAX_VELOCITY", maxVelocity);
+//            telemetry.addData("MAX_VELOCITY", maxVelocity);
 
+            // update values from dashboard changes
             calculator.setVelocitySpreadProportion(DrivePIDCoefficients.VELOCITY_SPREAD_PROPORTION);
 
             LB_PID.setPID(DrivePIDCoefficients.getDriveP(), DrivePIDCoefficients.getDriveI(), DrivePIDCoefficients.getDriveD());
@@ -252,6 +253,7 @@ public class DriveSubsystem extends SubsystemBase {
             RF_PID.setErrorTolerance(DrivePIDCoefficients.getErrorTolerance_p());
 
             telemetry.addData("THETA", theta);
+
             // handle wheel velocities
             double[] velocitySetpoints = calculator.calculateVelocitySetpoints(driveSpeed, theta, elapsedTime, travelTimes, maxVelocity, ignoreStartVelocity, ignoreEndVelocity);
             double LB_v = velocitySetpoints[0], RF_v = velocitySetpoints[0], RB_v = velocitySetpoints[1], LF_v = velocitySetpoints[1];
@@ -259,19 +261,21 @@ public class DriveSubsystem extends SubsystemBase {
             // handle turn correction
             double turnVelocityGain = DrivePIDCoefficients.TURN_VELOCITY_GAIN;
             double turnPositionGain = DrivePIDCoefficients.TURN_POSITION_GAIN;
-            double deltaTime = runtime.seconds() - elapsedTime;
             double currentHeading = getYaw();
             double thetaDiff = normalizeAngle(currentHeading - heading);
-//            telemetry.addData("HEADING", heading);
-//            telemetry.addData("YAW", getYaw());
-            if (Math.abs(thetaDiff) < 15) {
+            telemetry.addData("thetaDiff", thetaDiff);
+            telemetry.addData("HEADING", heading);
+            telemetry.addData("YAW", getYaw());
+            double absThetaDiff = Math.abs(thetaDiff);
+            if (absThetaDiff < 15) {
+                // TODO:see if these work, use old method if inconsistent
                 LB_v += turnVelocityGain * thetaDiff;
-                RB_v -= turnVelocityGain * thetaDiff;
                 LF_v += turnVelocityGain * thetaDiff;
+                RB_v -= turnVelocityGain * thetaDiff;
                 RF_v -= turnVelocityGain * thetaDiff;
                 LBTurnPosDiff += turnPositionGain * thetaDiff * deltaTime;
-                RBTurnPosDiff += turnPositionGain * thetaDiff * deltaTime;
-                LFTurnPosDiff -= turnPositionGain * thetaDiff * deltaTime;
+                LFTurnPosDiff += turnPositionGain * thetaDiff * deltaTime;
+                RBTurnPosDiff -= turnPositionGain * thetaDiff * deltaTime;
                 RFTurnPosDiff -= turnPositionGain * thetaDiff * deltaTime;
             }
 
@@ -338,14 +342,14 @@ public class DriveSubsystem extends SubsystemBase {
 //            telemetry.addData("RB Velocity", getRBVelocity());
 //            telemetry.addData("LF Velocity", getLFVelocity());
 //            telemetry.addData("RF Velocity", getRFVelocity());
-//            telemetry.addData("thetaDiff", thetaDiff);
 
             // normalize velocities and drive with motor powers
-            double theoreticalMaxVelocity = DrivePIDCoefficients.MAX_VELOCITY;
-            double LF_power = (LF_v + LFTurnPosDiff) / theoreticalMaxVelocity;
-            double RF_power = (RF_v + RFTurnPosDiff) / theoreticalMaxVelocity;
-            double LB_power = (LB_v + LBTurnPosDiff) / theoreticalMaxVelocity;
-            double RB_power = (RB_v + RBTurnPosDiff) / theoreticalMaxVelocity;
+            double maxTheoreticalVelocity = DrivePIDCoefficients.MAX_THEORETICAL_VELOCITY;
+            //TODO: each of these velocities were (v + TurnPosDiff)???
+            double LF_power = LF_v / maxTheoreticalVelocity;
+            double RF_power = RF_v / maxTheoreticalVelocity;
+            double LB_power = LB_v / maxTheoreticalVelocity;
+            double RB_power = RB_v / maxTheoreticalVelocity;
 
 //            telemetry.addData("LB Power", LB_power);
 //            telemetry.addData("RB Power", RB_power);
@@ -362,7 +366,9 @@ public class DriveSubsystem extends SubsystemBase {
             telemetry.update();
 
             // update elapsed time
-            elapsedTime = runtime.seconds() - startTime;
+            double currentTime = runtime.seconds();
+            deltaTime = currentTime - elapsedTime;
+            elapsedTime = currentTime - startTime;
 
             isBusy = true;
         }
@@ -390,46 +396,91 @@ public class DriveSubsystem extends SubsystemBase {
 
         isBusy = true;
 
+        // stop drivetrain at start
+        stopController();
+
+        // reset IMU yaw to 0
+        resetIMU();
+
         // begin action
-        double cumulativeAngle = 0, previousAngle = getYaw();
-        double K;
+        double start = -getYaw();
+        double D = Math.abs(degrees);
 
-        PIDController PID = new PIDController(DrivePIDCoefficients.getTurnP(), DrivePIDCoefficients.getTurnI(), DrivePIDCoefficients.getTurnD(), degrees);
+        PIDController PID = new PIDController(DrivePIDCoefficients.getTurnP(), DrivePIDCoefficients.getTurnI(), DrivePIDCoefficients.getTurnD(), start);
+        PIDController calculator = new PIDController();
+        calculator.setVelocitySpreadProportion(DrivePIDCoefficients.ANGULAR_VELOCITY_SPREAD_PROPORTION);
 
-        while (
-                opMode.opModeIsActive() && !(
-                        Math.abs(degrees - (cumulativeAngle + normalizeAngle(previousAngle-getYaw()))) < DrivePIDCoefficients.getErrorTolerance_degrees() &&
-                                Math.abs(getLBVelocity()) + Math.abs(getRBVelocity()) + Math.abs(getLFVelocity()) + Math.abs(getRFVelocity()) < 4 * DrivePIDCoefficients.getErrorTolerance_v())
-        ) {
+        // calculate time needed to complete entire turn
+        double maxVelocity = DrivePIDCoefficients.MAX_ADJUSTED_ANGULAR_VELOCITY;
+        double[] travelTimes = calculator.calculateTravelTimes(D, maxVelocity, false, false);
+        double firstHalfTime = travelTimes[0]; // time needed to turn the first half
+        double secondHalfTime = travelTimes[1]; // time needed to turn the second half
+        double totalTime = firstHalfTime + secondHalfTime;
+
+        double startTime = runtime.seconds(); // beginning time of the turn
+        double elapsedTime = 0; // will act as the independent variable t for heading & velocity calculations
+
+        while (opMode.opModeIsActive() && elapsedTime < totalTime) {
+
+            telemetry.addData("CRASHED BECAUSE BUSY", CRASHED);
+            telemetry.addData("CURRENT MOVEMENT:", DriveSubsystem.currentMovement);
+            telemetry.addData("max adjusted angular velocity", maxVelocity);
+
+            // update values from dashboard changes
+            calculator.setVelocitySpreadProportion(DrivePIDCoefficients.ANGULAR_VELOCITY_SPREAD_PROPORTION);
+
             PID.setPID(DrivePIDCoefficients.getTurnP(), DrivePIDCoefficients.getTurnI(), DrivePIDCoefficients.getTurnD());
 
-            double currentHeading = getYaw();
+            PID.setErrorTolerance(DrivePIDCoefficients.getErrorTolerance_degrees());
 
-            cumulativeAngle += normalizeAngle(previousAngle-currentHeading);
-            previousAngle = currentHeading;
+            // handle velocity setpoint
+            double v = calculator.calculateVelocitySetpoints(turnSpeed, elapsedTime, travelTimes, maxVelocity, degrees, false, false);
 
-            K = PID.update(cumulativeAngle);
+            // handle heading setpoint
+            double sp = normalizeAngle(calculator.calculatePositionSetpoints(start, degrees, elapsedTime, travelTimes, maxVelocity, false, false));
 
-            if (telemetry != null) {
-                telemetry.addData("CRASHED BECAUSE BUSY", CRASHED);
-                telemetry.addData("CURRENT MOVEMENT:", currentMovement);
-                telemetry.addData("HEADING", heading);
-                telemetry.addData("YAW", getYaw());
-                telemetry.addData("Degrees Disp setpoint", degrees);
-                telemetry.addData("Degrees diff", degrees - cumulativeAngle);
-                telemetry.addData("Degrees cumulative",cumulativeAngle);
-                telemetry.addData("K",K);
-                telemetry.update();
+            PID.setSetPoint(sp);
+
+            double p = -getYaw();
+
+            // heading correction using PID
+            double velocityGain = DrivePIDCoefficients.ANGULAR_VELOCITY_GAIN;
+            double C = PID.updateError(normalizeAngle(sp - p)) * velocityGain;
+
+            telemetry.addData("sp", PID.getSetPoint());
+            telemetry.addData("p", p);
+            telemetry.addData("C", C);
+            telemetry.addData("Abs Error", PID.getAbsoluteDiff(p));
+
+            if (!(PID.getAbsoluteDiff(p) < DrivePIDCoefficients.getErrorTolerance_degrees())) {
+                v += C;
             }
 
-            driveRobotCentric(0, 0, turnSpeed * K);
+            telemetry.addData("v (sp)", v);
+
+            telemetry.addData("Angular Velocity", getAngularVelocity());
+
+            double maxTheoreticalVelocity = DrivePIDCoefficients.MAX_THEORETICAL_ANGULAR_VELOCITY;
+            double power = v / maxTheoreticalVelocity;
+
+            telemetry.addData("Power", power);
+
+            driveRobotCentric(0, 0, power);
+
+            telemetry.update();
+
+            // update elapsed time
+            double currentTime = runtime.seconds();
+            deltaTime = currentTime - elapsedTime;
+            elapsedTime = currentTime - startTime;
 
             isBusy = true;
         }
 
         // brake
         stopController();
-        heading = getYaw();
+        // TODO:is this correct
+        heading = normalizeAngle(heading - degrees);
         telemetry.addData("HEADING", heading);
         telemetry.addData("YAW", getYaw());
         telemetry.update();
@@ -568,10 +619,15 @@ public class DriveSubsystem extends SubsystemBase {
     public void resetIMU() {
         imu.resetDeviceConfigurationForOpMode();
         imu.initialize(new BNO055IMU.Parameters());
+        imuResetValue = imu.getAngularOrientation().firstAngle * 180.0 / Math.PI; // degrees
     }
 
     public double getYaw() {
-        return normalizeAngle(imu.getAngularOrientation().firstAngle * 180.0 / Math.PI + offsetAngle);
+        return normalizeAngle(imu.getAngularOrientation().firstAngle * 180.0 / Math.PI - imuResetValue + offsetAngle);
+    }
+
+    public double getAngularVelocity() {
+        return imu.getAngularVelocity(AngleUnit.DEGREES).yRotationRate;
     }
 
     /**

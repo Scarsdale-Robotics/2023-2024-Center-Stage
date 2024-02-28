@@ -182,7 +182,6 @@ public class InDepSubsystem extends SubsystemBase {
         }
 
         setElbowPosition(calculateElbowPosition(armPos-delta));
-        // TODO: add ada's equations?
         setWristPosition(calculateWristPosition(armPos-delta));
 
         opMode.telemetry.addData("chicken: ", "nugget");
@@ -239,7 +238,7 @@ public class InDepSubsystem extends SubsystemBase {
         R_PID.setOutputBounds(-1, 1);
 
         // calculate time needed to complete entire arm movement
-        double maxVelocity = InDepPIDCoefficients.MAX_ATTAINABLE_VELOCITY;
+        double maxVelocity = InDepPIDCoefficients.MAX_ADJUSTED_VELOCITY;
         double[] travelTimes = calculator.calculateTravelTimes(D, maxVelocity, false, false);
         double firstHalfTime = travelTimes[0]; // time needed to turn the first half of the angle
         double secondHalfTime = travelTimes[1]; // time needed to turn the second half of the angle
@@ -251,7 +250,9 @@ public class InDepSubsystem extends SubsystemBase {
         while (opMode.opModeIsActive() && elapsedTime < totalTime) {
 
             telemetry.addData("CRASHED BECAUSE BUSY", DriveSubsystem.CRASHED);
+            telemetry.addData("CURRENT MOVEMENT:", DriveSubsystem.currentMovement);
 
+            // update values from dashboard changes
             calculator.setVelocitySpreadProportion(InDepPIDCoefficients.VELOCITY_SPREAD_PROPORTION);
 
             L_PID.setPID(InDepPIDCoefficients.getKp(), InDepPIDCoefficients.getKi(), InDepPIDCoefficients.getKd());
@@ -302,9 +303,9 @@ public class InDepSubsystem extends SubsystemBase {
 //            telemetry.addData("R Velocity", getRightArmVelocity());
 
             // normalize velocities and turn arm with motor powers
-            double theoreticalMaxVelocity = InDepPIDCoefficients.MAX_ATTAINABLE_VELOCITY;
-            double L_power = L_v / theoreticalMaxVelocity;
-            double R_power = R_v / theoreticalMaxVelocity;
+            double maxTheoreticalVelocity = InDepPIDCoefficients.MAX_THEORETICAL_VELOCITY;
+            double L_power = L_v / maxTheoreticalVelocity;
+            double R_power = R_v / maxTheoreticalVelocity;
 
 //            telemetry.addData("L Power", L_power);
 //            telemetry.addData("R Power", R_power);
@@ -315,8 +316,8 @@ public class InDepSubsystem extends SubsystemBase {
             telemetry.update();
 
             // nathan addition (hopefully doesn't break everything):
-            setElbowPosition(calculateElbowPosition(getLeftArmPosition()));
-            setWristPosition(calculateWristPosition(getLeftArmPosition()));
+            setElbowPosition(calculateElbowPosition(getLeftArmPosition())-delta);
+            setWristPosition(calculateWristPosition(getLeftArmPosition())-delta);
 
             // update elapsed time
             elapsedTime = PIDTimer.seconds() - startTime;

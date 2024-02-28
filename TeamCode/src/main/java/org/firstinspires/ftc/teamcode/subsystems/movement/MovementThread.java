@@ -86,8 +86,8 @@ public class MovementThread implements Runnable {
 
         // ARM CASES
         if (type.isArmType) {
-            double d = movement.DEGREES_ELEVATION;
-            InDepPIDCoefficients.MAX_ATTAINABLE_VELOCITY = Math.min(InDepPIDCoefficients.MAX_VELOCITY, InDepPIDCoefficients.MAX_VELOCITY * (d*d) / 5400.0 + InDepPIDCoefficients.MAX_VELOCITY / (3.0) );
+            double d = Math.abs(movement.DEGREES_ELEVATION);
+            InDepPIDCoefficients.MAX_ADJUSTED_VELOCITY = Math.min(InDepPIDCoefficients.MAX_RUN_VELOCITY, InDepPIDCoefficients.MAX_RUN_VELOCITY * (d*d) / 5400.0 + InDepPIDCoefficients.MAX_RUN_VELOCITY / (3.0) );
             inDep.raiseByEncoder(
                 POWER_ARM,
                 movement.DEGREES_ELEVATION * MovementThread.K_ARM * type.SGN_elevation
@@ -150,7 +150,7 @@ public class MovementThread implements Runnable {
                 L = Math.abs(u*c*Math.cos(theta)-u*c*Math.sin(theta))/Math.sqrt(2),
                 R = Math.abs(u*c*Math.cos(theta)+u*c*Math.sin(theta))/Math.sqrt(2);
 
-        DrivePIDCoefficients.MAX_ATTAINABLE_VELOCITY = Math.min(DrivePIDCoefficients.MAX_VELOCITY, DrivePIDCoefficients.MAX_VELOCITY * (c*c) / 5400.0 + DrivePIDCoefficients.MAX_VELOCITY / (3.0) );
+        DrivePIDCoefficients.MAX_ADJUSTED_VELOCITY = Math.min(DrivePIDCoefficients.MAX_RUN_VELOCITY, DrivePIDCoefficients.MAX_RUN_VELOCITY * (c*c) / 5400.0 + DrivePIDCoefficients.MAX_RUN_VELOCITY / (3.0) );
 
         drive.driveByAngularEncoder(POWER_DRIVE, L, R, theta, driveMovement.ignoreStartVelocity, driveMovement.ignoreEndVelocity);
 
@@ -162,6 +162,9 @@ public class MovementThread implements Runnable {
      */
     private void executeTurnMovement(Movement turnMovement) {
         Movement.MovementType type = turnMovement.MOVEMENT_TYPE;
+
+        double d = Math.abs(turnMovement.DEGREES_TURN);
+        DrivePIDCoefficients.MAX_ADJUSTED_ANGULAR_VELOCITY = Math.min(DrivePIDCoefficients.MAX_RUN_ANGULAR_VELOCITY, DrivePIDCoefficients.MAX_RUN_ANGULAR_VELOCITY * (d*d) / 10000.0 + DrivePIDCoefficients.MAX_RUN_ANGULAR_VELOCITY / (3.0) );
 
         drive.turnByIMU(POWER_TURN, turnMovement.DEGREES_TURN * type.SGN_turn);
 
