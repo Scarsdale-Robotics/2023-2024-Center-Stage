@@ -267,7 +267,7 @@ public class DriveSubsystem extends SubsystemBase {
             telemetry.addData("HEADING", heading);
             telemetry.addData("YAW", getYaw());
             double absThetaDiff = Math.abs(thetaDiff);
-            if (absThetaDiff < 15) {
+            if (absThetaDiff < 90) {
                 LB_v += turnVelocityGain * thetaDiff;
                 LF_v += turnVelocityGain * thetaDiff;
                 RB_v -= turnVelocityGain * thetaDiff;
@@ -401,7 +401,7 @@ public class DriveSubsystem extends SubsystemBase {
         resetIMU();
 
         // begin action
-        double start = -getYaw();
+        double start = getYaw();
         double D = Math.abs(degrees);
 
         PIDController PID = new PIDController(DrivePIDCoefficients.getTurnP(), DrivePIDCoefficients.getTurnI(), DrivePIDCoefficients.getTurnD(), start);
@@ -439,7 +439,7 @@ public class DriveSubsystem extends SubsystemBase {
 
             PID.setSetPoint(sp);
 
-            double p = -getYaw();
+            double p = getYaw();
 
             // heading correction using PID
             double velocityGain = DrivePIDCoefficients.ANGULAR_VELOCITY_GAIN;
@@ -448,9 +448,9 @@ public class DriveSubsystem extends SubsystemBase {
             telemetry.addData("sp", PID.getSetPoint());
             telemetry.addData("p", p);
             telemetry.addData("C", C);
-            telemetry.addData("Abs Error", PID.getAbsoluteDiff(p));
+            telemetry.addData("Abs Error", Math.abs(normalizeAngle(sp - p)));
 
-            if (!(PID.getAbsoluteDiff(p) < DrivePIDCoefficients.getErrorTolerance_degrees())) {
+            if (!(Math.abs(normalizeAngle(sp - p)) < DrivePIDCoefficients.getErrorTolerance_degrees())) {
                 v += C;
             }
 

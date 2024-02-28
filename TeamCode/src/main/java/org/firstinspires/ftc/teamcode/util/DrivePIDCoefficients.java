@@ -22,11 +22,11 @@ public class DrivePIDCoefficients {
     public static double MAX_RUN_ANGULAR_VELOCITY = 0.9 * MAX_THEORETICAL_ANGULAR_VELOCITY;
     public static double MAX_ADJUSTED_ANGULAR_VELOCITY = MAX_RUN_ANGULAR_VELOCITY; // adjusted to scale with displacement
     public static double ANGULAR_VELOCITY_GAIN = 10; // for heading control in turn movements
-    public static double ANGULAR_VELOCITY_SPREAD_PROPORTION = 1; // should only fall within [0, 1]
+    public static double ANGULAR_VELOCITY_SPREAD_PROPORTION = 0.75; // should only fall within [0, 1]
 
     public static double turn_Kd = 0.05;
     public static double turn_Ki = 0.0;
-    public static double turn_Kp = 0.5;
+    public static double turn_Kp = 0.25;
 
     public static double errorTolerance_degrees = 0.0;
     public static double errorTolerance_p = 0.0;
