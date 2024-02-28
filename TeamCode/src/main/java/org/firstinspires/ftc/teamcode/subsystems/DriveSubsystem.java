@@ -268,7 +268,6 @@ public class DriveSubsystem extends SubsystemBase {
             telemetry.addData("YAW", getYaw());
             double absThetaDiff = Math.abs(thetaDiff);
             if (absThetaDiff < 15) {
-                // TODO:see if these work, use old method if inconsistent
                 LB_v += turnVelocityGain * thetaDiff;
                 LF_v += turnVelocityGain * thetaDiff;
                 RB_v -= turnVelocityGain * thetaDiff;
@@ -345,7 +344,6 @@ public class DriveSubsystem extends SubsystemBase {
 
             // normalize velocities and drive with motor powers
             double maxTheoreticalVelocity = DrivePIDCoefficients.MAX_THEORETICAL_VELOCITY;
-            //TODO: each of these velocities were (v + TurnPosDiff)???
             double LF_power = LF_v / maxTheoreticalVelocity;
             double RF_power = RF_v / maxTheoreticalVelocity;
             double LB_power = LB_v / maxTheoreticalVelocity;
@@ -479,7 +477,6 @@ public class DriveSubsystem extends SubsystemBase {
 
         // brake
         stopController();
-        // TODO:is this correct
         heading = normalizeAngle(heading - degrees);
         telemetry.addData("HEADING", heading);
         telemetry.addData("YAW", getYaw());
