@@ -164,7 +164,7 @@ public class MovementThread implements Runnable {
         Movement.MovementType type = turnMovement.MOVEMENT_TYPE;
 
         double d = Math.abs(turnMovement.DEGREES_TURN);
-        DrivePIDCoefficients.MAX_ADJUSTED_ANGULAR_VELOCITY = Math.min(DrivePIDCoefficients.MAX_RUN_ANGULAR_VELOCITY, DrivePIDCoefficients.MAX_RUN_ANGULAR_VELOCITY * (d*d) / 10000.0 + DrivePIDCoefficients.MAX_RUN_ANGULAR_VELOCITY / (3.0) );
+        DrivePIDCoefficients.MAX_ADJUSTED_ANGULAR_VELOCITY = Math.min(DrivePIDCoefficients.MAX_RUN_ANGULAR_VELOCITY, DrivePIDCoefficients.MAX_RUN_ANGULAR_VELOCITY * (d*d) / 48600.0 + DrivePIDCoefficients.MAX_RUN_ANGULAR_VELOCITY / (3.0) );
 
         drive.turnByIMU(POWER_TURN, turnMovement.DEGREES_TURN * type.SGN_turn);
 
