@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementStringInterpreter;
 
-@Autonomous(name = "Auto Close Red")
+@Autonomous(name = "[2+2] Auto Close Red")
 @Config
 public class AutoCloseRed extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
@@ -108,12 +108,12 @@ public class AutoCloseRed extends LinearOpMode {
                     .build();
         } else if (propLocation == 1) {
             purpleYellow = new MovementSequenceBuilder()
-                    .forwardRight(36-2, 7.25+5.5)
+                    .forwardRight(36-2-0.5, 7.25+5.5)
                     .raiseArm(5, true)  // 5
                     .turnLeft(90)
                     .openRightClaw()
                     .sleepFor(111)
-                    .backwardLeft(13.5, 9+2)
+                    .backwardLeft(13.5, 9+2.5)
                     .raiseArm(215, true)  // 220
                     .openLeftClaw()
                     .sleepFor(111)
@@ -122,7 +122,7 @@ public class AutoCloseRed extends LinearOpMode {
                     .forward(4)
                     .left(24)
                     .lowerArm(200, true)  // 20
-                    .backward(14)
+                    .backward(25)
                     .forward(10)
                     .lowerArm(20, true)
                     .build();
@@ -169,12 +169,12 @@ public class AutoCloseRed extends LinearOpMode {
                     .build();
         } else if (propLocation == 0) {
             purpleYellow = new MovementSequenceBuilder()
-                    .forwardLeft(28.5, 8.75-5)
+                    .forwardLeft(27, 8.75-5)
                     .raiseArm(3.5, true)  // 3.5
                     .turnLeft(90)
                     .openRightClaw()
                     .sleepFor(123)
-                    .backwardRight(30, 7)
+                    .backwardRight(30, 8.5)
                     .raiseArm(211.5, true)  // 215
                     .openLeftClaw()
                     .sleepFor(123)
@@ -183,7 +183,7 @@ public class AutoCloseRed extends LinearOpMode {
                     .forward(4)
                     .left(30)
                     .lowerArm(195, true)  // 20
-                    .backward(14)
+                    .backward(20)
                     .forward(10)
                     .lowerArm(20, true)
                     .build();

@@ -11,9 +11,9 @@ import org.firstinspires.ftc.teamcode.subsystems.RobotSystem;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequence;
 import org.firstinspires.ftc.teamcode.subsystems.movement.MovementSequenceBuilder;
 
-@Autonomous(name = "[2+2] Auto Close Blue")
+@Autonomous(name = "[2+0] Auto Close Blue Whiteless")
 @Config
-public class AutoCloseBlue extends LinearOpMode {
+public class AutoCloseBlueWhiteless extends LinearOpMode {
     final private ElapsedTime runtime = new ElapsedTime();
     private DriveSubsystem drive;
     public static String sequence = "";
@@ -93,9 +93,10 @@ public class AutoCloseBlue extends LinearOpMode {
                     .backward(3)
                     .build();
             park = new MovementSequenceBuilder()
+                    .forward(5)
                     .right(18)
                     .lowerArm(195, true)  // 20
-                    .backward(10)
+                    .backward(15)
                     .forward(5)
                     .lowerArm(20, true)
                     .build();
@@ -138,9 +139,10 @@ public class AutoCloseBlue extends LinearOpMode {
                     .backward(3)
                     .build();
             park = new MovementSequenceBuilder()
+                    .forward(5)
                     .right(24)
                     .lowerArm(195, true)  // 20
-                    .backward(10)
+                    .backward(15)
                     .forward(5)
                     .lowerArm(20, true)
                     .build();
@@ -186,9 +188,10 @@ public class AutoCloseBlue extends LinearOpMode {
                     .backward(3)
                     .build();
             park = new MovementSequenceBuilder()
+                    .forward(5)
                     .right(30)
                     .lowerArm(195, true)  // 20
-                    .backward(10)
+                    .backward(15)
                     .forward(5)
                     .lowerArm(20, true)
                     .build();
@@ -206,8 +209,8 @@ public class AutoCloseBlue extends LinearOpMode {
         if (!useString) {
             // perform the actual movements here in sequence
             drive.followMovementSequence(purpleYellow);
-            drive.followMovementSequence(white);
-//            drive.followMovementSequence(park);
+//            drive.followMovementSequence(white);
+            drive.followMovementSequence(park);
         }
 
         drive.stopController();

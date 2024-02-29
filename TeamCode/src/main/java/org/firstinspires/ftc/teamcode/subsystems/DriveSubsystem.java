@@ -401,7 +401,8 @@ public class DriveSubsystem extends SubsystemBase {
         resetIMU();
 
         // begin action
-        double start = getYaw();
+        double realStartHeading = getYaw();
+        double start = -realStartHeading;
         double D = Math.abs(degrees);
 
         PIDController PID = new PIDController(DrivePIDCoefficients.getTurnP(), DrivePIDCoefficients.getTurnI(), DrivePIDCoefficients.getTurnD(), start);
@@ -439,7 +440,7 @@ public class DriveSubsystem extends SubsystemBase {
 
             PID.setSetPoint(sp);
 
-            double p = getYaw();
+            double p = -getYaw();
 
             // heading correction using PID
             double velocityGain = DrivePIDCoefficients.ANGULAR_VELOCITY_GAIN;
@@ -477,7 +478,7 @@ public class DriveSubsystem extends SubsystemBase {
 
         // brake
         stopController();
-        heading = normalizeAngle(heading - degrees);
+        heading = normalizeAngle(realStartHeading - degrees);
         telemetry.addData("HEADING", heading);
         telemetry.addData("YAW", getYaw());
         telemetry.update();

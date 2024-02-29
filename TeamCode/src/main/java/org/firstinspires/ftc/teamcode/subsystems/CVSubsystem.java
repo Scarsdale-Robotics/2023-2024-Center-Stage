@@ -104,8 +104,8 @@ public class CVSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
         this.cameraName1 = cameraName1;
         this.cameraName2 = cameraName2;
-//        switchableCamera = ClassFactory.getInstance()
-//                .getCameraManager().nameForSwitchableCamera(this.cameraName2, this.cameraName1);
+        switchableCamera = ClassFactory.getInstance()
+                .getCameraManager().nameForSwitchableCamera(this.cameraName2, this.cameraName1);
         this.isRedTeam = isRedTeam;
         this.opMode = opMode;
         runtime.reset();
@@ -159,7 +159,7 @@ public class CVSubsystem extends SubsystemBase {
 
         // TODO: DISABLE PROPPROCESSOR FOR TELEOP
         builder.addProcessors(aprilTag, propProcessor);
-        builder.setAutoStopLiveView(false);
+//        builder.setAutoStopLiveView(false);
 
         // Build the Vision Portal, using the above settings.
         visionPortal = builder.build();
@@ -176,7 +176,7 @@ public class CVSubsystem extends SubsystemBase {
         ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
         exposureControl.setMode(ExposureControl.Mode.Manual);
         // tune duration at comp, higher for brighter view (ie. in darker environments)
-        exposureControl.setExposure(30, TimeUnit.MILLISECONDS);
+        exposureControl.setExposure(15, TimeUnit.MILLISECONDS);
     }
 
     public void decShutter() {

@@ -59,13 +59,13 @@ public class AutoFarRed extends LinearOpMode {
         if (propLocation == 0) {
             main = new MovementSequenceBuilder()// START POSE (-40.75,-63.5,90)
                     .forwardLeft(26.5-12, 7.25+2)
-                    .raiseArm(3.5, true)  // 3.5
+                    .raiseArm(5.5, true)  // 3.5
                     .openRightClaw()
                     .sleepFor(300)
                     .backwardRight(23-14, 16)
                     .turnLeft(90)
                     .backward(39+4.5)
-                    .raiseArm(21.5, true)  // 25
+                    .raiseArm(19.5, true)  // 25
                     .backwardRight(34, 30+3)
                     .raiseArm(185, true)  // 210
                     .openLeftClaw()
@@ -73,7 +73,7 @@ public class AutoFarRed extends LinearOpMode {
                     .forward(2)
                     .right(16)
                     .lowerArm(190, true)  // 20
-                    .backward(12)
+                    .backward(24)
                     .forward(8)
                     .lowerArm(20, true)  // 0
                     .build();
@@ -86,14 +86,14 @@ public class AutoFarRed extends LinearOpMode {
                     .backwardRight(18, 3)
                     .turnLeft(90)
                     .backward(39+9+5)
-                    .backwardRight(27, 27)
+                    .backwardRight(27, 23)
                     .raiseArm(206.5, true)  // 210
                     .openLeftClaw()
                     .sleepFor(300)
                     .forward(2)
                     .right(24)
                     .lowerArm(190, true)  // 20
-                    .backward(12)
+                    .backward(24)
                     .forward(8)
                     .lowerArm(20, true)  // 0
                     .build();
@@ -116,7 +116,7 @@ public class AutoFarRed extends LinearOpMode {
                     .forward(2)
                     .right(33)
                     .lowerArm(190, true)  // 20
-                    .backward(15)
+                    .backward(24)
                     .forward(10)
                     .lowerArm(20, true)  // 0
                     .build();

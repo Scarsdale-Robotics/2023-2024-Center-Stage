@@ -50,12 +50,12 @@ public class AutoFarBlue extends LinearOpMode {
         else
             initCV = seqs[0];
 
-        drive.followMovementSequence(initCV);
+//        drive.followMovementSequence(initCV);
         int propLocation = robot.getCV().getPropLocation();
         robot.getCV().disablePropProcessor();
 //        int propLocation = 0;
 
-        MovementSequence placePurple = new MovementSequenceBuilder().build(),
+        MovementSequence main = new MovementSequenceBuilder().build(),
                 //approachWhite = new MovementSequenceBuilder().build(),
                 //placeWhite = new MovementSequenceBuilder().build(),
                 placeYellow = new MovementSequenceBuilder().build(),
@@ -68,7 +68,7 @@ public class AutoFarBlue extends LinearOpMode {
 
         if (propLocation == 0) {
             // left
-            placePurple = new MovementSequenceBuilder()
+            main = new MovementSequenceBuilder()
                     .forwardLeft(24, 3.5)
                     .raiseArm(5, true)
                     .turnLeft(90)
@@ -77,18 +77,14 @@ public class AutoFarBlue extends LinearOpMode {
                     .backward(8)
                     .forwardLeft(1, 19)
                     .turnRight(180)
-                    .build();
-            placeYellow = new MovementSequenceBuilder()
                     .backward(49)
                     .raiseArm(15, true)
-                    .backwardLeft(40, 21)
+                    .backwardLeft(40, 24)
                     .raiseArm(200, true)
                     .openLeftClaw()
                     .sleepFor(150)
-                    .build();
-            park = new MovementSequenceBuilder()
                     .forward(2)
-                    .left(31)
+                    .left(11)
                     .lowerArm(170, true)
                     .backward(14)
                     .lowerArm(40)
@@ -132,23 +128,19 @@ public class AutoFarBlue extends LinearOpMode {
 //                    .forwardLeft(20, 24) // align with truss
 //                    .build();
         } else if (propLocation == 1) {
-            placePurple = new MovementSequenceBuilder()
+            main = new MovementSequenceBuilder()
                     .forwardLeft(23, 1.75)
                     .raiseArm(5, true)
                     .openRightClaw()
                     .sleepFor(150)
                     .backwardLeft(19, 2)
                     .turnRight(90)  // -37 60
-                    .build();
-            placeYellow = new MovementSequenceBuilder()
                     .backward(47)
                     .raiseArm(15, true)
-                    .backwardLeft(31, 31.5)
+                    .backwardLeft(31, 29)
                     .raiseArm(200, true)
                     .openLeftClaw()
                     .sleepFor(150)
-                    .build();
-            park = new MovementSequenceBuilder()
                     .forward(2)
                     .left(24)
                     .lowerArm(170, true)
@@ -184,7 +176,7 @@ public class AutoFarBlue extends LinearOpMode {
 //                    .forwardLeft(31, 18) // align with truss
 //                    .build();
         } else if (propLocation == 2) {
-            placePurple = new MovementSequenceBuilder()
+            main = new MovementSequenceBuilder()
                     .forwardRight(17.5,6.25)
                     .raiseArm(5, true)
                     .openRightClaw()
@@ -192,18 +184,14 @@ public class AutoFarBlue extends LinearOpMode {
                     .backwardLeft(6, 1)
                     .turnRight(90)
                     .backwardRight(9, 8)  // -37 60
-                    .build();
-            placeYellow = new MovementSequenceBuilder()
                     .backward(47)
                     .raiseArm(15, true)
-                    .backwardLeft(28.25, 32)
+                    .backwardLeft(28.25, 17)
                     .raiseArm(200, true)
                     .openLeftClaw()
                     .sleepFor(150)
-                    .build();
-            park = new MovementSequenceBuilder()
                     .forward(2)
-                    .left(17)
+                    .left(30)
                     .lowerArm(170, true)
                     .backward(15)
                     .lowerArm(40)
@@ -239,22 +227,22 @@ public class AutoFarBlue extends LinearOpMode {
         }
 
         if (useString) {
-            placePurple = seqs[1];
+            main = seqs[1];
             placeYellow = seqs[2];
             park = seqs[3];
         }
 
 
         // perform the actual movements here in sequence
-        drive.followMovementSequence(placePurple);
+        drive.followMovementSequence(main);
 //        drive.followMovementSequence(approachFirstWhite);
-        drive.followMovementSequence(placeYellow);
-//        for (int i = 0;i<2;i++)
-//        {
-//            drive.followMovementSequence(approachWhite);
-//            drive.followMovementSequence(placeWhite);
-//        }
-        drive.followMovementSequence(park);
+//        drive.followMovementSequence(placeYellow);
+////        for (int i = 0;i<2;i++)
+////        {
+////            drive.followMovementSequence(approachWhite);
+////            drive.followMovementSequence(placeWhite);
+////        }
+//        drive.followMovementSequence(park);
 
         drive.stopController();
     }
