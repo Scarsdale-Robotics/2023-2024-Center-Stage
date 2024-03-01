@@ -45,8 +45,8 @@ public class CVSubsystem extends SubsystemBase {
     private OpenCvCamera camera;
     private DriveSubsystem drive;
 
-    public final int SAMPLE_COUNT = 10;
-    public final long SAMPLE_WAIT_MILLISECONDS = 55;
+    public final int SAMPLE_COUNT = 44;
+    public final long SAMPLE_WAIT_MILLISECONDS = 22;
     public final int LOCATION_LEFT   =  0;
     public final int LOCATION_CENTER =  1;
     public final int LOCATION_RIGHT  =  2;
@@ -176,7 +176,7 @@ public class CVSubsystem extends SubsystemBase {
         ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
         exposureControl.setMode(ExposureControl.Mode.Manual);
         // tune duration at comp, higher for brighter view (ie. in darker environments)
-        exposureControl.setExposure(15, TimeUnit.MILLISECONDS);
+        exposureControl.setExposure(10, TimeUnit.MILLISECONDS);
     }
 
     public void decShutter() {

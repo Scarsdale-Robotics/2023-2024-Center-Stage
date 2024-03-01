@@ -103,7 +103,7 @@ public class PropDetectionPipeline implements VisionProcessor {
         this.output = input;
 
         double maxTotalArea = Double.MIN_VALUE;
-        int best_idx = -999;
+        int best_idx = 2;
 
         for (int i=0; i<3; i++) {
             Rect crop = new Rect(width*i/3,height * 17 / 24,width/3, height * 7 / 24);

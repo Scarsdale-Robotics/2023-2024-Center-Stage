@@ -103,12 +103,12 @@ public class AutoCloseBlueWhiteless extends LinearOpMode {
         } else if (propLocation == 1) {
             purpleYellow = new MovementSequenceBuilder()
                     //(16.75,63.5,-90)
-                    .forwardLeft(39.5, 15)
+                    .forwardLeft(38.5, 15)
                     .raiseArm(10, true)  // 10
                     .turnRight(90)
                     .openRightClaw()
                     .sleepFor(250)
-                    .backwardLeft(25-11.5, 4-14.5-1-2.5)
+                    .backwardLeft(25-11.5, 4-14.5-1-2.5+1)
                     .raiseArm(205, true)  // 215
                     .openLeftClaw()
                     .sleepFor(333)

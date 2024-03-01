@@ -66,9 +66,9 @@ public class InDepSubsystem extends SubsystemBase {
         }
     }
     public enum EndEffector {
-        LEFT_CLAW_OPEN(0.75),
+        LEFT_CLAW_OPEN(0.8),
         LEFT_CLAW_CLOSED(0.55),
-        RIGHT_CLAW_OPEN(0.05),
+        RIGHT_CLAW_OPEN(0.0),
         RIGHT_CLAW_CLOSED(0.25),
         ELBOW_REST(0.763),
         ELBOW_FLIPPED(0.262);
