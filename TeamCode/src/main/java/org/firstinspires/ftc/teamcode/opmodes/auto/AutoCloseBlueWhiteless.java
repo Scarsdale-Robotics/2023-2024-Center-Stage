@@ -97,7 +97,7 @@ public class AutoCloseBlueWhiteless extends LinearOpMode {
                     .right(18)
                     .lowerArm(195, true)  // 20
                     .backward(15)
-                    .forward(5)
+                    .forward(-5)
                     .lowerArm(20, true)
                     .build();
         } else if (propLocation == 1) {
@@ -143,7 +143,7 @@ public class AutoCloseBlueWhiteless extends LinearOpMode {
                     .right(24)
                     .lowerArm(195, true)  // 20
                     .backward(15)
-                    .forward(5)
+                    .forward(-5)
                     .lowerArm(20, true)
                     .build();
         } else if (propLocation == 2) {
@@ -192,7 +192,7 @@ public class AutoCloseBlueWhiteless extends LinearOpMode {
                     .right(30)
                     .lowerArm(195, true)  // 20
                     .backward(15)
-                    .forward(5)
+                    .forward(-5)
                     .lowerArm(20, true)
                     .build();
         }

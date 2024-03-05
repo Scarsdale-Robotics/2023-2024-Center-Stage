@@ -83,8 +83,8 @@ public class AutoCloseRed extends LinearOpMode {
             white = new MovementSequenceBuilder()
                     .forwardLeft(25, 15)
                     .lowerArm(215, true)  // 5
-                    .forward(42)
-                    .forwardRight(16, 27.5)
+                    .forward(38)
+                    .forwardRight(20, 27.5)
                     .forward(5)
                     .closeBothClaws()
                     .sleepFor(123)
